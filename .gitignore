@@ -1,0 +1,16 @@
+
+.vs/*
+AnimationEventLog/.vs/*
+AnimationEventLog/x64/*
+ExtendedWeaponSystem/.vs/*
+ExtendedWeaponSystem/x64/*
+ReverseHelper/.vs/*
+ReverseHelper/x64/*
+common/.vs/*
+common/x64_vc11/*
+f4se/.vs/*
+f4se/f4se_common/.vs/*
+f4se/f4se_common/x64/*
+f4se/x64/*
+x64/*
+x64_vc11/*
