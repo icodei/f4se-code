@@ -5,6 +5,7 @@ bool reloadStarted = false;
 bool reloadEnd = true;
 bool processCurrentWeap = false;
 bool processCurrentScope = false;
+bool playerIsInWorkbench = false;
 
 int currentAmmoCount = 0;
 int ammoCapacity = 0;
@@ -79,8 +80,9 @@ void SprintHandler_Hook(void* arg1, ButtonEvent* event) {
 
 void ReadyWeaponHandler_Hook(void* arg1, ButtonEvent* event) {
 	if ((*g_player) && IsButtonPressed(event)) {
-		//logIfNeeded("Player Weapon Ready Event");
+		logIfNeeded("Player Weapon Ready Event via button press");
 	}
+	logIfNeeded("Player Weapon Ready Event");
 	ReadyWeaponHandler_Original(arg1, event);
 }
 
@@ -89,9 +91,9 @@ std::uint32_t PlayerUseAmmoEvent_ReceiveEvent_Hook(Actor* actor, const WeaponDat
 		if (actor == *g_player) {
 			Actor::MiddleProcess::Data08::EquipData* equipData = GetEquipDataByEquipIndex(EquipIndex::kEquipIndex_Default);
 			TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(a_weapon.item, a_weapon.instanceData);
-			if (weapInst && weapInst != weapInstance) {
-				weapInstance = weapInst;
-				ammoCapacity = weapInstance->ammoCapacity;
+			if (weapInst && weapInst != currentWeapInstance) {
+				currentWeapInstance = weapInst;
+				ammoCapacity = currentWeapInstance->ammoCapacity;
 			}
 			currentAmmoCount = equipData->equippedData->unk18;
 			totalAmmoCount = GetInventoryItemCount(actor, weapInst->ammo);
@@ -110,19 +112,14 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 	static BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
 	static BSFixedString sightedStateEnter("sightedStateEnter");
 	static BSFixedString sightedStateExit("sightedStateExit");
+	static BSFixedString weaponDraw("weaponDraw");
 
-	if (weapInstance && processCurrentWeap)	{
+	if (currentWeapInstance && processCurrentWeap)	{
 		if (!reloadStarted && reloadEnd) {
 			if (evn->name == Event00) {
-				//logIfNeeded("reloadStarted");
 				reloadStartHandle();
 				StopLesserAmmo();
-				if (currentAmmoCount == 0) {
-					isEmptyReload = true;
-				}
-				else {
-					isEmptyReload = false;
-				}
+				isEmptyReload = currentAmmoCount == 0 ? true : false;
 			}
 		}
 		if (reloadStarted && !reloadEnd) {
@@ -169,12 +166,18 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 			logIfNeeded("throw end");
 		}
 	}
-	if (weapInstance && processCurrentScope) {
+	if (evn->name == weaponDraw) {
+		HanldeWeaponEquipAfter3D();
+		return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
+	}
+	if (currentWeapInstance && processCurrentScope) {
 		if (evn->name == sightedStateEnter) {
-			(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, shadeData, true);
+			(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
+			return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
 		}
 		else if (evn->name == sightedStateExit) {
-			(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, shadeData);
+			(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
+			return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
 		}
 	}
 	return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
@@ -184,14 +187,19 @@ EventResult TESEquipEventSink::ReceiveEvent(TESEquipEvent* evn, void* dispatcher
 	if (evn->owner == *g_player && evn->isEquipping) {
 		TESForm* form = LookupFormByID(evn->FormID);
 		if (form && form->formType == kFormType_WEAP) {
-			
-			Actor::MiddleProcess::Data08::EquipData* equipData = GetEquipDataByEquipIndex(EquipIndex::kEquipIndex_Default);
-			if (equipData) {
-				TESObjectWEAP* weap = DYNAMIC_CAST(equipData->item, TESForm, TESObjectWEAP);;
-				TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(equipData->item, equipData->instanceData);
-				logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
-				HanldeWeaponEquip(weapInst);
+			if (playerIsInWorkbench == false) {
+				Actor::MiddleProcess::Data08::EquipData* equipData = GetEquipDataByEquipIndex(EquipIndex::kEquipIndex_Default);
+				if (equipData) {
+					TESObjectWEAP* weap = DYNAMIC_CAST(equipData->item, TESForm, TESObjectWEAP);;
+					TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(equipData->item, equipData->instanceData);
+					logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
+					HanldeWeaponEquip(weapInst);
+				}
 			}
+			else {
+				logIfNeeded("Player EquipEvent recieved but the player is curently in a workbench. We will ignore this equip.");
+			}
+			
 		}
 	}
 	return kEvent_Continue;
@@ -200,9 +208,9 @@ EventResult TESEquipEventSink::ReceiveEvent(TESEquipEvent* evn, void* dispatcher
 EventResult PlayerAmmoCountEventSink::ReceiveEvent(PlayerAmmoCountEvent* evn, void* dispatcher) {
 	if (processCurrentWeap) {
 		if (evn->weapon || evn->weaponInstance || evn->unk08 == 1) {
-			if (evn->unk08 == 1 && evn->weapon && evn->weaponInstance && evn->weaponInstance != weapInstance) {
-				weapInstance = evn->weaponInstance;
-				ammoCapacity = weapInstance->ammoCapacity;
+			if (evn->unk08 == 1 && evn->weapon && evn->weaponInstance && evn->weaponInstance != currentWeapInstance) {
+				currentWeapInstance = evn->weaponInstance;
+				ammoCapacity = currentWeapInstance->ammoCapacity;
 			}
 			currentAmmoCount = evn->ammoCount;
 			totalAmmoCount = evn->totalAmmoCount;
@@ -226,7 +234,7 @@ PlayerSetWeaponStateEventSink playerSetWeaponStateEventSink;
 
 EventResult TESLoadGameHandler::ReceiveEvent(TESLoadGameEvent* evn, void* dispatcher)	{
 	RegisterAfterLoadEvents();
-	if (!oncePerSession) {
+	if (oncePerSession == false) {
 		if (!RegisterAfterLoadEvents()) {
 			logIfNeeded("unable to register for events on game load");
 		}
@@ -247,9 +255,26 @@ EventResult MenuOpenCloseEvent_ReceiveEvent_Hook(void* arg1, MenuOpenCloseEvent*
 }
 
 EventResult BGSOnPlayerUseWorkBenchEventSink::ReceiveEvent(BGSOnPlayerUseWorkBenchEvent* evn, void* dispatcher) {
+	processCurrentWeap = false;
 	processCurrentScope = false;
-	ScopeTextureLoader = nullptr;
-	logIfNeeded("Player used a workbench.");
+	playerIsInWorkbench = true;
+	//logIfNeeded("Player used a workbench.");
+	return kEvent_Continue;
+}
+
+EventResult TESFurnitureEventSink::ReceiveEvent(TESFurnitureEvent* evn, void* dispatcher) {
+	if (evn->actor == (*g_player)) {
+		if (evn->isGettingUp == true) {
+			logIfNeeded("Player is leaving the workbench. We may resume our work.");
+			playerIsInWorkbench = false;
+		}
+		else {
+			logIfNeeded("Player is entering a workbench. We need to ignore certain events during this time.");
+			playerIsInWorkbench = true;
+			processCurrentWeap = false;
+			processCurrentScope = false;
+		}
+	}
 	return kEvent_Continue;
 }
 
@@ -286,6 +311,7 @@ bool Install() { //Called at GameLoaded
 
 	GetEventDispatcher<TESEquipEvent>()->AddEventSink(new TESEquipEventSink());
 	GetEventDispatcher<BGSOnPlayerUseWorkBenchEvent>()->AddEventSink(new BGSOnPlayerUseWorkBenchEventSink());
+	GetEventDispatcher<TESFurnitureEvent>()->AddEventSink(new TESFurnitureEventSink());
 	return toReturn;
 }
 
@@ -307,9 +333,6 @@ bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global even
 		log("Unable to register PlayerWeaponReloadEvent.");
 		return false;
 	}
-
-	
-
 	return true;
 }
 

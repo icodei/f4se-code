@@ -7,28 +7,31 @@
 class NiNode : public NiAVObject
 {
 public:
-	virtual NiRTTI		* GetRTTI(void) override;
-	virtual NiNode		* GetAsNiNode(void) override;
-	virtual const NiNode* IsNode(void) const override;
-	virtual NiObject*	CreateClone(NiCloningProcess* unk1) override;
-	virtual void		LoadBinary(void* stream) override; // LoadBinary
-	virtual void		Unk_1C() override;
-	virtual bool		Unk_1D() override;
-	virtual void		SaveBinary(void* stream) override; // SaveBinary
-	virtual bool		IsEqual(NiObject* object) override; // IsEqual
-	virtual void		ProcessClone(NiCloningProcess& a_cloning) override;
-	virtual void		UpdateControllers(NiUpdateData& a_data) override;
-	virtual void		PerformOp() override;
-	virtual void		AttachProperty() override;
-	virtual NiAVObject* GetObjectByName(BSFixedString& nodeName) override { CALL_MEMBER_FN(this, GetObjectByName_Internal)(nodeName); };
-	virtual void		SetSelectiveUpdateFlags(bool* unk1, bool unk2, bool* unk3) override;
-	virtual void		UpdateDownwardPass() override;
-	virtual void		UpdateSelectedDownwardPass() override;
-	virtual void		UpdateRigidDownwardPass() override;
-	virtual void		UpdateWorldBound() override;
-	virtual void		UpdateTransformAndBounds(NiUpdateData& a_data) override;
-	virtual void		UpdateTransforms(NiUpdateData& a_data) override;
-	virtual void		OnVisible(void) override;
+	//virtual NiRTTI		* GetRTTI(void) override;
+	//virtual NiNode		* GetAsNiNode(void) override;
+	//virtual const NiNode* IsNode(void) const override;
+	//virtual NiObject*	CreateClone(NiCloningProcess* unk1) override;
+	//virtual void		LoadBinary(void* stream) override; // LoadBinary
+	//virtual void		Unk_1C() override;
+	//virtual bool		Unk_1D() override;
+	//virtual void		SaveBinary(void* stream) override; // SaveBinary
+	//virtual bool		IsEqual(NiObject* object) override; // IsEqual
+	//virtual void		ProcessClone(NiCloningProcess& a_cloning) override;
+	//virtual void		UpdateControllers(NiUpdateData& a_data) override;
+	//virtual void		PerformOp() override;
+	//virtual void		AttachProperty() override;
+	//virtual NiAVObject* GetObjectByName(BSFixedString& nodeName) override { CALL_MEMBER_FN(this, GetObjectByName_Internal)(nodeName); };
+	//virtual void		SetSelectiveUpdateFlags(bool* unk1, bool unk2, bool* unk3) override;
+	//virtual void		UpdateDownwardPass() override;
+	//virtual void		UpdateSelectedDownwardPass() override;
+	//virtual void		UpdateRigidDownwardPass() override;
+	//virtual void		UpdateWorldBound() override;
+	//virtual void		UpdateTransformAndBounds(NiUpdateData& a_data) override;
+	//virtual void		UpdateTransforms(NiUpdateData& a_data) override;
+	//virtual void		OnVisible(void) override;
+	
+	//add
+	virtual void		Unk_39(void);
 	virtual void		AttachChild(NiAVObject * obj, bool firstAvail);
 	virtual void		InsertChildAt(UInt32 index, NiAVObject * obj);
 	virtual void		DetachChild(NiAVObject * obj, NiPointer<NiAVObject> & out);

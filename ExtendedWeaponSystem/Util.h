@@ -76,6 +76,8 @@ UInt32 GetInventoryItemCount(Actor* actor, TESForm* item);
 
 void FillWeaponInfo();
 void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap);
+void HanldeWeaponEquipAfter3D();
+BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3);
 
 void reloadStop();
 void reloadContinue();

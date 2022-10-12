@@ -16,16 +16,6 @@ class TESWorldSpace;
 class BGSScene;
 class TESQuest;
 
-
-
-//typedef bool (* _CreateHandleByREFR)(UInt32 * handle, TESObjectREFR * ref);
-//extern RelocAddr <_CreateHandleByREFR> CreateHandleByREFR;
-
-//typedef bool (* _LookupREFRByHandle)(UInt32 * handle, TESObjectREFR ** ref);
-//extern RelocAddr <_LookupREFRByHandle> LookupREFRByHandle;
-
-//extern RelocPtr <UInt32> g_invalidRefHandle;
-
 typedef bool (*_HasDetectionLOS)(Actor* source, TESObjectREFR* target, UInt8* unk1);
 extern RelocAddr<_HasDetectionLOS> HasDetectionLOS;
 
@@ -98,24 +88,26 @@ public:
 	//virtual void	GetFormEditorID() override;
 
 	//add
-	virtual void	Predestroy();
-	virtual void	PreModelLoaderQueueing();
-	virtual void	GetEditorLocation();
-	virtual void	GetEditorLocation2();
-	virtual void	IsTalking();
-	virtual void	ForceEditorLocation();
-	virtual void	Update3DPosition();
-	virtual void	UpdateSoundCallBack();
-	virtual void	SetDialogueWithPlayer();
-	virtual void	AddDynamicIdleCRC();
-	virtual void	GetPreviousDynamicIdleCRCS();
-	virtual void	GetFullLODRef();
-	virtual void	SetFullLODRef();
-	virtual void	GetSequencer();
-	virtual void	QCanUpdateSync();
-	virtual void	GetAllowPromoteToPersistent();
-	virtual void	DoesFloat();
-	virtual void	CheckForCurrentAliasPackage();
+	virtual void	Unk_48();
+	virtual void	Unk_49();
+	virtual void	Unk_4A();
+	virtual void	Unk_4B();
+	virtual void	Unk_4C();
+	virtual void	Unk_4D();
+	virtual void	Unk_4E();
+	virtual void	Unk_4F();
+	virtual void	Unk_50();
+	virtual void	Unk_51();
+	virtual void	Unk_52();
+	virtual void	Unk_53();
+	virtual void	Unk_54();
+	virtual void	Unk_55();
+	virtual void	Unk_56();
+	virtual void	Unk_57();
+	virtual void	Unk_58();
+	virtual void	Unk_59();
+	virtual void	Unk_5A();
+	virtual void	Unk_5B();
 	virtual BGSScene* GetCurrentScene();  // 5C  Returns the Scene this reference is currently participating in, or NULL if it isn't in a scene.
 	virtual void	Unk_5D();
 	virtual void	Unk_5E();
@@ -219,7 +211,7 @@ public:
 	virtual void	Unk_C0();
 	virtual void	Unk_C1();
 	virtual void	Unk_C2();
-	virtual void	Unk_C3();                                                                                                                                    // 8A
+	virtual void	Unk_C3();
 
 
 	enum { kTypeID = kFormType_REFR };
@@ -232,8 +224,8 @@ public:
 	IAnimationGraphManagerHolder				animGraphHolder;		// 48
 	IKeywordFormBase							keywordFormBase;		// 50
 	ActorValueOwner								actorValueOwner;		// 58
-	void* unk60;				// 60
-	void* unk68;				// 68
+	void*										unk60;					// 60
+	void*										unk68;					// 68
 	UInt32										unk70;					// 70
 	UInt32										unk74;					// 74
 	UInt32										unk78;					// 78
@@ -245,13 +237,13 @@ public:
 	UInt64										unkA0;					// A0
 	UInt64										unkA8;					// A8
 	UInt64										unkB0;					// B0
-	TESObjectCELL* parentCell;			// B8
+	TESObjectCELL*								parentCell;				// B8
 	NiPoint3									rot;					// C0, C4, C8 - Probably quat?
 	float										unkCC;
 	NiPoint3									pos;					// D0, D4, D8
 	float										unkDC;
-	TESForm* baseForm;				// E0
-	void* unkE8;				// E8
+	TESForm*									baseForm;				// E0
+	void*										unkE8;					// E8
 
 	struct LoadedData
 	{
@@ -269,9 +261,9 @@ public:
 		// ...
 	};
 
-	LoadedData* unkF0;				// F0 - Root node at 0x08
-	BGSInventoryList* inventoryList;		// F8
-	ExtraDataList* extraDataList;		// 100 - ExtraData?
+	LoadedData*									unkF0;					// F0 - Root node at 0x08
+	BGSInventoryList*							inventoryList;			// F8
+	ExtraDataList*								extraDataList;			// 100 - ExtraData?
 	UInt32										unk104;					// 104
 	UInt32										unk108;					// 108
 
@@ -439,11 +431,11 @@ public:
 
 			struct EquipData
 			{
-				TESForm* item;			// 00
-				TBO_InstanceData* instanceData;	// 08
-				BGSEquipSlot* equipSlot;	// 10
-				UInt64				unk18;			// 18
-				EquippedWeaponData* equippedData;	// 20
+				TESForm*				item;			// 00
+				TBO_InstanceData*		instanceData;	// 08
+				BGSEquipSlot*			equipSlot;		// 10
+				UInt64					unk18;			// 18
+				EquippedWeaponData*		equippedData;	// 20
 			};
 
 			tArray<EquipData> equipData;		// 288

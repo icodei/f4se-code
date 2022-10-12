@@ -15,7 +15,7 @@
       <Project>{d4c128a1-73dc-4941-a453-ce55af239ba8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\f4se\f4se_common\f4se_common.vcxproj">
-      <Project>{f1447a44-f26a-4680-8e20-2d9186766e51}</Project>
+      <Project>{20C6411C-596F-4B85-BE4E-8BC91F59D8A6}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +39,7 @@
     <ClCompile Include="GameExtraData.cpp" />
     <ClCompile Include="GameFormComponents.cpp" />
     <ClCompile Include="GameForms.cpp" />
+    <ClCompile Include="GameHandle.cpp" />
     <ClCompile Include="GameInput.cpp" />
     <ClCompile Include="GameMemory.cpp" />
     <ClCompile Include="GameMenus.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="BSParticleShaderEmitter.h" />
     <ClInclude Include="BSSkin.h" />
     <ClInclude Include="CustomMenu.h" />
+    <ClInclude Include="GameHandle.h" />
     <ClInclude Include="NiSerialization.h" />
     <ClInclude Include="PapyrusArmor.h" />
     <ClInclude Include="PapyrusArmorAddon.h" />

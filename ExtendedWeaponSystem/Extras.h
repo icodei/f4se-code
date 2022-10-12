@@ -7,6 +7,16 @@
 #include "f4se/GameForms.h"
 #include "f4se/BSGraphics.h"
 
+class MemoryManager {
+public:
+
+
+	MEMBER_FN_PREFIX(MemoryManager);
+	DEFINE_MEMBER_FN(Allocate, void*, 0x01B0EFD0, unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired);
+
+	void* Allocate(unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired);
+};
+
 class SceneGraph {
 public:
 
@@ -111,7 +121,7 @@ public:
 	DEFINE_MEMBER_FN(StopEffectShader, void, 0x00311CC0, TESEffectShader* shader, NiAVObject* object, BSEffectShaderData* shaderData);
 
 	DEFINE_MEMBER_FN(CreateEffectShaderData, BSEffectShaderData*, 0x00311570, NiAVObject* object, NiTexture* baseTex, NiTexture* blockoutTex, NiTexture* specialTex);
-	DEFINE_MEMBER_FN(ResetEffectShaderData, void, 0x003116D0, BSEffectShaderData* shadeData, NiAVObject* object, NiTexture* baseTex, NiTexture* blockoutTex, NiTexture* specialTex);
+	DEFINE_MEMBER_FN(ResetEffectShaderData, void, 0x003116D0, BSEffectShaderData* effectShaderData, NiAVObject* object, NiTexture* baseTex, NiTexture* blockoutTex, NiTexture* specialTex);
 
 	unsigned int StartEffectShader(TESEffectShader* shader, NiAVObject* object, BSEffectShaderData* shaderData, bool a4);
 	void StopEffectShader(TESEffectShader* shader, NiAVObject* object, BSEffectShaderData* shaderData);
@@ -121,19 +131,48 @@ public:
 };
 STATIC_ASSERT(sizeof(TESEffectShader) == 0x130);
 
+class DrawWorld {
+public:
+	
+	MEMBER_FN_PREFIX(DrawWorld);
+};
 
+//DrawWorld Static Stuff
+extern RelocPtr<NiAVObject*>			DrawWorld_p1stPerson;
+extern RelocPtr<NiAVObject*>			DrawWorld_pScreenSplatterRoot;
+extern RelocPtr<NiCamera*>				DrawWorld_pCamera;
+extern RelocPtr<NiCamera*>				DrawWorld_pVisCamera;
+extern RelocPtr<NiCamera*>				DrawWorld_pScreenSplatterCamera;
+
+typedef void(**_VATSEffectRenderFunc)(NiCamera*);
+extern RelocPtr<_VATSEffectRenderFunc*>	DrawWorld_VATSEffectRenderFunc;
+typedef void(**_Interface3DRenderFN)(UInt32);
+extern RelocPtr<_Interface3DRenderFN*>	DrawWorld_Interface3DRenderFN;
+typedef void(**_Additional1stPersonFunc)(BSTArray<NiPointer<NiAVObject>>&);
+extern RelocPtr<_Additional1stPersonFunc*>	DrawWorld_Additional1stPersonFunc;
+
+extern RelocPtr<NiPointer<BSGeometry>>	DrawWorld_spUnitBox;
+extern RelocPtr<NiPointer<NiCamera>>	DrawWorld_sp1stPersonCamera;
+
+extern RelocPtr<NiPointer<BSShaderAccumulator>>	DrawWorld_spDraw1stPersonAccum;
+
+extern RelocAddr<BSCullingGroup>		DrawWorld_k1stPersonCullingGroup;
+extern RelocAddr<BSTArray<NiPointer<NiAVObject>>>	DrawWorld_Additional1stPersonGeom;
+//DrawWorld Static Stuff End
 
 namespace BSUtilities {
-	NiAVObject* GetObjectByName(NiAVObject* target, BSFixedString& name, bool a3, bool a4);
+	NiAVObject* GetObjectByName(NiAVObject* target, const BSFixedString& name, bool a3, bool a4);
 }
-typedef NiAVObject* (*_GetObjectByName)(NiAVObject* target, BSFixedString& name, bool a3, bool a4);
+typedef NiAVObject* (*_GetObjectByName)(NiAVObject* target, const BSFixedString& name, bool a3, bool a4);
 extern RelocAddr<_GetObjectByName> GetObjectByName_Internal;
 
 void InstallExtraFunc();
 
-extern RelocPtr <NiPointer<SceneGraph>>	spWorldSceneGraph;
-extern RelocPtr <NiPointer<SceneGraph>>	spMenuRoot;
-extern RelocPtr <NiPointer<SceneGraph>>	sp3DMenuRoot;
+extern RelocPtr<NiPointer<SceneGraph>>	spWorldSceneGraph;
+extern RelocPtr<NiPointer<SceneGraph>>	spMenuRoot;
+extern RelocPtr<NiPointer<SceneGraph>>	sp3DMenuRoot;
 
-extern RelocPtr <NiPointer<NiCamera>>	spCustomCamera;
-extern RelocPtr <NiPointer<NiCamera>>	spCamera;
+extern RelocPtr<NiPointer<NiCamera>>	spCustomCamera;
+extern RelocPtr<NiPointer<NiCamera>>	spCamera;
+
+extern RelocPtr<MemoryManager>			MemoryManager_Instance;

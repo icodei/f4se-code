@@ -10,6 +10,7 @@
 #include "f4se/GameRTTI.h"
 #include "f4se/GameData.h"
 #include "f4se/GameWorkshop.h"
+#include "f4se/GameHandle.h"
 
 #include "f4se/BSGeometry.h"
 #include "f4se/NiExtraData.h"
@@ -415,7 +416,7 @@ namespace papyrusObjectReference {
 					}
 					else
 					{
-						NiAVObject * child = root->GetObjectByName(connectPoint->parent);
+						NiAVObject * child = root->GetObjectByName(&connectPoint->parent);
 						if(child)
 							parent = child;
 					}
@@ -519,7 +520,7 @@ namespace papyrusObjectReference {
 				parent = root;
 			else
 			{
-				NiAVObject * child = root->GetObjectByName(connectPoint->parent);
+				NiAVObject * child = root->GetObjectByName(&connectPoint->parent);
 				if(child)
 					parent = child;
 			}

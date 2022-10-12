@@ -97,6 +97,12 @@ public:
 	virtual EventResult ReceiveEvent(BGSOnPlayerUseWorkBenchEvent* evn, void* dispatcher) override;
 };
 
+class TESFurnitureEventSink : public BSTEventSink<TESFurnitureEvent> {
+public:
+	virtual ~TESFurnitureEventSink() { };
+	virtual EventResult ReceiveEvent(TESFurnitureEvent* evn, void* dispatcher) override;
+};
+
 typedef void(*_TogglePOV)(void* arg1, ButtonEvent* event);
 typedef void(*_MovementHandler)(void*, ButtonEvent*);
 typedef void(*_SprintHandler)(void*, ButtonEvent*);

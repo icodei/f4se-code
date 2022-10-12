@@ -1,17 +1,15 @@
 #pragma once
 
-#include "f4se/NiObjects.h"
 #include "f4se/BSLight.h"
-
-
-
-class BSShaderMaterial;
-class BSParticleShaderCubeEmitter;
-class NiTexture;
-class BSRenderPass;
-class BSFadeNode;
+#include "f4se/NiObjects.h"
+#include "f4se/NiTypes.h"
+#include "f4se/NiTextures.h"
 
 class BSEffectShaderMaterial;
+class BSFadeNode;
+class BSParticleShaderCubeEmitter;
+class BSRenderPass;
+class BSShaderMaterial;
 
 class NiProperty : public NiObjectNET
 {
@@ -106,6 +104,18 @@ public:
 	bool							bIgnoreBaseGeomTexAlpha;	// 89
 	bool							bLighting;					// 8A
 	bool							bAlpha;						// 8B
+
+	inline BSEffectShaderData() {
+		CALL_MEMBER_FN(this, ctor)();
+	}
+	inline ~BSEffectShaderData() {
+		CALL_MEMBER_FN(this, dtor)();
+	}
+
+	MEMBER_FN_PREFIX(BSEffectShaderData);
+	DEFINE_MEMBER_FN(ctor, void, 0x001D10C0);
+	DEFINE_MEMBER_FN(dtor, void, 0x001D1500);
+
 };
 
 // 70
@@ -137,7 +147,7 @@ public:
 	DEFINE_MEMBER_FN(SetMaterial, bool, 0x027BC560, BSShaderMaterial * material, bool unk1);
 	DEFINE_MEMBER_FN(SetFlag, void, 0x027BC3E0, UInt8 flags, bool enabled); // sets or unsets particular flags
 
-	DEFINE_MEMBER_FN(SetEffectShaderData, void, 0x001D1E2B, BSEffectShaderData* shaderData);
+	DEFINE_MEMBER_FN(SetEffectShaderData, void, 0x001D1DF0, BSEffectShaderData* shaderData);
 
 	void SetEffectShaderData(BSEffectShaderData* shaderData);
 };

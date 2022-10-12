@@ -133,7 +133,7 @@
       </SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL</PreprocessorDefinitions>
       <ConformanceMode>Default</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;E:\Games\Tools\Bethesda\My Mods\F4SE\F4SEPlugins-master\common;E:\Games\Tools\Bethesda\My Mods\F4SE\F4SEPlugins-master\f4se\xbyak;E:\Games\Tools\Bethesda\My Mods\F4SE\F4SEPlugins-master\f4se;E:\Games\Tools\Bethesda\My Mods\F4SE\F4SEPlugins-master\f4se\f4se_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\common;$(SolutionDir)\f4se\xbyak;$(SolutionDir)\f4se;$(SolutionDir)\f4se\f4se_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
       <PrecompiledHeader />

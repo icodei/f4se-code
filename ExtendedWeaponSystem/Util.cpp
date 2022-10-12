@@ -1,5 +1,5 @@
 #include "Global.h"
-
+#include "f4se/NiObjects.h"
 bool IsReloading() {
 	if (!*g_player)
 		return false;
@@ -212,7 +212,6 @@ BSFixedString GetDisplayName(ExtraDataList* extraDataList, TESForm* kbaseForm) {
 		if (pFullName)
 			return pFullName->name;
 	}
-
 	return BSFixedString();
 }
 
@@ -335,72 +334,211 @@ void FillWeaponInfo() {
 void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap) {
 	TESObjectWEAP::InstanceData* equippedWeaponInstance = weap;
 	TESObjectWEAP* weapBase = (TESObjectWEAP*)equippedWeaponInstance;
-	if (HasKeywordInstWEAP(weap, reloadSequentialKeyword) || (WornHasKeywordActor(*g_player, reloadSequentialKeyword))) {
+	currentWeapInstance = equippedWeaponInstance;
+	if (HasKeywordInstWEAP(weap, reloadSequentialKeyword) || WornHasKeywordActor(*g_player, reloadSequentialKeyword)) {
 		processCurrentWeap = true;
-		if (equippedWeaponInstance && processCurrentWeap) {
-			ammoCapacity = equippedWeaponInstance->ammoCapacity;
-			weapInstance = equippedWeaponInstance;
-			logIfNeeded("reloadSequentialKeyword found. We should process this weapon for sequential reloads.");
-			logIfNeeded("weapon instance equipped with ammo capacity of:" + std::to_string(weapInstance->ammoCapacity));
-		}
+		ammoCapacity = equippedWeaponInstance->ammoCapacity;
+		logIfNeeded("reloadSequentialKeyword found. We should process this weapon for sequential reloads.");
+		logIfNeeded("weapon instance equipped with ammo capacity of:" + std::to_string(currentWeapInstance->ammoCapacity));
+		
 	}
 	else {
 		logIfNeeded("No reloadSequentialKeyword found. We can ignore this weapon for sequential reloads.");
-		weapInstance = nullptr;
 		processCurrentWeap = false;
 	}
-
-	NiAVObject* player3D = nullptr;
-	NiAVObject* objGeom = nullptr;
-	BSEffectShaderProperty* shadeprop;
-	BSEffectShaderMaterial* shadematerial;
-	BSFixedString targetName = "TextureLoader";
-	if (HasKeywordInstWEAP(weap, ThermalScopeKeyword) || (WornHasKeywordActor(*g_player, ThermalScopeKeyword))) {
+	if (HasKeywordInstWEAP(weap, ThermalScopeKeyword) || WornHasKeywordActor(*g_player, ThermalScopeKeyword)) {
+		processCurrentScope = true;
 		logIfNeeded("ThermalScopeKeyword found. We should process this weapon for special scope utility.");
-		if (player3D == nullptr || objGeom == nullptr) {
-			player3D = (*g_player)->GetActorRootNode(true);
-			if (player3D != nullptr) {
+	}
+	else {
+		processCurrentScope = false;
+		logIfNeeded("No ThermalScopeKeyword found. We can ignore this weapon for special scope utility.");
+	}
+}
+
+//Called from anim event of weapon equip. This should happen after the 3d is loaded hopefully
+void HanldeWeaponEquipAfter3D() {
+	BSFadeNode* player3D = nullptr;
+	BSGeometry* objGeom = nullptr;
+	NiPointer<BSShaderProperty> shaderProperty;
+	BSEffectShaderProperty* effectShaderProperty;
+	BSEffectShaderMaterial* effectShaderMaterial;
+	const BSFixedString targetName = "TextureLoader:0";
+	if (processCurrentScope) {
+		logIfNeeded("The 3D should be loaded now. We should be able to interact with geometry now.");
+		if (!objGeom) {
+			//player3D = (*g_player) ? (*g_player)->GetActorRootNode(true) : nullptr;
+			player3D = (*g_player) ? (BSFadeNode*)(*g_player)->GetObjectRootNode() : nullptr;
+			if (player3D) {
 				logIfNeeded("Got player 3D.");
-				//objGeom = player3D->GetObjectByName(targetName);
-				objGeom = BSUtilities::GetObjectByName(player3D, targetName, true, true);
-				//if (objGeom == nullptr) {
-				//	logIfNeeded("NiNode vtable unable to find Scope Geom, Trying with BSUtilities now...");
-				//	objGeom = BSUtilities::GetObjectByName(player3D, targetName, true, true);
-				//}
+				//_MESSAGE("player3D %llx", player3D);
+				objGeom = BSUtilities::GetObjectByName(player3D, targetName, true, true)->GetAsBSGeometry();
+				if (!objGeom) {
+					logIfNeeded("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
+					for (UInt32 i = 0; i < player3D->kGeomArray.count; i++) {
+						BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
+						if (object->m_name == targetName) {
+							objGeom = object;
+							//_MESSAGE("objGeom %llx", objGeom);
+						}
+					}
+				}
+				if (!objGeom) {
+					logIfNeeded("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
+					for (UInt32 i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
+						NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
+						if (object) {
+							if (object->m_name == targetName) {
+								objGeom = object.get()->GetAsBSGeometry();
+								//_MESSAGE("objGeom %llx", objGeom);
+							}
+						}
+					}
+				}
 				if (objGeom) {
 					logIfNeeded("Found the geometry of the scope.");
-					ScopeTextureLoader = objGeom->GetAsBSGeometry();
-					shadeprop = (BSEffectShaderProperty*)ScopeTextureLoader->shaderProperty.m_pObject;
-					shadematerial = shadeprop->QEffectShaderMaterial();
-					shadeData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, shadematerial->spBaseTexture.m_pObject, shadematerial->spBaseTexture.m_pObject, shadematerial->spBaseTexture.m_pObject);
-					shadeprop->SetEffectShaderData(shadeData);
-					shadeprop->SetupGeometry(ScopeTextureLoader);
-					logIfNeeded("Scope materials setup complete.");
-					processCurrentScope = true;
+					ScopeTextureLoader = objGeom;
+					shaderProperty = ni_cast(ScopeTextureLoader->shaderProperty, BSShaderProperty);
+					effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
+					if (shaderProperty.get()) {
+						logIfNeeded("Got the EffectShaderProperty");
+						//effectShaderMaterial = effectShaderProperty->QEffectShaderMaterial();
+						effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
+						//effectShaderData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
+						effectShaderData = CreateEffectShaderDataCustom(ThermalFXS, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
+						effectShaderProperty->SetEffectShaderData(effectShaderData);
+						if (effectShaderProperty->SetupGeometry(ScopeTextureLoader)) {
+							logIfNeeded("Geometry was setup with the shaders.");
+						}
+						else {
+							logIfNeeded("Geometry was unable to be setup.");
+						}
+						logIfNeeded("Scope materials setup complete.");
+					}
 				}
 				else {
 					logIfNeeded("Could not find the geometry of the scope.");
-					(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, shadeData);
+					(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
 					processCurrentScope = false;
-					ScopeTextureLoader = nullptr;
-					objGeom = nullptr;
-					player3D = nullptr;
-					shadeprop = nullptr;
-					shadematerial = nullptr;
 				}
 			}
 		}
 	}
+}
+
+BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3) {
+	//TESEffectShader::CreateEffectShaderData but without the reset part breaking it
+	BSEffectShaderData* newEffectShaderData = (BSEffectShaderData*)MemoryManager_Instance->Allocate(0x88, 0, false);
+	if (newEffectShaderData) {
+		newEffectShaderData->m_refCount = 0;
+		newEffectShaderData->pNodeFilterFunction = 0i64;
+		newEffectShaderData->spBaseTexture.m_pObject = NULL;
+		newEffectShaderData->spPaletteTexture.m_pObject = NULL;
+		newEffectShaderData->spBlockOutTexture.m_pObject = NULL;
+		newEffectShaderData->eTextureClampMode = 3;
+		newEffectShaderData->FillColor.g = 0.0;
+		newEffectShaderData->FillColor.a = 0.0;
+		newEffectShaderData->RimColor.g = 0.0;
+		newEffectShaderData->RimColor.a = 0.0;
+		newEffectShaderData->fBaseFillScale = 1.0;
+		newEffectShaderData->fBaseFillAlpha = 1.0;
+		newEffectShaderData->fBaseRimAlpha = 1.0;
+		newEffectShaderData->fVOffset = 0.0;
+		newEffectShaderData->fUScale = 1.0;
+		newEffectShaderData->fVScale = 1.0;
+		newEffectShaderData->fEdgeExponent = 1.0;
+		newEffectShaderData->eSrcBlend = NiAlphaProperty::AlphaFunction::kAlpha_SrcAlpha;
+		newEffectShaderData->eDestBlend = NiAlphaProperty::AlphaFunction::kAlpha_InvSrcAlpha;
+		newEffectShaderData->eZTestFunc = 1;
+		newEffectShaderData->bBaseTextureProjectedUVs = 0;
+	}
 	else {
-		logIfNeeded("No ThermalScopeKeyword found. We can ignore this weapon for special scope utility.");
-		processCurrentScope = false;
-		ScopeTextureLoader = nullptr;
-		objGeom = nullptr;
-		player3D = nullptr;
+		newEffectShaderData = NULL;
+	}
+	InterlockedIncrement(&newEffectShaderData->m_refCount);
+
+	NiPointer<NiTexture> textureShaderTexture;
+	NiPointer<NiTexture> blockOutTexture;
+	NiPointer<NiTexture> paletteTexture;
+
+	gShaderManagerInstance->GetTexture(shader->textureShaderTexture.str.c_str(), false, textureShaderTexture, true, true ,true);
+	gShaderManagerInstance->GetTexture(shader->blockOutTexture.str.c_str(), false, blockOutTexture, true, true, true);
+	gShaderManagerInstance->GetTexture(shader->paletteTexture.str.c_str(), false, paletteTexture, true, true, true);
+
+	newEffectShaderData->spBaseTexture = textureShaderTexture;
+	newEffectShaderData->spBlockOutTexture = blockOutTexture;
+	newEffectShaderData->spPaletteTexture = paletteTexture;
+
+
+	newEffectShaderData->FillColor.r = (float)BYTE0(shader->data.fillColor1) * FToRGB;
+	newEffectShaderData->FillColor.g = (float)BYTE1(shader->data.fillColor1) * FToRGB;
+	newEffectShaderData->FillColor.b = (float)BYTE2(shader->data.fillColor1) * FToRGB;
+	newEffectShaderData->FillColor.a = 0.0 * FToRGB;
+
+	float rimColorR = BYTE0(shader->data.edgeColor);
+	float rimColorG = BYTE1(shader->data.edgeColor);
+	float rimColorB = BYTE2(shader->data.edgeColor);
+
+	newEffectShaderData->RimColor.r = (float)rimColorR * FToRGB;
+	newEffectShaderData->RimColor.g = (float)rimColorG * FToRGB;
+	newEffectShaderData->RimColor.b = (float)rimColorB * FToRGB;
+	newEffectShaderData->RimColor.a = 0.0 * FToRGB;
+
+	float fillAlpha;
+	if (shader->data.fillAlphaFadeInTime == 0.0 && shader->data.fillAlphaFullTime == 0.0) {
+		fillAlpha = shader->data.fillAlphaFullPercent;
+	}
+	else {
+		fillAlpha = 0.0;
+	}
+	newEffectShaderData->fBaseFillAlpha = fillAlpha;
+	float edgeAlpha;
+	if (shader->data.edgeAlphaFadeInTime == 0.0 && shader->data.edgeAlphaFullTime == 0.0) {
+		edgeAlpha = shader->data.edgeAlphaFullPercent;
+	}
+	newEffectShaderData->fBaseRimAlpha = edgeAlpha;
+	newEffectShaderData->fUOffset = 0;
+	newEffectShaderData->fUScale = shader->data.fillTextureUScale;
+	newEffectShaderData->fVScale = shader->data.fillTextureVScale;
+	newEffectShaderData->fEdgeExponent = shader->data.edgeExponentValue;
+
+	newEffectShaderData->eSrcBlend = NiAlphaProperty::AlphaFunction::kAlpha_SrcAlpha;
+	newEffectShaderData->eDestBlend = NiAlphaProperty::AlphaFunction::kAlpha_InvSrcAlpha;
+	newEffectShaderData->eZTestFunc = 1;
+	newEffectShaderData->ucAlphaTestRef = shader->data.alphaTestStartValue;
+	newEffectShaderData->bGrayscaleToColor = (shader->data.flags & 2) != 0;
+	newEffectShaderData->bGrayscaleToAlpha = (shader->data.flags & 4) != 0;
+	newEffectShaderData->bIgnoreTextureAlpha = (shader->data.flags & 64) != 0;
+	newEffectShaderData->bBaseTextureProjectedUVs = (shader->data.flags & 128) != 0;
+	newEffectShaderData->bIgnoreBaseGeomTexAlpha = BYTE1(shader->data.flags) & 1;
+	newEffectShaderData->bLighting = (shader->data.flags & 512) != 0;
+	newEffectShaderData->bAlpha = (shader->data.flags & 2048) != 0;
+
+	if ((shader->data.flags & 16) != 0)
+	{
+		rimColorG = rimColorG - 255.0;
+		rimColorB = rimColorB - 255.0;
+		newEffectShaderData->RimColor.r = (float)(rimColorR - 255.0) * FToRGB;
+	}
+	else
+	{
+		newEffectShaderData->RimColor.r = rimColorR * FToRGB;
+	}
+	newEffectShaderData->RimColor.g = rimColorG * FToRGB;
+	newEffectShaderData->RimColor.b = rimColorB * FToRGB;
+	newEffectShaderData->RimColor.a = 0.0 * FToRGB;
+
+	if (effectShaderData == newEffectShaderData) {
+		newEffectShaderData->~BSEffectShaderData();
+		return effectShaderData;
+
+	}
+	else {
+		return newEffectShaderData;
 	}
 }
 
-//code from bingle
+//code from Bingle
 //void ReloadSubgraph()
 //{
 //	uint64_t oldSubgraph = p->currentProcess->middleHigh->currentWeaponSubGraphID[1].identifier;
@@ -482,18 +620,18 @@ void StopLesserAmmo() {
 
 //Set weapon capacity to needed amount to be sure reloadComplete fills needed amount of ammo
 void SetWeapAmmoCapacity(int amount) {
-	if (weapInstance) {
-		if (amount > ammoCapacity) {
-			weapInstance->ammoCapacity = ammoCapacity;
-			logIfNeeded("ammo count set to: " + std::to_string(ammoCapacity));
+	if (currentWeapInstance) {
+		if (amount > ammoCapacity) { //This if statement is for when ammo complete of the animation goes over the original max ammo count. Will be edited later for +1 and +2 loading
+			currentWeapInstance->ammoCapacity = ammoCapacity;
+			logIfNeeded("Ammo count set to: " + std::to_string(ammoCapacity));
 		}
 		else {
-			weapInstance->ammoCapacity = amount;
-			logIfNeeded("ammo count set to: " + std::to_string(amount));
+			currentWeapInstance->ammoCapacity = amount;
+			logIfNeeded("Ammo count set to: " + std::to_string(amount));
 		}
 	}
 	else {
-		log("weapon instance is nullptr. Could not set ammo");
+		log("Weapon instance is nullptr. Could not set ammo.");
 	}
 }
 

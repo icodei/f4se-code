@@ -14,11 +14,11 @@ bool logEnabled = true;
 bool oncePerSession = false;
 
 BSGeometry* ScopeTextureLoader = nullptr;
-BSEffectShaderData* shadeData = nullptr;
+BSEffectShaderData* effectShaderData = nullptr;
 TESEffectShader* ThermalFXS = nullptr;
 BGSKeyword* ThermalScopeKeyword = nullptr;
 BGSKeyword* reloadSequentialKeyword = nullptr;
-TESObjectWEAP::InstanceData* weapInstance = nullptr;
+TESObjectWEAP::InstanceData* currentWeapInstance = nullptr;
 
 void OnF4SEMessage(F4SEMessagingInterface::Message* msg) {
 	switch (msg->type) {
@@ -47,6 +47,7 @@ void OnF4SEMessage(F4SEMessagingInterface::Message* msg) {
 		reloadEnd = true;
 		processCurrentWeap = false;
 		processCurrentScope = false;
+		playerIsInWorkbench = false;
 		FillWeaponInfo();
 		break;
 	}

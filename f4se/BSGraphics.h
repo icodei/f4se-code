@@ -9,6 +9,7 @@
 #include "d3d11.h"
 
 class BSGeometryData;
+class BSCullingGroup;
 
 //struct ID3D11Buffer;
 //struct ID3D11ComputeShader;
@@ -348,10 +349,10 @@ public:
 
 	};
 	MEMBER_FN_PREFIX(BSShaderManager);
-	DEFINE_MEMBER_FN(GetTexture, void, 0x027D61F0, char * a1, bool a2, NiPointer<NiTexture> & a3, bool a4, bool a5, bool a6);
+	DEFINE_MEMBER_FN(GetTexture, void, 0x027D61F0, const char* filePath, bool a2, NiPointer<NiTexture>& returnTex, bool a4, bool a5, bool a6);
 
 
-	void GetTexture(char* a1, bool a2, NiPointer<NiTexture>& a3, bool a4, bool a5, bool a6);
+	void GetTexture(const char* filePath, bool a2, NiPointer<NiTexture>& returnTex, bool a4, bool a5, bool a6);
 };
 
 class BSShaderAccumulator {
@@ -371,11 +372,9 @@ public:
 
 extern RelocPtr <BSGraphics::Context*>					pCurContext;
 extern RelocPtr <BSGraphics::Context*>					pDefaultContext;
-//extern RelocPtr <BSGraphics::BSRenderer*>				pRenderer;
 extern RelocPtr <BSGraphics::Renderer>					gRenderer;
 extern RelocPtr <BSGraphics::RendererData*>				pRendererData;
 extern RelocPtr <BSGraphics::RendererWindow*>			pRendererWindow;
-//extern RelocPtr <BSGraphics::BSRenderManager>			gRenderManager;
 extern RelocPtr <BSGraphics::State>						gRenderState;
 extern RelocPtr <BSGraphics::RenderTargetManager>		gRenderTargetManager;
 extern RelocPtr <BSShaderAccumulator*>					pCurrentShaderAccumulator;

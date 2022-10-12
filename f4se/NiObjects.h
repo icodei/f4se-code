@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "f4se/GameTypes.h"
 #include "f4se/NiTypes.h"
 
@@ -20,9 +22,6 @@ class bhkBlendCollisionObject;
 class bhkNPCollisionObject;
 class bhkRigidBody;
 class bhkLimitedHingeConstraint;
-
-class BSFadeNode;
-class BSMultiBoundNode;
 
 typedef void (* _WorldToScreen)(NiPoint3 * in, NiPoint3 * out);
 extern RelocAddr <_WorldToScreen> WorldToScreen_Internal;
@@ -50,10 +49,10 @@ class NiObject : public NiRefObject
 public:
 	virtual NiRTTI				* GetRTTI(void) { return nullptr; };
 	virtual NiNode				* GetAsNiNode(void) { return nullptr; };
-	virtual const NiNode		* IsNode(void) const { return nullptr; };
 	virtual NiSwitchNode		* GetAsNiSwitchNode(void) { return nullptr; };
-	virtual BSFadeNode			* GetAsBSFadeNode() { return nullptr; };
-	virtual BSMultiBoundNode	* GetAsBSMultiBoundNode() { return nullptr; };
+	virtual void				* Unk_05() { return nullptr; };
+	virtual void				* Unk_06() { return nullptr; };
+	virtual void				* Unk_07() { return nullptr; };
 	virtual BSGeometry			* GetAsBSGeometry(void) { return nullptr; };
 	virtual void				* GetAsBStriStrips() { return nullptr; };
 	virtual BSTriShape			* GetAsBSTriShape(void) { return nullptr; };
@@ -140,7 +139,7 @@ public:
 	virtual void SetMaterialNeedsUpdate(bool unk); // empty?
 	virtual void SetDefaultMaterialNeedsUpdateFlag(bool unk); // empty?
 	virtual void SetAppCulled(bool set);
-	virtual NiAVObject * GetObjectByName(BSFixedString & nodeName);
+	virtual NiAVObject * GetObjectByName(const BSFixedString* nodeName);
 	virtual void SetSelectiveUpdateFlags(bool * unk1, bool unk2, bool * unk3);
 	virtual void UpdateDownwardPass();
 	virtual void UpdateSelectedDownwardPass();
@@ -149,9 +148,8 @@ public:
 	virtual void UpdateWorldData(NiUpdateData * a_data);
 	virtual void UpdateTransformAndBounds(NiUpdateData & a_data);
 	virtual void UpdateTransforms(NiUpdateData& a_data);
-	virtual void PreAttachUpdate(NiNode* a_eventualParent, NiUpdateData& a_data);
-	virtual void PostAttachUpdate();
-	virtual void OnVisible();
+	virtual void PreAttachUpdate(NiNode* a_eventualParent, NiUpdateData& a_data); //37?
+	virtual void PostAttachUpdate(); //38?
 
 	NiNode						* m_parent;				// 28
 	NiTransform					m_localTransform;		// 30
@@ -205,24 +203,6 @@ public:
 	DEFINE_MEMBER_FN(SetScenegraphChange, void, 0x01BA47C0);
 
 	// Return true in the functor to halt traversal
-	template<typename T>
-	bool Visit(T & functor)
-	{
-		if (functor(this))
-			return true;
-
-		NiPointer<NiNode> node(GetAsNiNode());
-		if(node) {
-			for(UInt32 i = 0; i < node->m_children.m_emptyRunStart; i++) {
-				NiPointer<NiAVObject> object(node->m_children.m_data[i]);
-				if(object) {
-					if (object->Visit(functor))
-						return true;
-				}
-			}
-		}
-
-		return false;
-	}
+	bool Visit(const std::function<bool(NiAVObject*)>& functor);
 };
-//STATIC_ASSERT(sizeof(NiAVObject) == 0x120);
+STATIC_ASSERT(sizeof(NiAVObject) == 0x120);
