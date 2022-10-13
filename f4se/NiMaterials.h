@@ -5,9 +5,6 @@
 #include "f4se/NiTextures.h"
 #include "f4se/NiProperties.h"
 
-
-class NiTexture;
-class BSTextureSet;
 class NiStream;
 class BSShaderData;
 class BSTriShape;
@@ -20,19 +17,18 @@ class BSEffectShaderPropertyColorController;
 struct BSNiAlphaPropertyTestRefController;
 
 // 38
-class BSShaderMaterial
-{
+class BSShaderMaterial {
 public:
 	virtual ~BSShaderMaterial();
 
 	virtual BSShaderMaterial	* Create();
-	virtual void	CopyMembers(const BSShaderMaterial * other);
-	virtual void	ComputeCRC32(UInt32, bool);
+	virtual void				CopyMembers(const BSShaderMaterial * other);
+	virtual void				ComputeCRC32(UInt32, bool);
 	virtual BSShaderMaterial	* GetDefault();
-	virtual UInt32	GetType();
-	virtual UInt32	GetFeature(); // 2 for Lighting shaders, 1 for effect shaders
-	virtual void	Compare(const BSShaderMaterial & other);
-	virtual void	IsCopy(const BSShaderMaterial * other);
+	virtual UInt32				GetType();
+	virtual UInt32				GetFeature(); // 2 for Lighting shaders, 1 for effect shaders
+	virtual void				Compare(const BSShaderMaterial & other);
+	virtual void				IsCopy(const BSShaderMaterial * other);
 
 	volatile UInt32	m_refCount;		// 08
 	NiPoint2	textCoordOffset[2];	// 0C

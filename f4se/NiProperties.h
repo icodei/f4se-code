@@ -1,20 +1,66 @@
 #pragma once
 
+#include "f4se/BSGraphics.h"
 #include "f4se/BSLight.h"
 #include "f4se/NiObjects.h"
-#include "f4se/NiTypes.h"
 #include "f4se/NiTextures.h"
+#include "f4se/NiTypes.h"
 
 class BSEffectShaderMaterial;
 class BSFadeNode;
 class BSParticleShaderCubeEmitter;
+
 class BSRenderPass;
+class BSShader;
+class BSShaderAccumulator;
+
 class BSShaderMaterial;
 
 class NiProperty : public NiObjectNET
 {
 public:
 	virtual ~NiProperty();
+	//NiRefObject::DeleteThis
+	//virtual NiRTTI				* GetRTTI() override;
+	//NiObject::IsNode
+	//NiObject::IsNode
+	//NiObject::IsSwitchNode
+	//NiObject::IsFadeNode
+	//NiObject::IsMultiBoundNode
+	//NiObject::IsGeometry
+	//NiObject::IsTriStrips
+	//NiObject::IsTriShape
+	//NiObject::IsDynamicTriShape
+	//NiObject::IsSegmentedTriShape
+	//NiObject::IsSubIndexTriShape
+	//NiObject::IsNiGeometry
+	//NiObject::IsNiTriBasedGeom
+	//NiObject::IsNiTriShape
+	//NiObject::IsParticlesGeom
+	//NiObject::IsParticleSystem
+	//NiObject::IsLinesGeom
+	//NiObject::IsLight
+	//NiObject::IsBhkNiCollisionObject
+	//NiObject::IsBhkBlendCollisionObject
+	//NiObject::IsBhkRigidBody
+	//NiObject::IsBhkLimitedHingeConstraint
+	//NiObject::IsbhkNPCollisionObject
+	//virtual NiObject			* CreateClone(NiCloningProcess* unk1) override { return nullptr; };
+	//virtual void				LoadBinary(void* stream) override { }; // LoadBinary
+	//virtual void				LinkObject() override { }; //1C
+	//virtual bool				RegisterStreamables() override { return false; }; //1D
+	//virtual void				SaveBinary(void* stream) override { }; // SaveBinary
+	//virtual bool				IsEqual(NiObject* object) override { return false; }	// IsEqual
+	//NiObjectNET::ProcessClone
+	//NiObjectNET::PostLinkObject
+	//NiObject::StreamCanSkip
+	//NiObject::GetStreamableRTTI
+	//NiObject::GetBlockAllocationSize
+	//NiObject::GetGroup
+	//NiObject::SetGroup
+	//NiObject::IsNiControllerManager
+	virtual SInt32				GetType(void);
+	virtual void				Update(NiAVObject::NiUpdateData&);
 
 	enum
 	{
@@ -22,7 +68,7 @@ public:
 		kTypeShade = 1
 	};
 
-	virtual SInt32 GetType(void);
+	
 };
 
 // 30
@@ -30,6 +76,47 @@ class NiAlphaProperty : public NiProperty
 {
 public:
 	virtual ~NiAlphaProperty();
+	//NiRefObject::DeleteThis
+	//virtual NiRTTI				* GetRTTI() override;
+	//NiObject::IsNode
+	//NiObject::IsNode
+	//NiObject::IsSwitchNode
+	//NiObject::IsFadeNode
+	//NiObject::IsMultiBoundNode
+	//NiObject::IsGeometry
+	//NiObject::IsTriStrips
+	//NiObject::IsTriShape
+	//NiObject::IsDynamicTriShape
+	//NiObject::IsSegmentedTriShape
+	//NiObject::IsSubIndexTriShape
+	//NiObject::IsNiGeometry
+	//NiObject::IsNiTriBasedGeom
+	//NiObject::IsNiTriShape
+	//NiObject::IsParticlesGeom
+	//NiObject::IsParticleSystem
+	//NiObject::IsLinesGeom
+	//NiObject::IsLight
+	//NiObject::IsBhkNiCollisionObject
+	//NiObject::IsBhkBlendCollisionObject
+	//NiObject::IsBhkRigidBody
+	//NiObject::IsBhkLimitedHingeConstraint
+	//NiObject::IsbhkNPCollisionObject
+	//NiAlphaProperty::CreateClone
+	//NiAlphaProperty::LoadBinary
+	//NiAlphaProperty::LinkObject
+	//NiAlphaProperty::RegisterStreamables
+	//NiAlphaProperty::SaveBinary
+	//NiAlphaProperty::IsEqual
+	//NiObjectNET::ProcessClone
+	//NiObjectNET::PostLinkObject
+	//NiObject::StreamCanSkip
+	//NiObject::GetStreamableRTTI
+	//NiObject::GetBlockAllocationSize
+	//NiObject::GetGroup
+	//NiObject::SetGroup
+	//NiObject::IsNiControllerManager
+	//NiAlphaProperty::Type
+	//NiProperty::Update
 
 	enum AlphaFunction
 	{
@@ -69,8 +156,49 @@ class NiShadeProperty : public NiProperty
 {
 public:
 	virtual ~NiShadeProperty();
+	//NiRefObject::DeleteThis
+	//virtual NiRTTI				* GetRTTI() override;
+	//NiObject::IsNode
+	//NiObject::IsNode
+	//NiObject::IsSwitchNode
+	//NiObject::IsFadeNode
+	//NiObject::IsMultiBoundNode
+	//NiObject::IsGeometry
+	//NiObject::IsTriStrips
+	//NiObject::IsTriShape
+	//NiObject::IsDynamicTriShape
+	//NiObject::IsSegmentedTriShape
+	//NiObject::IsSubIndexTriShape
+	//NiObject::IsNiGeometry
+	//NiObject::IsNiTriBasedGeom
+	//NiObject::IsNiTriShape
+	//NiObject::IsParticlesGeom
+	//NiObject::IsParticleSystem
+	//NiObject::IsLinesGeom
+	//NiObject::IsLight
+	//NiObject::IsBhkNiCollisionObject
+	//NiObject::IsBhkBlendCollisionObject
+	//NiObject::IsBhkRigidBody
+	//NiObject::IsBhkLimitedHingeConstraint
+	//NiObject::IsbhkNPCollisionObject
+	//NiShadeProperty::CreateClone
+	//NiShadeProperty::LoadBinary
+	//NiShadeProperty::LinkObject
+	//NiShadeProperty::RegisterStreamables
+	//NiShadeProperty::SaveBinary
+	//NiShadeProperty::IsEqual
+	//NiObjectNET::ProcessClone
+	//NiObjectNET::PostLinkObject
+	//NiObject::StreamCanSkip
+	//NiObject::GetStreamableRTTI
+	//NiObject::GetBlockAllocationSize
+	//NiObject::GetGroup
+	//NiObject::SetGroup
+	//NiObject::IsNiControllerManager
+	//NiShadeProperty::Type
+	//NiProperty::Update
+	virtual void SetupGeometry();
 
-	virtual void Unk_23(void);
 };
 
 // 90
@@ -122,6 +250,86 @@ public:
 class BSShaderProperty : public NiShadeProperty
 {
 public:
+
+	class RenderPassArray {
+	public:
+
+		// members
+		BSRenderPass* passList{ nullptr };  // 0
+	};
+	STATIC_ASSERT(sizeof(RenderPassArray) == 0x8);
+
+	class ForEachVisitor {
+	public:
+		virtual ~ForEachVisitor();
+
+	};
+
+	virtual ~BSShaderProperty();
+	//NiRefObject::DeleteThis
+	//virtual NiRTTI				* GetRTTI() override;
+	//NiObject::IsNode
+	//NiObject::IsNode
+	//NiObject::IsSwitchNode
+	//NiObject::IsFadeNode
+	//NiObject::IsMultiBoundNode
+	//NiObject::IsGeometry
+	//NiObject::IsTriStrips
+	//NiObject::IsTriShape
+	//NiObject::IsDynamicTriShape
+	//NiObject::IsSegmentedTriShape
+	//NiObject::IsSubIndexTriShape
+	//NiObject::IsNiGeometry
+	//NiObject::IsNiTriBasedGeom
+	//NiObject::IsNiTriShape
+	//NiObject::IsParticlesGeom
+	//NiObject::IsParticleSystem
+	//NiObject::IsLinesGeom
+	//NiObject::IsLight
+	//NiObject::IsBhkNiCollisionObject
+	//NiObject::IsBhkBlendCollisionObject
+	//NiObject::IsBhkRigidBody
+	//NiObject::IsBhkLimitedHingeConstraint
+	//NiObject::IsbhkNPCollisionObject
+	//BSShaderProperty::CreateClone
+	//BSShaderProperty::LoadBinary
+	//BSShaderProperty::LinkObject
+	//BSShaderProperty::RegisterStreamables
+	//BSShaderProperty::SaveBinary
+	//BSShaderProperty::IsEqual
+	//NiObjectNET::ProcessClone
+	//BSShaderProperty::PostLinkObject
+	//NiObject::StreamCanSkip
+	//NiObject::GetStreamableRTTI
+	//NiObject::GetBlockAllocationSize
+	//NiObject::GetGroup
+	//NiObject::SetGroup
+	//NiObject::IsNiControllerManager
+	//NiShadeProperty::Type
+	//NiProperty::Update
+	//BSShaderProperty::SetupGeometry
+	//_purecall_0
+	virtual RenderPassArray				* GetRenderPasses_ShadowMapOrMask(BSGeometry* a_geom, UInt32, BSShaderAccumulator*);
+	virtual RenderPassArray				* GetRenderPasses_LocalMap(BSGeometry*, UInt32, BSShaderAccumulator*);
+	virtual BSRenderPass				* CreateVatsMaskRenderPass(BSGeometry*);
+	virtual UInt16						GetNumberofPasses(BSGeometry*);
+	virtual BSRenderPass				* GetRenderDepthPass(BSGeometry*);
+	virtual bool						CanMerge(BSShaderProperty*);
+	virtual void						SetMaterialAlpha(float);
+	virtual float						QMaterialAlpha(void);
+	virtual BSFixedString				& GetRootName(void);
+	virtual SInt32						ForEachTexture(ForEachVisitor& functor);
+	virtual SInt32						QShader(void);
+	virtual void						ClearUnusedMaterialValues(void);
+	virtual BSShaderProperty			* ClarifyShader(BSGeometry*, bool, bool);
+	virtual NiTexture					* GetBaseTexture(void);
+	virtual RenderPassArray				* GetWaterFogPassList(BSGeometry*);
+	virtual bool						AcceptsEffectData(void);
+	virtual void						PrecacheTextures(void);
+	virtual UInt32						DetermineUtilityShaderDecl(void);
+	virtual UInt32						GetMaterialType(void);
+	virtual void						DoClearRenderPasses(void);
+
 	float					fAlpha;					// 28
 	SInt32					iLastRenderPassState;	// 2C - Set to 0x7FFFFFFF somekind of lock?
 	UInt64					flags;					// 30
@@ -136,18 +344,24 @@ public:
 
 	enum : UInt64
 	{
-		kShaderFlags_GrayscaleToPalette	= 0x0000000080000000ULL,	//00000000|80000000
-		kShaderFlags_Hair				= 0x0000400000000000ULL,	//00004000|00000000
-		kShaderFlags_Refraction			= 0x0000000000008000ULL,	//00000000|00008000
-		kShaderFlags_EmitColor			= 0x0000000000400000ULL,	//00000000|00400000
-		kShaderFlags_NoExternalEmit		= 0x4000000000000000ULL		//40000000|00000000
+		kShaderFlags_GrayscaleToPalette	= 0x0000000080000000ULL,	//00000000|80000000 ???
+		kShaderFlags_Hair				= 0x0000400000000000ULL,	//00004000|00000000 ???
+		kShaderFlags_Refraction			= 0x0000000000008000ULL,	//00000000|00008000 ???
+		kShaderFlags_EmitColor			= 0x0000000000400000ULL,	//00000000|00400000 ???
+		kShaderFlags_NoExternalEmit		= 0x4000000000000000ULL		//40000000|00000000 ???
 	};
 
 	MEMBER_FN_PREFIX(BSShaderProperty);
 	DEFINE_MEMBER_FN(SetMaterial, bool, 0x027BC560, BSShaderMaterial * material, bool unk1);
 	DEFINE_MEMBER_FN(SetFlag, void, 0x027BC3E0, UInt8 flags, bool enabled); // sets or unsets particular flags
 
+	DEFINE_MEMBER_FN(RenderPassArray_Add, BSRenderPass*, 0x027BBB70, BSShader*, BSShaderProperty*, BSGeometry*, UInt32, UInt8, BSLight*, BSLight*, BSLight*, BSLight*);
+	DEFINE_MEMBER_FN(RenderPassArray_Replace, BSRenderPass*, 0x027BBC80, BSRenderPass*, BSShader*, BSShaderProperty*, BSGeometry*, UInt32);
+
 	DEFINE_MEMBER_FN(SetEffectShaderData, void, 0x001D1DF0, BSEffectShaderData* shaderData);
+
+	BSRenderPass* RenderPassArray_Add(BSShader*, BSShaderProperty*, BSGeometry*, UInt32, UInt8, BSLight*, BSLight*, BSLight*, BSLight*);
+	BSRenderPass* RenderPassArray_Replace(BSRenderPass*, BSShader*, BSShaderProperty*, BSGeometry*, UInt32);
 
 	void SetEffectShaderData(BSEffectShaderData* shaderData);
 };
@@ -157,6 +371,8 @@ STATIC_ASSERT(sizeof(BSShaderProperty) == 0x70);
 class BSEffectShaderProperty : public BSShaderProperty
 {
 public:
+	virtual ~BSEffectShaderProperty();
+
 	BSParticleShaderCubeEmitter		* pEnvCubeEmitter;		// 70
 	NiColor							* pExternalEmitColor;	// 78
 	UInt32							uBaseTextureIndex;		// 80
@@ -169,9 +385,11 @@ public:
 
 	DEFINE_MEMBER_FN(QEffectShaderMaterial, BSEffectShaderMaterial*, 0x001E0930);
 	DEFINE_MEMBER_FN(SetupGeometry, bool, 0x027CAB60, BSGeometry* geom);
+	DEFINE_MEMBER_FN(GetRenderPasses, BSShaderProperty::RenderPassArray*, 0x027CAE10, BSGeometry*, UInt32, BSShaderAccumulator*);
 
 	BSEffectShaderMaterial* QEffectShaderMaterial();
 	bool SetupGeometry(BSGeometry* geom);
+	BSShaderProperty::RenderPassArray* GetRenderPasses(BSGeometry* a_geom, UInt32 a1, BSShaderAccumulator* a_accumulator);
 };
 STATIC_ASSERT(sizeof(BSEffectShaderProperty) == 0x88);
 
@@ -179,6 +397,10 @@ STATIC_ASSERT(sizeof(BSEffectShaderProperty) == 0x88);
 class BSLightingShaderProperty : public BSShaderProperty
 {
 public:
+	virtual ~BSLightingShaderProperty();
+	//NiRefObject::DeleteThis
+	virtual NiRTTI				* GetRTTI() override;
+
 	NiColorA		kProjectedUVColor;				// 70
 	NiColorA		kProjectedUVParams;				// 80
 	BSRenderPass	* kDepthMapRenderPassListA[3];	// 90

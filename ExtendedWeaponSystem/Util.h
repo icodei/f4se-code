@@ -77,6 +77,9 @@ UInt32 GetInventoryItemCount(Actor* actor, TESForm* item);
 void FillWeaponInfo();
 void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap);
 void HanldeWeaponEquipAfter3D();
+BSGeometry* GetGeometryByNameHelper(const BSFixedString& name);
+void SetupTextureLoaderWithEffectShader();
+void SetupImageSpaceShader(BSGeometry* objGeom, bool active);
 BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3);
 
 void reloadStop();
@@ -88,7 +91,6 @@ void reloadEndHandle();
 void StopLesserAmmo();
 
 void SetWeapAmmoCapacity(int amount);
-
 
 const std::string currentDateTime();
 const std::string prefixLog();

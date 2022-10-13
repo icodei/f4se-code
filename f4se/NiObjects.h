@@ -47,12 +47,13 @@ public:
 class NiObject : public NiRefObject
 {
 public:
+	virtual ~NiObject();
 	virtual NiRTTI				* GetRTTI(void) { return nullptr; };
 	virtual NiNode				* GetAsNiNode(void) { return nullptr; };
+	virtual NiNode				* GetAsNiNode2(void) { return nullptr; };
 	virtual NiSwitchNode		* GetAsNiSwitchNode(void) { return nullptr; };
-	virtual void				* Unk_05() { return nullptr; };
-	virtual void				* Unk_06() { return nullptr; };
-	virtual void				* Unk_07() { return nullptr; };
+	virtual void				* GetAsFadeNode() { return nullptr; };
+	virtual void				* GetAsMultiBoundNode() { return nullptr; };
 	virtual BSGeometry			* GetAsBSGeometry(void) { return nullptr; };
 	virtual void				* GetAsBStriStrips() { return nullptr; };
 	virtual BSTriShape			* GetAsBSTriShape(void) { return nullptr; };
@@ -73,18 +74,18 @@ public:
 	virtual bhkNPCollisionObject		* GetAsbhkNPCollisionObject() { return nullptr; };
 	virtual NiObject			* CreateClone(NiCloningProcess * unk1) { return nullptr; };
 	virtual void				LoadBinary(void * stream) { }; // LoadBinary
-	virtual void				Unk_1C() { };
-	virtual bool				Unk_1D() { return false; };
+	virtual void				LinkObject() { }; //1C
+	virtual bool				RegisterStreamables() { return false; }; //1D
 	virtual void				SaveBinary(void * stream) { }; // SaveBinary
 	virtual bool				IsEqual(NiObject * object) { return CALL_MEMBER_FN(this, Internal_IsEqual)(object); }	// IsEqual
 	virtual void				ProcessClone(NiCloningProcess& a_cloning) { return; };
 	virtual void				PostLinkObject() { };
 	virtual bool				StreamCanSkip() { return false; };
 	virtual NiRTTI				* GetStreamableRTTI() { return GetRTTI(); };
-	virtual bool				Unk_24() { return false; };
-	virtual bool				Unk_25() { return false; };
-	virtual void				Unk_26() { };
-	virtual bool				Unk_27() { return false; };
+	virtual bool				GetBlockAllocationSize() { return false; }; //24
+	virtual bool				GetGroup() { return false; }; //25
+	virtual void				SetGroup() { }; //26
+	virtual bool				IsNiControllerManager() { return false; }; //27
 
 	MEMBER_FN_PREFIX(NiObject);
 	DEFINE_MEMBER_FN(Internal_IsEqual, bool, 0x01B94A90, NiObject * object);
@@ -94,6 +95,10 @@ public:
 class NiObjectNET : public NiObject
 {
 public:
+	virtual ~NiObjectNET();
+	//virtual void DeleteThis();
+	virtual NiRTTI* GetRTTI(void) override { return nullptr; };
+
 	enum CopyType
 	{
 		COPY_NONE,
@@ -118,12 +123,11 @@ class NiAVObject : public NiObjectNET
 {
 public:
 
-	struct NiUpdateData
-	{
+	struct NiUpdateData {
 		NiUpdateData() : unk00(nullptr), pCamera(nullptr), flags(0), unk14(0), unk18(0), unk20(0), unk28(0), unk30(0), unk38(0) { }
 
-		void	* unk00;			// 00
-		void	* pCamera;			// 08
+		void* unk00;			// 00
+		void* pCamera;			// 08
 		UInt32	flags;				// 10
 		UInt32	unk14;				// 14
 		UInt64	unk18;				// 18

@@ -14,11 +14,9 @@ class NiDirectionalLight;
 class ShadowSceneNode;
 
 
-struct UIShaderColors
-{
+struct UIShaderColors {
 public:
-	enum class Flags
-	{
+	enum class Flags {
 		kBackgroundQuad = 1u << 0,
 		kColorMultiplier = 1u << 1,
 		kVerticalGradient = 1u << 2,
@@ -34,16 +32,13 @@ public:
 };
 STATIC_ASSERT(sizeof(UIShaderColors) == 0x38);
 
-struct alignas(0x10) UIShaderFXInfo
-{
+struct alignas(0x10) UIShaderFXInfo {
 public:
 	// members
 	NiRect<float> renderQuad;  // 00
 	UIShaderColors shaderFX;   // 10
 };
 STATIC_ASSERT(sizeof(UIShaderFXInfo) == 0x50);
-
-
 
 class Interface3D {
 public:
@@ -124,11 +119,9 @@ public:
 	};
 	STATIC_ASSERT(sizeof(OldScreenEffectControl) == 0x70);
 
-	class Renderer
-	{
+	class Renderer {
 	public:
-		struct LightParams
-		{
+		struct LightParams {
 		public:
 			// members
 			UInt32 type;  // 00
@@ -202,6 +195,4 @@ public:
 
 
 	MEMBER_FN_PREFIX(Interface3D);
-
-
 };

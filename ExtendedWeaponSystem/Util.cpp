@@ -1,50 +1,52 @@
 #include "Global.h"
 #include "f4se/NiObjects.h"
 bool IsReloading() {
-	if (!*g_player)
+	if (!*g_player) {
 		return false;
-
+	}
 	UInt32 reload_flag = ((*g_player)->actorState.flags >> 14) & 0xF;
 	return reload_flag == 0x04;
 }
 
 bool IsSprinting() {
-	if (!*g_player)
+	if (!*g_player) {
 		return false;
-
+	}
 	return (*g_player)->actorState.unk08 & 0x0100;
 }
 
 bool IsFirstPerson() {
-	if (!*g_playerCamera)
+	if (!*g_playerCamera) {
 		return false;
-
+	}
 	return (*g_playerCamera)->cameraState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_FirstPerson];
 }
 
 bool IsThirdPerson() {
-	if (!*g_playerCamera)
+	if (!*g_playerCamera) {
 		return false;
-
+	}
 	return (*g_playerCamera)->cameraState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_ThirdPerson2];
 }
 
 bool IsWeaponDrawn() {
-	if (!*g_player)
+	if (!*g_player) {
 		return false;
-
+	}
 	return (*g_player)->actorState.IsWeaponDrawn();
 }
 
 bool IsButtonPressed(ButtonEvent* btnEvent) {
-	if (btnEvent->isDown == BUTTON_UP && (btnEvent->timer > 0 && btnEvent->timer < BUTTON_HOLD_TIMER))
+	if (btnEvent->isDown == BUTTON_UP && (btnEvent->timer > 0 && btnEvent->timer < BUTTON_HOLD_TIMER)) {
 		return true;
+	}
 	return false;
 }
 
 bool IsHoldingButton(ButtonEvent* btnEvent) {
-	if (btnEvent->isDown == BUTTON_DOWN && btnEvent->timer >= BUTTON_HOLD_TIMER)
+	if (btnEvent->isDown == BUTTON_DOWN && btnEvent->timer >= BUTTON_HOLD_TIMER) {
 		return true;
+	}
 	return false;
 }
 
@@ -62,10 +64,10 @@ bool IsWeaponReloadable() {
 		return false;
 
 	Actor::MiddleProcess::Data08::EquipData* equipData = nullptr;
-	for (UInt32 ii = 0; ii < equipDataArr.count; ii++) {
-		UInt32 equipIndex = *reinterpret_cast<UInt32*>(&equipDataArr.entries[ii].unk18);
+	for (UInt32 i = 0; i < equipDataArr.count; i++) {
+		UInt32 equipIndex = *reinterpret_cast<UInt32*>(&equipDataArr.entries[i].unk18);
 		if (equipIndex == 0) {
-			equipData = &equipDataArr.entries[ii];
+			equipData = &equipDataArr.entries[i];
 			break;
 		}
 	}
@@ -80,32 +82,32 @@ bool IsWeaponReloadable() {
 	return !IsReloadable_Internal(&wrapper, equipData);
 }
 
-RelocAddr <_SetAnimationVariableBoolPapyrus > SetAnimationVariableBoolPapyrusInternal(0x140EB30);
+RelocAddr <_SetAnimationVariableBoolPapyrus> SetAnimationVariableBoolPapyrusInternal(0x140EB30);
 void SetAnimationVariableBoolPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal) {
 	SetAnimationVariableBoolPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
 }
 
-RelocAddr <_SetAnimationVariableIntPapyrus > SetAnimationVariableIntPapyrusInternal(0x140EC70);
+RelocAddr <_SetAnimationVariableIntPapyrus> SetAnimationVariableIntPapyrusInternal(0x140EC70);
 void SetAnimationVariableIntPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, int newVal) {
 	SetAnimationVariableIntPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
 }
 
-RelocAddr <_SetAnimationVariableFloatPapyrus > SetAnimationVariableFloatPapyrusInternal(0x140EBD0);
+RelocAddr <_SetAnimationVariableFloatPapyrus> SetAnimationVariableFloatPapyrusInternal(0x140EBD0);
 void SetAnimationVariableFloatPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, float newVal) {
 	SetAnimationVariableFloatPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
 }
 
-RelocAddr <_SetSubGraphFloatVariablePapyrus > SetSubGraphFloatVariablePapyrusInternal(0x138B430);
+RelocAddr <_SetSubGraphFloatVariablePapyrus> SetSubGraphFloatVariablePapyrusInternal(0x138B430);
 void SetSubGraphFloatVariablePapyrus(Actor* actor, BSFixedString& asVariableName, float newVal) {
 	SetSubGraphFloatVariablePapyrusInternal((*g_gameVM)->m_virtualMachine, 0, actor, asVariableName, newVal);
 }
 
-RelocAddr <_CreateNS_NiCamera_Create_Internal > CreateNS_NiCamera_Create_Internal(0x1BAE180);
+RelocAddr <_CreateNS_NiCamera_Create_Internal> CreateNS_NiCamera_Create_Internal(0x1BAE180);
 NiObject* CreateNS_NiCamera_Create() {
 	CreateNS_NiCamera_Create_Internal();
 }
 
-RelocAddr <_WornHasKeywordActor > Actor_WornHasKeyword(0x138C440);
+RelocAddr <_WornHasKeywordActor> Actor_WornHasKeyword(0x138C440);
 bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword) {
 	if (Actor_WornHasKeyword((*g_gameVM)->m_virtualMachine, 1, akTarget, akKeyword)) {
 		return true;
@@ -164,8 +166,7 @@ TESForm* GetFormFromIdentifier(const std::string& identifier) {
 				formID &= 0xFFF;
 				formID |= 0xFE << 24;
 				formID |= GetOffset<UInt16>(mod, 0x372) << 12;	// ESL load order
-			}
-			else {
+			} else {
 				formID |= (mod->modIndex) << 24;
 			}
 			return LookupFormByID(formID);
@@ -313,16 +314,14 @@ void FillWeaponInfo() {
 		if (WornHasKeywordActor(*g_player, reloadSequentialKeyword)) {
 			processCurrentWeap = true;
 			logIfNeeded(GetFullNameWEAP(weap) + " has the reloadSequentialKeyword.");
-		}
-		else {
+		} else {
 			processCurrentWeap = false;
 			logIfNeeded(GetFullNameWEAP(weap) + " does not have the reloadSequentialKeyword.");
 		}
 		if (WornHasKeywordActor(*g_player, ThermalScopeKeyword)) {
 			processCurrentScope = true;
 			logIfNeeded(GetFullNameWEAP(weap) + " has the ThermalScopeKeyword.");
-		}
-		else {
+		} else {
 			processCurrentScope = false;
 			logIfNeeded(GetFullNameWEAP(weap) + "does not have the ThermalScopeKeyword.");
 		}
@@ -333,101 +332,122 @@ void FillWeaponInfo() {
 //Equip Handler
 void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap) {
 	TESObjectWEAP::InstanceData* equippedWeaponInstance = weap;
-	TESObjectWEAP* weapBase = (TESObjectWEAP*)equippedWeaponInstance;
 	currentWeapInstance = equippedWeaponInstance;
+	logIfNeeded(";======================================================================================;");
 	if (HasKeywordInstWEAP(weap, reloadSequentialKeyword) || WornHasKeywordActor(*g_player, reloadSequentialKeyword)) {
 		processCurrentWeap = true;
 		ammoCapacity = equippedWeaponInstance->ammoCapacity;
 		logIfNeeded("reloadSequentialKeyword found. We should process this weapon for sequential reloads.");
 		logIfNeeded("weapon instance equipped with ammo capacity of:" + std::to_string(currentWeapInstance->ammoCapacity));
-		
-	}
-	else {
+	} else {
 		logIfNeeded("No reloadSequentialKeyword found. We can ignore this weapon for sequential reloads.");
 		processCurrentWeap = false;
 	}
 	if (HasKeywordInstWEAP(weap, ThermalScopeKeyword) || WornHasKeywordActor(*g_player, ThermalScopeKeyword)) {
 		processCurrentScope = true;
 		logIfNeeded("ThermalScopeKeyword found. We should process this weapon for special scope utility.");
-	}
-	else {
+	} else {
 		processCurrentScope = false;
+		ScopeTextureLoader = nullptr;
 		logIfNeeded("No ThermalScopeKeyword found. We can ignore this weapon for special scope utility.");
 	}
+	logIfNeeded(";======================================================================================;");
 }
 
 //Called from anim event of weapon equip. This should happen after the 3d is loaded hopefully
 void HanldeWeaponEquipAfter3D() {
-	BSFadeNode* player3D = nullptr;
 	BSGeometry* objGeom = nullptr;
-	NiPointer<BSShaderProperty> shaderProperty;
-	BSEffectShaderProperty* effectShaderProperty;
-	BSEffectShaderMaterial* effectShaderMaterial;
 	const BSFixedString targetName = "TextureLoader:0";
 	if (processCurrentScope) {
 		logIfNeeded("The 3D should be loaded now. We should be able to interact with geometry now.");
-		if (!objGeom) {
-			//player3D = (*g_player) ? (*g_player)->GetActorRootNode(true) : nullptr;
-			player3D = (*g_player) ? (BSFadeNode*)(*g_player)->GetObjectRootNode() : nullptr;
-			if (player3D) {
-				logIfNeeded("Got player 3D.");
-				//_MESSAGE("player3D %llx", player3D);
-				objGeom = BSUtilities::GetObjectByName(player3D, targetName, true, true)->GetAsBSGeometry();
-				if (!objGeom) {
-					logIfNeeded("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
-					for (UInt32 i = 0; i < player3D->kGeomArray.count; i++) {
-						BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
-						if (object->m_name == targetName) {
-							objGeom = object;
-							//_MESSAGE("objGeom %llx", objGeom);
-						}
-					}
-				}
-				if (!objGeom) {
-					logIfNeeded("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
-					for (UInt32 i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
-						NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
-						if (object) {
-							if (object->m_name == targetName) {
-								objGeom = object.get()->GetAsBSGeometry();
-								//_MESSAGE("objGeom %llx", objGeom);
-							}
-						}
-					}
-				}
-				if (objGeom) {
-					logIfNeeded("Found the geometry of the scope.");
-					ScopeTextureLoader = objGeom;
-					shaderProperty = ni_cast(ScopeTextureLoader->shaderProperty, BSShaderProperty);
-					effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
-					if (shaderProperty.get()) {
-						logIfNeeded("Got the EffectShaderProperty");
-						//effectShaderMaterial = effectShaderProperty->QEffectShaderMaterial();
-						effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
-						//effectShaderData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
-						effectShaderData = CreateEffectShaderDataCustom(ThermalFXS, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
-						effectShaderProperty->SetEffectShaderData(effectShaderData);
-						if (effectShaderProperty->SetupGeometry(ScopeTextureLoader)) {
-							logIfNeeded("Geometry was setup with the shaders.");
-						}
-						else {
-							logIfNeeded("Geometry was unable to be setup.");
-						}
-						logIfNeeded("Scope materials setup complete.");
-					}
-				}
-				else {
-					logIfNeeded("Could not find the geometry of the scope.");
-					(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
-					processCurrentScope = false;
-				}
-			}
+		objGeom = GetGeometryByNameHelper(targetName);
+		if (objGeom) {
+			logIfNeeded("Found the geometry of the scope.");
+			ScopeTextureLoader = objGeom;
+			//SetupTextureLoaderWithEffectShader();
+			SetupImageSpaceShader(ScopeTextureLoader, true);
+		} else {
+			logIfNeeded("Could not find the geometry of the scope.");
+			(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
+			processCurrentScope = false;
 		}
 	}
 }
 
+void SetupImageSpaceShader(BSGeometry* objGeom, bool active) {
+	BSImagespaceShader* BSImageShader = (BSImagespaceShader*)(*pImageSpaceManagerInstance)->GetEffect(ImageSpaceManager::ImageSpaceEffectEnum::kBSHUDGlassCopy);
+	NiPointer<BSShaderProperty> shaderProperty;
+	BSEffectShaderProperty* effectShaderProperty;
+	BSEffectShaderMaterial* effectShaderMaterial;
+	shaderProperty = ni_cast(objGeom->shaderProperty, BSShaderProperty);
+	effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
+	if (shaderProperty.get()) {
+		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
+		BSImageShader->Render((BSTriShape*)objGeom, BSImagespaceShader_DefaultParam);
+
+		logIfNeeded("Scope materials setup complete.");
+	}
+}
+
+void SetupTextureLoaderWithEffectShader() {
+	NiPointer<BSShaderProperty> shaderProperty;
+	BSEffectShaderProperty* effectShaderProperty;
+	BSEffectShaderMaterial* effectShaderMaterial;
+	shaderProperty = ni_cast(ScopeTextureLoader->shaderProperty, BSShaderProperty);
+	effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
+	if (shaderProperty.get()) {
+		logIfNeeded("Got the EffectShaderProperty");
+		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
+		//effectShaderData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
+		effectShaderData = CreateEffectShaderDataCustom(ThermalFXS, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
+		effectShaderProperty->SetEffectShaderData(effectShaderData);
+		if (effectShaderProperty->SetupGeometry(ScopeTextureLoader)) {
+			logIfNeeded("Geometry was setup with the shaders.");
+		} else {
+			logIfNeeded("Geometry was unable to be setup.");
+		}
+		logIfNeeded("Scope materials setup complete.");
+	}
+}
+
+BSGeometry* GetGeometryByNameHelper(const BSFixedString& name) {
+	BSFadeNode* player3D = (*g_player) ? (BSFadeNode*)(*g_player)->GetObjectRootNode() : nullptr;
+	if (player3D) {
+		logIfNeeded("Got player 3D.");
+		BSGeometry* objGeom = nullptr;
+		objGeom = BSUtilities::GetObjectByName(player3D, name, true, true)->GetAsBSGeometry();
+		if (!objGeom) {
+			logIfNeeded("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
+			for (UInt32 i = 0; i < player3D->kGeomArray.count; i++) {
+				BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
+				if (object->m_name == name) {
+					objGeom = object;
+					return objGeom;
+				}
+			}
+		}
+		if (!objGeom) {
+			logIfNeeded("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
+			for (UInt32 i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
+				NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
+				if (object) {
+					if (object->m_name == name) {
+						objGeom = object.get()->GetAsBSGeometry();
+						return objGeom;
+					}
+				}
+			}
+		}
+		if (objGeom) {
+			return objGeom;
+		} else {
+			return nullptr;
+		}
+	}
+}
+
+//TESEffectShader::CreateEffectShaderData but without the reset part breaking it
 BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3) {
-	//TESEffectShader::CreateEffectShaderData but without the reset part breaking it
 	BSEffectShaderData* newEffectShaderData = (BSEffectShaderData*)MemoryManager_Instance->Allocate(0x88, 0, false);
 	if (newEffectShaderData) {
 		newEffectShaderData->m_refCount = 0;
@@ -451,8 +471,7 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 		newEffectShaderData->eDestBlend = NiAlphaProperty::AlphaFunction::kAlpha_InvSrcAlpha;
 		newEffectShaderData->eZTestFunc = 1;
 		newEffectShaderData->bBaseTextureProjectedUVs = 0;
-	}
-	else {
+	} else {
 		newEffectShaderData = NULL;
 	}
 	InterlockedIncrement(&newEffectShaderData->m_refCount);
@@ -487,8 +506,7 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 	float fillAlpha;
 	if (shader->data.fillAlphaFadeInTime == 0.0 && shader->data.fillAlphaFullTime == 0.0) {
 		fillAlpha = shader->data.fillAlphaFullPercent;
-	}
-	else {
+	} else {
 		fillAlpha = 0.0;
 	}
 	newEffectShaderData->fBaseFillAlpha = fillAlpha;
@@ -514,14 +532,11 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 	newEffectShaderData->bLighting = (shader->data.flags & 512) != 0;
 	newEffectShaderData->bAlpha = (shader->data.flags & 2048) != 0;
 
-	if ((shader->data.flags & 16) != 0)
-	{
+	if ((shader->data.flags & 16) != 0) {
 		rimColorG = rimColorG - 255.0;
 		rimColorB = rimColorB - 255.0;
 		newEffectShaderData->RimColor.r = (float)(rimColorR - 255.0) * FToRGB;
-	}
-	else
-	{
+	} else {
 		newEffectShaderData->RimColor.r = rimColorR * FToRGB;
 	}
 	newEffectShaderData->RimColor.g = rimColorG * FToRGB;
@@ -530,17 +545,16 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 
 	if (effectShaderData == newEffectShaderData) {
 		newEffectShaderData->~BSEffectShaderData();
+		logIfNeeded("The BSEffectShaderData has already been made. We can delete the one just now created");
 		return effectShaderData;
 
-	}
-	else {
+	} else {
 		return newEffectShaderData;
 	}
 }
 
 //code from Bingle
-//void ReloadSubgraph()
-//{
+//void ReloadSubgraph() {
 //	uint64_t oldSubgraph = p->currentProcess->middleHigh->currentWeaponSubGraphID[1].identifier;
 //	p->HandleItemEquip(false);
 //	std::thread([oldSubgraph]() -> void {
@@ -624,13 +638,11 @@ void SetWeapAmmoCapacity(int amount) {
 		if (amount > ammoCapacity) { //This if statement is for when ammo complete of the animation goes over the original max ammo count. Will be edited later for +1 and +2 loading
 			currentWeapInstance->ammoCapacity = ammoCapacity;
 			logIfNeeded("Ammo count set to: " + std::to_string(ammoCapacity));
-		}
-		else {
+		} else {
 			currentWeapInstance->ammoCapacity = amount;
 			logIfNeeded("Ammo count set to: " + std::to_string(amount));
 		}
-	}
-	else {
+	} else {
 		log("Weapon instance is nullptr. Could not set ammo.");
 	}
 }

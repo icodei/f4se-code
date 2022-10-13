@@ -131,25 +131,14 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 				logIfNeeded("reloadComplete");
 				if ((ammoCapacity - 1) == currentAmmoCount) {
 					reloadStop();
-				}
-				else {
+				} else {
 					SetWeapAmmoCapacity(currentAmmoCount + 1);
 					if (isEmptyReload) {
 						reloadContinueFromEmpty();
-					}
-					else {
+					} else {
 						reloadContinue();
 					}
 				}
-				//if (toAdd != ammoCapacity && reloadStarted && !reloadEnd) {
-				//	incrementor++;
-				//	logIfNeeded("incrementor++");
-				//	SetWeapAmmoCapacity(currentAmmoCount + 1);
-				//	if (incrementor >= toAdd) {
-				//		logIfNeeded("incrementor >= toAdd. Reload Stop");
-				//		reloadStop();
-				//	}
-				//}
 			}
 		}
 		//Manually handle relaod end for various situations
@@ -174,8 +163,7 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 		if (evn->name == sightedStateEnter) {
 			(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
 			return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
-		}
-		else if (evn->name == sightedStateExit) {
+		} else if (evn->name == sightedStateExit) {
 			(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
 			return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
 		}
@@ -195,11 +183,9 @@ EventResult TESEquipEventSink::ReceiveEvent(TESEquipEvent* evn, void* dispatcher
 					logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
 					HanldeWeaponEquip(weapInst);
 				}
-			}
-			else {
+			} else {
 				logIfNeeded("Player EquipEvent recieved but the player is curently in a workbench. We will ignore this equip.");
-			}
-			
+			}	
 		}
 	}
 	return kEvent_Continue;
@@ -258,10 +244,10 @@ EventResult BGSOnPlayerUseWorkBenchEventSink::ReceiveEvent(BGSOnPlayerUseWorkBen
 	processCurrentWeap = false;
 	processCurrentScope = false;
 	playerIsInWorkbench = true;
-	//logIfNeeded("Player used a workbench.");
 	return kEvent_Continue;
 }
 
+//todo check what furniture the player is getting into. Might be able to ignore power armor frame
 EventResult TESFurnitureEventSink::ReceiveEvent(TESFurnitureEvent* evn, void* dispatcher) {
 	if (evn->actor == (*g_player)) {
 		if (evn->isGettingUp == true) {
@@ -319,8 +305,7 @@ bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global even
 	auto PlayerAmmoCountEventDispatcher = GET_EVENT_DISPATCHER(PlayerAmmoCountEvent);
 	if (PlayerAmmoCountEventDispatcher) {
 		PlayerAmmoCountEventDispatcher->AddEventSink(&playerAmmoCountEventSink);
-	}
-	else {
+	} else {
 		log("Unable to register PlayerAmmoCountEvent.");
 		return false;
 	}
@@ -328,8 +313,7 @@ bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global even
 	auto PlayerWeaponReloadEventDispatcher = GET_EVENT_DISPATCHER(PlayerWeaponReloadEvent);
 	if (PlayerWeaponReloadEventDispatcher) {
 		PlayerWeaponReloadEventDispatcher->AddEventSink(&playerWeaponReloadEventSink);
-	}
-	else {
+	} else {
 		log("Unable to register PlayerWeaponReloadEvent.");
 		return false;
 	}

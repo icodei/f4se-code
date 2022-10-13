@@ -1,11 +1,11 @@
 #pragma once
 
-#include "f4se/NiTypes.h"
-#include "f4se/NiObjects.h"
-#include "f4se/NiProperties.h"
+#include "f4se/BSGraphics.h"
 #include "f4se/GameFormComponents.h"
 #include "f4se/GameForms.h"
-#include "f4se/BSGraphics.h"
+#include "f4se/NiObjects.h"
+#include "f4se/NiProperties.h"
+#include "f4se/NiTypes.h"
 
 class MemoryManager {
 public:
@@ -24,14 +24,9 @@ public:
 	MEMBER_FN_PREFIX(SceneGraph);
 };
 
-class  NiCamera :
-	public NiAVObject  // 00
-{
+class  NiCamera : public NiAVObject {
 public:
-	
-
 	virtual ~NiCamera();  // 00
-
 
 	// members
 	float worldToCam[4][4];  // 120
@@ -59,14 +54,13 @@ enum class _D3DBLEND;    // NOLINT(bugprone-reserved-identifier)
 enum class _D3DBLENDOP;  // NOLINT(bugprone-reserved-identifier)
 enum class _D3DCMPFUNC;  // NOLINT(bugprone-reserved-identifier)
 
-struct EffectShaderData
-{
+struct EffectShaderData {
 public:
 	// members
-	_D3DBLEND textureBlendModeSource;   // 00
-	_D3DBLENDOP textureBlendOperation;  // 04
-	_D3DCMPFUNC textureZTestFunction;   // 08
-	UInt32 fillColor1;                                           // 0C
+	_D3DBLEND textureBlendModeSource;									// 00
+	_D3DBLENDOP textureBlendOperation;									// 04
+	_D3DCMPFUNC textureZTestFunction;									// 08
+	UInt32 fillColor1;													// 0C
 	float fillAlphaFadeInTime;                                          // 10
 	float fillAlphaFullTime;                                            // 14
 	float fillAlphaFadeOutTime;                                         // 18
@@ -76,7 +70,7 @@ public:
 	float fillTextureUAnimSpeed;                                        // 28
 	float fillTextureVAnimSpeed;                                        // 2C
 	float edgeExponentValue;                                            // 30
-	UInt32 edgeColor;                                            // 34
+	UInt32 edgeColor;													// 34
 	float edgeAlphaFadeInTime;                                          // 38
 	float edgeAlphaFullTime;                                            // 3C
 	float edgeAlphaFadeOutTime;                                         // 40
@@ -85,27 +79,24 @@ public:
 	float edgeAlphaPulseFrequency;                                      // 4C
 	float fillAlphaFullPercent;                                         // 50
 	float edgeAlphaFullPercent;                                         // 54
-	_D3DBLEND textureBlendModeDest;     // 58
+	_D3DBLEND textureBlendModeDest;										// 58
 	float alphaTestStartTime;                                           // 5C
 	float alphaTestEndTime;                                             // 60
 	float alphaTestStartValue;                                          // 64
 	float alphaTestEndValue;                                            // 68
 	BGSSoundDescriptorForm* ambientSound;                               // 70
-	UInt32 fillColor2;                                           // 78
-	UInt32 fillColor3;                                           // 7C
+	UInt32 fillColor2;													// 78
+	UInt32 fillColor3;													// 7C
 	float fillColorScaleA[3];                                           // 80
 	float fillColorTimeA[3];                                            // 8C
-	UInt32 flags;                                                // 98
+	UInt32 flags;														// 98
 	float fillTextureUScale;                                            // 9C
 	float fillTextureVScale;                                            // A0
-	SInt8 boneDepth;                                              // A4
+	SInt8 boneDepth;													// A4
 };
 STATIC_ASSERT(sizeof(EffectShaderData) == 0xA8);
 
-class __declspec(novtable) TESEffectShader :
-	public TESForm,  // 000
-	public TESModel  // 020
-{
+class __declspec(novtable) TESEffectShader : public TESForm, public TESModel {
 public:
 
 	// members

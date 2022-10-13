@@ -7,16 +7,14 @@ void* MemoryManager::Allocate(unsigned __int64 a_size, unsigned int a_alignment,
 unsigned int TESEffectShader::StartEffectShader(TESEffectShader* shader, NiAVObject* object, BSEffectShaderData* shaderData, bool a4) {
 	if (object) {
 		return CALL_MEMBER_FN(this, StartEffectShader)(shader, object, shaderData, a4);
-	}
-	else {
+	} else {
 		return 0;
 	}
 };
 void TESEffectShader::StopEffectShader(TESEffectShader* shader, NiAVObject* object, BSEffectShaderData* shaderData) {
 	if (object) {
 		CALL_MEMBER_FN(this, StopEffectShader)(shader, object, shaderData);
-	}
-	else {
+	} else {
 		logIfNeeded("Could not stop Effect Shader");
 	}
 };
@@ -27,13 +25,11 @@ BSEffectShaderData* TESEffectShader::CreateEffectShaderData(NiAVObject* object, 
 		if (data) {
 			logIfNeeded("Successfully created a new BSEffectShaderData from the TESEffectShader.");
 			return data;
-		}
-		else {
+		} else {
 			logIfNeeded("Could not create new BSEffectShaderData.");
 			return NULL;
 		}
-	}
-	else {
+	} else {
 		logIfNeeded("Could not create new BSEffectShaderData.");
 		return NULL;
 	}
@@ -41,8 +37,7 @@ BSEffectShaderData* TESEffectShader::CreateEffectShaderData(NiAVObject* object, 
 void TESEffectShader::ResetEffectShaderData(BSEffectShaderData* shadeData, NiAVObject* object, NiTexture* baseTex, NiTexture* blockoutTex, NiTexture* specialTex) {
 	if (shadeData) {
 		CALL_MEMBER_FN(this, ResetEffectShaderData)(shadeData, object, baseTex, blockoutTex, specialTex);
-	}
-	else {
+	} else {
 		logIfNeeded("Could not reset the BSEffectShaderData");
 	}
 };
