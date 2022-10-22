@@ -118,6 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir);$(SolutionDir)\common;$(SolutionDir);$(SolutionDir)\f4se\xbyak;$(SolutionDir);$(SolutionDir)\f4se;$(SolutionDir);$(SolutionDir)\f4se\f4se_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,16 +134,18 @@
       </SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL</PreprocessorDefinitions>
       <ConformanceMode>Default</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir);$(SolutionDir)\common;$(SolutionDir);$(SolutionDir)\f4se\xbyak;$(SolutionDir);$(SolutionDir)\f4se;$(SolutionDir);$(SolutionDir)\f4se\f4se_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ExtendedWeaponSystem;$(SolutionDir)\ExtendedWeaponSystem\..;$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\common;$(SolutionDir)\f4se\xbyak;$(SolutionDir)\f4se;$(SolutionDir)\f4se\f4se_common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <EnforceTypeConversionRules>true</EnforceTypeConversionRules>
+      <EnforceTypeConversionRules>
+      </EnforceTypeConversionRules>
       <PrecompiledHeader />
       <CompileAs>CompileAsCpp</CompileAs>
       <ForcedIncludeFiles>common/IPrefix.h</ForcedIncludeFiles>
       <UseFullPaths>false</UseFullPaths>
       <LanguageStandard>Default</LanguageStandard>
-      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
       <TranslateIncludes>true</TranslateIncludes>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -174,6 +177,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CustomRenderer.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="Interface3D.cpp" />
     <ClCompile Include="main.cpp" />
@@ -181,6 +185,7 @@
     <ClCompile Include="Extras.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomRenderer.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="Hooks.h" />
     <ClInclude Include="Interface3D.h" />

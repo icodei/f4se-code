@@ -2019,3 +2019,77 @@ class BSTOptional
 	bool hasValue;
 };
 
+
+
+template <class T>
+class BSTPointDefaultOps {
+public:
+};
+
+extern template class BSTPointDefaultOps<SInt8>;
+extern template class BSTPointDefaultOps<UInt8>;
+extern template class BSTPointDefaultOps<SInt16>;
+extern template class BSTPointDefaultOps<UInt16>;
+extern template class BSTPointDefaultOps<SInt32>;
+extern template class BSTPointDefaultOps<UInt32>;
+extern template class BSTPointDefaultOps<float>;
+extern template class BSTPointDefaultOps<double>;
+
+template <class T>
+class BSTPoint2Base {
+public:
+	T x;  // 00
+	T y;  // ??
+};
+
+extern template class BSTPoint2Base<SInt8>;
+extern template class BSTPoint2Base<UInt8>;
+extern template class BSTPoint2Base<SInt16>;
+extern template class BSTPoint2Base<UInt16>;
+extern template class BSTPoint2Base<SInt32>;
+extern template class BSTPoint2Base<UInt32>;
+extern template class BSTPoint2Base<float>;
+extern template class BSTPoint2Base<double>;
+
+template <class T, class Ops = BSTPointDefaultOps<T>> class BSTPoint2 : public BSTPoint2Base<T>, public BSTPointDefaultOps<T> {
+public:
+};
+
+extern template class BSTPoint2<SInt8>;
+extern template class BSTPoint2<UInt8>;
+extern template class BSTPoint2<SInt16>;
+extern template class BSTPoint2<UInt16>;
+extern template class BSTPoint2<SInt32>;
+extern template class BSTPoint2<UInt32>;
+extern template class BSTPoint2<float>;
+extern template class BSTPoint2<double>;
+
+template <class T>
+class BSTPoint3Base {
+public:
+	T x;  // 00
+	T y;  // ??
+	T z;  // ??
+};
+
+extern template class BSTPoint3Base<SInt8>;
+extern template class BSTPoint3Base<UInt8>;
+extern template class BSTPoint3Base<SInt16>;
+extern template class BSTPoint3Base<UInt16>;
+extern template class BSTPoint3Base<SInt32>;
+extern template class BSTPoint3Base<UInt32>;
+extern template class BSTPoint3Base<float>;
+extern template class BSTPoint3Base<double>;
+
+template <class T, class Ops = BSTPointDefaultOps<T>> class BSTPoint3 : public BSTPoint3Base<T>, public BSTPointDefaultOps<T> {
+public:
+};
+
+extern template class BSTPoint3<SInt8>;
+extern template class BSTPoint3<UInt8>;
+extern template class BSTPoint3<SInt16>;
+extern template class BSTPoint3<UInt16>;
+extern template class BSTPoint3<SInt32>;
+extern template class BSTPoint3<UInt32>;
+extern template class BSTPoint3<float>;
+extern template class BSTPoint3<double>;

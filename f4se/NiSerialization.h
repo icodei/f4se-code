@@ -1,9 +1,9 @@
 #pragma once
 
 #include "f4se_common/Utilities.h"
+#include "f4se/NiObjects.h"
 
 class NiBinaryStream;
-class NiObject;
 
 // 708
 class NiStream

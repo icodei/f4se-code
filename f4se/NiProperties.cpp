@@ -13,15 +13,13 @@ BSRenderPass* BSShaderProperty::RenderPassArray_Replace(BSRenderPass* a_pass, BS
 	return CALL_MEMBER_FN(this, RenderPassArray_Replace)(a_pass, a_shader, a_prop, a_geom, a1);
 };
 
-BSLightingShaderProperty* BSLightingShaderProperty::Create()
-{
+BSLightingShaderProperty* BSLightingShaderProperty::Create() {
 	BSLightingShaderProperty* prop = (BSLightingShaderProperty*)Heap_Allocate(sizeof(BSLightingShaderProperty));
 	CALL_MEMBER_FN(prop, ctor)();
 	return prop;
 }
 
-BSEffectShaderProperty* BSEffectShaderProperty::Create()
-{
+BSEffectShaderProperty* BSEffectShaderProperty::Create() {
 	BSEffectShaderProperty* prop = (BSEffectShaderProperty*)Heap_Allocate(sizeof(BSEffectShaderProperty));
 	CALL_MEMBER_FN(prop, ctor)();
 	return prop;

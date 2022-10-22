@@ -34,6 +34,7 @@
 #include "Hooks.h"
 #include "Interface3D.h"
 #include "Util.h"
+#include "CustomRenderer.h"
 
 #include <chrono>
 #include <ctime>

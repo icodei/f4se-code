@@ -6,13 +6,6 @@
 class bhkPhysicsSystem;
 class bhkMigrationWorld;
 
-// 18
-class NiCollisionObject : public NiObject
-{
-public:
-	NiAVObject *m_pkSceneObject;	// 10
-};
-
 // 20
 class bhkNPCollisionObjectBase : public NiCollisionObject
 {

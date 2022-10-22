@@ -3,6 +3,7 @@
 #include "f4se/GameTypes.h"
 #include "f4se/NiTypes.h"
 #include "f4se/NiObjects.h"
+#include "f4se/NiTextures.h"
 
 class BSLight;
 class NiLight;
@@ -11,22 +12,20 @@ class BSPortal;
 class BSPortalGraph;
 class BSCullingProcess;
 class NiCamera;
-class NiTexture;
+//class NiTexture;
 class BSLensFlareRenderData;
 
 // 28
-class BSShaderPropertyLightData
-{
+class BSShaderPropertyLightData {
 public:
 	UInt32				uiLightListFence;	// 00
 	UInt32				uiShadowAccumFlags;	// 04
 	UInt32				uiLightListChanged;	// 08
-	tArray<BSLight *>	lLightList;			// 10
+	tArray<BSLight*>	lLightList;			// 10
 };
 
 // 190
-class BSLight : public NiRefObject
-{
+class BSLight : public NiRefObject {
 public:
 	float						fLODDimmer;				// 10
 	float						fLuminance;				// 14
@@ -35,8 +34,7 @@ public:
 	float						kGoboProjection[4][4];	// 20 - aligned to 16
 	NiMatrix43					kShapeRotation;			// 60
 	NiPoint3A					bPointPosition;			// 90
-	union
-	{
+	union {
 		float fCenterAndHalfExtents[6];
 		float fRadius;
 		float fSpotParam[2];
@@ -48,9 +46,9 @@ public:
 	void						* kGeomListFence;		// D8
 	void						* unk0E0;				// E0
 	void						* unkE8;				// E8
-	tArray<BSMultiBoundNode *>	kMultiboundRooms;		// F0
-	tArray<BSPortal *>			kPortals;				// 108
-	tArray<NiNode *>			kProcessedNodes;		// 120
+	tArray<BSMultiBoundNode*>	kMultiboundRooms;		// F0
+	tArray<BSPortal*>			kPortals;				// 108
+	tArray<NiNode*>				kProcessedNodes;		// 120
 	BSPortalGraph				* pPortalGraph;			// 138
 	BSCullingProcess			* pCullingProcess;		// 140
 	NiPointer<BSGeometry>		spGeometry;				// 148

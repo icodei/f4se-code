@@ -416,6 +416,6 @@ public:
 	tHashSet<TaggedEntry, TESForm*> taggedForms;	// 180
 	// ...
 };
-STATIC_ASSERT(offsetof(FavoritesManager, taggedForms) == 0x180);
+//STATIC_ASSERT(offsetof(FavoritesManager, taggedForms) == 0x180);
 
 extern RelocPtr <FavoritesManager*> g_favoritesManager;

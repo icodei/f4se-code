@@ -835,13 +835,18 @@ public:
 
 	enum Flags
 	{
-		kUnk1 = 0x80000,
-		kUnk2 = 0x40000,
+		kUnk1 =							0x80000,
+		kUnk2 =							0x40000,
 
-		kWeaponStateShift = 1,
-		kWeaponStateMask = 0x07,
+		kWeaponStateShift =				1,
+		kWeaponStateMask =				0x07,
 
-		kWeaponState_Drawn = 0x03,
+		kWeaponState_Sheathed =			0x00,
+		kWeaponState_WantToDraw =		0x01,
+		kWeaponState_Drawing =			0x02,
+		kWeaponState_Drawn =			0x03,
+		kWeaponState_WantToSheathe =	0x04,
+		kWeaponState_Sheathing =		0x05
 	};
 
 	UInt32	unk08;	// 08

@@ -99,3 +99,6 @@ void log(std::string text);
 
 typedef NiObject *(*_CreateNS_NiCamera_Create_Internal)();
 NiObject * CreateNS_NiCamera_Create();
+
+typedef NiObject* (*_CreateNS_NiNode_Create_Internal)();
+NiObject* CreateNS_NiNode_Create();

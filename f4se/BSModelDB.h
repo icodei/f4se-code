@@ -3,10 +3,9 @@
 #include "f4se_common/Utilities.h"
 #include "f4se/GameStreams.h"
 #include "f4se/NiTypes.h"
-#include "f4se/NiNodes.h"
-#include "f4se/NiObjects.h"
 
-//class NiAVObject;
+class NiAVObject;
+class NiNode;
 
 class BSModelDB {
 public:
@@ -38,10 +37,10 @@ public:
 	class TESProcessor : public BSModelProcessor
 	{
 	public:
-		TESProcessor() { }
+		TESProcessor() { };
 		virtual ~TESProcessor() { CALL_MEMBER_FN(this, dtor)(); };
 
-		virtual void Process(ModelData * modelData, const char * modelName, NiAVObject ** root, UInt32 * typeOut) override { CALL_MEMBER_FN(this, Impl_Process)(modelData, modelName, root, typeOut); }
+		virtual void Process(ModelData* modelData, const char* modelName, NiAVObject** root, UInt32* typeOut) override { CALL_MEMBER_FN(this, Impl_Process)(modelData, modelName, root, typeOut); };
 
 		MEMBER_FN_PREFIX(TESProcessor);
 		// ??_7BSModelProcessor@BSModelDB@@6B@

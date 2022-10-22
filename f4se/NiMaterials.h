@@ -1,13 +1,15 @@
 #pragma once
 
+#include "f4se/BSGeometry.h"
 #include "f4se/GameTypes.h"
-#include "f4se/NiTypes.h"
-#include "f4se/NiTextures.h"
 #include "f4se/NiProperties.h"
+#include "f4se/NiTextures.h"
+#include "f4se/NiTypes.h"
 
 class NiStream;
 class BSShaderData;
 class BSTriShape;
+class BSTextureSet;
 
 class BSLightingShaderPropertyFloatController;
 class BSLightingShaderPropertyUShortController;

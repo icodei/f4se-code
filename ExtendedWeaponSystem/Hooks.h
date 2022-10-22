@@ -70,8 +70,18 @@ public:
 	virtual EventResult ReceiveEvent(PlayerWeaponReloadEvent* evn, void* dispatcher) override;
 };
 
-struct PlayerSetWeaponStateEvent {
+enum class WEAPON_STATE : UInt32 {
+	kSheathed,
+	kWantToDraw,
+	kDrawing,
+	kDrawn,
+	kWantToSheathe,
+	kSheathing
+};
 
+struct PlayerSetWeaponStateEvent {
+	WEAPON_STATE state;
+	bool unk04;
 };
 
 class PlayerSetWeaponStateEventSink : public BSTEventSink<PlayerSetWeaponStateEvent> {

@@ -7,8 +7,7 @@ struct ID3D11ShaderResourceView;
 struct ID3D11Resource;
 
 // 40
-struct BSRenderData
-{
+struct BSRenderData {
 	ID3D11ShaderResourceView	* resourceView;	// 00
 	ID3D11Resource				* resource;		// 08
 	UInt64						unk10;			// 10
@@ -24,8 +23,7 @@ struct BSRenderData
 };
 
 // 48
-class NiTexture : public NiObject
-{
+class NiTexture : public NiObject {
 public:
 	BSFixedString	name;				// 10
 	UInt32			unk18;				// 18
@@ -81,7 +79,7 @@ public:
 	MEMBER_FN_PREFIX(BSShaderTextureSet);
 	DEFINE_MEMBER_FN(Copy, BSShaderTextureSet*, 0x004C36B0);
 };
-STATIC_ASSERT(sizeof(BSShaderTextureSet) == 0x60);
+//STATIC_ASSERT(sizeof(BSShaderTextureSet) == 0x60);
 
 typedef BSShaderTextureSet * (* _CreateBSShaderTextureSet)();
 extern RelocAddr <_CreateBSShaderTextureSet> CreateBSShaderTextureSet;

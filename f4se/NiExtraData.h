@@ -6,18 +6,16 @@
 class BSGeometrySegmentData;
 
 // 18
-class NiExtraData : public NiObject
-{
+class NiExtraData : public NiObject {
 public:
 	virtual ~NiExtraData() { };
 
 	virtual NiRTTI				* GetRTTI(void) override { return NIRTTI_NiExtraData; };
 
-	virtual void				LoadBinary(void * stream) override { CALL_MEMBER_FN(this, Internal_LoadBinary)(stream); };
-	virtual void				SaveBinary(void * stream) override { CALL_MEMBER_FN(this, Internal_SaveBinary)(stream); };
+	virtual void				LoadBinary(void* stream) override { CALL_MEMBER_FN(this, Internal_LoadBinary)(stream); };
+	virtual void				SaveBinary(void* stream) override { CALL_MEMBER_FN(this, Internal_SaveBinary)(stream); };
 
-	virtual bool				IsEqual(NiObject * object) override
-	{
+	virtual bool				IsEqual(NiObject* object) override {
 		bool equal = __super::IsEqual(object);
 		if(equal)
 			return m_name == static_cast<NiExtraData*>(object)->m_name;
@@ -30,7 +28,7 @@ public:
 
 	BSFixedString	m_name;	// 10
 
-	MEMBER_FN_PREFIX(NiObject);
+	MEMBER_FN_PREFIX(NiExtraData);
 	// 834C1A014705796BD4E62721AE5EFA5F72AE14DB+15
 	DEFINE_MEMBER_FN(Internal_LoadBinary, void, 0x01B96400, void * stream);
 	// 99E296799A58456B4597D53A5954CD9AFFA441FB+1A
@@ -38,8 +36,7 @@ public:
 };
 
 // 20
-class NiStringExtraData : public NiExtraData
-{
+class NiStringExtraData : public NiExtraData {
 public:
 	virtual ~NiStringExtraData();
 
@@ -50,8 +47,7 @@ public:
 extern RelocAddr<uintptr_t> s_NiStringExtraDataVtbl;
 
 // 28
-class NiBinaryExtraData : public NiExtraData
-{
+class NiBinaryExtraData : public NiExtraData {
 public:
 	UInt8 * binaryData;	// 18
 	UInt32	size;		// 20
@@ -60,8 +56,7 @@ public:
 };
 
 // 20 (DynPosData)
-class BSDynPosData : public NiExtraData
-{
+class BSDynPosData : public NiExtraData {
 public:
 	UInt8 * vertexData;	// 18
 
@@ -69,8 +64,7 @@ public:
 };
 
 // 28 (FOD)
-class BSFaceGenBaseMorphExtraData : public NiExtraData
-{
+class BSFaceGenBaseMorphExtraData : public NiExtraData {
 public:
 	NiPoint3	* vertexData;		// 18
 	UInt32		modelVertexCount;	// 20
@@ -88,12 +82,10 @@ protected:
 extern RelocAddr<uintptr_t> s_BSFaceGenBaseMorphExtraDataVtbl;
 
 
-class BSConnectPoint
-{
+class BSConnectPoint {
 public:
 	// 30
-	class Parents : public NiExtraData
-	{
+	class Parents : public NiExtraData {
 	public:
 		struct ConnectPoint
 		{
@@ -104,22 +96,19 @@ public:
 			NiPoint3		pos;	// 28
 			float			scale;	// 34
 		};
-		tArray<ConnectPoint*>	points;	// 18
+		tArray<ConnectPoint* >	points;	// 18
 	};
 };
 
 // 198
-class BSDismembermentExtraData : public NiExtraData
-{
+class BSDismembermentExtraData : public NiExtraData {
 public:
-	tArray<BSTriShape*> segments[16];	// 18
+	tArray<BSTriShape* > segments[16];	// 18
 };
-
-STATIC_ASSERT(sizeof(BSDismembermentExtraData) == 0x198);
+//STATIC_ASSERT(sizeof(BSDismembermentExtraData) == 0x198);
 
 // 20
-class NiIntegerExtraData : public NiExtraData
-{
+class NiIntegerExtraData : public NiExtraData {
 public:
 	UInt32	value;	// 18
 	UInt32	pad1C;	// 1C
@@ -134,8 +123,7 @@ public:
 };
 
 // 20
-class BSSegmentDataStorage : public NiExtraData
-{
+class BSSegmentDataStorage : public NiExtraData {
 public:
 	BSGeometrySegmentData * segmentData;	// 18
 };

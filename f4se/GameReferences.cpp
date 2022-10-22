@@ -86,7 +86,8 @@ bool Actor::GetEquippedExtraData(UInt32 slotIndex, ExtraDataList ** extraData)
 
 NiAVObject* PlayerCharacter::GetCurrent3D() {
 	return CALL_MEMBER_FN(this, GetCurrent3D)();
-};
+}
+
 NiAVObject* PlayerCharacter::Get3D(bool firstPerson) {
 	return CALL_MEMBER_FN(this, Get3D)(firstPerson);
-};
+}

@@ -156,7 +156,7 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 		}
 	}
 	if (evn->name == weaponDraw) {
-		HanldeWeaponEquipAfter3D();
+		//HanldeWeaponEquipAfter3D();
 		return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
 	}
 	if (currentWeapInstance && processCurrentScope) {
@@ -180,6 +180,7 @@ EventResult TESEquipEventSink::ReceiveEvent(TESEquipEvent* evn, void* dispatcher
 				if (equipData) {
 					TESObjectWEAP* weap = DYNAMIC_CAST(equipData->item, TESForm, TESObjectWEAP);;
 					TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(equipData->item, equipData->instanceData);
+					logIfNeeded(";======================================================================================;");
 					logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
 					HanldeWeaponEquip(weapInst);
 				}
@@ -214,6 +215,19 @@ EventResult PlayerWeaponReloadEventSink::ReceiveEvent(PlayerWeaponReloadEvent* e
 PlayerWeaponReloadEventSink playerWeaponReloadEventSink;
 
 EventResult PlayerSetWeaponStateEventSink::ReceiveEvent(PlayerSetWeaponStateEvent* evn, void* dispatcher) {
+	bool isDrawing;
+	if (evn->state == WEAPON_STATE::kDrawing) {
+		logIfNeeded("Weapon is being equiped.");
+		isDrawing = true;
+	}
+	if (evn->state == WEAPON_STATE::kDrawn && isDrawing) {
+		HanldeWeaponEquipAfter3D();
+		logIfNeeded("Weapon has finished being equiped.");
+		isDrawing = false;
+	}
+	if (evn->state == WEAPON_STATE::kSheathing || evn->state == WEAPON_STATE::kSheathed) {
+		isDrawing = false;
+	}
 	return kEvent_Continue;
 }
 PlayerSetWeaponStateEventSink playerSetWeaponStateEventSink;
@@ -233,6 +247,8 @@ EventResult MenuOpenCloseEvent_ReceiveEvent_Hook(void* arg1, MenuOpenCloseEvent*
 	static BSFixedString LoadingMenu("LoadingMenu");
 	if (evn->menuName == LoadingMenu && evn->isOpen) {
 		isEmptyReload = false;
+		processCurrentScope = false;
+		processCurrentWeap = false;
 
 		static auto pLoadGameHandler = new TESLoadGameHandler();
 		GetEventDispatcher<TESLoadGameEvent>()->AddEventSink(pLoadGameHandler);
@@ -286,8 +302,8 @@ bool Install() { //Called at GameLoaded
 	//PlayerUseAmmoEvent_Original = *(_PlayerUseAmmoEvent_ReceiveEvent*)(PlayerUseAmmoEvent_ReceiveEvent_Target.GetUIntPtr());
 	//SafeWrite64(PlayerUseAmmoEvent_ReceiveEvent_Target, (uintptr_t)PlayerUseAmmoEvent_ReceiveEvent_Hook);
 
-	ReadyWeaponHandler_Original = *(_ReadyWeaponHandler*)(ReadyWeaponHandler_Target.GetUIntPtr());
-	SafeWrite64(ReadyWeaponHandler_Target.GetUIntPtr(), (uintptr_t)ReadyWeaponHandler_Hook);
+	//ReadyWeaponHandler_Original = *(_ReadyWeaponHandler*)(ReadyWeaponHandler_Target.GetUIntPtr());
+	//SafeWrite64(ReadyWeaponHandler_Target.GetUIntPtr(), (uintptr_t)ReadyWeaponHandler_Hook);
 
 	PlayerAnimationEvent_Original = *(_PlayerAnimGraphEvent_ReceiveEvent*)(PlayerAnimGraphEvent_ReceiveEvent_Target.GetUIntPtr());
 	SafeWrite64(PlayerAnimGraphEvent_ReceiveEvent_Target, (uintptr_t)PlayerAnimGraphEvent_ReceiveEvent_Hook);
@@ -307,6 +323,15 @@ bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global even
 		PlayerAmmoCountEventDispatcher->AddEventSink(&playerAmmoCountEventSink);
 	} else {
 		log("Unable to register PlayerAmmoCountEvent.");
+		return false;
+	}
+
+	auto PlayerSetWeaponStateEventDispatcher = GET_EVENT_DISPATCHER(PlayerSetWeaponStateEvent);
+	if (PlayerSetWeaponStateEventDispatcher) {
+		PlayerSetWeaponStateEventDispatcher->AddEventSink(&playerSetWeaponStateEventSink);
+	}
+	else {
+		log("Unable to register PlayerSetWeaponStateEvent.");
 		return false;
 	}
 

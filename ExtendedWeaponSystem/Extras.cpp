@@ -1,8 +1,42 @@
 #include "Global.h"
 
-void* MemoryManager::Allocate(unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired) {
-	return CALL_MEMBER_FN(this, Allocate)(a_size, a_alignment, a_alignmentRequired);
-};
+//void* MemoryManager::Allocate(unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired) {
+//	return CALL_MEMBER_FN(this, Allocate)(a_size, a_alignment, a_alignmentRequired);
+//}
+//RelocPtr<MemoryManager>	MemoryManager_Instance(0x038CC980);
+
+BSPortalGraphEntry* Main::GetCameraPortalGraphEntry() {
+	return CALL_MEMBER_FN(this, GetCameraPortalGraphEntry)();
+}
+RelocPtr<Main*>						appMain(0x05AA4278);
+RelocPtr<NiPointer<SceneGraph>>		Main__spWorldSceneGraph(0x05AA4358);
+RelocPtr<NiPointer<SceneGraph>>		Main__spMenuRoot(0x05AA4360);
+RelocPtr<NiPointer<SceneGraph>>		Main__sp3DMenuRoot(0x05AA4368);
+
+RelocPtr<TES*>			tes(0x05AA4288);
+
+NiCamera::NiCamera() {
+	CALL_MEMBER_FN(this, ctor)();
+}
+
+NiCamera::NiCamera(NiCamera* cam) {
+	CALL_MEMBER_FN(cam, ctor)(); 
+}
+
+NiFrustum& NiCamera::GetViewFrustrum() {
+	return CALL_MEMBER_FN(this, GetViewFrustrum)();
+}
+NiRect<float>& NiCamera::GetViewPort() {
+	return CALL_MEMBER_FN(this, GetViewPort)();
+}
+
+void NiCamera::SetViewFrustrum(NiFrustum& a1) {
+	CALL_MEMBER_FN(this, SetViewFrustrum)(a1);
+}
+
+void NiCamera::SetViewPort(NiRect<float>& port) {
+	CALL_MEMBER_FN(this, SetViewPort)(port);
+}
 
 unsigned int TESEffectShader::StartEffectShader(TESEffectShader* shader, NiAVObject* object, BSEffectShaderData* shaderData, bool a4) {
 	if (object) {
@@ -10,14 +44,15 @@ unsigned int TESEffectShader::StartEffectShader(TESEffectShader* shader, NiAVObj
 	} else {
 		return 0;
 	}
-};
+}
+
 void TESEffectShader::StopEffectShader(TESEffectShader* shader, NiAVObject* object, BSEffectShaderData* shaderData) {
 	if (object) {
 		CALL_MEMBER_FN(this, StopEffectShader)(shader, object, shaderData);
 	} else {
 		logIfNeeded("Could not stop Effect Shader");
 	}
-};
+}
 
 BSEffectShaderData* TESEffectShader::CreateEffectShaderData(NiAVObject* object, NiTexture* baseTex, NiTexture* blockoutTex, NiTexture* specialTex) {
 	if (object) {
@@ -33,14 +68,15 @@ BSEffectShaderData* TESEffectShader::CreateEffectShaderData(NiAVObject* object, 
 		logIfNeeded("Could not create new BSEffectShaderData.");
 		return NULL;
 	}
-};
+}
+
 void TESEffectShader::ResetEffectShaderData(BSEffectShaderData* shadeData, NiAVObject* object, NiTexture* baseTex, NiTexture* blockoutTex, NiTexture* specialTex) {
 	if (shadeData) {
 		CALL_MEMBER_FN(this, ResetEffectShaderData)(shadeData, object, baseTex, blockoutTex, specialTex);
 	} else {
 		logIfNeeded("Could not reset the BSEffectShaderData");
 	}
-};
+}
 
 //DrawWorld Static Stuff
 RelocPtr<NiAVObject*>				DrawWorld_p1stPerson(0x06723200);
@@ -71,14 +107,8 @@ namespace BSUtilities {
 }
 
 void InstallExtraFunc() {
+
 }
-
-
-RelocPtr<NiPointer<SceneGraph>>		spWorldSceneGraph(0x05AA4358);
-RelocPtr<NiPointer<SceneGraph>>		spMenuRoot(0x05AA4360);
-RelocPtr<NiPointer<SceneGraph>>		sp3DMenuRoot(0x05AA4368);
 
 RelocPtr <NiPointer<NiCamera>>		spCustomCamera(0x058DF5B0);
 RelocPtr <NiPointer<NiCamera>>		spCamera(0x058DEF88);
-
-RelocPtr<MemoryManager>				MemoryManager_Instance(0x038CC980);

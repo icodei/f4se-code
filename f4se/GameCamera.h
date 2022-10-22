@@ -6,33 +6,31 @@
 #include "f4se/NiTypes.h"
 
 class NiNode;
+class TESCamera;
 class TESCameraState;
 
 // 24
-class TESCameraState : public BSIntrusiveRefCounted, public BSInputEventUser
-{
+class TESCameraState : public BSIntrusiveRefCounted, public BSInputEventUser {
 public:
-	virtual ~TESCameraState();
+	virtual ~TESCameraState() {};
 
-	virtual void Unk_09();
-	virtual void Unk_0A();
-	virtual void Unk_0B(void * arg);
-	virtual void GetRotation(NiQuaternion * out);
-	virtual void GetPosition(NiPoint3 * out);
-	virtual void Unk_0E();
-	virtual void Unk_0F();
-	virtual void Unk_10();
+	virtual void Begin() {};
+	virtual void End() {};
+	virtual void Update(TESCameraState* arg) {};
+	virtual void GetRotation(NiQuaternion* out) {};
+	virtual void GetPosition(NiPoint3* out) {};
+	virtual void SaveGame() {};
+	virtual void LoadGame() {};
+	virtual void Revert() {};
 
-	void	* unk18;	// 18
-	UInt32	stateID;	// 20
-	UInt32	pad24;		// 24
+	TESCamera	*camera;	// 18
+	UInt32		stateID;	// 20
+	UInt32		pad24;		// 24
 };
-
 STATIC_ASSERT(sizeof(TESCameraState) == 0x28);
 
 // 138
-class ThirdPersonState : public TESCameraState
-{
+class ThirdPersonState : public TESCameraState {
 public:
 	virtual ~ThirdPersonState();
 
@@ -44,30 +42,31 @@ public:
 };
 
 // 38
-class TESCamera
-{
+class TESCamera {
 public:
-	virtual ~TESCamera();
+	TESCamera() { CALL_MEMBER_FN(this, ctor)(); }
+	virtual ~TESCamera() {};
 
-	virtual void SetCameraNode(NiNode * node);
-	virtual void Unk_02(UInt8 unk1); // Sets 0x30
-	virtual void Unk_03();
+	virtual void SetCameraNode(NiNode* node) {};
+	virtual void SetEnabled(bool enabled) {}; // Sets 0x30
+	virtual void Update() {};
 
-	float	unk08;	// 08
-	float	unk0C;	// 0C
-	float	unk10;	// 10
-	float	unk14;	// 14
-	float	unk18;	// 18
-	UInt32	unk1C;	// 1C
-	NiNode			* cameraNode;	// 20
-	TESCameraState	* cameraState;	// 28
-	UInt8	unk30;		// 30
-	UInt8	unk31;		// 31
-	UInt16	unk32;		// 32
-	UInt32	unk34;		// 34
+	//members
+	BSTPoint2<float>	rotationInput;		// 08
+	BSTPoint3<float>	translationInput;	// 10
+	float				zoomInput;			// 1C
+	NiNode				* cameraNode;		// 20
+	TESCameraState		* cameraState;		// 28
+	bool				enabled;			// 30
+	UInt8				unk31;				// 31
+	UInt16				unk32;				// 32
+	UInt32				unk34;				// 34
 
 	MEMBER_FN_PREFIX(TESCamera);
-	DEFINE_MEMBER_FN(SetCameraState, void, 0x0082E930, TESCameraState * cameraState);
+	DEFINE_MEMBER_FN(ctor, void, 0x0082E640);
+	DEFINE_MEMBER_FN(SetCameraState, void, 0x0082E930, TESCameraState* cameraState);
+
+	void SetCameraState(TESCameraState* cameraState);
 };
 
 class PlayerCamera : public TESCamera

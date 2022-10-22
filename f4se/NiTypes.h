@@ -4,8 +4,7 @@
 
 // 8
 template <typename T>
-class NiPointer
-{
+class NiPointer {
 public:
 	T	* m_pObject;	// 00
 
@@ -173,6 +172,13 @@ public:
 	T	m_bottom;	// 0C
 };
 
+// 10
+struct NiPlane
+{
+	NiPoint3	m_kNormal;
+	float		m_fConstant;
+};
+
 // 1C
 class NiFrustum
 {
@@ -185,6 +191,39 @@ public:
 	float	m_fFar;		// 14
 	bool	m_bOrtho;	// 18
 };
+
+class NiFrustumPlanes {
+public:
+	struct Planes {
+		enum Plane {
+			kNear,
+			kFar,
+			kLeft,
+			kRight,
+			kTop,
+			kBottom,
+
+			kTotal
+		};
+	};
+
+	enum class ActivePlane {
+		kNear = 1 << 0,
+		kFar = 1 << 1,
+		kLeft = 1 << 2,
+		kRight = 1 << 3,
+		kTop = 1 << 4,
+		kBottom = 1 << 5
+	};
+
+	// members
+	NiPlane				cullingPlanes[6];  // 00
+	ActivePlane			activePlanes;                   // 60
+	UInt32				basePlaneStates;                // 64
+	UInt32				unk68;                          // 68
+	UInt32				unk6C;                          // 6C
+};
+//STATIC_ASSERT(sizeof(NiFrustumPlanes) == 0x70);
 
 // 10
 class NiQuaternion
@@ -331,20 +370,13 @@ public:
 };
 STATIC_ASSERT(sizeof(NiTransform) == 0x40);
 
-// 10
-struct NiPlane
-{
-	NiPoint3 m_kNormal;
-	float m_fConstant;
-};
-
 // 18
 template <typename T>
 class NiTArray
 {
 public:
-	NiTArray();
-	virtual ~NiTArray();
+	NiTArray() {};
+	virtual ~NiTArray() {};
 
 	// sparse array, can have NULL entries that should be skipped
 	// iterate from 0 to m_emptyRunStart - 1

@@ -5,30 +5,30 @@
 #include "f4se/GameTypes.h"
 #include "f4se/NiTypes.h"
 
-class NiRTTI;
-class NiExtraData;
-class NiNode;
-class NiSwitchNode;
-class TESObjectREFR;
-class NiGeometry;
-class BSGeometry;
-class BSTriShape;
-class BSDynamicTriShape;
-class BSSubIndexTriShape;
-class NiCloningProcess;
-class NiCollisionObject;
-class bhkNiCollisionObject;
 class bhkBlendCollisionObject;
+class bhkLimitedHingeConstraint;
+class bhkNiCollisionObject;
 class bhkNPCollisionObject;
 class bhkRigidBody;
-class bhkLimitedHingeConstraint;
+class BSDynamicTriShape;
+class BSFadeNode;
+class BSGeometry;
+class BSMultiBoundNode;
+class BSSubIndexTriShape;
+class BSTriShape;
+class NiCloningProcess;
+class NiCollisionObject;
+class NiExtraData;
+class NiGeometry;
+class NiNode;
+class NiRTTI;
+class NiSwitchNode;
+class TESObjectREFR;
 
 typedef void (* _WorldToScreen)(NiPoint3 * in, NiPoint3 * out);
 extern RelocAddr <_WorldToScreen> WorldToScreen_Internal;
-
 // 10
-class NiRefObject
-{
+class NiRefObject {
 public:
 	NiRefObject() : m_uiRefCount(0) { };
 	virtual ~NiRefObject() { };
@@ -39,21 +39,20 @@ public:
 	void	DecRef(void);
 	bool	Release(void);
 
-//	void	** _vtbl;		// 00
+	//	void	** _vtbl;		// 00
 	volatile SInt32	m_uiRefCount;	// 08
 };
 
 // 10
-class NiObject : public NiRefObject
-{
+class NiObject : public NiRefObject {
 public:
-	virtual ~NiObject();
+	//virtual						~NiObject() { };
 	virtual NiRTTI				* GetRTTI(void) { return nullptr; };
 	virtual NiNode				* GetAsNiNode(void) { return nullptr; };
 	virtual NiNode				* GetAsNiNode2(void) { return nullptr; };
 	virtual NiSwitchNode		* GetAsNiSwitchNode(void) { return nullptr; };
-	virtual void				* GetAsFadeNode() { return nullptr; };
-	virtual void				* GetAsMultiBoundNode() { return nullptr; };
+	virtual BSFadeNode			* GetAsFadeNode() { return nullptr; };
+	virtual BSMultiBoundNode	* GetAsMultiBoundNode() { return nullptr; };
 	virtual BSGeometry			* GetAsBSGeometry(void) { return nullptr; };
 	virtual void				* GetAsBStriStrips() { return nullptr; };
 	virtual BSTriShape			* GetAsBSTriShape(void) { return nullptr; };
@@ -77,7 +76,7 @@ public:
 	virtual void				LinkObject() { }; //1C
 	virtual bool				RegisterStreamables() { return false; }; //1D
 	virtual void				SaveBinary(void * stream) { }; // SaveBinary
-	virtual bool				IsEqual(NiObject * object) { return CALL_MEMBER_FN(this, Internal_IsEqual)(object); }	// IsEqual
+	virtual bool				IsEqual(NiObject* object) { return CALL_MEMBER_FN(this, Internal_IsEqual)(object); };	// IsEqual
 	virtual void				ProcessClone(NiCloningProcess& a_cloning) { return; };
 	virtual void				PostLinkObject() { };
 	virtual bool				StreamCanSkip() { return false; };
@@ -95,12 +94,11 @@ public:
 class NiObjectNET : public NiObject
 {
 public:
-	virtual ~NiObjectNET();
-	//virtual void DeleteThis();
-	virtual NiRTTI* GetRTTI(void) override { return nullptr; };
+	//virtual			~NiObjectNET() { };
+	//virtual void	DeleteThis() { };
+	//virtual NiRTTI* GetRTTI(void) override { return nullptr; };
 
-	enum CopyType
-	{
+	enum CopyType {
 		COPY_NONE,
 		COPY_EXACT,
 		COPY_UNIQUE
@@ -112,22 +110,21 @@ public:
 
 	bool AddExtraData(NiExtraData * extraData);
 	NiExtraData * GetExtraData(const BSFixedString & name);
-	bool HasExtraData(const BSFixedString & name) { return GetExtraData(name) != nullptr; }
+	bool HasExtraData(const BSFixedString& name) { return GetExtraData(name) != nullptr; };
 
 	MEMBER_FN_PREFIX(NiObjectNET);
 	DEFINE_MEMBER_FN(Internal_AddExtraData, bool, 0x01B978C0, NiExtraData * extraData);
 };
 
 // 120
-class NiAVObject : public NiObjectNET
-{
+class NiAVObject : public NiObjectNET {
 public:
 
 	struct NiUpdateData {
-		NiUpdateData() : unk00(nullptr), pCamera(nullptr), flags(0), unk14(0), unk18(0), unk20(0), unk28(0), unk30(0), unk38(0) { }
+		NiUpdateData() : unk00(nullptr), pCamera(nullptr), flags(0), unk14(0), unk18(0), unk20(0), unk28(0), unk30(0), unk38(0) { };
 
-		void* unk00;			// 00
-		void* pCamera;			// 08
+		void* unk00;				// 00
+		void* pCamera;				// 08
 		UInt32	flags;				// 10
 		UInt32	unk14;				// 14
 		UInt64	unk18;				// 18
@@ -137,23 +134,23 @@ public:
 		UInt64	unk38;				// 38
 	};
 
-	virtual void UpdateControllers(NiUpdateData& a_data);
-	virtual void PerformOp();
-	virtual void AttachProperty();
-	virtual void SetMaterialNeedsUpdate(bool unk); // empty?
-	virtual void SetDefaultMaterialNeedsUpdateFlag(bool unk); // empty?
-	virtual void SetAppCulled(bool set);
-	virtual NiAVObject * GetObjectByName(const BSFixedString* nodeName);
-	virtual void SetSelectiveUpdateFlags(bool * unk1, bool unk2, bool * unk3);
-	virtual void UpdateDownwardPass();
-	virtual void UpdateSelectedDownwardPass();
-	virtual void UpdateRigidDownwardPass();
-	virtual void UpdateWorldBound();
-	virtual void UpdateWorldData(NiUpdateData * a_data);
-	virtual void UpdateTransformAndBounds(NiUpdateData & a_data);
-	virtual void UpdateTransforms(NiUpdateData& a_data);
-	virtual void PreAttachUpdate(NiNode* a_eventualParent, NiUpdateData& a_data); //37?
-	virtual void PostAttachUpdate(); //38?
+	virtual void UpdateControllers(NiUpdateData* a_data) {};
+	virtual void PerformOp() {};
+	virtual void AttachProperty() {};
+	virtual void SetMaterialNeedsUpdate(bool unk) {}; // empty?
+	virtual void SetDefaultMaterialNeedsUpdateFlag(bool unk) {}; // empty?
+	virtual void SetAppCulled(bool set) {};
+	virtual NiAVObject* GetObjectByName(const BSFixedString* nodeName) { return CALL_MEMBER_FN(this, GetAVObjectByName)(nodeName, 1, 1); };
+	virtual void SetSelectiveUpdateFlags(bool* unk1, bool unk2, bool* unk3) {};
+	virtual void UpdateDownwardPass() {};
+	virtual void UpdateSelectedDownwardPass() {};
+	virtual void UpdateRigidDownwardPass() {};
+	virtual void UpdateWorldBound() {};
+	virtual void UpdateWorldData(NiUpdateData* a_data) {};
+	virtual void UpdateTransformAndBounds(NiUpdateData* a_data) {};
+	virtual void UpdateTransforms(NiUpdateData* a_data) {};
+	virtual void PreAttachUpdate(NiNode* a_eventualParent, NiUpdateData* a_data) {}; //37?
+	virtual void PostAttachUpdate() {}; //38?
 
 	NiNode						* m_parent;				// 28
 	NiTransform					m_localTransform;		// 30
@@ -162,8 +159,7 @@ public:
 	NiTransform					m_previousWorld;		// C0
 	NiPointer<NiCollisionObject> m_spCollisionObject;	// 100
 
-	enum : UInt64
-	{
+	enum : UInt64 {
 		kFlagAlwaysDraw = (1 << 11),
 		kFlagIsMeshLOD = (1 << 12),
 		kFlagFixedBound = (1 << 13),
@@ -203,10 +199,16 @@ public:
 	UInt32			unk11C;				// 11C
 
 	MEMBER_FN_PREFIX(NiAVObject);
-	DEFINE_MEMBER_FN(GetAVObjectByName, NiAVObject*, 0x01C93980, BSFixedString * name, bool unk1, bool unk2);
+	DEFINE_MEMBER_FN(GetAVObjectByName, NiAVObject*, 0x01C93980, const BSFixedString * name, bool unk1, bool unk2);
 	DEFINE_MEMBER_FN(SetScenegraphChange, void, 0x01BA47C0);
 
 	// Return true in the functor to halt traversal
 	bool Visit(const std::function<bool(NiAVObject*)>& functor);
 };
 STATIC_ASSERT(sizeof(NiAVObject) == 0x120);
+
+// 18
+class NiCollisionObject : public NiObject {
+public:
+	NiAVObject* m_pkSceneObject;	// 10
+};

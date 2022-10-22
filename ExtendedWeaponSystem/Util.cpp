@@ -1,38 +1,27 @@
 #include "Global.h"
-#include "f4se/NiObjects.h"
 bool IsReloading() {
-	if (!*g_player) {
-		return false;
-	}
+	if (!*g_player) { return false; }
 	UInt32 reload_flag = ((*g_player)->actorState.flags >> 14) & 0xF;
 	return reload_flag == 0x04;
 }
 
 bool IsSprinting() {
-	if (!*g_player) {
-		return false;
-	}
+	if (!*g_player) { return false; }
 	return (*g_player)->actorState.unk08 & 0x0100;
 }
 
 bool IsFirstPerson() {
-	if (!*g_playerCamera) {
-		return false;
-	}
+	if (!*g_playerCamera) { return false; }
 	return (*g_playerCamera)->cameraState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_FirstPerson];
 }
 
 bool IsThirdPerson() {
-	if (!*g_playerCamera) {
-		return false;
-	}
+	if (!*g_playerCamera) { return false; }
 	return (*g_playerCamera)->cameraState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_ThirdPerson2];
 }
 
 bool IsWeaponDrawn() {
-	if (!*g_player) {
-		return false;
-	}
+	if (!*g_player) { return false; }
 	return (*g_player)->actorState.IsWeaponDrawn();
 }
 
@@ -56,12 +45,12 @@ bool IsThrowableWeapon(UInt32 equipIndex) {
 
 RelocAddr <_IsReloadable> IsReloadable_Internal(0xE24B80);
 bool IsWeaponReloadable() {
-	if (!*g_player || !(*g_player)->middleProcess || !(*g_player)->middleProcess->unk08)
-		return false;
+	if (!*g_player || !(*g_player)->middleProcess || !(*g_player)->middleProcess->unk08) { return false; }
 
 	tArray<Actor::MiddleProcess::Data08::EquipData> equipDataArr = reinterpret_cast<tArray<Actor::MiddleProcess::Data08::EquipData> &>((*g_player)->middleProcess->unk08->equipData);
-	if (equipDataArr.count == 0)
+	if (equipDataArr.count == 0) {
 		return false;
+	}
 
 	Actor::MiddleProcess::Data08::EquipData* equipData = nullptr;
 	for (UInt32 i = 0; i < equipDataArr.count; i++) {
@@ -71,8 +60,7 @@ bool IsWeaponReloadable() {
 			break;
 		}
 	}
-	if (!equipData)
-		return false;
+	if (!equipData) { return false; }
 
 	IsReloadableData data = { 0 };
 	data.actor = *g_player;
@@ -104,7 +92,12 @@ void SetSubGraphFloatVariablePapyrus(Actor* actor, BSFixedString& asVariableName
 
 RelocAddr <_CreateNS_NiCamera_Create_Internal> CreateNS_NiCamera_Create_Internal(0x1BAE180);
 NiObject* CreateNS_NiCamera_Create() {
-	CreateNS_NiCamera_Create_Internal();
+	return CreateNS_NiCamera_Create_Internal();
+}
+
+RelocAddr <_CreateNS_NiNode_Create_Internal> CreateNS_NiNode_Create_Internal(0x01B99E60);
+NiObject* CreateNS_NiNode_Create() {
+	return CreateNS_NiNode_Create_Internal();
 }
 
 RelocAddr <_WornHasKeywordActor> Actor_WornHasKeyword(0x138C440);
@@ -210,8 +203,9 @@ BSFixedString GetDisplayName(ExtraDataList* extraDataList, TESForm* kbaseForm) {
 		}
 
 		TESFullName* pFullName = DYNAMIC_CAST(baseForm, TESForm, TESFullName);
-		if (pFullName)
+		if (pFullName) {
 			return pFullName->name;
+		}
 	}
 	return BSFixedString();
 }
@@ -223,24 +217,22 @@ std::string GetFullNameWEAP(TESObjectWEAP* weap) {
 }
 
 const tArray<Actor::MiddleProcess::Data08::EquipData>* GetEquipDataArray() {
-	if (!*g_player || !(*g_player)->middleProcess || !(*g_player)->middleProcess->unk08)
-		return nullptr;
+	if (!*g_player || !(*g_player)->middleProcess || !(*g_player)->middleProcess->unk08) { return nullptr; }
 
 	tArray<Actor::MiddleProcess::Data08::EquipData> equipDataArray = reinterpret_cast<tArray<Actor::MiddleProcess::Data08::EquipData>&>((*g_player)->middleProcess->unk08->equipData);
-	if (equipDataArray.count == 0)
-		return nullptr;
+	if (equipDataArray.count == 0) { return nullptr; }
 
 	return &reinterpret_cast<tArray<Actor::MiddleProcess::Data08::EquipData>&>((*g_player)->middleProcess->unk08->equipData);
 }
 
 Actor::MiddleProcess::Data08::EquipData* GetEquipDataByFormID(UInt32 formId) {
 	const tArray<Actor::MiddleProcess::Data08::EquipData>* equipDataArray = GetEquipDataArray();
-	if (!equipDataArray)
-		return nullptr;
+	if (!equipDataArray) { return nullptr; }
 
-	for (UInt32 ii = 0; ii < equipDataArray->count; ii++) {
-		if (equipDataArray->entries[ii].item->formID == formId)
-			return &equipDataArray->entries[ii];
+	for (UInt32 i = 0; i < equipDataArray->count; i++) {
+		if (equipDataArray->entries[i].item->formID == formId) {
+			return &equipDataArray->entries[i];
+		}
 	}
 
 	return nullptr;
@@ -248,36 +240,35 @@ Actor::MiddleProcess::Data08::EquipData* GetEquipDataByFormID(UInt32 formId) {
 
 Actor::MiddleProcess::Data08::EquipData* GetEquipDataByEquipIndex(EquipIndex equipIndex) {
 	const tArray<Actor::MiddleProcess::Data08::EquipData>* equipDataArray = GetEquipDataArray();
-	if (!equipDataArray)
-		return nullptr;
-
+	if (!equipDataArray) { return nullptr; }
+	
 	for (UInt32 i = 0; i < equipDataArray->count; i++) {
 		UInt32 eIdx = reinterpret_cast<UInt32&>(equipDataArray->entries[i].unk18);
-		if (eIdx == equipIndex)
+		if (eIdx == equipIndex) {
 			return &equipDataArray->entries[i];
+		}
 	}
+
 	return nullptr;
 }
 
 TESObjectWEAP::InstanceData* GetWeaponInstanceData(TESForm* weapForm, TBO_InstanceData* weapInst) {
 	TESObjectWEAP::InstanceData* weapInstData = (TESObjectWEAP::InstanceData*)Runtime_DynamicCast(weapInst, RTTI_TBO_InstanceData, RTTI_TESObjectWEAP__InstanceData);
-	if (weapInstData)
+	if (weapInstData) {
 		return weapInstData;
-
+	}
 	TESObjectWEAP* objWeap = DYNAMIC_CAST(weapForm, TESForm, TESObjectWEAP);
-	if (!objWeap)
-		return nullptr;
 
+	if (!objWeap) { return nullptr; }
+		
 	return &objWeap->weapData;
 }
 
 UInt32 GetInventoryItemCount(Actor* actor, TESForm* item) {
-	if (!actor || !item)
-		return 0;
+	if (!actor || !item) { return NULL; }
 
 	BGSInventoryList* inventory = actor->inventoryList;
-	if (!inventory)
-		return 0;
+	if (!inventory) { return NULL; }
 
 	UInt32 totalItemCount = 0;
 	inventory->inventoryLock.LockForRead();
@@ -304,9 +295,7 @@ void FillWeaponInfo() {
 		ammoCapacity = equippedWeaponInstance->ammoCapacity;
 		currentAmmoCount = equipData->equippedData->unk18;
 		totalAmmoCount = GetInventoryItemCount(*g_player, equippedWeaponInstance->ammo);
-
-		logIfNeeded("Game Loaded. Getting Initial Weapon Stats");
-		logIfNeeded(";======================================================================================;");
+		logIfNeeded(";====================== Game Loaded. Getting Initial Weapon Stats =====================;");
 		logIfNeeded("Weapon: " + GetFullNameWEAP(weap));
 		logIfNeeded("TotalAmmoCount: " + std::to_string(totalAmmoCount));
 		logIfNeeded("CurrentAmmoCount: " + std::to_string(currentAmmoCount));
@@ -333,7 +322,6 @@ void FillWeaponInfo() {
 void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap) {
 	TESObjectWEAP::InstanceData* equippedWeaponInstance = weap;
 	currentWeapInstance = equippedWeaponInstance;
-	logIfNeeded(";======================================================================================;");
 	if (HasKeywordInstWEAP(weap, reloadSequentialKeyword) || WornHasKeywordActor(*g_player, reloadSequentialKeyword)) {
 		processCurrentWeap = true;
 		ammoCapacity = equippedWeaponInstance->ammoCapacity;
@@ -363,7 +351,12 @@ void HanldeWeaponEquipAfter3D() {
 		objGeom = GetGeometryByNameHelper(targetName);
 		if (objGeom) {
 			logIfNeeded("Found the geometry of the scope.");
-			ScopeTextureLoader = objGeom;
+			if (objGeom != ScopeTextureLoader) {
+				ScopeTextureLoader = objGeom;
+				logIfNeeded("This geometry is the new to us.");
+			} else {
+				logIfNeeded("This geometry is the same as last time we checked.");
+			}
 			//SetupTextureLoaderWithEffectShader();
 			SetupImageSpaceShader(ScopeTextureLoader, true);
 		} else {
@@ -375,7 +368,7 @@ void HanldeWeaponEquipAfter3D() {
 }
 
 void SetupImageSpaceShader(BSGeometry* objGeom, bool active) {
-	BSImagespaceShader* BSImageShader = (BSImagespaceShader*)(*pImageSpaceManagerInstance)->GetEffect(ImageSpaceManager::ImageSpaceEffectEnum::kBSHUDGlassCopy);
+	BSImagespaceShader* BSImageShader = (BSImagespaceShader*)(*ImageSpaceManager_pInstance)->GetEffect(ImageSpaceManager::ImageSpaceEffectEnum::kBSHUDGlassCopy);
 	NiPointer<BSShaderProperty> shaderProperty;
 	BSEffectShaderProperty* effectShaderProperty;
 	BSEffectShaderMaterial* effectShaderMaterial;
@@ -440,15 +433,13 @@ BSGeometry* GetGeometryByNameHelper(const BSFixedString& name) {
 		}
 		if (objGeom) {
 			return objGeom;
-		} else {
-			return nullptr;
-		}
-	}
+		} else { return nullptr; }
+	} else { return nullptr; }
 }
 
 //TESEffectShader::CreateEffectShaderData but without the reset part breaking it
 BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3) {
-	BSEffectShaderData* newEffectShaderData = (BSEffectShaderData*)MemoryManager_Instance->Allocate(0x88, 0, false);
+	BSEffectShaderData* newEffectShaderData = (BSEffectShaderData*)Heap_Allocate(0x88);
 	if (newEffectShaderData) {
 		newEffectShaderData->m_refCount = 0;
 		newEffectShaderData->pNodeFilterFunction = 0i64;
@@ -552,6 +543,7 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 		return newEffectShaderData;
 	}
 }
+
 
 //code from Bingle
 //void ReloadSubgraph() {

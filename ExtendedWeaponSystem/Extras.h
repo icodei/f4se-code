@@ -7,26 +7,80 @@
 #include "f4se/NiProperties.h"
 #include "f4se/NiTypes.h"
 
-class MemoryManager {
+class BSMultiBoundRoom;
+class BSPortalGraphEntry;
+class BSPortalGraph;
+class SceneGraph;
+
+//I made this not knowing that Heap_Allocate() from f4se does the same thing
+//class MemoryManager {
+//public:
+//
+//	MEMBER_FN_PREFIX(MemoryManager);
+//	DEFINE_MEMBER_FN(Allocate, void*, 0x01B0EFD0, unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired);
+//
+//	void* Allocate(unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired);
+//};
+//extern RelocPtr<MemoryManager>	MemoryManager_Instance;
+
+class Main {
 public:
 
+	MEMBER_FN_PREFIX(Main);
+	DEFINE_MEMBER_FN(GetCameraPortalGraphEntry, BSPortalGraphEntry*, 0x00D3CA50);
 
-	MEMBER_FN_PREFIX(MemoryManager);
-	DEFINE_MEMBER_FN(Allocate, void*, 0x01B0EFD0, unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired);
+	BSPortalGraphEntry* GetCameraPortalGraphEntry();
+};
+extern RelocPtr<Main*>					appMain;
+extern RelocPtr<NiPointer<SceneGraph>>	Main__spWorldSceneGraph;
+extern RelocPtr<NiPointer<SceneGraph>>	Main__spMenuRoot;
+extern RelocPtr<NiPointer<SceneGraph>>	Main__sp3DMenuRoot;
 
-	void* Allocate(unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired);
+class TES {
+public:
+
+	MEMBER_FN_PREFIX(TES);
+};
+extern RelocPtr<TES*> tes;
+
+class BSPortalGraph : public NiRefObject {
+public:
+	BSTArray<void*> QOccluderList; //NiTPointerList<BSOcclusionShape *>
+	BSTArray<void*> QPortalList; //NiTPointerList<BSPortal *>
+	BSTArray<NiPointer<BSMultiBoundRoom>> QRooms;
+	BSTArray<NiPointer<NiAVObject>> QAlwaysRenderArray;
+	NiNode* QPortalNodeRoot;
+	BSTArray<void*> unk78;
+	BSTArray<void*> unk90;
+	BSTArray<NiPointer<NiNode>> QUnboundNodes;
+	UInt32 QWorldID;
 };
 
-class SceneGraph {
+class BSPortalGraphEntry : public NiRefObject {
 public:
-
-
-	MEMBER_FN_PREFIX(SceneGraph);
+	BSPortalGraph* QPortalGraph;
+	BSTArray<NiPointer<BSMultiBoundRoom>> QRoomAccumList;
+	BSMultiBoundRoom* QRoomRoot;
+	UInt8 gap38[12];
+	UInt32 field_44;
+	UInt32 field_48;
+	UInt32 field_4C;
+	UInt32 field_50;
+	UInt8 gap54[12];
+	UInt64 field_60;
+	BSCompoundFrustum QUnboundCompoundFrustum;
+	bool QVisibleUnboundSpace;
+	UInt32 field_13C;
+	UInt16 field_140;
+	UInt32 field_144;
+	UInt32 field_148;
 };
 
-class  NiCamera : public NiAVObject {
+class NiCamera : public NiAVObject {
 public:
-	virtual ~NiCamera();  // 00
+	NiCamera();
+	NiCamera(NiCamera* cam);
+	//virtual ~NiCamera();  // 00
 
 	// members
 	float worldToCam[4][4];  // 120
@@ -37,7 +91,7 @@ public:
 	float lodAdjust;         // 194
 
 	MEMBER_FN_PREFIX(NiCamera);
-
+	DEFINE_MEMBER_FN(ctor, void, 0x01BAC3F0);
 	DEFINE_MEMBER_FN(GetViewFrustrum, NiFrustum &, 0x0010A010);
 	DEFINE_MEMBER_FN(GetViewPort, NiRect<float> &, 0x00AE3F90);
 	DEFINE_MEMBER_FN(SetViewFrustrum, void, 0x01BAC520, NiFrustum & a1);
@@ -159,11 +213,8 @@ extern RelocAddr<_GetObjectByName> GetObjectByName_Internal;
 
 void InstallExtraFunc();
 
-extern RelocPtr<NiPointer<SceneGraph>>	spWorldSceneGraph;
-extern RelocPtr<NiPointer<SceneGraph>>	spMenuRoot;
-extern RelocPtr<NiPointer<SceneGraph>>	sp3DMenuRoot;
+
 
 extern RelocPtr<NiPointer<NiCamera>>	spCustomCamera;
 extern RelocPtr<NiPointer<NiCamera>>	spCamera;
 
-extern RelocPtr<MemoryManager>			MemoryManager_Instance;

@@ -12,3 +12,7 @@ SInt32 PlayerCamera::GetCameraStateId(TESCameraState * state)
 
 	return -1;
 }
+
+void TESCamera::SetCameraState(TESCameraState* cameraState) {
+	CALL_MEMBER_FN(this, SetCameraState)(cameraState);
+}

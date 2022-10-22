@@ -1,12 +1,20 @@
 #pragma once
 
+#include "f4se/f4se_common/Utilities.h"
+
 #include "f4se/NiObjects.h"
 #include "f4se/BSLight.h"
+#include "f4se/BSGraphics.h"
+#include "f4se/BSGeometry.h"
+
+class BSShaderPropertyLightData;
 
 // 140
-class NiNode : public NiAVObject
-{
+class NiNode : public NiAVObject {
 public:
+	NiNode();
+	NiNode(UInt16 children) { CALL_MEMBER_FN(this, ctor)(children); };
+
 	//virtual NiRTTI		* GetRTTI(void) override;
 	//virtual NiNode		* GetAsNiNode(void) override;
 	//virtual const NiNode* IsNode(void) const override;
@@ -31,18 +39,18 @@ public:
 	//virtual void		OnVisible(void) override;
 	
 	//add
-	virtual void		Unk_39(void);
-	virtual void		AttachChild(NiAVObject * obj, bool firstAvail);
-	virtual void		InsertChildAt(UInt32 index, NiAVObject * obj);
-	virtual void		DetachChild(NiAVObject * obj, NiPointer<NiAVObject> & out);
-	virtual void		RemoveChild(NiAVObject * obj);
-	virtual void		DetachChildAt(UInt32 i, NiPointer<NiAVObject> & out);
-	virtual void		RemoveChildAt(UInt32 i);
-	virtual void		SetAt(UInt32 index, NiAVObject * obj, NiPointer<NiAVObject> & replaced);
-	virtual void		SetAt(UInt32 index, NiAVObject * obj);
-	virtual void		UpdateUpwardPass(void);
+	virtual void		Unk_39(void) {};
+	virtual void		AttachChild(NiAVObject* obj, bool firstAvail) {};
+	virtual void		InsertChildAt(UInt32 index, NiAVObject* obj) {};
+	virtual void		DetachChild(NiAVObject* obj, NiPointer<NiAVObject>& out) {};
+	virtual void		RemoveChild(NiAVObject* obj) {};
+	virtual void		DetachChildAt(UInt32 i, NiPointer<NiAVObject>& out) {};
+	virtual void		RemoveChildAt(UInt32 i) {};
+	virtual void		SetAt(UInt32 index, NiAVObject* obj, NiPointer<NiAVObject>& replaced) {};
+	virtual void		SetAt(UInt32 index, NiAVObject* obj) {};
+	virtual void		UpdateUpwardPass(void) {};
 
-	NiTArray <NiAVObject *>	m_children;	// 120
+	NiTArray <NiAVObject*>	m_children;	// 120
 	float					unk138;
 	float					unk13C;
 
@@ -54,16 +62,14 @@ public:
 
 	NiAVObject* GetObjectByName_Internal(const BSFixedString& name);
 };
-//STATIC_ASSERT(sizeof(NiNode) == 0x140);
+STATIC_ASSERT(sizeof(NiNode) == 0x140);
 
 // 1C0
-class BSFadeNode : public NiNode
-{
+class BSFadeNode : public NiNode {
 public:
 	virtual ~BSFadeNode();
 
-	struct FlattenedGeometryData
-	{
+	struct FlattenedGeometryData {
 		NiBound					kBound;		// 00
 		NiPointer<BSGeometry>	spGeometry;	// 10
 		UInt32					uiFlags;	// 18
@@ -102,4 +108,33 @@ public:
 	UInt32					flags;			// 17C
 	UInt64					unk180;			// 180
 	UInt64					unk188;			// 188
+};
+
+
+class BSSceneGraph : public NiNode {
+public:
+	virtual ~BSSceneGraph();
+
+	//add
+	virtual void GetFarDistance();
+	virtual void GetNearDistance();
+	virtual void SetViewDistanceBasedOnFrameRate();
+
+};
+
+class SceneGraph : public BSSceneGraph {
+public:
+	virtual ~SceneGraph();
+
+	MEMBER_FN_PREFIX(SceneGraph);
+};
+
+class ShadowSceneNode : public NiNode {
+public:
+	virtual ~ShadowSceneNode();
+
+	MEMBER_FN_PREFIX(ShadowSceneNode);
+	DEFINE_MEMBER_FN(ProcessQueuedLights, void, 0x028101E0, BSCullingProcess*);
+
+	void ProcessQueuedLights(BSCullingProcess* cullproc);
 };

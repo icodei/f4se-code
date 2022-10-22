@@ -97,7 +97,7 @@ void SimpleLock::Release(void)
 }
 
 /*
-// This implementation isn't quite right when compared to the came code, something is off
+// This implementation isn't quite right when compared to the game code, something is off
 void BSReadWriteLock::LockForRead()
 {
 	SInt32 myThreadID = GetCurrentThreadId();
