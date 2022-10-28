@@ -47,11 +47,11 @@ class BSReadWriteLock
 		kLockWrite = 0x80000000,
 		kLockCountMask = 0xFFFFFFF
 	};
-
+public:
 	volatile SInt32	threadID;	// 00
 	volatile SInt32	lockValue;	// 04
 
-public:
+//public:
 	BSReadWriteLock() : threadID(0), lockValue(0) {}
 
 	//void LockForRead();

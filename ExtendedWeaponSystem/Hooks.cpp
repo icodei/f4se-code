@@ -6,6 +6,7 @@ bool reloadEnd = true;
 bool processCurrentWeap = false;
 bool processCurrentScope = false;
 bool playerIsInWorkbench = false;
+bool readyForRender = false;
 
 int currentAmmoCount = 0;
 int ammoCapacity = 0;
@@ -13,36 +14,9 @@ int totalAmmoCount = 0;
 int incrementor = 0;
 int toAdd = 0;
 
-RelocPtr<float> minCurrentZoom(0x3805130);
-
-RelocAddr<uintptr_t> TogglePOV_Target(0x2D49E48 + 0x40);
-RelocAddr<uintptr_t> TogglePOV_FirstToThird_Target(0x2D84518 + 0x40);
-RelocAddr<uintptr_t> TogglePOV_ThirdToFirst_Target(0x2D07A38 + 0x40);
-_TogglePOV TogglePOV_Original;
-_TogglePOV TogglePOV_FirstToThird_Original;
-_TogglePOV TogglePOV_ThirdToFirst_Original;
-
-RelocAddr<uintptr_t> MovementHandler_Target(0x2D49908 + 0x40);
-_MovementHandler MovementHandler_Original;
-
-RelocAddr<uintptr_t> SprintHandler_Target(0x2D499C8 + 0x40);
-_SprintHandler SprintHandler_Original;
-
-RelocAddr<uintptr_t> ReadyWeaponHandler_Target(0x2D49B48 + 0x40);
-_ReadyWeaponHandler ReadyWeaponHandler_Original;
-
-RelocAddr<uintptr_t> PlayerAnimGraphEvent_ReceiveEvent_Target(0x2D442D8 + 0x8);
-_PlayerAnimGraphEvent_ReceiveEvent PlayerAnimationEvent_Original;
-
-RelocAddr<uintptr_t> PlayerUseAmmoEvent_ReceiveEvent_Target(0x2D438E8 + 0x780);
-_PlayerUseAmmoEvent_ReceiveEvent PlayerUseAmmoEvent_Original;
-
-RelocAddr<uintptr_t> MenuOpenCloseEvent_ReceiveEvent_Target(0x2D49200 + 0x08);
-_MenuOpenCloseEvent_ReceiveEvent MenuOpenCloseEvent_ReceiveEvent_Original;
-
 BSTEventDispatcher<void*>* GetGlobalEventDispatcher(BSTGlobalEvent* globalEvents, const char* dispatcherName) {
 	for (int i = 0; i < globalEvents->eventSources.count; i++) {
-		const char* name = GetObjectClassName(globalEvents->eventSources[i]) + 15;    // ?$EventSource@V
+		const char* name = GetObjectClassName(globalEvents->eventSources[i]) + 15;
 		if (strstr(name, dispatcherName) == name) {
 			return &globalEvents->eventSources[i]->eventDispatcher;
 		}
@@ -50,11 +24,21 @@ BSTEventDispatcher<void*>* GetGlobalEventDispatcher(BSTGlobalEvent* globalEvents
 	return nullptr;
 }
 
+typedef void(*_ReadyWeaponHandler)(void*, ButtonEvent*);
+RelocAddr<uintptr_t> ReadyWeaponHandler_Target(0x2D49B48 + 0x40);
+_ReadyWeaponHandler ReadyWeaponHandler_Original;
 
+RelocPtr<float> minCurrentZoom(0x3805130);
+
+typedef void(*_TogglePOV)(void*, ButtonEvent*);
+RelocAddr<uintptr_t> TogglePOV_Target(0x2D49E48 + 0x40);
+_TogglePOV TogglePOV_Original;
 void TogglePOV_Hook(void* arg1, ButtonEvent* event) {
 	TogglePOV_Original(arg1, event);
 }
 
+RelocAddr<uintptr_t> TogglePOV_FirstToThird_Target(0x2D84518 + 0x40);
+_TogglePOV TogglePOV_FirstToThird_Original;
 void TogglePOV_FirstToThird_Hook(void* arg1, ButtonEvent* event) {
 	processCurrentScope = false;
 	ScopeTextureLoader = nullptr;
@@ -62,18 +46,26 @@ void TogglePOV_FirstToThird_Hook(void* arg1, ButtonEvent* event) {
 	TogglePOV_FirstToThird_Original(arg1, event);
 }
 
+RelocAddr<uintptr_t> TogglePOV_ThirdToFirst_Target(0x2D07A38 + 0x40);
+_TogglePOV TogglePOV_ThirdToFirst_Original;
 void TogglePOV_ThirdToFirst_Hook(void* arg1, ButtonEvent* event) {
-	static BSFixedString TogglePOV("TogglePOV");
-	static BSFixedString ZoomIn("ZoomIn");
+	static const BSFixedString TogglePOV("TogglePOV");
+	static const BSFixedString ZoomIn("ZoomIn");
 
 	TogglePOV_ThirdToFirst_Original(arg1, event);
 }
 
+typedef void(*_MovementHandler)(void*, ButtonEvent*);
+RelocAddr<uintptr_t> MovementHandler_Target(0x2D49908 + 0x40);
+_MovementHandler MovementHandler_Original;
 void MovementHandler_Hook(void* arg1, ButtonEvent* event) {
-	static BSFixedString Forward("Forward");
+	static const BSFixedString Forward("Forward");
 	MovementHandler_Original(arg1, event);
 }
 
+typedef void(*_SprintHandler)(void*, ButtonEvent*);
+RelocAddr<uintptr_t> SprintHandler_Target(0x2D499C8 + 0x40);
+_SprintHandler SprintHandler_Original;
 void SprintHandler_Hook(void* arg1, ButtonEvent* event) {
 	SprintHandler_Original(arg1, event);
 }
@@ -86,6 +78,9 @@ void ReadyWeaponHandler_Hook(void* arg1, ButtonEvent* event) {
 	ReadyWeaponHandler_Original(arg1, event);
 }
 
+typedef std::uint32_t(*_PlayerUseAmmoEvent_ReceiveEvent)(Actor*, const WeaponData&, std::uint32_t, std::uint32_t);
+RelocAddr<uintptr_t> PlayerUseAmmoEvent_ReceiveEvent_Target(0x2D438E8 + 0x780);
+_PlayerUseAmmoEvent_ReceiveEvent PlayerUseAmmoEvent_Original;
 std::uint32_t PlayerUseAmmoEvent_ReceiveEvent_Hook(Actor* actor, const WeaponData& a_weapon, std::uint32_t a_equipIndex, std::uint32_t a_shotCount) {
 	if (processCurrentWeap) {
 		if (actor == *g_player) {
@@ -103,16 +98,35 @@ std::uint32_t PlayerUseAmmoEvent_ReceiveEvent_Hook(Actor* actor, const WeaponDat
 	return PlayerUseAmmoEvent_Original(actor, a_weapon, a_equipIndex, a_shotCount);
 }
 
+typedef EventResult(*_MenuOpenCloseEvent_ReceiveEvent)(void*, MenuOpenCloseEvent*, void*);
+RelocAddr<uintptr_t> MenuOpenCloseEvent_ReceiveEvent_Target(0x2D49200 + 0x08);
+_MenuOpenCloseEvent_ReceiveEvent MenuOpenCloseEvent_ReceiveEvent_Original;
+EventResult MenuOpenCloseEvent_ReceiveEvent_Hook(void* arg1, MenuOpenCloseEvent* evn, void* dispatcher) {
+	static const BSFixedString LoadingMenu("LoadingMenu");
+	if (evn->menuName == LoadingMenu && evn->isOpen) {
+		isEmptyReload = false;
+		processCurrentScope = false;
+		processCurrentWeap = false;
+
+		static auto pLoadGameHandler = new TESLoadGameHandler();
+		GetEventDispatcher<TESLoadGameEvent>()->AddEventSink(pLoadGameHandler);
+	}
+	return MenuOpenCloseEvent_ReceiveEvent_Original(arg1, evn, dispatcher);
+}
+
+typedef EventResult(*_PlayerAnimGraphEvent_ReceiveEvent)(void*, BSAnimationGraphEvent*, void*);
+RelocAddr<uintptr_t> PlayerAnimGraphEvent_ReceiveEvent_Target(0x2D442D8 + 0x8);
+_PlayerAnimGraphEvent_ReceiveEvent PlayerAnimationEvent_Original;
 EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphEvent* evn, void* dispatcher) {
-	static BSFixedString WeaponFire("WeaponFire");
-	static BSFixedString ReloadEnd("ReloadEnd");
-	static BSFixedString ReloadComplete("ReloadComplete");
-	static BSFixedString Event00("Event00");
-	static BSFixedString reloadSequentialStart("reloadSequentialStart");
-	static BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
-	static BSFixedString sightedStateEnter("sightedStateEnter");
-	static BSFixedString sightedStateExit("sightedStateExit");
-	static BSFixedString weaponDraw("weaponDraw");
+	static const BSFixedString WeaponFire("WeaponFire");
+	static const BSFixedString ReloadEnd("ReloadEnd");
+	static const BSFixedString ReloadComplete("ReloadComplete");
+	static const BSFixedString Event00("Event00");
+	static const BSFixedString reloadSequentialStart("reloadSequentialStart");
+	static const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
+	static const BSFixedString sightedStateEnter("sightedStateEnter");
+	static const BSFixedString sightedStateExit("sightedStateExit");
+	static const BSFixedString weaponDraw("weaponDraw");
 
 	if (currentWeapInstance && processCurrentWeap)	{
 		if (!reloadStarted && reloadEnd) {
@@ -155,19 +169,16 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 			logIfNeeded("throw end");
 		}
 	}
-	if (evn->name == weaponDraw) {
-		//HanldeWeaponEquipAfter3D();
-		return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
-	}
-	if (currentWeapInstance && processCurrentScope) {
-		if (evn->name == sightedStateEnter) {
-			(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
-			return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
-		} else if (evn->name == sightedStateExit) {
-			(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
-			return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
-		}
-	}
+	//if (evn->name == weaponDraw) {
+	//	//HanldeWeaponEquipAfter3D();
+	//}
+	//if (currentWeapInstance && processCurrentScope) {
+	//	if (evn->name == sightedStateEnter) {
+	//		//(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
+	//	} else if (evn->name == sightedStateExit) {
+	//		//(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
+	//	}
+	//}
 	return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
 }
 
@@ -234,26 +245,7 @@ PlayerSetWeaponStateEventSink playerSetWeaponStateEventSink;
 
 EventResult TESLoadGameHandler::ReceiveEvent(TESLoadGameEvent* evn, void* dispatcher)	{
 	RegisterAfterLoadEvents();
-	if (oncePerSession == false) {
-		if (!RegisterAfterLoadEvents()) {
-			logIfNeeded("unable to register for events on game load");
-		}
-		oncePerSession = true;
-	}
 	return kEvent_Continue;
-}
-
-EventResult MenuOpenCloseEvent_ReceiveEvent_Hook(void* arg1, MenuOpenCloseEvent* evn, void* dispatcher) {
-	static BSFixedString LoadingMenu("LoadingMenu");
-	if (evn->menuName == LoadingMenu && evn->isOpen) {
-		isEmptyReload = false;
-		processCurrentScope = false;
-		processCurrentWeap = false;
-
-		static auto pLoadGameHandler = new TESLoadGameHandler();
-		GetEventDispatcher<TESLoadGameEvent>()->AddEventSink(pLoadGameHandler);
-	}
-	return MenuOpenCloseEvent_ReceiveEvent_Original(arg1, evn, dispatcher);
 }
 
 EventResult BGSOnPlayerUseWorkBenchEventSink::ReceiveEvent(BGSOnPlayerUseWorkBenchEvent* evn, void* dispatcher) {
@@ -263,7 +255,7 @@ EventResult BGSOnPlayerUseWorkBenchEventSink::ReceiveEvent(BGSOnPlayerUseWorkBen
 	return kEvent_Continue;
 }
 
-//todo check what furniture the player is getting into. Might be able to ignore power armor frame
+//TODO: check what furniture the player is getting into. Might be able to ignore power armor frame
 EventResult TESFurnitureEventSink::ReceiveEvent(TESFurnitureEvent* evn, void* dispatcher) {
 	if (evn->actor == (*g_player)) {
 		if (evn->isGettingUp == true) {
@@ -280,10 +272,33 @@ EventResult TESFurnitureEventSink::ReceiveEvent(TESFurnitureEvent* evn, void* di
 	return kEvent_Continue;
 }
 
-bool Install() { //Called at GameLoaded
-	bool toReturn = true;
-	log("Hooks Install");
+typedef void(*_PlayerUpdate)(void*, float);
+RelocAddr<uintptr_t> PlayerUpdate_Target(0x02D43F60);
+_PlayerUpdate PlayerUpdate_Original;
+void PlayerUpdate_Hook(void* player, float a1) {
+	if (processCurrentScope && ScopeTextureLoader && readyForRender) {
+		ScopeRendererManager::RenderHelper(1);
+	}
+	return PlayerUpdate_Original(player, a1);
+}
 
+//IDK how to hook this function :( I will use the player update hook above
+//Hook DrawWorld
+//typedef void(*_DrawWorld_And_UI)(void*, bool);
+//RelocAddr<_DrawWorld_And_UI> DrawWorld_And_UI_Original(0x00D3CBE0);
+
+//Hook DrawWorld Func
+//void DrawWorld_And_UI_Hook(void* main, bool a1) {
+//	//if (processCurrentScope && scopeRenderer) {
+//	//	nsScope_Render();
+//	//}
+//	if (processCurrentScope && ScopeTextureLoader && readyForRender) {
+//		ScopeRendererManager::RenderHelper(1);
+//	}
+//	return DrawWorld_And_UI_Original(main, a1);
+//}
+
+bool Install() { //Called at GameLoaded
 	//TogglePOV_Original = *(_TogglePOV*)(TogglePOV_Target.GetUIntPtr());
 	//SafeWrite64(TogglePOV_Target.GetUIntPtr(), (uintptr_t)TogglePOV_Hook);
 
@@ -305,6 +320,12 @@ bool Install() { //Called at GameLoaded
 	//ReadyWeaponHandler_Original = *(_ReadyWeaponHandler*)(ReadyWeaponHandler_Target.GetUIntPtr());
 	//SafeWrite64(ReadyWeaponHandler_Target.GetUIntPtr(), (uintptr_t)ReadyWeaponHandler_Hook);
 
+	//g_branchTrampoline.Write6Branch(DrawWorld_And_UI_Original.GetUIntPtr(), (uintptr_t)DrawWorld_And_UI_Hook);
+	//g_branchTrampoline.Write5Call(DrawWorld_And_UI_Original.GetUIntPtr(), (uintptr_t)DrawWorld_And_UI_Hook);
+	
+	PlayerUpdate_Original = *(_PlayerUpdate*)(PlayerUpdate_Target.GetUIntPtr());
+	SafeWrite64(PlayerUpdate_Target, (uintptr_t)PlayerUpdate_Hook);
+
 	PlayerAnimationEvent_Original = *(_PlayerAnimGraphEvent_ReceiveEvent*)(PlayerAnimGraphEvent_ReceiveEvent_Target.GetUIntPtr());
 	SafeWrite64(PlayerAnimGraphEvent_ReceiveEvent_Target, (uintptr_t)PlayerAnimGraphEvent_ReceiveEvent_Hook);
 
@@ -314,7 +335,8 @@ bool Install() { //Called at GameLoaded
 	GetEventDispatcher<TESEquipEvent>()->AddEventSink(new TESEquipEventSink());
 	GetEventDispatcher<BGSOnPlayerUseWorkBenchEvent>()->AddEventSink(new BGSOnPlayerUseWorkBenchEventSink());
 	GetEventDispatcher<TESFurnitureEvent>()->AddEventSink(new TESFurnitureEventSink());
-	return toReturn;
+	log("Hooks Install Complete");
+	return true;
 }
 
 bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global events
@@ -342,6 +364,15 @@ bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global even
 		log("Unable to register PlayerWeaponReloadEvent.");
 		return false;
 	}
+
+	if (!scopePOV || !scopePOVRoot || !pScopeManagerCullingProc || !pScopeManagerAccumulator || !pScopeManagerShaderParam) {
+		ScopeRendererManager::Setup();
+	}
+
+	//if (!scopeRenderer) {
+	//	//nsScope_CreateRenderer(); //CTD during creation. For some reason the ctor of ScopeCamera is called twice and crashes at the second called ctor
+	//}
+
 	return true;
 }
 

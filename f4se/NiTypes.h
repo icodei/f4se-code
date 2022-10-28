@@ -136,29 +136,32 @@ public:
 	NiPoint3& operator/= (float fScalar);
 };
 
-class __declspec(align(8)) NiPoint3A : NiPoint3
-{
+class __declspec(align(8)) NiPoint3A : NiPoint3 {
 public:
 
 };
 
 // C
-class NiColor
-{
+class NiColor {
 public:
 	float	r;	// 00
 	float	g;	// 04
 	float	b;	// 08
+
+	NiColor();
+	NiColor(float R, float G, float B) : r(R), g(G), b(B) { };
 };
 
 // 10
-class NiColorA
-{
+class NiColorA {
 public:
 	float	r;	// 00
 	float	g;	// 04
 	float	b;	// 08
 	float	a;	// 0C
+
+	NiColorA();
+	NiColorA(float R, float G, float B, float A) : r(R), g(G), b(B), a(A) { };
 };
 
 // 10

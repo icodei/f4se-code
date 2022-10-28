@@ -13,6 +13,30 @@ SInt32 PlayerCamera::GetCameraStateId(TESCameraState * state)
 	return -1;
 }
 
+void TESCamera::AddRotationInput(float a1, float a2) {
+	CALL_MEMBER_FN(this, AddRotationInput)(a1, a2);
+}
+
+void TESCamera::AddTranslationInput(float x, float y, float z) {
+	CALL_MEMBER_FN(this, AddTranslationInput)(x, y, z);
+}
+
+void TESCamera::AddZoomInput(float zoom) {
+	CALL_MEMBER_FN(this, AddZoomInput)(zoom);
+}
+
+bool TESCamera::GetCameraRoot(NiPointer<NiNode>& out) {
+	CALL_MEMBER_FN(this, GetCameraRoot)(out);
+}
+
+void TESCamera::SetCameraEnabled(bool enabled) {
+	CALL_MEMBER_FN(this, SetCameraEnabled)(enabled);
+}
+
+void TESCamera::SetCameraRoot(NiNode* newRoot) {
+	CALL_MEMBER_FN(this, SetCameraRoot)(newRoot);
+}
+
 void TESCamera::SetCameraState(TESCameraState* cameraState) {
 	CALL_MEMBER_FN(this, SetCameraState)(cameraState);
 }

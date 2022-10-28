@@ -15,14 +15,6 @@ RelocPtr<NiPointer<SceneGraph>>		Main__sp3DMenuRoot(0x05AA4368);
 
 RelocPtr<TES*>			tes(0x05AA4288);
 
-NiCamera::NiCamera() {
-	CALL_MEMBER_FN(this, ctor)();
-}
-
-NiCamera::NiCamera(NiCamera* cam) {
-	CALL_MEMBER_FN(cam, ctor)(); 
-}
-
 NiFrustum& NiCamera::GetViewFrustrum() {
 	return CALL_MEMBER_FN(this, GetViewFrustrum)();
 }

@@ -344,24 +344,50 @@ void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap) {
 
 //Called from anim event of weapon equip. This should happen after the 3d is loaded hopefully
 void HanldeWeaponEquipAfter3D() {
-	BSGeometry* objGeom = nullptr;
-	const BSFixedString targetName = "TextureLoader:0";
+	BSGeometry* objGeom;
+	NiCamera* currentCam;
+	NiCamera* cam;
+	NiCamera* newCam;
+
+	const BSFixedString geomName = "TextureLoader:0";
+	const BSFixedString camName = "ScopePOV";
 	if (processCurrentScope) {
 		logIfNeeded("The 3D should be loaded now. We should be able to interact with geometry now.");
-		objGeom = GetGeometryByNameHelper(targetName);
-		if (objGeom) {
-			logIfNeeded("Found the geometry of the scope.");
-			if (objGeom != ScopeTextureLoader) {
+		objGeom = GetGeometryByNameHelper(geomName);
+		if (objGeom != ScopeTextureLoader) {
+			if (objGeom) {
 				ScopeTextureLoader = objGeom;
-				logIfNeeded("This geometry is the new to us.");
-			} else {
-				logIfNeeded("This geometry is the same as last time we checked.");
+				logIfNeeded("Found the geometry of the scope.");
 			}
-			//SetupTextureLoaderWithEffectShader();
-			SetupImageSpaceShader(ScopeTextureLoader, true);
+		}
+		cam = (NiCamera*)GetGeometryByNameHelper(camName);
+		
+		if (cam) {
+			newCam = cam;
 		} else {
+			newCam = nullptr;
+		}
+		currentCam = scopePOV;
+		if (currentCam != newCam) {
+			if (newCam) {
+				scopePOV = newCam;
+				if (scopePOV->m_parent) {
+					scopePOVRoot = scopePOV->m_parent;
+				}
+				logIfNeeded("Found the scope camera.");
+			}
+			if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
+				currentCam->DeleteThis();
+			}
+		}
+		//if (scopePOV && scopeRenderer) {
+		//	scopeRenderer->scopeCam.camera = scopePOV;
+		//}
+		//SetupTextureLoaderWithEffectShader();
+		//SetupImageSpaceShader(ScopeTextureLoader, true);
+		if (!objGeom) {
 			logIfNeeded("Could not find the geometry of the scope.");
-			(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
+			//(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
 			processCurrentScope = false;
 		}
 	}
@@ -409,28 +435,28 @@ BSGeometry* GetGeometryByNameHelper(const BSFixedString& name) {
 		logIfNeeded("Got player 3D.");
 		BSGeometry* objGeom = nullptr;
 		objGeom = BSUtilities::GetObjectByName(player3D, name, true, true)->GetAsBSGeometry();
-		if (!objGeom) {
-			logIfNeeded("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
-			for (UInt32 i = 0; i < player3D->kGeomArray.count; i++) {
-				BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
-				if (object->m_name == name) {
-					objGeom = object;
-					return objGeom;
-				}
-			}
-		}
-		if (!objGeom) {
-			logIfNeeded("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
-			for (UInt32 i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
-				NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
-				if (object) {
-					if (object->m_name == name) {
-						objGeom = object.get()->GetAsBSGeometry();
-						return objGeom;
-					}
-				}
-			}
-		}
+		//if (!objGeom) {
+		//	logIfNeeded("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
+		//	for (UInt32 i = 0; i < player3D->kGeomArray.count; i++) {
+		//		BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
+		//		if (object->m_name == name) {
+		//			objGeom = object;
+		//			return objGeom;
+		//		}
+		//	}
+		//}
+		//if (!objGeom) {
+		//	logIfNeeded("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
+		//	for (UInt32 i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
+		//		NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
+		//		if (object) {
+		//			if (object->m_name == name) {
+		//				objGeom = object.get()->GetAsBSGeometry();
+		//				return objGeom;
+		//			}
+		//		}
+		//	}
+		//}
 		if (objGeom) {
 			return objGeom;
 		} else { return nullptr; }

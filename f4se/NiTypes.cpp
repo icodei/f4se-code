@@ -64,6 +64,19 @@ NiPoint3& NiPoint3::operator/= (float scalar)
 	return *this;
 }
 
+NiColor::NiColor() {
+	r = 0.0f;
+	g = 0.0f;
+	b = 0.0f;
+}
+
+NiColorA::NiColorA() {
+	r = 0.0f;
+	g = 0.0f;
+	b = 0.0f;
+	a = 1.0f;
+}
+
 NiMatrix43 NiMatrix43::operator* (const NiMatrix43& rhs) const
 {
 	NiMatrix43 tmp;

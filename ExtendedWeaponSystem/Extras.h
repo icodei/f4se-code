@@ -78,8 +78,8 @@ public:
 
 class NiCamera : public NiAVObject {
 public:
-	NiCamera();
-	NiCamera(NiCamera* cam);
+	NiCamera() { CALL_MEMBER_FN(this, ctor)(); };
+	NiCamera(NiCamera* cam) { CALL_MEMBER_FN(cam, ctor)(); };
 	//virtual ~NiCamera();  // 00
 
 	// members

@@ -55,8 +55,7 @@ public:
 };
 
 // 110
-class TESObjectREFR : public TESForm
-{
+class TESObjectREFR : public TESForm {
 public:
 	//virtual void	InitializeData() override;
 	//virtual void	ClearData() override;
@@ -283,8 +282,7 @@ STATIC_ASSERT(offsetof(TESObjectREFR, baseForm) == 0xE0);
 STATIC_ASSERT(sizeof(TESObjectREFR) == 0x110);
 
 // 490
-class Actor : public TESObjectREFR
-{
+class Actor : public TESObjectREFR {
 public:
 	virtual void	Unk_C4();
 	virtual void	Unk_C5();
@@ -556,9 +554,8 @@ public:
 	NiAVObject* GetCurrent3D();
 	NiAVObject* Get3D(bool firstPerson);
 };
-
-extern RelocPtr <PlayerCharacter*> g_player;
-
 STATIC_ASSERT(offsetof(PlayerCharacter, menuOpenClose) == 0x490);
 STATIC_ASSERT(offsetof(PlayerCharacter, playerEquipData) == 0xB70);
 STATIC_ASSERT(offsetof(PlayerCharacter, tints) == 0xD00);
+
+extern RelocPtr <PlayerCharacter*> g_player;

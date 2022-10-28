@@ -1,28 +1,28 @@
 #pragma once
 #include "f4se/xbyak/xbyak.h"
-#include "f4se/PapyrusVM.h"
-#include "f4se/NiTypes.h"
-#include "f4se/NiTextures.h"
-#include "f4se/NiRTTI.h"
-#include "f4se/NiProperties.h"
-#include "f4se/NiObjects.h"
-#include "f4se/NiNodes.h"
-#include "f4se/NiMaterials.h"
-#include "f4se/GameTypes.h"
-#include "f4se/GameStreams.h"
-#include "f4se/GameRTTI.h"
-#include "f4se/GameReferences.h"
-#include "f4se/GameObjects.h"
-#include "f4se/GameInput.h"
-#include "f4se/GameForms.h"
-#include "f4se/GameFormComponents.h"
-#include "f4se/GameExtraData.h"
-#include "f4se/GameEvents.h"
-#include "f4se/GameData.h"
-#include "f4se/GameCamera.h"
-#include "f4se/GameAPI.h"
-#include "f4se/BSGraphics.h"
 #include "f4se/BSGeometry.h"
+#include "f4se/BSGraphics.h"
+#include "f4se/GameAPI.h"
+#include "f4se/GameCamera.h"
+#include "f4se/GameData.h"
+#include "f4se/GameEvents.h"
+#include "f4se/GameExtraData.h"
+#include "f4se/GameFormComponents.h"
+#include "f4se/GameForms.h"
+#include "f4se/GameInput.h"
+#include "f4se/GameObjects.h"
+#include "f4se/GameReferences.h"
+#include "f4se/GameRTTI.h"
+#include "f4se/GameStreams.h"
+#include "f4se/GameTypes.h"
+#include "f4se/NiMaterials.h"
+#include "f4se/NiNodes.h"
+#include "f4se/NiObjects.h"
+#include "f4se/NiProperties.h"
+#include "f4se/NiRTTI.h"
+#include "f4se/NiTextures.h"
+#include "f4se/NiTypes.h"
+#include "f4se/PapyrusVM.h"
 
 #include "f4se_common/BranchTrampoline.h"
 #include "f4se_common/f4se_version.h"
@@ -56,6 +56,7 @@ extern bool processCurrentScope;
 extern bool processCurrentWeap;
 extern bool reloadEnd;
 extern bool reloadStarted;
+extern bool readyForRender;
 
 extern int ammoCapacity;
 extern int currentAmmoCount;
@@ -72,6 +73,17 @@ extern TESObjectWEAP::InstanceData* currentWeapInstance;
 extern BSGeometry* ScopeTextureLoader;
 extern BSEffectShaderData* effectShaderData;
 extern TESEffectShader* ThermalFXS;
+
+//This was for the ScopeRenderer class but it seems to not be working out
+extern ScopeRenderer* scopeRenderer;
+extern BSReadWriteLock* scopeRendererLock;
+
+//stuff for ScopeRendererManager
+extern NiCamera* scopePOV;
+extern NiNode* scopePOVRoot;
+extern BSCullingProcess* pScopeManagerCullingProc;
+extern BSShaderAccumulator* pScopeManagerAccumulator;
+extern ImageSpaceShaderParam* pScopeManagerShaderParam;
 
 #define GET_EVENT_DISPATCHER(EventName) (BSTEventDispatcher<EventName>*) GetGlobalEventDispatcher(*g_globalEvents, #EventName);
 

@@ -8,6 +8,10 @@ void BSGraphics::Renderer::ClearColor() {
 	CALL_MEMBER_FN(this, ClearColor)();
 }
 
+void BSGraphics::Renderer::DoZPrePass(NiCamera* cam1, NiCamera* cam2, float a1, float a2, float a3, float a4) {
+	CALL_MEMBER_FN(this, DoZPrePass)(cam1, cam2, a1, a2, a3, a4);
+}
+
 void BSGraphics::Renderer::Flush() {
 	CALL_MEMBER_FN(this, Flush)();
 }
@@ -80,8 +84,8 @@ BSGraphics::Texture* BSGraphics::RenderTargetManager::SaveRenderTargetToTexture(
 	return CALL_MEMBER_FN(this, SaveRenderTargetToTexture)(target, a1, a2, use);
 }
 
-void BSGraphics::RenderTargetManager::SetCurrentRenderTarget(SInt32 a1, SInt32 a2, SetRenderTargetMode mode) {
-	CALL_MEMBER_FN(this, SetCurrentRenderTarget)(a1, a2, mode);
+void BSGraphics::RenderTargetManager::SetCurrentRenderTarget(SInt32 slot, SInt32 targetIndex, SetRenderTargetMode mode) {
+	CALL_MEMBER_FN(this, SetCurrentRenderTarget)(slot, targetIndex, mode);
 }
 
 void BSGraphics::RenderTargetManager::SetCurrentDepthStencilTarget(SInt32 a1, SetRenderTargetMode mode, SInt32 a2, bool a3) {

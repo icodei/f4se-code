@@ -20,14 +20,31 @@ BGSKeyword* ThermalScopeKeyword = nullptr;
 BGSKeyword* reloadSequentialKeyword = nullptr;
 TESObjectWEAP::InstanceData* currentWeapInstance = nullptr;
 
+ScopeRenderer* scopeRenderer = nullptr;
+BSReadWriteLock* scopeRendererLock = nullptr;
+
+NiCamera* scopePOV = nullptr;
+NiNode* scopePOVRoot = nullptr;
+BSCullingProcess* pScopeManagerCullingProc = nullptr;
+BSShaderAccumulator* pScopeManagerAccumulator = nullptr;
+ImageSpaceShaderParam* pScopeManagerShaderParam = nullptr;
+
+void initGameStartData() {
+	reloadStarted = false;
+	reloadEnd = true;
+	processCurrentWeap = false;
+	processCurrentScope = false;
+	playerIsInWorkbench = false;
+	readyForRender = false;
+}
+
 void OnF4SEMessage(F4SEMessagingInterface::Message* msg) {
 	switch (msg->type) {
 	case F4SEMessagingInterface::kMessage_GameLoaded:
-		if (!GetForms()) {
-			log("Unable to get one of the form, game wont work");
-		}
-		else {
+		if (GetForms()) {
 			log("Got Forms");
+		} else {
+			log("Unable to get one of the form, game wont work");
 		}
 		if (!Install()) {
 			log("Couldn't install hooks");
@@ -37,17 +54,13 @@ void OnF4SEMessage(F4SEMessagingInterface::Message* msg) {
 	case F4SEMessagingInterface::kMessage_NewGame:
 		if (!oncePerSession) {
 			if (!RegisterAfterLoadEvents()) {
-				log("Unable to register for events on new game");
+				//log("Unable to register for events on new game");
 			}
 			oncePerSession = true;
 		}
 		break;
 	case F4SEMessagingInterface::kMessage_PostLoadGame:
-		reloadStarted = false;
-		reloadEnd = true;
-		processCurrentWeap = false;
-		processCurrentScope = false;
-		playerIsInWorkbench = false;
+		initGameStartData();
 		FillWeaponInfo();
 		break;
 	}
@@ -85,9 +98,24 @@ extern "C" {
 	bool F4SEPlugin_Load(const F4SEInterface* f4se) {
 		_MESSAGE("%s %s Loaded", prefixLog().c_str(), PLUGIN_NAME);
 
-		if (g_messaging)	{
+		if (g_messaging) {
 			log("Registered Listener");
 			g_messaging->RegisterListener(g_pluginHandle, "F4SE", OnF4SEMessage);
+		}
+
+		if (!g_localTrampoline.Create(1024 * 64, nullptr)) {
+			_ERROR("couldn't create codegen buffer. this is fatal. skipping remainder of init process.");
+			return false;
+		}
+
+		if (!g_branchTrampoline.Create(1024 * 64)) {
+			_ERROR("couldn't create branch trampoline. this is fatal. skipping remainder of init process.");
+			return false;
+		}
+
+		if (!g_localTrampoline.Create(1024 * 64, nullptr)) {
+			_ERROR("couldn't create codegen buffer. this is fatal. skipping remainder of init process.");
+			return false;
 		}
 		return true;
 	}

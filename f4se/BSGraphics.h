@@ -26,7 +26,9 @@ class BSShader;
 class ShadowSceneNode;
 
 class ImageSpaceEffect;
+class ImageSpaceEffectParam;
 class ImageSpaceManager;
+class ImageSpaceTexture;
 
 class NiCamera;
 class NiCullingProcess;
@@ -42,45 +44,6 @@ public:
 class NiAccumulator : public NiObject {
 public:
 	//virtual ~NiAccumulator();
-	//NiRefObject::DeleteThis
-	//NiAccumulator::GetRTTI
-	//NiObject::IsNode
-	//NiObject::IsNode
-	//NiObject::IsSwitchNode
-	//NiObject::IsFadeNode
-	//NiObject::IsMultiBoundNode
-	//NiObject::IsGeometry
-	//NiObject::IsTriStrips
-	//NiObject::IsTriShape
-	//NiObject::IsDynamicTriShape
-	//NiObject::IsSegmentedTriShape
-	//NiObject::IsSubIndexTriShape
-	//NiObject::IsNiGeometry
-	//NiObject::IsNiTriBasedGeom
-	//NiObject::IsNiTriShape
-	//NiObject::IsParticlesGeom
-	//NiObject::IsParticleSystem
-	//NiObject::IsLinesGeom
-	//NiObject::IsLight
-	//NiObject::IsBhkNiCollisionObject
-	//NiObject::IsBhkBlendCollisionObject
-	//NiObject::IsBhkRigidBody
-	//NiObject::IsBhkLimitedHingeConstraint
-	//NiObject::IsbhkNPCollisionObject
-	//NiObject::CreateClone
-	//NiAccumulator::LoadBinary
-	//NiAccumulator::LinkObject
-	//NiAccumulator::RegisterStreamables
-	//NiAccumulator::SaveBinary
-	//NiAccumulator::IsEqual
-	//NiObject::ProcessClone
-	//NiObject::PostLinkObject
-	//NiObject::StreamCanSkip
-	//NiObject::GetStreamableRTTI
-	//NiObject::GetBlockAllocationSize
-	//NiObject::GetGroup
-	//NiObject::SetGroup
-	//NiObject::IsNiControllerManager
 	//NiAccumulator::StartAccumulating
 	//NiAccumulator::FinishAccumulating
 	//_purecall_0
@@ -114,7 +77,7 @@ public:
 
 class NiCullingProcess {
 public:
-	NiCullingProcess() : m_bUseVirtualAppend(0), m_pkVisibleSet(nullptr), m_pkCamera(nullptr), m_kFrustum(), m_kPlanes(), kCustomCullPlanes(), m_bCameraRelatedUpdates(0), bUpdateAccumulateFlag(0), bIgnorePreprocess(0), bCustomCullPlanes(0), bUnknownBool1(0), bUnknownBool2(0){};
+	NiCullingProcess() : m_bUseVirtualAppend(0), m_pkVisibleSet(nullptr), m_pkCamera(nullptr), m_kFrustum(), m_kPlanes(), kCustomCullPlanes(), m_bCameraRelatedUpdates(0), bUpdateAccumulateFlag(0), bIgnorePreprocess(0), bCustomCullPlanes(0), bUnknownBool1(0), bUnknownBool2(0) { CALL_MEMBER_FN(this, ctor)(m_pkVisibleSet); };
 	NiCullingProcess(NiVisibleArray* a1) : m_bUseVirtualAppend(0), m_pkVisibleSet(nullptr) { CALL_MEMBER_FN(this, ctor)(a1); };
 	virtual void GetRTTI() {};
 	virtual void IsNode() {};
@@ -176,6 +139,7 @@ public:
 
 	BSCullingProcess() {};
 	BSCullingProcess(NiVisibleArray* a1) { CALL_MEMBER_FN(this, ctor)(a1); };
+	~BSCullingProcess() { CALL_MEMBER_FN(this, dtor)(); };
 	//virtual void GetRTTI();
 	//virtual void IsNode();
 	//virtual void IsNode2();
@@ -233,7 +197,7 @@ public:
 
 	void SetAccumulator(NiAccumulator* accumulator);
 };
-//STATIC_ASSERT(sizeof(BSCullingProcess) == 0x1A0ui64);
+//STATIC_ASSERT(sizeof(BSCullingProcess) == 0x1A0);
 
 
 class BSRenderPass {
@@ -275,6 +239,32 @@ struct BSGraphics {
 	//};
 	//STATIC_ASSERT(offsetof(BSRenderManager, m_textureLock) == 0x2590);
 
+	enum RenderTargetType : UInt32 {
+		unkN1 = 0xFFFFFFFF, //None??
+		unk00 = 0, //Buffer??
+		unk01 = 1, //Main??
+		unk02 = 2, //MainCopy??
+		unk03 = 3,
+
+		unk14 = 14, //RefractionNormals??
+		unk15 = 15, //ClearMask?? MenuBG??
+		unk16 = 16, //FaceCustomizationDiffuse
+		unk17 = 17, //FaceCustomizationNormals
+		unk18 = 18, //FaceCustomizationSmoothSpec
+
+		unk21 = 21, //LocalMapCompanion??
+
+		unk26 = 26, //part of DrawWorld::MainRenderSetup
+		unk27 = 27, //LocalMap?? part of DrawWorld::MainRenderSetup
+		
+		unk29 = 29, //part of DrawWorld::MainRenderSetup
+		unk30 = 30, //part of DrawWorld::MainRenderSetup
+		unk31 = 31, //part of DrawWorld::MainRenderSetup
+		unk32 = 32, //LoadingMenu?? part of DrawWorld::MainRenderSetup
+
+		unk63 = 63, //ScreenShot??
+	};
+	
 	enum SetRenderTargetMode : UInt32 { //Unconfirmed
 		SRTM_CLEAR = 0x0,
 		SRTM_CLEAR_DEPTH = 0x1,
@@ -285,10 +275,22 @@ struct BSGraphics {
 		SRTM_INIT = 0x6,
 	};
 
+	enum Format {};
 	enum DepthStencilDepthMode {};
-	enum Usage {};
+	
+	enum Usage { //Uncomfirmed
+		USAGE_DEFAULT = 0,
+		USAGE_IMMUTABLE = 1,
+		USAGE_DYNAMIC = 2,
+		USAGE_STAGING = 3
+	};
 
 	class RendererShadowState {
+	public:
+
+	};
+
+	class TextureHeader {
 	public:
 
 	};
@@ -397,7 +399,7 @@ struct BSGraphics {
 		ID3D11ShaderResourceView* copySRView;  // 20
 		ID3D11UnorderedAccessView* uaView;     // 28
 	};
-	STATIC_ASSERT(sizeof(RenderTarget) == 0x30);
+	//STATIC_ASSERT(sizeof(RenderTarget) == 0x30);
 
 	struct RenderTargetProperties {
 		UInt32 uiWidth;
@@ -411,7 +413,6 @@ struct BSGraphics {
 		UInt32 uiUnknown;
 	};
 	STATIC_ASSERT(sizeof(RenderTargetProperties) == 0x1C);
-
 
 	struct DepthStencilTargetProperties {
 		UInt32 uiWidth;
@@ -440,7 +441,7 @@ struct BSGraphics {
 		IDXGISwapChain* swapChain;
 		RenderTarget swapChainRenderTarget;
 	};
-	STATIC_ASSERT(sizeof(RendererWindow) == 0x50);
+	//STATIC_ASSERT(sizeof(RendererWindow) == 0x50);
 
 	class RendererData {
 	public:
@@ -485,12 +486,14 @@ struct BSGraphics {
 
 		MEMBER_FN_PREFIX(Renderer);
 		DEFINE_MEMBER_FN(ClearColor, void, 0x01D0B8B0);
+		DEFINE_MEMBER_FN(DoZPrePass, void, 0x01D12980, NiCamera*, NiCamera*, float, float, float, float);
 		DEFINE_MEMBER_FN(Flush, void, 0x01D0B760);
 		DEFINE_MEMBER_FN(SetClearColor, void, 0x01D0B770, float, float, float, float);
 		DEFINE_MEMBER_FN(ResetZPrePass, void, 0x01D125E0);
 		DEFINE_MEMBER_FN(ResetState, void, 0x01D11DA0);
 
 		void ClearColor();
+		void DoZPrePass(NiCamera* cam1, NiCamera* cam2, float a1, float a2, float a3, float a4);
 		void Flush();
 		void SetClearColor(float red, float green, float blue, float alpha);
 		void ResetZPrePass();
@@ -589,7 +592,7 @@ struct BSGraphics {
 		void ReleaseDepthStencil(SInt32 target);
 		void ReleaseRenderTarget(SInt32 target);
 		Texture* SaveRenderTargetToTexture(SInt32 target, bool a1, bool a2, Usage use);
-		void SetCurrentRenderTarget(SInt32 a1, SInt32 a2, SetRenderTargetMode mode);
+		void SetCurrentRenderTarget(SInt32 slot, SInt32 targetIndex, SetRenderTargetMode mode);
 		void SetCurrentDepthStencilTarget(SInt32 a1, SetRenderTargetMode mode, SInt32 a2, bool a3);
 		void SetCurrentViewportForceToRenderTargetDimensions();
 		void SetTextureRenderTarget(UInt32 a1, SInt32 a2, bool a3);
@@ -646,7 +649,6 @@ extern RelocAddr<_AccumulateScene> AccumulateScene_Internal;
 
 class BSUtilityShader : public BSShader {
 public:
-
 
 	// members
 	UInt32 currentTechniqueID;  // 118
@@ -707,8 +709,8 @@ public:
 		UInt32							uiFrameCount;
 		NiColorA						loadedRange;
 		bool							isInterior;
-		SInt8							bLightBrite;
-		UInt8							gap56;
+		bool							bLightBrite;
+		UInt8							unk56;
 		bool							rgbspecMAYBE;
 		bool							usePremultAlpha;
 		bool							field_59;
@@ -791,45 +793,7 @@ public:
 	
 	BSShaderAccumulator() { CALL_MEMBER_FN(this, ctor)(); };
 	//virtual ~BSShaderAccumulator();
-	//NiRefObject::DeleteThis
-	//BSShaderAccumulator::GetRTTI
-	//NiObject::IsNode
-	//NiObject::IsNode
-	//NiObject::IsSwitchNode
-	//NiObject::IsFadeNode
-	//NiObject::IsMultiBoundNode
-	//NiObject::IsGeometry
-	//NiObject::IsTriStrips
-	//NiObject::IsTriShape
-	//NiObject::IsDynamicTriShape
-	//NiObject::IsSegmentedTriShape
-	//NiObject::IsSubIndexTriShape
-	//NiObject::IsNiGeometry
-	//NiObject::IsNiTriBasedGeom
-	//NiObject::IsNiTriShape
-	//NiObject::IsParticlesGeom
-	//NiObject::IsParticleSystem
-	//NiObject::IsLinesGeom
-	//NiObject::IsLight
-	//NiObject::IsBhkNiCollisionObject
-	//NiObject::IsBhkBlendCollisionObject
-	//NiObject::IsBhkRigidBody
-	//NiObject::IsBhkLimitedHingeConstraint
-	//NiObject::IsbhkNPCollisionObject
-	//NiObject::CreateClone
-	//NiAlphaAccumulator::LoadBinary
-	//NiAlphaAccumulator::LinkObject
-	//NiAlphaAccumulator::RegisterStreamables
-	//NiAlphaAccumulator::SaveBinary
-	//NiAlphaAccumulator::IsEqual
-	//NiObject::ProcessClone
-	//NiObject::PostLinkObject
-	//NiObject::StreamCanSkip
-	//NiObject::GetStreamableRTTI
-	//NiObject::GetBlockAllocationSize
-	//NiObject::GetGroup
-	//NiObject::SetGroup
-	//NiObject::IsNiControllerManager
+	
 	//BSShaderAccumulator::StartAccumulating
 	//BSShaderAccumulator::FinishAccumulating
 	//NiAlphaAccumulator::RegisterObjectArray

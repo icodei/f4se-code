@@ -2,7 +2,6 @@
 
 BSTEventDispatcher<void*>* GetGlobalEventDispatcher(BSTGlobalEvent* globalEvents, const char* dispatcherName);
 
-
 struct CustomThirdPersonState {
 public:
 	UInt32	unk00[0x0EC >> 2];
@@ -33,7 +32,7 @@ struct TESEquipEvent {
 	TESObject*						item;
 	TESObjectWEAP::InstanceData*	instanceData;
 };
-STATIC_ASSERT(offsetof(TESEquipEvent, instanceData) == 0xa8);
+STATIC_ASSERT(offsetof(TESEquipEvent, instanceData) == 0xA8);
 STATIC_ASSERT(offsetof(TESEquipEvent, invItem) == 0x88);
 
 DECLARE_EVENT_DISPATCHER(TESEquipEvent, 0x00442870);
@@ -112,14 +111,6 @@ public:
 	virtual ~TESFurnitureEventSink() { };
 	virtual EventResult ReceiveEvent(TESFurnitureEvent* evn, void* dispatcher) override;
 };
-
-typedef void(*_TogglePOV)(void* arg1, ButtonEvent* event);
-typedef void(*_MovementHandler)(void*, ButtonEvent*);
-typedef void(*_SprintHandler)(void*, ButtonEvent*);
-typedef void(*_ReadyWeaponHandler)(void*, ButtonEvent*);
-typedef std::uint32_t(*_PlayerUseAmmoEvent_ReceiveEvent)(Actor* actor, const WeaponData& a_weapon, std::uint32_t a_equipIndex, std::uint32_t a_shotCount);
-typedef EventResult(*_PlayerAnimGraphEvent_ReceiveEvent)(void*, BSAnimationGraphEvent*, void*);
-typedef EventResult(*_MenuOpenCloseEvent_ReceiveEvent)(void*, MenuOpenCloseEvent*, void*);
 
 bool Install();
 bool RegisterAfterLoadEvents();
