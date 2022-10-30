@@ -362,6 +362,7 @@ void HanldeWeaponEquipAfter3D() {
 		}
 		cam = (NiCamera*)GetByNameHelper(camName);
 		if (cam) {
+			new(cam) NiCamera();
 			newCam = cam;
 		} else {
 			newCam = nullptr;
@@ -383,8 +384,8 @@ void HanldeWeaponEquipAfter3D() {
 		}
 		//TODO: add actor value or something similar to set what the FOV should be on the camera of each scope
 		if (scopePOV) {
-			float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
-			BSShaderUtil::SetCameraFOV((*Main__spWorldSceneGraph), (float)(FOV/4), 0, scopePOV, 1); //TEMP for testing. Right now I just have it as 4x zoom
+			//float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
+			BSShaderUtil_SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0/4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
 		}
 		
 		//if (scopePOV && scopeRenderer) {

@@ -90,13 +90,13 @@ RelocAddr<BSCullingGroup>			DrawWorld_k1stPersonCullingGroup(0x067236A0);
 RelocAddr<BSTArray<NiPointer<NiAVObject>>>	DrawWorld_Additional1stPersonGeom(0x067239C8);
 //DrawWorld Static Stuff End
 
-RelocAddr<_GetObjectByName>			GetObjectByName_Internal(0x01C93980);
 namespace BSUtilities {
 	NiAVObject* GetObjectByName(NiAVObject* target, const BSFixedString& name, bool a3, bool a4) {
 		NiAVObject* obj = GetObjectByName_Internal(target, name, a3, a4);
 		return obj;
 	}
 }
+RelocAddr<_GetObjectByName>			GetObjectByName_Internal(0x01C93980);
 
 void InstallExtraFunc() {
 

@@ -40,10 +40,10 @@
 #include <ctime>
 #include <iostream> 
 #include <sstream> 
-#include <stdio>
+#include <stdio.h>
 #include <string>  
 #include <thread>
-#include <time>
+#include <time.h>
 
 
 #define PLUGIN_NAME	"ExtendedWeaponSystem"

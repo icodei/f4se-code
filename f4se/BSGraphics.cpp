@@ -144,10 +144,10 @@ void BSShaderAccumulator::RenderOpaqueDecals() {
 	CALL_MEMBER_FN(this, RenderOpaqueDecals)();
 }
 
-void BSShaderUtil::SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4) {
+void BSShaderUtil_SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4) {
 	SetCameraFOV_Internal(scene, FOV, a3, cam, a4);
 }
-RelocAddr<BSShaderUtil::_SetCameraFOV> BSShaderUtil::SetCameraFOV_Internal(0x028201F0);
+RelocAddr<_SetCameraFOV> SetCameraFOV_Internal(0x028201F0);
 
 void ImageSpaceShaderParam::ResizeConstantGroup(SInt32 a1, SInt32 a2) {
 	CALL_MEMBER_FN(this, ResizeConstantGroup)(a1, a2);

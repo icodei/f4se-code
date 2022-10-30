@@ -22,6 +22,7 @@ class BSIStream;
 class BSLight;
 class BSPortalGraphEntry;
 class BSShader;
+class BSSceneGraph;
 
 class ShadowSceneNode;
 
@@ -857,11 +858,9 @@ public:
 	void RenderOpaqueDecals();
 };
 
-namespace BSShaderUtil {
-	typedef void (*_SetCameraFOV)(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
-	void SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
-	extern RelocAddr<_SetCameraFOV> SetCameraFOV_Internal;
-}
+void BSShaderUtil_SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
+typedef void (*_SetCameraFOV)(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
+extern RelocAddr<_SetCameraFOV> SetCameraFOV_Internal;
 
 //IMAGESPACE
 
