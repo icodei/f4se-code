@@ -25,6 +25,8 @@ BSReadWriteLock* scopeRendererLock = nullptr;
 
 NiCamera* scopePOV = nullptr;
 NiNode* scopePOVRoot = nullptr;
+NiCamera* scopePOV_BACKUP = nullptr;
+NiNode* scopePOVRoot_BACKUP = nullptr;
 BSCullingProcess* pScopeManagerCullingProc = nullptr;
 BSShaderAccumulator* pScopeManagerAccumulator = nullptr;
 ImageSpaceShaderParam* pScopeManagerShaderParam = nullptr;
@@ -34,7 +36,7 @@ void initGameStartData() {
 	reloadEnd = true;
 	processCurrentWeap = false;
 	processCurrentScope = false;
-	playerIsInWorkbench = false;
+	ignore = false;
 	readyForRender = false;
 }
 

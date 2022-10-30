@@ -5,7 +5,7 @@ bool reloadStarted = false;
 bool reloadEnd = true;
 bool processCurrentWeap = false;
 bool processCurrentScope = false;
-bool playerIsInWorkbench = false;
+bool ignore = false;
 bool readyForRender = false;
 
 int currentAmmoCount = 0;
@@ -23,10 +23,6 @@ BSTEventDispatcher<void*>* GetGlobalEventDispatcher(BSTGlobalEvent* globalEvents
 	}
 	return nullptr;
 }
-
-typedef void(*_ReadyWeaponHandler)(void*, ButtonEvent*);
-RelocAddr<uintptr_t> ReadyWeaponHandler_Target(0x2D49B48 + 0x40);
-_ReadyWeaponHandler ReadyWeaponHandler_Original;
 
 RelocPtr<float> minCurrentZoom(0x3805130);
 
@@ -70,6 +66,9 @@ void SprintHandler_Hook(void* arg1, ButtonEvent* event) {
 	SprintHandler_Original(arg1, event);
 }
 
+typedef void(*_ReadyWeaponHandler)(void*, ButtonEvent*);
+RelocAddr<uintptr_t> ReadyWeaponHandler_Target(0x2D49B48 + 0x40);
+_ReadyWeaponHandler ReadyWeaponHandler_Original;
 void ReadyWeaponHandler_Hook(void* arg1, ButtonEvent* event) {
 	if ((*g_player) && IsButtonPressed(event)) {
 		logIfNeeded("Player Weapon Ready Event via button press");
@@ -105,8 +104,7 @@ EventResult MenuOpenCloseEvent_ReceiveEvent_Hook(void* arg1, MenuOpenCloseEvent*
 	static const BSFixedString LoadingMenu("LoadingMenu");
 	if (evn->menuName == LoadingMenu && evn->isOpen) {
 		isEmptyReload = false;
-		processCurrentScope = false;
-		processCurrentWeap = false;
+		ignore = true;
 
 		static auto pLoadGameHandler = new TESLoadGameHandler();
 		GetEventDispatcher<TESLoadGameEvent>()->AddEventSink(pLoadGameHandler);
@@ -127,6 +125,7 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 	static const BSFixedString sightedStateEnter("sightedStateEnter");
 	static const BSFixedString sightedStateExit("sightedStateExit");
 	static const BSFixedString weaponDraw("weaponDraw");
+	static const BSFixedString weaponInstantDown("weaponInstantDown");
 
 	if (currentWeapInstance && processCurrentWeap)	{
 		if (!reloadStarted && reloadEnd) {
@@ -169,35 +168,40 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 			logIfNeeded("throw end");
 		}
 	}
-	//if (evn->name == weaponDraw) {
-	//	//HanldeWeaponEquipAfter3D();
-	//}
-	//if (currentWeapInstance && processCurrentScope) {
-	//	if (evn->name == sightedStateEnter) {
-	//		//(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
-	//	} else if (evn->name == sightedStateExit) {
-	//		//(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
-	//	}
-	//}
+	if (evn->name == weaponDraw) {
+		HanldeWeaponEquipAfter3D();
+	}
+	if (evn->name == weaponInstantDown) {
+		ignore = true;
+	}
+	if (currentWeapInstance && processCurrentScope) {
+		if (evn->name == sightedStateEnter) {
+			ignore = false;
+			//(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
+		} else if (evn->name == sightedStateExit) {
+			ignore = true;
+			//(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
+		}
+	}
 	return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
 }
 
+//adding too much to this hook causes the equip to stall and do weird things
+//Bingle showed me how threading worked :) hopefully that should fix the issues with the above comment
 EventResult TESEquipEventSink::ReceiveEvent(TESEquipEvent* evn, void* dispatcher) {
-	if (evn->owner == *g_player && evn->isEquipping) {
+	if (evn->owner == *g_player && evn->isEquipping && ignore == false) {
 		TESForm* form = LookupFormByID(evn->FormID);
 		if (form && form->formType == kFormType_WEAP) {
-			if (playerIsInWorkbench == false) {
-				Actor::MiddleProcess::Data08::EquipData* equipData = GetEquipDataByEquipIndex(EquipIndex::kEquipIndex_Default);
-				if (equipData) {
-					TESObjectWEAP* weap = DYNAMIC_CAST(equipData->item, TESForm, TESObjectWEAP);;
-					TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(equipData->item, equipData->instanceData);
-					logIfNeeded(";======================================================================================;");
-					logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
-					HanldeWeaponEquip(weapInst);
-				}
-			} else {
-				logIfNeeded("Player EquipEvent recieved but the player is curently in a workbench. We will ignore this equip.");
-			}	
+			Actor::MiddleProcess::Data08::EquipData* equipData = GetEquipDataByEquipIndex(EquipIndex::kEquipIndex_Default);
+			if (equipData) {
+				TESObjectWEAP* weap = DYNAMIC_CAST(equipData->item, TESForm, TESObjectWEAP);;
+				TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(equipData->item, equipData->instanceData);
+				logIfNeeded(";======================================================================================;");
+				logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
+				std::thread([weapInst]() { HanldeWeaponEquip(weapInst); }).detach();
+				//HanldeWeaponEquip(weapInst);
+				return kEvent_Continue;
+			}
 		}
 	}
 	return kEvent_Continue;
@@ -232,12 +236,14 @@ EventResult PlayerSetWeaponStateEventSink::ReceiveEvent(PlayerSetWeaponStateEven
 		isDrawing = true;
 	}
 	if (evn->state == WEAPON_STATE::kDrawn && isDrawing) {
-		HanldeWeaponEquipAfter3D();
+		//HanldeWeaponEquipAfter3D();
+		ignore = false;
 		logIfNeeded("Weapon has finished being equiped.");
 		isDrawing = false;
 	}
 	if (evn->state == WEAPON_STATE::kSheathing || evn->state == WEAPON_STATE::kSheathed) {
 		isDrawing = false;
+		ignore = true;
 	}
 	return kEvent_Continue;
 }
@@ -249,9 +255,7 @@ EventResult TESLoadGameHandler::ReceiveEvent(TESLoadGameEvent* evn, void* dispat
 }
 
 EventResult BGSOnPlayerUseWorkBenchEventSink::ReceiveEvent(BGSOnPlayerUseWorkBenchEvent* evn, void* dispatcher) {
-	processCurrentWeap = false;
-	processCurrentScope = false;
-	playerIsInWorkbench = true;
+	ignore = true;
 	return kEvent_Continue;
 }
 
@@ -260,24 +264,21 @@ EventResult TESFurnitureEventSink::ReceiveEvent(TESFurnitureEvent* evn, void* di
 	if (evn->actor == (*g_player)) {
 		if (evn->isGettingUp == true) {
 			logIfNeeded("Player is leaving the workbench. We may resume our work.");
-			playerIsInWorkbench = false;
-		}
-		else {
+			ignore = false;
+		} else {
 			logIfNeeded("Player is entering a workbench. We need to ignore certain events during this time.");
-			playerIsInWorkbench = true;
-			processCurrentWeap = false;
-			processCurrentScope = false;
+			ignore = true;
 		}
 	}
 	return kEvent_Continue;
 }
 
 typedef void(*_PlayerUpdate)(void*, float);
-RelocAddr<uintptr_t> PlayerUpdate_Target(0x02D43F60);
+RelocAddr<uintptr_t> PlayerUpdate_Target(0x02D43F60); //PlayerCharacter vtbl
 _PlayerUpdate PlayerUpdate_Original;
 void PlayerUpdate_Hook(void* player, float a1) {
-	if (processCurrentScope && ScopeTextureLoader && readyForRender) {
-		ScopeRendererManager::RenderHelper(1);
+	if (processCurrentScope && readyForRender && (ignore == false) && ScopeTextureLoader) {
+		ScopeRendererManager::RenderHelper(true);
 	}
 	return PlayerUpdate_Original(player, a1);
 }
@@ -351,19 +352,18 @@ bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global even
 	auto PlayerSetWeaponStateEventDispatcher = GET_EVENT_DISPATCHER(PlayerSetWeaponStateEvent);
 	if (PlayerSetWeaponStateEventDispatcher) {
 		PlayerSetWeaponStateEventDispatcher->AddEventSink(&playerSetWeaponStateEventSink);
-	}
-	else {
+	} else {
 		log("Unable to register PlayerSetWeaponStateEvent.");
 		return false;
 	}
 
-	auto PlayerWeaponReloadEventDispatcher = GET_EVENT_DISPATCHER(PlayerWeaponReloadEvent);
-	if (PlayerWeaponReloadEventDispatcher) {
-		PlayerWeaponReloadEventDispatcher->AddEventSink(&playerWeaponReloadEventSink);
-	} else {
-		log("Unable to register PlayerWeaponReloadEvent.");
-		return false;
-	}
+	//auto PlayerWeaponReloadEventDispatcher = GET_EVENT_DISPATCHER(PlayerWeaponReloadEvent);
+	//if (PlayerWeaponReloadEventDispatcher) {
+	//	PlayerWeaponReloadEventDispatcher->AddEventSink(&playerWeaponReloadEventSink);
+	//} else {
+	//	log("Unable to register PlayerWeaponReloadEvent.");
+	//	return false;
+	//}
 
 	if (!scopePOV || !scopePOVRoot || !pScopeManagerCullingProc || !pScopeManagerAccumulator || !pScopeManagerShaderParam) {
 		ScopeRendererManager::Setup();

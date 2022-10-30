@@ -77,7 +77,7 @@ UInt32 GetInventoryItemCount(Actor* actor, TESForm* item);
 void FillWeaponInfo();
 void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap);
 void HanldeWeaponEquipAfter3D();
-BSGeometry* GetGeometryByNameHelper(const BSFixedString& name);
+NiAVObject* GetByNameHelper(const BSFixedString& name);
 void SetupTextureLoaderWithEffectShader();
 void SetupImageSpaceShader(BSGeometry* objGeom, bool active);
 BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3);

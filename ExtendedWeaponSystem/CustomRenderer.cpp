@@ -798,6 +798,7 @@ void ScopeRendererManager::Setup() {
 			InterlockedIncrement(&newCam->m_uiRefCount);
 		}
 		scopePOV = newCam;
+		scopePOV_BACKUP = newCam;
 		if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
 			currentCam->DeleteThis();
 		}
@@ -829,6 +830,7 @@ void ScopeRendererManager::Setup() {
 			InterlockedIncrement(&newNode->m_uiRefCount);
 		}
 		scopePOVRoot = newNode;
+		scopePOVRoot_BACKUP = newNode;
 		if (currentNode && !InterlockedDecrement(&currentNode->m_uiRefCount)) {
 			currentNode->DeleteThis();
 		}
@@ -897,7 +899,7 @@ void ScopeRendererManager::Setup() {
 }
 
 void ScopeRendererManager::RenderHelper(bool save) {
-	logIfNeeded("ScopeRendererManager Rendering...");
+	//logIfNeeded("ScopeRendererManager Rendering...");
 	NiTexture* renderedTexture;
 	renderedTexture = ScopeRendererManager::Render(save);
 	if (renderedTexture) {
@@ -916,8 +918,8 @@ void ScopeRendererManager::RenderHelper(bool save) {
 		if (shaderProperty.get()) {
 			effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
 			effectShaderMaterial->spBaseTexture = renderedTexture;
-			effectShaderMaterial->fBaseColorScale = 1.0;
-			effectShaderMaterial->kBaseColor = NiColorA(1.0, 1.0, 1.0, 1.0);
+			//effectShaderMaterial->fBaseColorScale = 1.0;
+			//effectShaderMaterial->kBaseColor = NiColorA(1.0, 1.0, 1.0, 1.0);
 		}
 
 		//BSLightingShaderProperty* lightingShaderProperty;

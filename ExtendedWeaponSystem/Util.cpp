@@ -312,6 +312,7 @@ void FillWeaponInfo() {
 			logIfNeeded(GetFullNameWEAP(weap) + " has the ThermalScopeKeyword.");
 		} else {
 			processCurrentScope = false;
+			ScopeTextureLoader = nullptr;
 			logIfNeeded(GetFullNameWEAP(weap) + "does not have the ThermalScopeKeyword.");
 		}
 		logIfNeeded(";======================================================================================;");
@@ -336,7 +337,6 @@ void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap) {
 		logIfNeeded("ThermalScopeKeyword found. We should process this weapon for special scope utility.");
 	} else {
 		processCurrentScope = false;
-		ScopeTextureLoader = nullptr;
 		logIfNeeded("No ThermalScopeKeyword found. We can ignore this weapon for special scope utility.");
 	}
 	logIfNeeded(";======================================================================================;");
@@ -351,21 +351,22 @@ void HanldeWeaponEquipAfter3D() {
 
 	const BSFixedString geomName = "TextureLoader:0";
 	const BSFixedString camName = "ScopePOV";
-	if (processCurrentScope) {
+	if (processCurrentScope && ignore == false) {
 		logIfNeeded("The 3D should be loaded now. We should be able to interact with geometry now.");
-		objGeom = GetGeometryByNameHelper(geomName);
+		objGeom = (BSGeometry*)GetByNameHelper(geomName);
 		if (objGeom != ScopeTextureLoader) {
 			if (objGeom) {
 				ScopeTextureLoader = objGeom;
 				logIfNeeded("Found the geometry of the scope.");
 			}
 		}
-		cam = (NiCamera*)GetGeometryByNameHelper(camName);
-		
+		cam = (NiCamera*)GetByNameHelper(camName);
 		if (cam) {
 			newCam = cam;
 		} else {
 			newCam = nullptr;
+			scopePOV = scopePOV_BACKUP;
+			scopePOVRoot = scopePOVRoot_BACKUP;
 		}
 		currentCam = scopePOV;
 		if (currentCam != newCam) {
@@ -380,6 +381,12 @@ void HanldeWeaponEquipAfter3D() {
 				currentCam->DeleteThis();
 			}
 		}
+		//TODO: add actor value or something similar to set what the FOV should be on the camera of each scope
+		if (scopePOV) {
+			float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
+			BSShaderUtil::SetCameraFOV((*Main__spWorldSceneGraph), (float)(FOV/4), 0, scopePOV, 1); //TEMP for testing. Right now I just have it as 4x zoom
+		}
+		
 		//if (scopePOV && scopeRenderer) {
 		//	scopeRenderer->scopeCam.camera = scopePOV;
 		//}
@@ -403,7 +410,6 @@ void SetupImageSpaceShader(BSGeometry* objGeom, bool active) {
 	if (shaderProperty.get()) {
 		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
 		BSImageShader->Render((BSTriShape*)objGeom, BSImagespaceShader_DefaultParam);
-
 		logIfNeeded("Scope materials setup complete.");
 	}
 }
@@ -429,36 +435,36 @@ void SetupTextureLoaderWithEffectShader() {
 	}
 }
 
-BSGeometry* GetGeometryByNameHelper(const BSFixedString& name) {
+NiAVObject* GetByNameHelper(const BSFixedString& name) {
 	BSFadeNode* player3D = (*g_player) ? (BSFadeNode*)(*g_player)->GetObjectRootNode() : nullptr;
 	if (player3D) {
-		logIfNeeded("Got player 3D.");
-		BSGeometry* objGeom = nullptr;
-		objGeom = BSUtilities::GetObjectByName(player3D, name, true, true)->GetAsBSGeometry();
-		//if (!objGeom) {
+		//logIfNeeded("Got player 3D.");
+		NiAVObject* obj;
+		obj = BSUtilities::GetObjectByName(player3D, name, true, true);
+		//if (!obj) {
 		//	logIfNeeded("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
 		//	for (UInt32 i = 0; i < player3D->kGeomArray.count; i++) {
 		//		BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
 		//		if (object->m_name == name) {
-		//			objGeom = object;
-		//			return objGeom;
+		//			obj = (NiAVObject*)object;
+		//			return obj;
 		//		}
 		//	}
 		//}
-		//if (!objGeom) {
+		//if (!obj) {
 		//	logIfNeeded("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
 		//	for (UInt32 i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
 		//		NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
 		//		if (object) {
 		//			if (object->m_name == name) {
-		//				objGeom = object.get()->GetAsBSGeometry();
-		//				return objGeom;
+		//				obj = object.get();
+		//				return obj;
 		//			}
 		//		}
 		//	}
 		//}
-		if (objGeom) {
-			return objGeom;
+		if (obj) {
+			return obj;
 		} else { return nullptr; }
 	} else { return nullptr; }
 }

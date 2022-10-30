@@ -22,24 +22,26 @@ public:
 
 struct TESEquipEvent {
 	TESObjectREFR*					owner;			// 00
-	UInt32							FormID;			// 08
-	char							padding[9];
-	bool							isEquipping;
-	char							padding2[111];
-
-	BGSInventoryItem::Stack*		invItem;
-	char							padding3[15];
-	TESObject*						item;
-	TESObjectWEAP::InstanceData*	instanceData;
+	UInt32							FormID;			// 08	base FormID
+	UInt32							unkC;			// 0C	Refr FormID?
+	UInt16							unk10;			// 10	ID?
+	bool							unk12;			// 12
+	bool							isEquipping;	// 15
+	UInt8							padding1[111];	// 16
+	//16-87 UNK
+	BGSInventoryItem::Stack*		invItem;		// 88
+	UInt8							padding2[15];	// 90
+	//90-9F UNK
+	TESObject*						item;			// A0
+	TESObjectWEAP::InstanceData*	instanceData;	// A8
 };
 STATIC_ASSERT(offsetof(TESEquipEvent, instanceData) == 0xA8);
 STATIC_ASSERT(offsetof(TESEquipEvent, invItem) == 0x88);
-
 DECLARE_EVENT_DISPATCHER(TESEquipEvent, 0x00442870);
 
 class TESEquipEventSink : public BSTEventSink<TESEquipEvent> {
 protected:
-	virtual ~TESEquipEventSink() {};
+	virtual ~TESEquipEventSink() { };
 	virtual EventResult ReceiveEvent(TESEquipEvent* evn, void* dispatcher) override;
 };
 
@@ -55,7 +57,7 @@ STATIC_ASSERT(offsetof(PlayerAmmoCountEvent, weapon) == 0x10);
 
 class PlayerAmmoCountEventSink : public BSTEventSink<PlayerAmmoCountEvent> {
 public:
-	virtual ~PlayerAmmoCountEventSink() {};
+	virtual ~PlayerAmmoCountEventSink() { };
 	virtual EventResult ReceiveEvent(PlayerAmmoCountEvent* evn, void* dispatcher) override;
 };
 
@@ -65,7 +67,7 @@ struct PlayerWeaponReloadEvent {
 
 class PlayerWeaponReloadEventSink : public BSTEventSink<PlayerWeaponReloadEvent> {
 public:
-	virtual ~PlayerWeaponReloadEventSink() {};
+	virtual ~PlayerWeaponReloadEventSink() { };
 	virtual EventResult ReceiveEvent(PlayerWeaponReloadEvent* evn, void* dispatcher) override;
 };
 

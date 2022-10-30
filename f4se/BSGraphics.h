@@ -222,6 +222,12 @@ public:
 class BSBatchRenderer {
 public:
 
+	// 28
+	class GeometryGroup {
+	public:
+
+	};
+	//STATIC_ASSERT(sizeof(GeometryGroup) == 0x28);
 };
 
 //GRAPHICS
@@ -509,10 +515,12 @@ struct BSGraphics {
 		void SetCameraData(NiCamera* cam, bool a3, float a4, float a5);
 	};
 
+	// 12272
 	class Context {
 	public:
 
 	};
+	//STATIC_ASSERT(sizeof(Context) == 0x12272);
 
 	class OcclusionQuery {
 	public:
@@ -848,6 +856,12 @@ public:
 	void RenderBlendedDecals();
 	void RenderOpaqueDecals();
 };
+
+namespace BSShaderUtil {
+	typedef void (*_SetCameraFOV)(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
+	void SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
+	extern RelocAddr<_SetCameraFOV> SetCameraFOV_Internal;
+}
 
 //IMAGESPACE
 

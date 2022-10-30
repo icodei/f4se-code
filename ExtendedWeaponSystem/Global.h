@@ -40,9 +40,10 @@
 #include <ctime>
 #include <iostream> 
 #include <sstream> 
-#include <stdio.h>
+#include <stdio>
 #include <string>  
-#include <time.h>
+#include <thread>
+#include <time>
 
 
 #define PLUGIN_NAME	"ExtendedWeaponSystem"
@@ -51,7 +52,7 @@
 extern bool isEmptyReload;
 extern bool logEnabled;
 extern bool oncePerSession;
-extern bool playerIsInWorkbench;
+extern bool ignore;
 extern bool processCurrentScope;
 extern bool processCurrentWeap;
 extern bool reloadEnd;
@@ -81,6 +82,8 @@ extern BSReadWriteLock* scopeRendererLock;
 //stuff for ScopeRendererManager
 extern NiCamera* scopePOV;
 extern NiNode* scopePOVRoot;
+extern NiCamera* scopePOV_BACKUP;
+extern NiNode* scopePOVRoot_BACKUP;
 extern BSCullingProcess* pScopeManagerCullingProc;
 extern BSShaderAccumulator* pScopeManagerAccumulator;
 extern ImageSpaceShaderParam* pScopeManagerShaderParam;
