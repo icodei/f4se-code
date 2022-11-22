@@ -201,6 +201,9 @@ public:
 	MEMBER_FN_PREFIX(NiAVObject);
 	DEFINE_MEMBER_FN(GetAVObjectByName, NiAVObject*, 0x01C93980, const BSFixedString * name, bool unk1, bool unk2);
 	DEFINE_MEMBER_FN(SetScenegraphChange, void, 0x01BA47C0);
+	DEFINE_MEMBER_FN(Update, void, 0x01BA3BE0, NiUpdateData&);
+
+	void Update(NiUpdateData& updateParams);
 
 	// Return true in the functor to halt traversal
 	bool Visit(const std::function<bool(NiAVObject*)>& functor);

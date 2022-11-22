@@ -41,9 +41,11 @@
 #include <iostream> 
 #include <sstream> 
 #include <stdio.h>
-#include <string>  
+#include <string> 
 #include <thread>
 #include <time.h>
+#include <type_traits>
+#include <unordered_map>
 
 
 #define PLUGIN_NAME	"ExtendedWeaponSystem"

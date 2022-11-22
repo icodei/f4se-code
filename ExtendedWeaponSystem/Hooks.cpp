@@ -177,6 +177,9 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 	if (currentWeapInstance && processCurrentScope) {
 		if (evn->name == sightedStateEnter) {
 			ignore = false;
+			if (readyForRender && (ignore == false) && ScopeTextureLoader && scopePOV) {
+				ScopeRendererManager::RenderHelper(true);
+			}
 			//(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
 		} else if (evn->name == sightedStateExit) {
 			ignore = true;
@@ -278,7 +281,7 @@ RelocAddr<uintptr_t> PlayerUpdate_Target(0x02D43F60); //PlayerCharacter vtbl
 _PlayerUpdate PlayerUpdate_Original;
 void PlayerUpdate_Hook(void* player, float a1) {
 	if (processCurrentScope && readyForRender && (ignore == false) && ScopeTextureLoader && scopePOV) {
-		ScopeRendererManager::RenderHelper(true);
+		//ScopeRendererManager::RenderHelper(true);
 	}
 	return PlayerUpdate_Original(player, a1);
 }

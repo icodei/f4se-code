@@ -831,6 +831,8 @@ void ScopeRendererManager::Setup() {
 		}
 		scopePOVRoot = newNode;
 		scopePOVRoot_BACKUP = newNode;
+		//float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
+		BSShaderUtil_SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0 / 4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
 		if (currentNode && !InterlockedDecrement(&currentNode->m_uiRefCount)) {
 			currentNode->DeleteThis();
 		}
@@ -896,6 +898,16 @@ void ScopeRendererManager::Setup() {
 	pScopeManagerShaderParam->ResizeConstantGroup(0, 1);
 	readyForRender = true;
 	logIfNeeded("ScopeRendererManager Setup Completed.");
+}
+
+//Delete the current stored values and objects we have created so far. I don't think DestroyRenderTarget is needed but idk. I'm still not sure how rendertargets work
+void ScopeRendererManager::Shutdown() {
+
+}
+
+//I'm not too sure about this one. Mostly a test to see if ReleaseRenderTarget is a thing I need to do or not
+void ScopeRendererManager::Pause() {
+
 }
 
 void ScopeRendererManager::RenderHelper(bool save) {
@@ -1132,16 +1144,14 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	}
 	if (pShadow->m_children.m_emptyRunStart > 9) {
 		pChildAt9 = pShadow->m_children.m_data[9];
-	}
-	else {
+	} else {
 		pChildAt9 = nullptr;
 	}
 	BSShaderUtil::AccumulateScene(scopePOV, pChildAt9, (*scopeCulling), 0);
 	NiAVObject* pChildAt8;
 	if (pShadow->m_children.m_emptyRunStart > 8) {
 		pChildAt8 = pShadow->m_children.m_data[8];
-	}
-	else {
+	} else {
 		pChildAt8 = nullptr;
 	}
 	BSShaderUtil::AccumulateScene(scopePOV, pChildAt8, (*scopeCulling), 0);
@@ -1265,3 +1275,82 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	}
 	return renderedTexture;
 }
+
+
+bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAttach, char nodeName = 0) {
+	
+	NiCamera* cam;
+	NiCamera** pCam;
+
+	if (doAttach) {
+		BSFixedString sCamName(camName);
+		BSFixedString sNodeName(&nodeName);
+		NiNode* targetNode = (NiNode*)GetByNameHelper(sNodeName);
+		if (targetNode) {
+			if (std::get<bool>(s_extraCamerasMap.try_emplace(camName, pCam))) {
+				*pCam = cam = (NiCamera*)CreateNS_NiCamera_Create();
+				InterlockedIncrement(&cam->m_uiRefCount);
+				cam->m_name = sCamName;
+				cam->viewFrustum.m_fNear = 5.0;
+				cam->viewFrustum.m_fFar = 353840.0;
+				cam->minNearPlaneDist = 1.0;
+				cam->maxFarNearRatio = 70768.0;
+				cam->lodAdjust = 0.001;
+
+				scopePOV = cam;
+				scopePOV_BACKUP = cam;
+			}
+			else { cam = *pCam; }
+			if (cam->m_parent != targetNode) {
+				targetNode->AttachChild(cam, 1);
+				NiAVObject::NiUpdateData camUpdateParams = NiAVObject::NiUpdateData();
+				camUpdateParams.unk00 = 0; //time = 0.0
+				memset(camUpdateParams.pCamera, 0, 20);
+				cam->Update(camUpdateParams);
+			}
+		}
+	} else {
+		auto findCam = (*s_extraCamerasMap.find(camName)).second;
+		if (findCam) {
+			cam = findCam;
+			s_extraCamerasMap.erase(camName);
+			if (cam->m_parent) {
+				cam->m_parent->RemoveChild(cam);
+			}
+			cam->DeleteThis();
+		}
+	}
+	return true;
+}
+
+void ExtraCameraManager::GenerateExtraCameraTexture(TESObjectCELL* cell, NiCamera* camera, NiTexture* outTexture) {
+
+}
+
+bool ExtraCameraManager::ProjectExtraCamera(const char camName[0x40], const char nodeName[0x40], float fov, UInt32 pixelSize) {
+	NiCamera* cam = (*s_extraCamerasMap.find(camName)).second;
+	if (cam && cam->m_parent) {
+		NiTexture** pTex = NULL;
+		if (nodeName[0]) {
+			BSFixedString sNodeName(nodeName);
+			NiAVObject* targetGeom = GetByNameHelper(sNodeName);
+			if (targetGeom && targetGeom->GetAsBSGeometry()) {
+				NiPointer<BSShaderProperty> shaderProperty;
+
+				BSEffectShaderProperty* effectShaderProperty;
+				shaderProperty = ni_cast(ScopeTextureLoader->shaderProperty, BSShaderProperty);
+				effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
+				if (shaderProperty.get()) {
+					NiTexture* baseTex = effectShaderProperty->QBaseTexture();
+					pTex = &baseTex;
+				}
+			}
+		}
+		if (pTex) {
+
+		}
+	}
+	return true;
+}
+
+std::unordered_map<const char*, NiCamera*> s_extraCamerasMap;

@@ -1,6 +1,5 @@
 #include "f4se/NiProperties.h"
 
-
 void BSShaderProperty::SetEffectShaderData(BSEffectShaderData* shaderData) {
 	CALL_MEMBER_FN(this, SetEffectShaderData)(shaderData);
 }
@@ -25,14 +24,18 @@ BSEffectShaderProperty* BSEffectShaderProperty::Create() {
 	return prop;
 }
 
+BSShaderProperty::RenderPassArray* BSEffectShaderProperty::GetRenderPasses(BSGeometry* a_geom, UInt32 a1, BSShaderAccumulator* a_accumulator) {
+	return CALL_MEMBER_FN(this, GetRenderPasses)(a_geom, a1, a_accumulator);
+}
+
+NiTexture* BSEffectShaderProperty::QBaseTexture() {
+	return CALL_MEMBER_FN(this, QBaseTexture)();
+}
+
 BSEffectShaderMaterial* BSEffectShaderProperty::QEffectShaderMaterial() {
 	return CALL_MEMBER_FN(this, QEffectShaderMaterial)();
 }
 
 bool BSEffectShaderProperty::SetupGeometry(BSGeometry* geom) {
 	return CALL_MEMBER_FN(this, SetupGeometry)(geom);
-}
-
-BSShaderProperty::RenderPassArray* BSEffectShaderProperty::GetRenderPasses(BSGeometry* a_geom, UInt32 a1, BSShaderAccumulator* a_accumulator) {
-	return CALL_MEMBER_FN(this, GetRenderPasses)(a_geom, a1, a_accumulator);
 }

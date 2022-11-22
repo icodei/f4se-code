@@ -19,15 +19,14 @@ class NiProperty : public NiObjectNET {
 public:
 	virtual ~NiProperty();
 	//add
-	virtual SInt32				GetType(void);
-	//virtual void				Update(NiAVObject::NiUpdateData&);
+	virtual SInt32	GetType(void);
+	//virtual void	Update(NiAVObject::NiUpdateData&);
 
 	enum {
 		kTypeAlpha = 0,
 		kTypeShade = 1
 	};
 
-	
 };
 
 // 30
@@ -71,7 +70,7 @@ class NiShadeProperty : public NiProperty {
 public:
 	virtual ~NiShadeProperty();
 	//add
-	virtual bool SetupGeometry();
+	virtual bool SetupGeometry() {};
 
 };
 
@@ -204,13 +203,16 @@ public:
 
 	MEMBER_FN_PREFIX(BSEffectShaderProperty);
 	DEFINE_MEMBER_FN(ctor, void, 0x027CAAC0);
+	DEFINE_MEMBER_FN(GetRenderPasses, BSShaderProperty::RenderPassArray*, 0x027CAE10, BSGeometry*, UInt32, BSShaderAccumulator*);
+	DEFINE_MEMBER_FN(GetBaseTexture, NiTexture*, 0x027CBFE0);
+	DEFINE_MEMBER_FN(QBaseTexture, NiTexture*, 0x027CC0B0);
 	DEFINE_MEMBER_FN(QEffectShaderMaterial, BSEffectShaderMaterial*, 0x001E0930);
 	DEFINE_MEMBER_FN(SetupGeometry, bool, 0x027CAB60, BSGeometry* geom);
-	DEFINE_MEMBER_FN(GetRenderPasses, BSShaderProperty::RenderPassArray*, 0x027CAE10, BSGeometry*, UInt32, BSShaderAccumulator*);
 
+	BSShaderProperty::RenderPassArray* GetRenderPasses(BSGeometry* a_geom, UInt32 a1, BSShaderAccumulator* a_accumulator);
+	NiTexture* QBaseTexture();
 	BSEffectShaderMaterial* QEffectShaderMaterial();
 	bool SetupGeometry(BSGeometry* geom);
-	BSShaderProperty::RenderPassArray* GetRenderPasses(BSGeometry* a_geom, UInt32 a1, BSShaderAccumulator* a_accumulator);
 
 	static BSEffectShaderProperty* Create();
 };

@@ -466,8 +466,10 @@ NiAVObject* GetByNameHelper(const BSFixedString& name) {
 		//}
 		if (obj) {
 			return obj;
-		} else { return nullptr; }
-	} else { return nullptr; }
+		}
+		else { return nullptr; }
+	}
+	else { return nullptr; }
 }
 
 //TESEffectShader::CreateEffectShaderData but without the reset part breaking it
@@ -576,7 +578,6 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 		return newEffectShaderData;
 	}
 }
-
 
 //code from Bingle
 //void ReloadSubgraph() {

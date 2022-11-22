@@ -92,7 +92,36 @@ public:
 
 	//functions
 	static void Setup();
+	static void Shutdown();
+	static void Pause();
 	static void RenderHelper(bool save);
 	static NiTexture* Render(bool save);
+
 };
 STATIC_ASSERT(std::is_empty_v<ScopeRendererManager>);
+
+//stuff from JiP for reference
+//
+//#define DEFINE_COMMAND_PLUGIN(name, refRequired, numParams, paramInfo) \
+//DEFINE_CMD_FULL(name, , refRequired, numParams, paramInfo, NULL)
+// 
+//DEFINE_COMMAND_PLUGIN(AttachExtraCamera, 1, 4, kParams_OneString_OneInt_OneOptionalString_OneOptionalInt);
+// 
+//DEFINE_COMMAND_PLUGIN(ProjectExtraCamera, 0, 5, kParams_TwoStrings_OneFloat_TwoOptionalInt);
+
+UInt32 s_texturePixelSize = 0x110;
+UInt32 s_projectPixelSize = 0x100;
+
+//manages extra cameras
+class ExtraCameraManager {
+public:
+
+	//functions
+	static bool AttachExtraCamera(const char camName[0x40], bool doAttach, char nodeName = 0);
+	static void GenerateExtraCameraTexture(TESObjectCELL* cell, NiCamera* camera, NiTexture* outTexture);
+	static bool ProjectExtraCamera(const char camName[0x40], const char nodeName[0x40], float fov, UInt32 pixelSize = 0x100);
+
+};
+STATIC_ASSERT(std::is_empty_v<ExtraCameraManager>);
+
+extern std::unordered_map<const char*, NiCamera*> s_extraCamerasMap;

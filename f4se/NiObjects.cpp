@@ -35,6 +35,10 @@ bool NiObjectNET::AddExtraData(NiExtraData * extraData) {
 	return CALL_MEMBER_FN(this, Internal_AddExtraData)(extraData);
 }
 
+void NiAVObject::Update(NiUpdateData& updateParams) {
+	CALL_MEMBER_FN(this, Update)(updateParams);
+}
+
 bool NiAVObject::Visit(const std::function<bool(NiAVObject*)>& functor) {
 	if (functor(this)) {
 		return true;
