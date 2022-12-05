@@ -37,6 +37,6 @@ void TESCamera::SetCameraRoot(NiNode* newRoot) {
 	CALL_MEMBER_FN(this, SetCameraRoot)(newRoot);
 }
 
-void TESCamera::SetCameraState(TESCameraState* cameraState) {
-	CALL_MEMBER_FN(this, SetCameraState)(cameraState);
+void TESCamera::SetCameraState(TESCameraState* newCameraState) {
+	CALL_MEMBER_FN(this, SetCameraState)(newCameraState);
 }

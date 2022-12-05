@@ -179,7 +179,7 @@ namespace papyrusGame
 	{
 		PlayerCamera * playerCamera = *g_playerCamera;
 		if(playerCamera)
-			return playerCamera->GetCameraStateId(playerCamera->cameraState);
+			return playerCamera->GetCameraStateId(playerCamera->currentState);
 
 		return -1;
 	}

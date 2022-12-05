@@ -184,9 +184,9 @@ ScopeCamera::ScopeCamera() : TESCamera() {
 	cameraNode->AttachChild(camera, true);
 
 	ScopeCamera::DefaultState* camDefaultState;
-	TESCameraState* oldCamDefaultState;
+	TESCameraState* oldCamState;
 	camDefaultState = (ScopeCamera::DefaultState*)Heap_Allocate(sizeof(ScopeCamera::DefaultState));
-	if (camDefaultState) {
+	if (camDefaultState) { //TODO: Add new members
 		camDefaultState->m_refCount = 0;
 		camDefaultState->camera = this;
 		camDefaultState->stateID = 0;
@@ -200,21 +200,33 @@ ScopeCamera::ScopeCamera() : TESCamera() {
 		camDefaultState = nullptr;
 		logIfNeeded("ScopeCamera - ScopeCamera::DefaultState Creation FAILED");
 	}
-	oldCamDefaultState = defaultState;
-	if (camDefaultState != oldCamDefaultState) {
+	oldCamState = currentState;
+	if (camDefaultState != oldCamState) {
 		if (camDefaultState) {
 			InterlockedIncrement(&camDefaultState->m_refCount);
 		}
-		defaultState = camDefaultState;
-		if (oldCamDefaultState && !InterlockedDecrement(&oldCamDefaultState->m_refCount)) {
-			oldCamDefaultState->~TESCameraState();
+		currentState = camDefaultState;
+		if (oldCamState && !InterlockedDecrement(&oldCamState->m_refCount)) {
+			oldCamState->~TESCameraState();
 		}
 	}
 	//this->SetState(this->defaultState); //This is crashing. Idk why
 	logIfNeeded("ScopeCamera ctor Completed.");
 }
 
-ScopeCamera::~ScopeCamera() {
+ScopeCamera::~ScopeCamera() { //TODO
+
+}
+
+void ScopeCamera::SetCameraNode(NiNode* node) { //TODO
+
+}
+
+void ScopeCamera::SetEnabled(bool enabled) { //TODO
+
+}
+
+void ScopeCamera::Update() { //TODO
 
 }
 
@@ -231,7 +243,7 @@ NiPoint3& ScopeCamera::QMinExtent() {
 }
 
 void ScopeCamera::Reset() {
-	cameraState->Begin();
+	currentState->Begin();
 }
 
 void ScopeCamera::SetExtents(NiPoint3& min, NiPoint3& max) {
@@ -239,32 +251,32 @@ void ScopeCamera::SetExtents(NiPoint3& min, NiPoint3& max) {
 	minExtent = min;
 }
 
-void ScopeCamera::SetState(TESCameraState* cameraState) {
+void ScopeCamera::SetState(TESCameraState* newCameraState) {
 	TESCameraState* pOldState;
 	TESCameraState* oldState;
 	TESCameraState* newState;
 
-	pOldState = defaultState;
+	pOldState = currentState;
 	if (pOldState) {
 		pOldState->End();
 	}
-	oldState = defaultState;
-	if (cameraState != oldState) {
-		if (cameraState) {
-			InterlockedIncrement(&cameraState->m_refCount);
+	oldState = currentState;
+	if (newCameraState != oldState) {
+		if (newCameraState) {
+			InterlockedIncrement(&newCameraState->m_refCount);
 		}
-		defaultState = cameraState;
+		currentState = newCameraState;
 		if (oldState && !InterlockedDecrement(&oldState->m_refCount)) {
 			oldState->~TESCameraState();
 		}
 	}
-	newState = defaultState;
+	newState = currentState;
 	if (newState) {
 		newState->Begin();
 	}
 }
 
-ScopeCamera::DefaultState::DefaultState(TESCamera& cam, UInt32 ID) : TESCameraState(cam, ID) {
+ScopeCamera::DefaultState::DefaultState(TESCamera& cam, UInt32 ID) : TESCameraState(cam, ID) { //TODO: Add new members
 	logIfNeeded("ScopeCamera::DefaultState ctor Starting...");
 	m_refCount = 0;
 	camera = &cam;
@@ -284,24 +296,56 @@ ScopeCamera::DefaultState::~DefaultState() {
 	logIfNeeded("ScopeCamera::DefaultState dtor Completed.");
 }
 
-void ScopeCamera::DefaultState::Begin() {
+bool ScopeCamera::DefaultState::ShouldHandleEvent(InputEvent* inputEvent) { //TODO
+	return false; //TEMP
+}
+
+void ScopeCamera::DefaultState::OnKinectEvent(KinectEvent* inputEvent) { //TODO
+
+}
+
+void ScopeCamera::DefaultState::OnDeviceConnectEvent(DeviceConnectEvent* inputEvent) { //TODO
+
+}
+
+void ScopeCamera::DefaultState::OnThumbstickEvent(ThumbstickEvent* inputEvent) { //TODO
+
+}
+
+void ScopeCamera::DefaultState::OnCursorMoveEvent(CursorMoveEvent* inputEvent) { //TODO
+
+}
+
+void ScopeCamera::DefaultState::OnMouseMoveEvent(MouseMoveEvent* inputEvent) { //TODO
+
+}
+
+void ScopeCamera::DefaultState::OnCharacterEvent(CharacterEvent* inputEvent) { //TODO
+
+}
+
+void ScopeCamera::DefaultState::OnButtonEvent(ButtonEvent* inputEvent) { //TODO
+
+}
+
+void ScopeCamera::DefaultState::Begin() { //TODO: Add new members
 	translation = NiPoint3_ZERO;
 	zoom = 1.0;
 }
 
-void ScopeCamera::DefaultState::End() {
+void ScopeCamera::DefaultState::End() { //TODO
 
 }
 
-void ScopeCamera::DefaultState::Update(TESCameraState* arg) {
+void ScopeCamera::DefaultState::Update(TESCameraState* arg) { //TODO
 
 }
 
-void ScopeCamera::DefaultState::GetRotation(NiQuaternion* out) {
+void ScopeCamera::DefaultState::GetRotation(NiQuaternion* out) { //TODO
 
 }
 
-void ScopeCamera::DefaultState::GetPosition(NiPoint3* out) {
+void ScopeCamera::DefaultState::GetPosition(NiPoint3* out) { //TODO
 
 }
 
@@ -382,7 +426,7 @@ ScopeRenderer::~ScopeRenderer() {
 	//NiAVObject* overlayObjMaybe;
 	BSShaderAccumulator* shaderAccum;
 	NiCamera* cam;
-	ScopeCamera::DefaultState* state;
+	TESCameraState* state;
 
 	//overlayObjMaybe = this->overlayObjMaybe;
 	//if (overlayObjMaybe && !_InterlockedDecrement(&overlayObjMaybe->m_uiRefCount)) {
@@ -397,9 +441,9 @@ ScopeRenderer::~ScopeRenderer() {
 	if (cam && !InterlockedDecrement(&cam->m_uiRefCount)) {
 		cam->DeleteThis();
 	}
-	state = scopeCam.defaultState;
+	state = scopeCam.currentState;
 	if (state && !InterlockedDecrement(&state->m_refCount)) {
-		state->~DefaultState();
+		state->~TESCameraState();
 	}
 	(&scopeCam)->~ScopeCamera();
 	(&scopeCullingProc)->~BSCullingProcess();

@@ -67,7 +67,7 @@ public:
 	BSTPoint3<float>	translationInput;	// 10
 	float				zoomInput;			// 1C
 	NiNode				* cameraNode;		// 20
-	TESCameraState		* cameraState;		// 28
+	TESCameraState		* currentState;		// 28
 	bool				enabled;			// 30
 	UInt8				unk31;				// 31
 	UInt16				unk32;				// 32
@@ -82,7 +82,7 @@ public:
 	DEFINE_MEMBER_FN(GetCameraRoot, bool, 0x0082E7C0, NiPointer<NiNode>&);
 	DEFINE_MEMBER_FN(SetCameraEnabled, void, 0x0082E810, bool);
 	DEFINE_MEMBER_FN(SetCameraRoot, void, 0x0082E780, NiNode*);
-	DEFINE_MEMBER_FN(SetCameraState, void, 0x0082E930, TESCameraState* cameraState);
+	DEFINE_MEMBER_FN(SetCameraState, void, 0x0082E930, TESCameraState*);
 
 	void AddRotationInput(float a1, float a2);
 	void AddTranslationInput(float x, float y, float z);
@@ -90,7 +90,7 @@ public:
 	bool GetCameraRoot(NiPointer<NiNode>& out);
 	void SetCameraEnabled(bool enabled);
 	void SetCameraRoot(NiNode* newRoot);
-	void SetCameraState(TESCameraState* cameraState);
+	void SetCameraState(TESCameraState* newCameraState);
 };
 
 class PlayerCamera : public TESCamera

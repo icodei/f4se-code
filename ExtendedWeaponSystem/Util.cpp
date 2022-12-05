@@ -12,12 +12,12 @@ bool IsSprinting() {
 
 bool IsFirstPerson() {
 	if (!*g_playerCamera) { return false; }
-	return (*g_playerCamera)->cameraState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_FirstPerson];
+	return (*g_playerCamera)->currentState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_FirstPerson];
 }
 
 bool IsThirdPerson() {
 	if (!*g_playerCamera) { return false; }
-	return (*g_playerCamera)->cameraState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_ThirdPerson2];
+	return (*g_playerCamera)->currentState == (*g_playerCamera)->cameraStates[PlayerCamera::kCameraState_ThirdPerson2];
 }
 
 bool IsWeaponDrawn() {

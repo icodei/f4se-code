@@ -9,6 +9,10 @@ public:
 	ScopeCamera();
 
 	virtual ~ScopeCamera();
+
+	virtual void SetCameraNode(NiNode* node) override;
+	virtual void SetEnabled(bool enabled) override;
+	virtual void Update() override;
 	
 	enum {
 		kCameraState_Default = 0,
@@ -41,7 +45,9 @@ public:
 		virtual void Revert(BGSSaveFormBuffer* save) override { };
 
 		//members
+		NiQuaternion initialRotation;
 		NiPoint3 initialPosition;
+		NiQuaternion rotation;
 		NiPoint3 translation;
 		float zoom;
 		float minFrustumHalfWidth;
@@ -59,7 +65,6 @@ public:
 
 	//members
 	TESCameraState* cameraStates[kNumCameraStates];
-	TESCameraState* defaultState;
 	NiPointer<NiCamera> camera;
 	NiPoint3 maxExtent;
 	NiPoint3 minExtent;
@@ -72,7 +77,7 @@ public:
 	//functions
 	void Reset();
 	void SetExtents(NiPoint3& min, NiPoint3& max);
-	void SetState(TESCameraState* cameraState);
+	void SetState(TESCameraState* newCameraState);
 	
 };
 

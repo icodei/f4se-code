@@ -20,7 +20,7 @@ void SetCameraState_Hook(TESCamera * camera, TESCameraState * newCameraState)
 {
 	if(camera == (*g_playerCamera))
 	{
-		SInt32 oldState = (*g_playerCamera)->GetCameraStateId(camera->cameraState);
+		SInt32 oldState = (*g_playerCamera)->GetCameraStateId(camera->currentState);
 		SInt32 newState = (*g_playerCamera)->GetCameraStateId(newCameraState);
 
 		g_cameraEventRegs.ForEach(
