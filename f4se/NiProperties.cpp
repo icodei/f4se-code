@@ -36,6 +36,78 @@ BSEffectShaderMaterial* BSEffectShaderProperty::QEffectShaderMaterial() {
 	return CALL_MEMBER_FN(this, QEffectShaderMaterial)();
 }
 
+NiTexture* BSEffectShaderProperty::QEnvMap() {
+	return CALL_MEMBER_FN(this, QEnvMap)();
+}
+
+NiTexture* BSEffectShaderProperty::QEnvMapMask() {
+	return CALL_MEMBER_FN(this, QEnvMapMask)();
+}
+
+NiTexture* BSEffectShaderProperty::QGrayscaleTexture() {
+	return CALL_MEMBER_FN(this, QGrayscaleTexture)();
+}
+
+NiTexture* BSEffectShaderProperty::QNormalMap() {
+	return CALL_MEMBER_FN(this, QNormalMap)();
+};
+
+void BSEffectShaderProperty::SetBaseTexture(NiTexture* newTex) {
+	BSEffectShaderMaterial* mat = (BSEffectShaderMaterial*)this->shaderMaterial;
+	NiTexture* tex = mat->spBaseTexture.get();
+	if (tex != newTex) {
+		if (newTex) {
+			InterlockedIncrement(&newTex->m_uiRefCount);
+		}
+		mat->spBaseTexture = newTex;
+		if (tex) {
+			if (!InterlockedDecrement(&tex->m_uiRefCount)) {
+				tex->DeleteThis();
+			}
+		}
+	}
+}
+
+void BSEffectShaderProperty::SetEnvMap(NiTexture* newTex) {
+	CALL_MEMBER_FN(this, SetEnvMap)(newTex);
+}
+
+void BSEffectShaderProperty::SetEnvMapMask(NiTexture* newTex) {
+	BSEffectShaderMaterial* mat = (BSEffectShaderMaterial*)this->shaderMaterial;
+	NiTexture* tex = mat->spEnvironmentMapMaskTexture.get();
+	if (tex != newTex) {
+		if (newTex) {
+			InterlockedIncrement(&newTex->m_uiRefCount);
+		}
+		mat->spEnvironmentMapMaskTexture = newTex;
+		if (tex) {
+			if (!InterlockedDecrement(&tex->m_uiRefCount)) {
+				tex->DeleteThis();
+			}
+		}
+	}
+}
+
+void BSEffectShaderProperty::SetGrayscaleTexture(NiTexture* newTex) {
+	BSEffectShaderMaterial* mat = (BSEffectShaderMaterial*)this->shaderMaterial;
+	NiTexture* tex = mat->spGrayscaleTexture.get();
+	if (tex != newTex) {
+		if (newTex) {
+			InterlockedIncrement(&newTex->m_uiRefCount);
+		}
+		mat->spGrayscaleTexture = newTex;
+		if (tex) {
+			if (!InterlockedDecrement(&tex->m_uiRefCount)) {
+				tex->DeleteThis();
+			}
+		}
+	}
+}
+
+void BSEffectShaderProperty::SetNormalMap(NiTexture* newTex) {
+	return CALL_MEMBER_FN(this, SetNormalMap)(newTex);
+}
+
 bool BSEffectShaderProperty::SetupGeometry(BSGeometry* geom) {
 	return CALL_MEMBER_FN(this, SetupGeometry)(geom);
 }

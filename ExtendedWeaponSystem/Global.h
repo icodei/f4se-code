@@ -77,19 +77,6 @@ extern BSGeometry* ScopeTextureLoader;
 extern BSEffectShaderData* effectShaderData;
 extern TESEffectShader* ThermalFXS;
 
-//This was for the ScopeRenderer class but it seems to not be working out
-extern ScopeRenderer* scopeRenderer;
-extern BSReadWriteLock* scopeRendererLock;
-
-//stuff for ScopeRendererManager
-extern NiCamera* scopePOV;
-extern NiNode* scopePOVRoot;
-extern NiCamera* scopePOV_BACKUP;
-extern NiNode* scopePOVRoot_BACKUP;
-extern BSCullingProcess* pScopeManagerCullingProc;
-extern BSShaderAccumulator* pScopeManagerAccumulator;
-extern ImageSpaceShaderParam* pScopeManagerShaderParam;
-
 #define GET_EVENT_DISPATCHER(EventName) (BSTEventDispatcher<EventName>*) GetGlobalEventDispatcher(*g_globalEvents, #EventName);
 
 #define _BYTE  UInt8
@@ -128,3 +115,13 @@ extern ImageSpaceShaderParam* pScopeManagerShaderParam;
 #define WORD7(x)   WORDn(x,  7)
 
 #define FToRGB 0.0039215689
+#define NiPoint3_ZERO NiPoint3(0, 0, 0);
+
+#define FltPId2		1.570796371
+#define FltPI		3.141592741
+#define FltPIx2		6.283185482
+#define Flt2dPI		0.6366197467
+#define FltPId180	0.01745329238
+#define Flt180dPI	57.29578018
+#define DblPId180	0.017453292519943295
+#define Dbl180dPI	57.29577951308232

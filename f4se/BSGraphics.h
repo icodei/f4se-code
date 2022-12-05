@@ -127,6 +127,7 @@ public:
 	DEFINE_MEMBER_FN(dtor, void, 0x01BC4A40);
 };
 
+//0x1A0
 class BSCullingProcess : public NiCullingProcess {
 public:
 
@@ -289,7 +290,7 @@ struct BSGraphics {
 		USAGE_DEFAULT = 0,
 		USAGE_IMMUTABLE = 1,
 		USAGE_DYNAMIC = 2,
-		USAGE_STAGING = 3
+		USAGE_STAGING = 3 //ScreenShot::GetScreenShotData calls ScreenShot::BufferScreenShot using this
 	};
 
 	class RendererShadowState {
@@ -299,78 +300,91 @@ struct BSGraphics {
 
 	class TextureHeader {
 	public:
-
+		UInt16	height;
+		UInt16	width;
+		UInt8	mipLevels;
+		UInt8	format;
+		UInt8	field_6;
+		UInt8	field_7;
 	};
+	STATIC_ASSERT(sizeof(TextureHeader) == 0x8);
 
 	class Texture {
 	public:
 
 	};
 
+	class ViewData {
+	public:
+		NiPoint2 Unk0;
+		NiPoint2 Unk8;
+		NiPoint2 Unk10;
+	};
+
 	class ConstantGroup {
 	public:
 		// members
-		ID3D11Buffer* buffer;    // 00
-		float* data;             // 08
-		bool dataIsCPUWorkBuffer;  // 10
+		ID3D11Buffer* buffer;		// 00
+		float* data;				// 08
+		bool dataIsCPUWorkBuffer;	// 10
 	};
 	STATIC_ASSERT(sizeof(ConstantGroup) == 0x18);
 
 	class ComputeShader {
 	public:
 		// members
-		UInt32 id;                         // 00
-		ID3D11ComputeShader* shader;        // 08
-		UInt32 byteCodeSize;               // 10
-		BSGraphics::ConstantGroup constantBuffers[3];  // 18
-		UInt64 shaderDesc;                 // 60
-		SInt8 constantTable[32];            // 68
+		UInt32 id;										// 00
+		ID3D11ComputeShader* shader;					// 08
+		UInt32 byteCodeSize;							// 10
+		BSGraphics::ConstantGroup constantBuffers[3];	// 18
+		UInt64 shaderDesc;								// 60
+		SInt8 constantTable[32];						// 68
 	};
 	STATIC_ASSERT(sizeof(ComputeShader) == 0x88);
 
 	class DomainShader {
 	public:
 		// members
-		UInt32 id;                              // 00
-		ID3D11DomainShader* shader;              // 08
-		UInt32 byteCodeSize;                    // 10
-		BSGraphics::ConstantGroup constantBuffers[3];  // 18
-		UInt64 shaderDesc;                      // 60
-		SInt8 constantTable[32];                 // 68
+		UInt32 id;										// 00
+		ID3D11DomainShader* shader;						// 08
+		UInt32 byteCodeSize;							// 10
+		BSGraphics::ConstantGroup constantBuffers[3];	// 18
+		UInt64 shaderDesc;								// 60
+		SInt8 constantTable[32];						// 68
 	};
 	STATIC_ASSERT(sizeof(DomainShader) == 0x88);
 
 	class HullShader {
 	public:
 		// members
-		UInt32 id;                         // 00
-		ID3D11HullShader* shader;           // 08
-		UInt32 byteCodeSize;               // 10
-		BSGraphics::ConstantGroup constantBuffers[3];  // 18
-		UInt64 shaderDesc;                 // 60
-		SInt8 constantTable[32];            // 68
+		UInt32 id;										// 00
+		ID3D11HullShader* shader;						// 08
+		UInt32 byteCodeSize;							// 10
+		BSGraphics::ConstantGroup constantBuffers[3];	// 18
+		UInt64 shaderDesc;								// 60
+		SInt8 constantTable[32];						// 68
 	};
 	STATIC_ASSERT(sizeof(HullShader) == 0x88);
 
 	class PixelShader {
 	public:
 		// members
-		UInt32 id;                         // 00
-		ID3D11PixelShader* shader;          // 08
-		BSGraphics::ConstantGroup constantBuffers[3];  // 10
-		SInt8 constantTable[32];            // 58
+		UInt32 id;										// 00
+		ID3D11PixelShader* shader;						// 08
+		BSGraphics::ConstantGroup constantBuffers[3];	// 10
+		SInt8 constantTable[32];						// 58
 	};
 	STATIC_ASSERT(sizeof(PixelShader) == 0x78);
 
 	class VertexShader {
 	public:
 		// members
-		UInt32 id;                         // 00
-		ID3D11VertexShader* shader;         // 08
-		UInt32 byteCodeSize;               // 10
-		BSGraphics::ConstantGroup constantBuffers[3];  // 18
-		UInt64 shaderDesc;                 // 60
-		SInt8 constantTable[32];            // 68
+		UInt32 id;										// 00
+		ID3D11VertexShader* shader;						// 08
+		UInt32 byteCodeSize;							// 10
+		BSGraphics::ConstantGroup constantBuffers[3];	// 18
+		UInt64 shaderDesc;								// 60
+		SInt8 constantTable[32];						// 68
 	};
 	STATIC_ASSERT(sizeof(VertexShader) == 0x88);
 
@@ -493,6 +507,7 @@ struct BSGraphics {
 
 		MEMBER_FN_PREFIX(Renderer);
 		DEFINE_MEMBER_FN(ClearColor, void, 0x01D0B8B0);
+		DEFINE_MEMBER_FN(CreateEmptyTexture, Texture*, 0x01D0EB00, UInt32, UInt32);
 		DEFINE_MEMBER_FN(DoZPrePass, void, 0x01D12980, NiCamera*, NiCamera*, float, float, float, float);
 		DEFINE_MEMBER_FN(Flush, void, 0x01D0B760);
 		DEFINE_MEMBER_FN(SetClearColor, void, 0x01D0B770, float, float, float, float);
@@ -500,6 +515,7 @@ struct BSGraphics {
 		DEFINE_MEMBER_FN(ResetState, void, 0x01D11DA0);
 
 		void ClearColor();
+		Texture* CreateEmptyTexture(UInt32 width, UInt32 height);
 		void DoZPrePass(NiCamera* cam1, NiCamera* cam2, float a1, float a2, float a3, float a4);
 		void Flush();
 		void SetClearColor(float red, float green, float blue, float alpha);
@@ -516,12 +532,12 @@ struct BSGraphics {
 		void SetCameraData(NiCamera* cam, bool a3, float a4, float a5);
 	};
 
-	// 12272
+	// 0x2FF0
 	class Context {
 	public:
 
 	};
-	//STATIC_ASSERT(sizeof(Context) == 0x12272);
+	//STATIC_ASSERT(sizeof(Context) == 0x2FF0);
 
 	class OcclusionQuery {
 	public:
@@ -548,24 +564,24 @@ struct BSGraphics {
 			UInt32	unk18;		// 18 - r12b
 		};
 
-		BSGraphics::RenderTargetProperties pRenderTargetDataA[100];
-		BSGraphics::DepthStencilTargetProperties pDepthStencilTargetDataA[12];
-		BSGraphics::CubeMapRenderTargetProperties pCubeMapRenderTargetDataA[1];
-		UInt8 gapD50[568];
-		float Width;
-		float Height;
-		float dynamicWidth;
-		float dynamicHeight;
-		float IncreaseSpeed;
-		float DecreaseSpeed;
-		float deltaMovement;
-		bool increaseResolution;
-		bool bDynamicResolution;
-		bool bResolutionDontGrowOnPlayerMove;
-		char field_FA7;
-		int field_FA8;
-		unsigned int uiResolutionGrowEveryFrame;
-		UInt8 gapFB0[8];
+		RenderTargetProperties			pRenderTargetDataA[100];
+		DepthStencilTargetProperties	pDepthStencilTargetDataA[12];
+		CubeMapRenderTargetProperties	pCubeMapRenderTargetDataA[1];
+		UInt8							gapD50[568];
+		float							Width;
+		float							Height;
+		float							dynamicWidth;
+		float							dynamicHeight;
+		float							IncreaseSpeed;
+		float							DecreaseSpeed;
+		float							deltaMovement;
+		bool							increaseResolution;
+		bool							bDynamicResolution;
+		bool							bResolutionDontGrowOnPlayerMove;
+		UInt8							field_FA7;
+		UInt32							field_FA8;
+		UInt32							uiResolutionGrowEveryFrame;
+		UInt8							gapFB0[8];
 		void(__fastcall* Create)();
 
 		MEMBER_FN_PREFIX(RenderTargetManager);
@@ -946,6 +962,8 @@ public:
 };
 
 class ImageSpaceBaseData {
+public:
+
 	float hdrData[9];
 	float cinematicData[3];
 	float tintData[4];
@@ -953,6 +971,8 @@ class ImageSpaceBaseData {
 };
 
 class ImageSpaceLUTData {
+public:
+
 	BSFixedString field_0;
 	UInt8 gap8[24];
 	BSFixedString field_20;

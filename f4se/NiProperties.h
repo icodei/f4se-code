@@ -1,19 +1,18 @@
 #pragma once
 
 #include "f4se/BSLight.h"
+#include "f4se/NiMaterials.h"
 #include "f4se/NiObjects.h"
-//#include "f4se/BSGraphics.h"
 
 class BSFadeNode;
+class BSGeometry;
 class BSParticleShaderCubeEmitter;
 class BSRenderPass;
-class BSShaderMaterial;
-class NiTexture;
-
-class BSEffectShaderMaterial;
-class BSGeometry;
 class BSShader;
 class BSShaderAccumulator;
+class BSEffectShaderMaterial;
+class BSShaderMaterial;
+class NiTexture;
 
 class NiProperty : public NiObjectNET {
 public:
@@ -123,7 +122,7 @@ public:
 		// members
 		BSRenderPass* passList;  // 0
 	};
-	//STATIC_ASSERT(sizeof(RenderPassArray) == 0x8);
+	STATIC_ASSERT(sizeof(RenderPassArray) == 0x8);
 
 	class ForEachVisitor {
 	public:
@@ -132,27 +131,28 @@ public:
 	};
 
 	//virtual ~BSShaderProperty();
+
 	//add
-	virtual RenderPassArray				* GetRenderPasses_ShadowMapOrMask(BSGeometry* a_geom, UInt32 a_unk, BSShaderAccumulator* a_accum) {};
-	virtual RenderPassArray				* GetRenderPasses_LocalMap(BSGeometry* a_geom, UInt32 a_unk, BSShaderAccumulator* a_accum) {};
-	virtual BSRenderPass				* CreateVatsMaskRenderPass(BSGeometry* a_geom) {};
-	virtual UInt16						GetNumberofPasses(BSGeometry* a_geom) {};
-	virtual BSRenderPass				* GetRenderDepthPass(BSGeometry* a_geom) {};
-	virtual bool						CanMerge(BSShaderProperty* a_prop) {};
-	virtual void						SetMaterialAlpha(float a_value) {};
-	virtual float						QMaterialAlpha(void) {};
-	virtual BSFixedString				& GetRootName(void) {};
-	virtual SInt32						ForEachTexture(ForEachVisitor& functor) {};
-	virtual SInt32						QShader(void) {};
-	virtual void						ClearUnusedMaterialValues(void) {};
-	virtual BSShaderProperty			* ClarifyShader(BSGeometry* a_geom, bool a_unk1, bool a_unk2) {};
-	virtual NiTexture					* GetBaseTexture(void) {};
-	virtual RenderPassArray				* GetWaterFogPassList(BSGeometry* a_geom) {};
-	virtual bool						AcceptsEffectData(void) {};
-	virtual void						PrecacheTextures(void) {};
-	virtual UInt32						DetermineUtilityShaderDecl(void) {};
-	virtual UInt32						GetMaterialType(void) {};
-	virtual void						DoClearRenderPasses(void) {};
+	virtual RenderPassArray*	GetRenderPasses_ShadowMapOrMask(BSGeometry* a_geom, UInt32 a_unk, BSShaderAccumulator* a_accum) { return nullptr; };
+	virtual RenderPassArray*	GetRenderPasses_LocalMap(BSGeometry* a_geom, UInt32 a_unk, BSShaderAccumulator* a_accum) { return nullptr; };
+	virtual BSRenderPass*		CreateVatsMaskRenderPass(BSGeometry* a_geom) { return nullptr; };
+	virtual UInt16				GetNumberofPasses(BSGeometry* a_geom) { return 0; };
+	virtual BSRenderPass*		GetRenderDepthPass(BSGeometry* a_geom) { return nullptr; };
+	virtual bool				CanMerge(BSShaderProperty* a_prop) { return false; };
+	virtual void				SetMaterialAlpha(float a_value) { return; };
+	virtual float				QMaterialAlpha(void) { return fAlpha; };
+	virtual BSFixedString&		GetRootName(void) { return m_name; };
+	virtual SInt32				ForEachTexture(ForEachVisitor& functor) { return 0; };
+	virtual SInt32				QShader(void) { return 0; };
+	virtual void				ClearUnusedMaterialValues(void) { return; };
+	virtual BSShaderProperty*	ClarifyShader(BSGeometry* a_geom, bool a_unk1, bool a_unk2) { return nullptr; };
+	virtual NiTexture*			GetBaseTexture(void) { return nullptr; };
+	virtual RenderPassArray*	GetWaterFogPassList(BSGeometry* a_geom) { return nullptr; };
+	virtual bool				AcceptsEffectData(void) { return false; };
+	virtual void				PrecacheTextures(void) { return; };
+	virtual UInt32				DetermineUtilityShaderDecl(void) { return 0; };
+	virtual UInt32				GetMaterialType(void) { return 0; };
+	virtual void				DoClearRenderPasses(void) { return; };
 
 	float					fAlpha;					// 28
 	SInt32					iLastRenderPassState;	// 2C - Set to 0x7FFFFFFF somekind of lock?
@@ -203,15 +203,30 @@ public:
 
 	MEMBER_FN_PREFIX(BSEffectShaderProperty);
 	DEFINE_MEMBER_FN(ctor, void, 0x027CAAC0);
-	DEFINE_MEMBER_FN(GetRenderPasses, BSShaderProperty::RenderPassArray*, 0x027CAE10, BSGeometry*, UInt32, BSShaderAccumulator*);
 	DEFINE_MEMBER_FN(GetBaseTexture, NiTexture*, 0x027CBFE0);
+	DEFINE_MEMBER_FN(GetRenderPasses, BSShaderProperty::RenderPassArray*, 0x027CAE10, BSGeometry*, UInt32, BSShaderAccumulator*);
 	DEFINE_MEMBER_FN(QBaseTexture, NiTexture*, 0x027CC0B0);
 	DEFINE_MEMBER_FN(QEffectShaderMaterial, BSEffectShaderMaterial*, 0x001E0930);
+	DEFINE_MEMBER_FN(QEnvMap, NiTexture*, 0x027CC0C0);
+	DEFINE_MEMBER_FN(QEnvMapMask, NiTexture*, 0x027CC0D0);
+	DEFINE_MEMBER_FN(QGrayscaleTexture, NiTexture*, 0x027CC0E0);
+	DEFINE_MEMBER_FN(QNormalMap, NiTexture*, 0x027CC110);
+	DEFINE_MEMBER_FN(SetEnvMap, void, 0x00551140, NiTexture*);
+	DEFINE_MEMBER_FN(SetNormalMap, void, 0x00551390, NiTexture*);
 	DEFINE_MEMBER_FN(SetupGeometry, bool, 0x027CAB60, BSGeometry* geom);
 
 	BSShaderProperty::RenderPassArray* GetRenderPasses(BSGeometry* a_geom, UInt32 a1, BSShaderAccumulator* a_accumulator);
 	NiTexture* QBaseTexture();
 	BSEffectShaderMaterial* QEffectShaderMaterial();
+	NiTexture* QEnvMap();
+	NiTexture* QEnvMapMask();
+	NiTexture* QGrayscaleTexture();
+	NiTexture* QNormalMap();
+	void SetBaseTexture(NiTexture* newTex);
+	void SetEnvMap(NiTexture* newTex);
+	void SetEnvMapMask(NiTexture* newTex);
+	void SetGrayscaleTexture(NiTexture* newTex);
+	void SetNormalMap(NiTexture* newTex);
 	bool SetupGeometry(BSGeometry* geom);
 
 	static BSEffectShaderProperty* Create();

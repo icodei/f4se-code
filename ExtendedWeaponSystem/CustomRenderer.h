@@ -1,26 +1,44 @@
 #pragma once
+#include "Global.h"
 
 class ScopeRenderer;
 class ScopeCamera;
-
-#define NiPoint3_ZERO NiPoint3(0, 0, 0);
 
 class ScopeCamera : public TESCamera {
 public:
 	ScopeCamera();
 
+	virtual ~ScopeCamera();
+	
+	enum {
+		kCameraState_Default = 0,
+		kCameraState_IronSights,
+		kNumCameraStates
+	};
+
 	class DefaultState : public TESCameraState {
 	public:
-		DefaultState(TESCamera * cam, UInt32 ID);
+		DefaultState();
+		DefaultState(TESCamera & cam, UInt32 ID);
+
 		virtual ~DefaultState();
+
+		virtual bool ShouldHandleEvent(InputEvent* inputEvent = nullptr) override;
+		virtual void OnKinectEvent(KinectEvent* inputEvent) override;
+		virtual void OnDeviceConnectEvent(DeviceConnectEvent* inputEvent) override;
+		virtual void OnThumbstickEvent(ThumbstickEvent* inputEvent) override;
+		virtual void OnCursorMoveEvent(CursorMoveEvent* inputEvent) override;
+		virtual void OnMouseMoveEvent(MouseMoveEvent* inputEvent) override;
+		virtual void OnCharacterEvent(CharacterEvent* inputEvent) override;
+		virtual void OnButtonEvent(ButtonEvent* inputEvent) override;
 		virtual void Begin() override;
-		virtual void End() override { };
-		//virtual void Update(TESCameraState* arg) override;
-		//virtual void GetRotation(NiQuaternion* out) override;
-		//virtual void GetPosition(NiPoint3* out) override;
-		//virtual void SaveGame() override;
-		//virtual void LoadGame() override;
-		//virtual void Revert() override;
+		virtual void End() override;
+		virtual void Update(TESCameraState* arg) override;
+		virtual void GetRotation(NiQuaternion* out) override;
+		virtual void GetPosition(NiPoint3* out) override;
+		virtual void SaveGame(BGSSaveFormBuffer* save) override { };
+		virtual void LoadGame(BGSSaveFormBuffer* save) override { };
+		virtual void Revert(BGSSaveFormBuffer* save) override { };
 
 		//members
 		NiPoint3 initialPosition;
@@ -40,27 +58,21 @@ public:
 	};
 
 	//members
+	TESCameraState* cameraStates[kNumCameraStates];
+	TESCameraState* defaultState;
+	NiPointer<NiCamera> camera;
 	NiPoint3 maxExtent;
 	NiPoint3 minExtent;
-	DefaultState* defaultState;
-	NiPointer<NiCamera> camera;
-	float zRotation;
 
 	//member access
+	NiCamera* QRenderCamera();
 	NiPoint3& QMaxExtent();
 	NiPoint3& QMinExtent();
-	NiCamera* QRenderCamera();
-	float QZRotation();
 
 	//functions
-	void FocusOnPosition(NiPoint3 position);
 	void Reset();
 	void SetExtents(NiPoint3& min, NiPoint3& max);
-	void SetInitialPosition(const NiPoint3& newPos);
-	void SetMinFrustum(float width, float height);
-	void SetState(DefaultState* cameraState);
-	void SetZRotation(float rotation);
-	void SetZoom(float newZoom);
+	void SetState(TESCameraState* cameraState);
 	
 };
 
@@ -76,6 +88,9 @@ public:
 	ImageSpaceShaderParam			params;
 	UInt32							type;
 
+	//operators
+	ScopeRenderer& operator=(const ScopeRenderer& rhs);
+
 	//functions
 	NiTexture* Render(bool a1);
 };
@@ -85,6 +100,10 @@ ScopeRenderer* nsScope_InitRenderer();
 void nsScope_Render();
 
 void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeaccum, SInt32 a1, SInt32 a2, SInt32 a3);
+
+extern ScopeRenderer scopeRenderer;
+extern BSReadWriteLock scopeRendererLock;
+extern std::unordered_map<const char*, NiCamera*> s_extraCamerasMap;
 
 //This will technically do everything that ScopeRenderer and ScopeCamera does but without allocating the custom classes
 class ScopeRendererManager {
@@ -100,6 +119,14 @@ public:
 };
 STATIC_ASSERT(std::is_empty_v<ScopeRendererManager>);
 
+extern NiCamera* scopePOV;
+extern NiNode* scopePOVRoot;
+extern NiCamera* scopePOV_BACKUP;
+extern NiNode* scopePOVRoot_BACKUP;
+extern BSCullingProcess* pScopeManagerCullingProc;
+extern BSShaderAccumulator* pScopeManagerAccumulator;
+extern ImageSpaceShaderParam* pScopeManagerShaderParam;
+
 //stuff from JiP for reference
 //
 //#define DEFINE_COMMAND_PLUGIN(name, refRequired, numParams, paramInfo) \
@@ -109,8 +136,8 @@ STATIC_ASSERT(std::is_empty_v<ScopeRendererManager>);
 // 
 //DEFINE_COMMAND_PLUGIN(ProjectExtraCamera, 0, 5, kParams_TwoStrings_OneFloat_TwoOptionalInt);
 
-UInt32 s_texturePixelSize = 0x110;
-UInt32 s_projectPixelSize = 0x100;
+//UInt32 s_texturePixelSize = 0x110;
+//UInt32 s_projectPixelSize = 0x100;
 
 //manages extra cameras
 class ExtraCameraManager {
@@ -124,4 +151,3 @@ public:
 };
 STATIC_ASSERT(std::is_empty_v<ExtraCameraManager>);
 
-extern std::unordered_map<const char*, NiCamera*> s_extraCamerasMap;

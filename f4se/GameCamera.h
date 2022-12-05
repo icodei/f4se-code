@@ -8,11 +8,13 @@
 class NiNode;
 class TESCamera;
 class TESCameraState;
+class BGSSaveFormBuffer;
 
 // 24
 class TESCameraState : public BSIntrusiveRefCounted, public BSInputEventUser {
 public:
 	TESCameraState() { CALL_MEMBER_FN(this, ctor)(*camera, stateID); };
+	TESCameraState(TESCamera& cam, UInt32 ID) { CALL_MEMBER_FN(this, ctor)(cam, ID); };
 	//~TESCameraState() { CALL_MEMBER_FN(this, dtor)(); };
 
 	virtual ~TESCameraState() {  };
@@ -23,9 +25,9 @@ public:
 	virtual void Update(TESCameraState* arg) {  };
 	virtual void GetRotation(NiQuaternion* out) {  };
 	virtual void GetPosition(NiPoint3* out) {  };
-	virtual void SaveGame() {  };
-	virtual void LoadGame() {  };
-	virtual void Revert() {  };
+	virtual void SaveGame(BGSSaveFormBuffer* save) {  };
+	virtual void LoadGame(BGSSaveFormBuffer* save) {  };
+	virtual void Revert(BGSSaveFormBuffer* save) {  };
 
 	TESCamera	*camera;	// 18
 	UInt32		stateID;	// 20
@@ -54,7 +56,7 @@ class TESCamera {
 public:
 	TESCamera() { CALL_MEMBER_FN(this, ctor)(); };
 	//~TESCamera() { CALL_MEMBER_FN(this, dtor)(); };
-	virtual ~TESCamera() {  };
+	virtual ~TESCamera() { CALL_MEMBER_FN(this, dtor)(); };
 
 	virtual void SetCameraNode(NiNode* node) {  };
 	virtual void SetEnabled(bool enabled) {  }; // Sets 0x30

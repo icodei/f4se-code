@@ -12,7 +12,7 @@ class BSShaderPropertyLightData;
 // 140
 class NiNode : public NiAVObject {
 public:
-	NiNode();
+	NiNode() : NiNode(0) { };
 	NiNode(UInt16 children) { CALL_MEMBER_FN(this, ctor)(children); };
 
 	//virtual NiRTTI		* GetRTTI(void) override;

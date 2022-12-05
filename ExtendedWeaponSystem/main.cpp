@@ -20,17 +20,6 @@ BGSKeyword* ThermalScopeKeyword = nullptr;
 BGSKeyword* reloadSequentialKeyword = nullptr;
 TESObjectWEAP::InstanceData* currentWeapInstance = nullptr;
 
-ScopeRenderer* scopeRenderer = nullptr;
-BSReadWriteLock* scopeRendererLock = nullptr;
-
-NiCamera* scopePOV = nullptr;
-NiNode* scopePOVRoot = nullptr;
-NiCamera* scopePOV_BACKUP = nullptr;
-NiNode* scopePOVRoot_BACKUP = nullptr;
-BSCullingProcess* pScopeManagerCullingProc = nullptr;
-BSShaderAccumulator* pScopeManagerAccumulator = nullptr;
-ImageSpaceShaderParam* pScopeManagerShaderParam = nullptr;
-
 void initGameStartData() {
 	reloadStarted = false;
 	reloadEnd = true;

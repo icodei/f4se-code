@@ -25,7 +25,9 @@ struct BSRenderData { //this might be BSGraphics::Texture
 // 48
 class NiTexture : public NiObject {
 public:
+	NiTexture() { CALL_MEMBER_FN(this, ctor)(); };
 	//virtual ~NiTexture();
+	
 	//add
 	//virtual BSTextureArray::Texture* IsBSTextureArray();
 
@@ -36,15 +38,18 @@ public:
 	NiTexture		* prevTexture;		// 20
 	NiTexture		* nextTexture;		// 28
 	UInt64			unk30;				// 30 //BSTSmartPointer<BSResource::Stream>	stream;
-	BSRenderData	* rendererData;		// 38 //BSGraphics::Texture*	rendererTexture
+	BSRenderData	* rendererData;		// 38 //BSGraphics::Texture	rendererTexture
 	UInt8			desiredDegradeLevel;// 40
 	UInt8			savedDegradeLevel;  // 41
 	bool			isDDX : 1;          // 42:0
 	bool			isSRGB : 1;         // 42:1
 
 	MEMBER_FN_PREFIX(NiTexture);
+	DEFINE_MEMBER_FN(ctor, void, 0x01BA5670);
+	DEFINE_MEMBER_FN(Create, NiTexture*, 0x01BA4B90, BSFixedString&, bool, bool);
 	DEFINE_MEMBER_FN(CreateEmpty, NiTexture*, 0x01BA5220, BSFixedString&, bool, bool);
-
+	
+	NiTexture* Create(BSFixedString& name, bool a1, bool a2);
 	NiTexture* CreateEmpty(BSFixedString& name, bool a2, bool a3);
 };
 STATIC_ASSERT(sizeof(NiTexture) == 0x48);
@@ -77,6 +82,8 @@ public:
 // 10
 class BSTextureSet : public NiObject {
 public:
+
+	//add
 	virtual BSFixedString GetTextureFilenameFS(UInt32 typeEnum);
 	virtual const char * GetTextureFilename(UInt32 typeEnum);
 	virtual void Unk_2A();
@@ -94,12 +101,14 @@ public:
 };
 STATIC_ASSERT(sizeof(BSShaderTextureSet) == 0x60);
 
+//BSShaderTextureSet::CreateObject
 typedef BSShaderTextureSet * (* _CreateBSShaderTextureSet)();
 extern RelocAddr <_CreateBSShaderTextureSet> CreateBSShaderTextureSet;
 
+//NiTexture::CreateEmpty
 typedef NiTexture * (* _CreateTexture)(const BSFixedString & name, UInt8 unk1); // unk1 is true on diffuses?
 extern RelocAddr <_CreateTexture> CreateTexture;
 
-// unk1=1, unk2=0, unk3=0, unk4=0
-typedef void (* _LoadTextureByPath)(const char * filePath, bool unk1, NiTexture *& texture, SInt32 unk2, UInt64 unk3, UInt64 unk4);
+//BSShaderManager::GetTexture
+typedef void (* _LoadTextureByPath)(const char * filePath, bool unk1, NiTexture *& texture, SInt32 unk2, UInt64 unk3, UInt64 unk4); // unk1=1, unk2=0, unk3=0, unk4=0 
 extern RelocAddr <_LoadTextureByPath> LoadTextureByPath;
