@@ -1,11 +1,5 @@
 #pragma once
-
-#include "f4se/BSGraphics.h"
-#include "f4se/GameFormComponents.h"
-#include "f4se/GameForms.h"
-#include "f4se/NiObjects.h"
-#include "f4se/NiProperties.h"
-#include "f4se/NiTypes.h"
+#include "Global.h"
 
 class BSMultiBoundRoom;
 class BSPortalGraphEntry;
@@ -22,6 +16,15 @@ class SceneGraph;
 //	void* Allocate(unsigned __int64 a_size, unsigned int a_alignment, bool a_alignmentRequired);
 //};
 //extern RelocPtr<MemoryManager>	MemoryManager_Instance;
+
+typedef void(*_SetAnimationVariableBoolPapyrus)(VirtualMachine* vm, UInt32 stackId, TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal);
+void SetAnimationVariableBoolPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal);
+typedef void(*_SetAnimationVariableFloatPapyrus)(VirtualMachine* vm, UInt32 stackId, TESObjectREFR* ref, BSFixedString& asVariableName, float newVal);
+void SetAnimationVariableFloatPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, float newVal);
+typedef void(*_SetAnimationVariableIntPapyrus)(VirtualMachine* vm, UInt32 stackId, TESObjectREFR* ref, BSFixedString& asVariableName, int newVal);
+void SetAnimationVariableIntPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, int newVal);
+typedef void(*_SetSubGraphFloatVariablePapyrus)(VirtualMachine* vm, UInt32 stackId, Actor* actor, BSFixedString asVariableName, float newVal);
+void SetSubGraphFloatVariablePapyrus(Actor* actor, BSFixedString& asVariableName, float newVal);
 
 class Main {
 public:
@@ -183,16 +186,16 @@ public:
 };
 
 //DrawWorld Static Stuff
-extern RelocPtr<NiAVObject*>			DrawWorld_p1stPerson;
-extern RelocPtr<NiAVObject*>			DrawWorld_pScreenSplatterRoot;
-extern RelocPtr<NiCamera*>				DrawWorld_pCamera;
-extern RelocPtr<NiCamera*>				DrawWorld_pVisCamera;
-extern RelocPtr<NiCamera*>				DrawWorld_pScreenSplatterCamera;
+extern RelocPtr<NiAVObject*>	DrawWorld_p1stPerson;
+extern RelocPtr<NiAVObject*>	DrawWorld_pScreenSplatterRoot;
+extern RelocPtr<NiCamera*>		DrawWorld_pCamera;
+extern RelocPtr<NiCamera*>		DrawWorld_pVisCamera;
+extern RelocPtr<NiCamera*>		DrawWorld_pScreenSplatterCamera;
 
 typedef void(**_VATSEffectRenderFunc)(NiCamera*);
-extern RelocPtr<_VATSEffectRenderFunc*>	DrawWorld_VATSEffectRenderFunc;
+extern RelocPtr<_VATSEffectRenderFunc*>		DrawWorld_VATSEffectRenderFunc;
 typedef void(**_Interface3DRenderFN)(UInt32);
-extern RelocPtr<_Interface3DRenderFN*>	DrawWorld_Interface3DRenderFN;
+extern RelocPtr<_Interface3DRenderFN*>		DrawWorld_Interface3DRenderFN;
 typedef void(**_Additional1stPersonFunc)(BSTArray<NiPointer<NiAVObject>>&);
 extern RelocPtr<_Additional1stPersonFunc*>	DrawWorld_Additional1stPersonFunc;
 
@@ -210,9 +213,6 @@ namespace BSUtilities {
 }
 typedef NiAVObject* (*_GetObjectByName)(NiAVObject* target, const BSFixedString& name, bool a3, bool a4);
 extern RelocAddr<_GetObjectByName> GetObjectByName_Internal;
-
-void InstallExtraFunc();
-
 
 
 extern RelocPtr<NiPointer<NiCamera>>	spCustomCamera;

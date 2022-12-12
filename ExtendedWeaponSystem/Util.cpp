@@ -1,4 +1,5 @@
 #include "Global.h"
+
 bool IsReloading() {
 	if (!*g_player) { return false; }
 	UInt32 reload_flag = ((*g_player)->actorState.flags >> 14) & 0xF;
@@ -68,36 +69,6 @@ bool IsWeaponReloadable() {
 	IsReloadableDataWrapper wrapper = { &data.unk00, &data.actor };
 
 	return !IsReloadable_Internal(&wrapper, equipData);
-}
-
-RelocAddr <_SetAnimationVariableBoolPapyrus> SetAnimationVariableBoolPapyrusInternal(0x140EB30);
-void SetAnimationVariableBoolPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal) {
-	SetAnimationVariableBoolPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
-}
-
-RelocAddr <_SetAnimationVariableIntPapyrus> SetAnimationVariableIntPapyrusInternal(0x140EC70);
-void SetAnimationVariableIntPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, int newVal) {
-	SetAnimationVariableIntPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
-}
-
-RelocAddr <_SetAnimationVariableFloatPapyrus> SetAnimationVariableFloatPapyrusInternal(0x140EBD0);
-void SetAnimationVariableFloatPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, float newVal) {
-	SetAnimationVariableFloatPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
-}
-
-RelocAddr <_SetSubGraphFloatVariablePapyrus> SetSubGraphFloatVariablePapyrusInternal(0x138B430);
-void SetSubGraphFloatVariablePapyrus(Actor* actor, BSFixedString& asVariableName, float newVal) {
-	SetSubGraphFloatVariablePapyrusInternal((*g_gameVM)->m_virtualMachine, 0, actor, asVariableName, newVal);
-}
-
-RelocAddr <_CreateNS_NiCamera_Create_Internal> CreateNS_NiCamera_Create_Internal(0x1BAE180);
-NiObject* CreateNS_NiCamera_Create() {
-	return CreateNS_NiCamera_Create_Internal();
-}
-
-RelocAddr <_CreateNS_NiNode_Create_Internal> CreateNS_NiNode_Create_Internal(0x01B99E60);
-NiObject* CreateNS_NiNode_Create() {
-	return CreateNS_NiNode_Create_Internal();
 }
 
 RelocAddr <_WornHasKeywordActor> Actor_WornHasKeyword(0x138C440);
@@ -344,60 +315,9 @@ void HanldeWeaponEquip(TESObjectWEAP::InstanceData* weap) {
 
 //Called from anim event of weapon equip. This should happen after the 3d is loaded hopefully
 void HanldeWeaponEquipAfter3D() {
-	BSGeometry* objGeom;
-	NiCamera* currentCam;
-	NiCamera* cam;
-	NiCamera* newCam;
-
-	const BSFixedString geomName = "TextureLoader:0";
-	const BSFixedString camName = "ScopePOV";
+	
 	if (processCurrentScope && ignore == false) {
-		logIfNeeded("The 3D should be loaded now. We should be able to interact with geometry now.");
-		objGeom = (BSGeometry*)GetByNameHelper(geomName);
-		if (objGeom != ScopeTextureLoader) {
-			if (objGeom) {
-				ScopeTextureLoader = objGeom;
-				logIfNeeded("Found the geometry of the scope.");
-			}
-		}
-		cam = (NiCamera*)GetByNameHelper(camName);
-		if (cam) {
-			new(cam) NiCamera();
-			newCam = cam;
-		} else {
-			newCam = nullptr;
-			scopePOV = scopePOV_BACKUP;
-			scopePOVRoot = scopePOVRoot_BACKUP;
-		}
-		currentCam = scopePOV;
-		if (currentCam != newCam) {
-			if (newCam) {
-				scopePOV = newCam;
-				if (scopePOV->m_parent) {
-					scopePOVRoot = scopePOV->m_parent;
-				}
-				logIfNeeded("Found the scope camera.");
-			}
-			if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
-				currentCam->DeleteThis();
-			}
-		}
-		//TODO: add actor value or something similar to set what the FOV should be on the camera of each scope
-		if (scopePOV) {
-			//float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
-			BSShaderUtil_SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0/4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
-		}
 		
-		//if (scopePOV && scopeRenderer) {
-		//	scopeRenderer->scopeCam.camera = scopePOV;
-		//}
-		//SetupTextureLoaderWithEffectShader();
-		//SetupImageSpaceShader(ScopeTextureLoader, true);
-		if (!objGeom) {
-			logIfNeeded("Could not find the geometry of the scope.");
-			//(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
-			processCurrentScope = false;
-		}
 	}
 }
 

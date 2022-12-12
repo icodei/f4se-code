@@ -177,6 +177,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CreateNS.cpp" />
     <ClCompile Include="CustomRenderer.cpp" />
     <ClCompile Include="Hooks.cpp" />
     <ClCompile Include="Interface3D.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Extras.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CreateNS.h" />
     <ClInclude Include="CustomRenderer.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="Hooks.h" />

@@ -874,9 +874,13 @@ public:
 	void RenderOpaqueDecals();
 };
 
-void BSShaderUtil_SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
-typedef void (*_SetCameraFOV)(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
-extern RelocAddr<_SetCameraFOV> SetCameraFOV_Internal;
+namespace BSShaderUtil {
+	typedef void (*_SetSceneFOV)(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
+	void SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
+
+	typedef void (*_SetCameraFOV)(NiCamera* cam, float FOV, float f_far, float f_near);
+	void SetCameraFOV(NiCamera* cam, float FOV, float f_far, float f_near);
+}
 
 //IMAGESPACE
 
@@ -1114,8 +1118,11 @@ public:
 	NiPointer<BSTriShape>& SelectScreenShape(ImageSpaceEffect*);
 };
 
-class BSImagespaceShader : public ImageSpaceEffect {
+class BSImagespaceShader : public BSShader, public ImageSpaceEffect {
 public:
+	BSImagespaceShader() = delete;
+	BSImagespaceShader(const char* fxpName) { };
+
 	//virtual ~BSImagespaceShader();
 	//virtual void Render(BSTriShape*, ImageSpaceEffectParam*) override;
 	//virtual void Dispatch(ImageSpaceEffectParam*, bool, UInt32, EffectDesc*) override;

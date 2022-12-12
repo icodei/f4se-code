@@ -35,6 +35,7 @@
 #include "Interface3D.h"
 #include "Util.h"
 #include "CustomRenderer.h"
+#include "CreateNS.h"
 
 #include <chrono>
 #include <ctime>
@@ -125,3 +126,7 @@ extern TESEffectShader* ThermalFXS;
 #define Flt180dPI	57.29578018
 #define DblPId180	0.017453292519943295
 #define Dbl180dPI	57.29577951308232
+
+#define BUTTON_UP 0.0f
+#define BUTTON_DOWN 1.0f
+#define BUTTON_HOLD_TIMER 0.4f

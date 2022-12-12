@@ -5,6 +5,26 @@
 //}
 //RelocPtr<MemoryManager>	MemoryManager_Instance(0x038CC980);
 
+RelocAddr <_SetAnimationVariableBoolPapyrus> SetAnimationVariableBoolPapyrusInternal(0x140EB30);
+void SetAnimationVariableBoolPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal) {
+	SetAnimationVariableBoolPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
+}
+
+RelocAddr <_SetAnimationVariableIntPapyrus> SetAnimationVariableIntPapyrusInternal(0x140EC70);
+void SetAnimationVariableIntPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, int newVal) {
+	SetAnimationVariableIntPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
+}
+
+RelocAddr <_SetAnimationVariableFloatPapyrus> SetAnimationVariableFloatPapyrusInternal(0x140EBD0);
+void SetAnimationVariableFloatPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, float newVal) {
+	SetAnimationVariableFloatPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
+}
+
+RelocAddr <_SetSubGraphFloatVariablePapyrus> SetSubGraphFloatVariablePapyrusInternal(0x138B430);
+void SetSubGraphFloatVariablePapyrus(Actor* actor, BSFixedString& asVariableName, float newVal) {
+	SetSubGraphFloatVariablePapyrusInternal((*g_gameVM)->m_virtualMachine, 0, actor, asVariableName, newVal);
+}
+
 BSPortalGraphEntry* Main::GetCameraPortalGraphEntry() {
 	return CALL_MEMBER_FN(this, GetCameraPortalGraphEntry)();
 }
@@ -98,9 +118,6 @@ namespace BSUtilities {
 }
 RelocAddr<_GetObjectByName>			GetObjectByName_Internal(0x01C93980);
 
-void InstallExtraFunc() {
-
-}
 
 RelocPtr <NiPointer<NiCamera>>		spCustomCamera(0x058DF5B0);
 RelocPtr <NiPointer<NiCamera>>		spCamera(0x058DEF88);

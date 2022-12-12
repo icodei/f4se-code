@@ -8,7 +8,7 @@ BSCullingProcess* pScopeManagerCullingProc;
 BSShaderAccumulator* pScopeManagerAccumulator;
 ImageSpaceShaderParam* pScopeManagerShaderParam;
 
-ScopeRenderer scopeRenderer;
+ScopeRenderer* scopeRenderer;
 BSReadWriteLock scopeRendererLock;
 std::unordered_map<const char*, NiCamera*> s_extraCamerasMap;
 
@@ -16,25 +16,30 @@ void nsScope_CreateRenderer() {
 	logIfNeeded("ScopeRenderer Creation Starting...");
 	
 	//create a spinlock
-	scopeRendererLock = (*(BSReadWriteLock*)Heap_Allocate(sizeof(BSReadWriteLock)));
+	scopeRendererLock = *(new BSReadWriteLock());
+	//scopeRendererLock = (*(BSReadWriteLock*)Heap_Allocate(sizeof(BSReadWriteLock)));
 	logIfNeeded("ScopeRendererLock Allocated...");
 	new(&scopeRendererLock) BSReadWriteLock();
 	
+	if (scopeRenderer != nullptr) {
+
+	}
 
 	//if renderer is null
-	if (!(&scopeRenderer)) {
-		scopeRenderer = *nsScope_InitRenderer();
+	if (!scopeRenderer) {
+		scopeRenderer = nsScope_InitRenderer();
 		//in nsPipboy_LocalMap::CreateRenderer this is where the localMapCameraUpdateEvent stuff would also be created
 	}
 
-	//Unlock
-	if ((&scopeRendererLock)->lockValue == 1) {
-		(&scopeRendererLock)->threadID = (&scopeRendererLock)->lockValue -1;
-		_mm_mfence();
-		InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, (&scopeRendererLock)->lockValue - 1, (&scopeRendererLock)->lockValue);
-	} else {
-		InterlockedDecrement(&(&scopeRendererLock)->lockValue);
-	}
+	//Unlock?
+	//if ((&scopeRendererLock)->lockValue == 1) {
+	//	(&scopeRendererLock)->threadID = (&scopeRendererLock)->lockValue -1;
+	//	_mm_mfence();
+	//	InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, (&scopeRendererLock)->lockValue - 1, (&scopeRendererLock)->lockValue);
+	//} else {
+	//	InterlockedDecrement(&(&scopeRendererLock)->lockValue);
+	//}
+	(&scopeRendererLock)->Unlock();
 
 	logIfNeeded("ScopeRenderer Creation Complete.");
 }
@@ -45,24 +50,19 @@ ScopeRenderer* nsScope_InitRenderer() {
 	ScopeRenderer* renderer;
 	ScopeRenderer* newRenderer;
 
-	//allocate our renderer from MemoryManager
-	renderer = (ScopeRenderer*)Heap_Allocate(sizeof(ScopeRenderer)); //LocalMapRenderer allocates 0x2B0 (688)
+	//allocate our renderer
+	renderer = new ScopeRenderer();
+	//renderer = (ScopeRenderer*)Heap_Allocate(sizeof(ScopeRenderer)); //LocalMapRenderer allocates 0x2B0 (688)
 	logIfNeeded("ScopeRenderer Allocated...");
 	//if allocated succesful
 	if (renderer) {
-		new(renderer) ScopeRenderer();
+		//new(renderer) ScopeRenderer();
 		newRenderer = renderer;
 	} else {
 		newRenderer = nullptr;
 	}
-	//if (TESObjectREFR::GetInterior(pPlayer._ptr)) {
-	//	value = fLocalMapMinFrustumWidth_Interior_G._value;
-	//}
-	//} else {
-	//	value = fLocalMapMinFrustumWidth_G._value;
-	//}
-	//a2 = pPlayer._ptr->data.location.NiPoint3;
-	//if (TESObjectREFR::GetWorldSpace(pPlayer._ptr) && (TESObjectREFR::GetWorldSpace(pPlayer._ptr)->flags & 0x40) == 0) {
+	//a2 = g_player->data.location.NiPoint3;
+	//if (TESObjectREFR::GetWorldSpace(pPlayer._ptr) && (TESObjectREFR::GetWorldSpace(*g_player)->flags & 0x40) == 0) {
 	//	WorldSpace = TESObjectREFR::GetWorldSpace(pPlayer._ptr);
 	//	TESWorldSpace::AdjustMapMarkerCoord(WorldSpace, &a2, 0);
 	//}
@@ -72,7 +72,7 @@ ScopeRenderer* nsScope_InitRenderer() {
 	//(&newRenderer->scopeCam)->SetExtents(&v12, &v11);
 	//parentCell = pPlayer._ptr->parentCell;
 	//if (parentCell) {
-	//	NorthRotation = TESObjectCELL::GetNorthRotation((TESObjectCELL*)parentCell);
+	//	NorthRotation = TESObjectCELL::GetNorthRotation(parentCell);
 	//	(&newRenderer->scopeCam)->SetZRotation(&newLocalMapRenderer->LocalMapCamera, COERCE_FLOAT(LODWORD(NorthRotation) ^ _xmm.v.vector4_i.x));
 	//}
 
@@ -84,9 +84,10 @@ void nsScope_Render() {
 	
 	NiTexture* renderedTexture;
 
-	(&scopeRendererLock)->LockForReadAndWrite();
-	if (&scopeRenderer) {
-		renderedTexture = (&scopeRenderer)->Render(1);
+	BSReadAndWriteLocker locker(&scopeRendererLock);
+	//(&scopeRendererLock)->LockForReadAndWrite();
+	if (scopeRenderer) {
+		renderedTexture = (scopeRenderer)->Render(1);
 		if (renderedTexture) {
 			//if (texID string init) {
 			//	stuff about localMapTextureID
@@ -118,88 +119,40 @@ void nsScope_Render() {
 	}
 
 	//This seems to be unlocking the spinlock of the renderer after it's finished creating the renderer
-	if ((&scopeRendererLock)->lockValue == 1) {
-		(&scopeRendererLock)->threadID = 0;
-		_mm_mfence();
-		InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, 0, (&scopeRendererLock)->lockValue);
-	} else {
-		InterlockedDecrement(&(&scopeRendererLock)->lockValue);
-	}
+	//if ((&scopeRendererLock)->lockValue == 1) {
+	//	(&scopeRendererLock)->threadID = 0;
+	//	_mm_mfence();
+	//	InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, 0, (&scopeRendererLock)->lockValue);
+	//} else {
+	//	InterlockedDecrement(&(&scopeRendererLock)->lockValue);
+	//}
 	
+	locker.~BSReadAndWriteLocker();
 	//scopeRendererLock->Unlock();
 }
 
 ScopeCamera::ScopeCamera() : TESCamera() {
 	logIfNeeded("ScopeCamera ctor Starting...");
 
-	NiCamera* cam;
-	NiCamera* newCamera;
-	NiCamera* oldCam;
+	Init3D();
 
-	NiNode* node;
-	NiNode* newNode;
-
-	NiNode* camRootNode;
-
-	cam = (NiCamera*)CreateNS_NiCamera_Create();
-	if (cam) {
-		new(cam) NiCamera();
-		newCamera = cam;
-		logIfNeeded("ScopeCamera - Created NiCamera");
-	} else {
-		newCamera = nullptr;
-		logIfNeeded("ScopeCamera - NiCamera Creation FAILED");
-	}
-	oldCam = camera;
-	if (oldCam != newCamera) {
-		if (newCamera) {
-			InterlockedIncrement(&newCamera->m_uiRefCount);
-		}
-		camera = newCamera;
-		if (oldCam && !InterlockedDecrement(&oldCam->m_uiRefCount)) {
-			oldCam->DeleteThis();
-		}
-	}
-
-	node = (NiNode*)CreateNS_NiNode_Create();
-	if (node) {
-		new(node) NiNode(1);
-		newNode = node;
-		logIfNeeded("ScopeCamera - Created NiNode");
-		
-	} else {
-		newNode = nullptr;
-		logIfNeeded("ScopeCamera - NiNode Creation FAILED");
-	}
-	camRootNode = cameraNode;
-	if (camRootNode != newNode) {
-		if (newNode) {
-			InterlockedIncrement(&newNode->m_uiRefCount);
-		}
-		cameraNode = newNode;
-		if (camRootNode && !InterlockedDecrement(&camRootNode->m_uiRefCount)) {
-			camRootNode->DeleteThis();
-		}
-	}
-	cameraNode->AttachChild(camera, true);
-
-	ScopeCamera::DefaultState* camDefaultState;
+	DefaultState* camDefaultState;
 	TESCameraState* oldCamState;
-	camDefaultState = (ScopeCamera::DefaultState*)Heap_Allocate(sizeof(ScopeCamera::DefaultState));
-	if (camDefaultState) { //TODO: Add new members
-		camDefaultState->m_refCount = 0;
-		camDefaultState->camera = this;
-		camDefaultState->stateID = 0;
-		camDefaultState->initialPosition = NiPoint3_ZERO;
-		camDefaultState->translation = NiPoint3_ZERO;
-		camDefaultState->zoom = 1.0;
-		camDefaultState->minFrustumHalfWidth = 0.0;
-		camDefaultState->minFrustumHalfHeight = 0.0;
+
+	//defaultState init
+	camDefaultState = new DefaultState(*this, 0);
+	if (camDefaultState) { //TODO: Add each state to the cameraStates array
+		cameraStates[0] = camDefaultState;
 		logIfNeeded("ScopeCamera - Created ScopeCamera::DefaultState");
 	} else {
 		camDefaultState = nullptr;
 		logIfNeeded("ScopeCamera - ScopeCamera::DefaultState Creation FAILED");
 	}
+	//thermalState init
+
+	//nightVisionState init
+
+	//oldState
 	oldCamState = currentState;
 	if (camDefaultState != oldCamState) {
 		if (camDefaultState) {
@@ -210,7 +163,8 @@ ScopeCamera::ScopeCamera() : TESCamera() {
 			oldCamState->~TESCameraState();
 		}
 	}
-	//this->SetState(this->defaultState); //This is crashing. Idk why
+	//set state to default
+	this->SetState(cameraStates[0]);
 	logIfNeeded("ScopeCamera ctor Completed.");
 }
 
@@ -240,6 +194,84 @@ NiPoint3& ScopeCamera::QMaxExtent() {
 
 NiPoint3& ScopeCamera::QMinExtent() {
 	return minExtent;
+}
+
+void ScopeCamera::Init3D() {
+	NiCamera* cam;
+	NiCamera* newCam;
+	NiCamera* currentCam;
+
+	NiNode* node;
+	NiNode* newNode;
+	NiNode* currentNode;
+
+	NiAVObject* geo;
+	NiAVObject* newGeo;
+	NiAVObject* currentGeo;
+
+	cam = Create_NiCamera();
+	if (cam) {
+		new(cam) NiCamera();
+		newCam = cam;
+		logIfNeeded("ScopeCamera - Created NiCamera");
+	}
+	else {
+		newCam = nullptr;
+		logIfNeeded("ScopeCamera - NiCamera Creation FAILED");
+	}
+	currentCam = camera;
+	if (currentCam != newCam) {
+		if (newCam) {
+			InterlockedIncrement(&newCam->m_uiRefCount);
+		}
+		camera = newCam;
+		if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
+			currentCam->DeleteThis();
+		}
+	}
+
+	node = Create_NiNode();
+	if (node) {
+		new(node) NiNode(1);
+		newNode = node;
+		logIfNeeded("ScopeCamera - Created NiNode");
+	}
+	else {
+		newNode = nullptr;
+		logIfNeeded("ScopeCamera - NiNode Creation FAILED");
+	}
+	currentNode = cameraNode;
+	if (currentNode != newNode) {
+		if (newNode) {
+			InterlockedIncrement(&newNode->m_uiRefCount);
+		}
+		cameraNode = newNode;
+		if (currentNode && !InterlockedDecrement(&currentNode->m_uiRefCount)) {
+			currentNode->DeleteThis();
+		}
+	}
+	cameraNode->AttachChild(camera, true);
+
+	geo = Create_BSTriShape();
+	if (geo) {
+		new(geo) BSTriShape();
+		newGeo = geo;
+		logIfNeeded("ScopeCamera - Created BSTriShape");
+	} else {
+		newGeo = nullptr;
+		logIfNeeded("ScopeCamera - BSTriShape Creation FAILED");
+	}
+	currentGeo = renderPlane;
+	if (currentGeo != newGeo) {
+		if (newGeo) {
+			InterlockedIncrement(&newGeo->m_uiRefCount);
+		}
+		renderPlane = newGeo;
+		if (currentGeo && !InterlockedDecrement(&currentGeo->m_uiRefCount)) {
+			currentGeo->DeleteThis();
+		}
+	}
+
 }
 
 void ScopeCamera::Reset() {
@@ -276,7 +308,63 @@ void ScopeCamera::SetState(TESCameraState* newCameraState) {
 	}
 }
 
-ScopeCamera::DefaultState::DefaultState(TESCamera& cam, UInt32 ID) : TESCameraState(cam, ID) { //TODO: Add new members
+void ScopeCamera::Update3D() {
+	BSGeometry* objGeom;
+	NiCamera* currentCam;
+	NiCamera* cam;
+	NiCamera* newCam;
+
+	const BSFixedString geomName = "TextureLoader:0";
+	const BSFixedString camName = "ScopePOV";
+
+	logIfNeeded("The 3D should be loaded now. We should be able to interact with geometry now.");
+	objGeom = (BSGeometry*)GetByNameHelper(geomName);
+	if (objGeom != ScopeTextureLoader) {
+		if (objGeom) {
+			ScopeTextureLoader = objGeom;
+			logIfNeeded("Found the geometry of the scope.");
+		}
+	}
+	cam = (NiCamera*)GetByNameHelper(camName);
+	if (cam) {
+		newCam = cam;
+	} else {
+		newCam = nullptr;
+		scopePOV = scopePOV_BACKUP;
+		scopePOVRoot = scopePOVRoot_BACKUP;
+	}
+	currentCam = scopePOV;
+	if (currentCam != newCam) {
+		if (newCam) {
+			scopePOV = newCam;
+			if (scopePOV->m_parent) {
+				scopePOVRoot = scopePOV->m_parent;
+			}
+			logIfNeeded("Found the scope camera.");
+		}
+		if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
+			currentCam->DeleteThis();
+		}
+	}
+	//TODO: add actor value or something similar to set what the FOV should be on the camera of each scope
+	if (scopePOV) {
+		//float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
+		BSShaderUtil::SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0 / 4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
+	}
+
+	//if (scopePOV && scopeRenderer) {
+	//	scopeRenderer->scopeCam.camera = scopePOV;
+	//}
+	//SetupTextureLoaderWithEffectShader();
+	//SetupImageSpaceShader(ScopeTextureLoader, true);
+	if (!objGeom) {
+		logIfNeeded("Could not find the geometry of the scope.");
+		//(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
+		processCurrentScope = false;
+	}
+}
+
+ScopeCamera::DefaultState::DefaultState(TESCamera& cam, UInt32 ID) : TESCameraState(cam, ID) { //TODO: Add new members and add each new state
 	logIfNeeded("ScopeCamera::DefaultState ctor Starting...");
 	m_refCount = 0;
 	camera = &cam;
@@ -298,30 +386,6 @@ ScopeCamera::DefaultState::~DefaultState() {
 
 bool ScopeCamera::DefaultState::ShouldHandleEvent(InputEvent* inputEvent) { //TODO
 	return false; //TEMP
-}
-
-void ScopeCamera::DefaultState::OnKinectEvent(KinectEvent* inputEvent) { //TODO
-
-}
-
-void ScopeCamera::DefaultState::OnDeviceConnectEvent(DeviceConnectEvent* inputEvent) { //TODO
-
-}
-
-void ScopeCamera::DefaultState::OnThumbstickEvent(ThumbstickEvent* inputEvent) { //TODO
-
-}
-
-void ScopeCamera::DefaultState::OnCursorMoveEvent(CursorMoveEvent* inputEvent) { //TODO
-
-}
-
-void ScopeCamera::DefaultState::OnMouseMoveEvent(MouseMoveEvent* inputEvent) { //TODO
-
-}
-
-void ScopeCamera::DefaultState::OnCharacterEvent(CharacterEvent* inputEvent) { //TODO
-
 }
 
 void ScopeCamera::DefaultState::OnButtonEvent(ButtonEvent* inputEvent) { //TODO
@@ -412,7 +476,7 @@ ScopeRenderer::ScopeRenderer() {
 	pShaderAccum->QSilhouetteColor.g = 1.0;
 	pShaderAccum->QSilhouetteColor.b = 1.0;
 	pShaderAccum->QSilhouetteColor.a = 1.0;
-	(&scopeCullingProc)->SetAccumulator(this->spScopeAccumulator);
+	(&scopeCullingProc)->SetAccumulator(spScopeAccumulator);
 	scopeCullingProc.CullingType = BSCullingProcess::BSCPCullingType::kIgnoreMultiBounds;
 	scopeCullingProc.m_bCameraRelatedUpdates = 0;
 	(&params)->ResizeConstantGroup(0, 1);
@@ -827,7 +891,7 @@ void ScopeRendererManager::Setup() {
 	NiCamera* cam;
 	NiCamera* newCam;
 
-	cam = (NiCamera*)CreateNS_NiCamera_Create();
+	cam = Create_NiCamera();
 	if (cam) {
 		//CreateNS_NiCamera_Create already constructs using NiCamera::NiCamera() we do not need to do it again
 		//new(cam) NiCamera();
@@ -854,7 +918,7 @@ void ScopeRendererManager::Setup() {
 	NiNode* node;
 	NiNode* newNode;
 
-	node = (NiNode*)CreateNS_NiNode_Create();
+	node = Create_NiNode();
 	if (node) {
 		new(node) NiNode(1);
 		if ((*g_playerCamera)) {
@@ -877,7 +941,7 @@ void ScopeRendererManager::Setup() {
 		scopePOVRoot = newNode;
 		scopePOVRoot_BACKUP = newNode;
 		//float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
-		BSShaderUtil_SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0 / 4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
+		BSShaderUtil::SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0 / 4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
 		if (currentNode && !InterlockedDecrement(&currentNode->m_uiRefCount)) {
 			currentNode->DeleteThis();
 		}
@@ -1334,7 +1398,7 @@ bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAtta
 		NiNode* targetNode = (NiNode*)GetByNameHelper(sNodeName);
 		if (targetNode) {
 			if (std::get<bool>(s_extraCamerasMap.insert(std::pair<const char*, NiCamera*>(camName, *pCam)))) {
-				*pCam = cam = (NiCamera*)CreateNS_NiCamera_Create();
+				*pCam = cam = Create_NiCamera();
 				InterlockedIncrement(&cam->m_uiRefCount);
 				cam->m_name = sCamName;
 				cam->viewFrustum.m_fNear = 5.0;

@@ -31,10 +31,6 @@ bool IsWeaponDrawn();
 typedef bool (*_IsReloadable)(IsReloadableDataWrapper*, Actor::MiddleProcess::Data08::EquipData*);
 bool IsWeaponReloadable();
 
-#define BUTTON_UP 0.0f
-#define BUTTON_DOWN 1.0f
-#define BUTTON_HOLD_TIMER 0.4f
-
 bool IsButtonPressed(ButtonEvent* btnEvent);
 bool IsHoldingButton(ButtonEvent* btnEvent);
 
@@ -48,16 +44,6 @@ template <typename T>
 T GetOffset(const void* baseObject, int offset) {
 	return *reinterpret_cast<T*>((uintptr_t)baseObject + offset);
 }
-
-typedef void(*_SetAnimationVariableBoolPapyrus)(VirtualMachine* vm, UInt32 stackId, TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal);
-void SetAnimationVariableBoolPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal);
-typedef void(*_SetAnimationVariableFloatPapyrus)(VirtualMachine* vm, UInt32 stackId, TESObjectREFR* ref, BSFixedString& asVariableName, float newVal);
-void SetAnimationVariableFloatPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, float newVal);
-typedef void(*_SetAnimationVariableIntPapyrus)(VirtualMachine* vm, UInt32 stackId, TESObjectREFR* ref, BSFixedString& asVariableName, int newVal);
-void SetAnimationVariableIntPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, int newVal);
-
-typedef void(*_SetSubGraphFloatVariablePapyrus)(VirtualMachine* vm, UInt32 stackId, Actor* actor, BSFixedString asVariableName, float newVal);
-void SetSubGraphFloatVariablePapyrus(Actor* actor, BSFixedString& asVariableName, float newVal);
 
 typedef bool(*_WornHasKeywordActor)(VirtualMachine* vm, UInt32 stackId, Actor* akTarget, BGSKeyword* akKeyword);
 bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword);
@@ -97,8 +83,3 @@ const std::string prefixLog();
 void logIfNeeded(std::string text);
 void log(std::string text);
 
-typedef NiObject *(*_CreateNS_NiCamera_Create_Internal)();
-NiObject * CreateNS_NiCamera_Create();
-
-typedef NiObject* (*_CreateNS_NiNode_Create_Internal)();
-NiObject* CreateNS_NiNode_Create();
