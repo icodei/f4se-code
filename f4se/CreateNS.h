@@ -1,5 +1,12 @@
 #pragma once
-#include "Global.h"
+#include "f4se_common/Utilities.h"
+
+class NiObject;
+class BSEffectShaderProperty;
+class BSLightingShaderProperty;
+class BSTriShape;
+class NiCamera;
+class NiNode;
 
 typedef NiObject* (*_Create_BSEffectShaderProperty)();
 BSEffectShaderProperty* Create_BSEffectShaderProperty();

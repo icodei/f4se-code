@@ -10,8 +10,21 @@
 PluginHandle			g_pluginHandle = kPluginHandle_Invalid;
 F4SEMessagingInterface* g_messaging = NULL;
 
+bool ignore = false;
+bool isEmptyReload = false;
 bool logEnabled = true;
 bool oncePerSession = false;
+bool processCurrentScope = false;
+bool processCurrentWeap = false;
+bool readyForRender = false;
+bool reloadEnd = true;
+bool reloadStarted = false;
+
+int currentAmmoCount = 0;
+int ammoCapacity = 0;
+int totalAmmoCount = 0;
+int incrementor = 0;
+int toAdd = 0;
 
 BSGeometry* ScopeTextureLoader = nullptr;
 BSEffectShaderData* effectShaderData = nullptr;

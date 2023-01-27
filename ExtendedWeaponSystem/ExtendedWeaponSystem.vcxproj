@@ -177,22 +177,33 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CreateNS.cpp" />
+    <ClCompile Include="AnimationFunctions.cpp" />
     <ClCompile Include="CustomRenderer.cpp" />
+    <ClCompile Include="ExtraCameraManager.cpp" />
     <ClCompile Include="Hooks.cpp" />
-    <ClCompile Include="Interface3D.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ReloadHandlers.cpp" />
+    <ClCompile Include="ScopeCamera.cpp" />
+    <ClCompile Include="ScopeRendererManager.cpp" />
+    <ClCompile Include="ScopeShaders.cpp" />
     <ClCompile Include="Util.cpp" />
     <ClCompile Include="Extras.cpp" />
+    <ClCompile Include="WeaponHandlers.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CreateNS.h" />
+    <ClInclude Include="AnimationFunctions.h" />
     <ClInclude Include="CustomRenderer.h" />
+    <ClInclude Include="ExtraCameraManager.h" />
+    <ClInclude Include="ExtraEvents.h" />
     <ClInclude Include="Global.h" />
     <ClInclude Include="Hooks.h" />
-    <ClInclude Include="Interface3D.h" />
+    <ClInclude Include="ReloadHandlers.h" />
+    <ClInclude Include="ScopeCamera.h" />
+    <ClInclude Include="ScopeRendererManager.h" />
+    <ClInclude Include="ScopeShaders.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="Extras.h" />
+    <ClInclude Include="WeaponHandlers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,8 +1,7 @@
 #include "f4se/Hooks_Threads.h"
 #include "common/ICriticalSection.h"
-#include "f4se/GameThreads.h"
-#include "f4se_common/Relocation.h"
 #include "f4se_common/BranchTrampoline.h"
+#include "f4se_common/Relocation.h"
 #include "xbyak/xbyak.h"
 
 #include <queue>
@@ -45,6 +44,10 @@ void TaskInterface::AddTask(ITaskDelegate * task)
 	s_taskQueueLock.Leave();
 }
 
+void TaskInterface::AddTaskFunc(std::function<void()> a_task) {
+	AddTask(new TaskDelegate(std::move(a_task)));
+}
+
 void ProcessEventQueue_Hook(void * unk1)
 {
 	s_uiQueueLock.Enter();
@@ -65,6 +68,10 @@ void TaskInterface::AddUITask(ITaskDelegate * task)
 	s_uiQueueLock.Enter();
 	s_uiQueue.push(task);
 	s_uiQueueLock.Leave();
+}
+
+void TaskInterface::AddUITaskFunc(std::function<void()> a_task) {
+	AddUITask(new TaskDelegate(std::move(a_task)));
 }
 
 void Hooks_Threads_Init(void)

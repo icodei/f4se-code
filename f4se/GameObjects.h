@@ -275,70 +275,69 @@ public:
 	enum { kTypeID = kFormType_WEAP };
 
 	// 138
-	struct InstanceData : public TBO_InstanceData
-	{
+	struct InstanceData : public TBO_InstanceData {
 	public:
-		BGSSoundDescriptorForm		* unk10;					// 10 BGSSoundDescriptorForm *
-		UInt64						unk18;						// 18
-		UInt64						unk20;						// 20
-		BGSSoundDescriptorForm		*unk28;						// 28 BGSSoundDescriptorForm *
-		BGSSoundDescriptorForm		* unk30;					// 30 BGSSoundDescriptorForm *
-		BGSSoundDescriptorForm		* unk38;					// 38 BGSSoundDescriptorForm *
-		BGSSoundDescriptorForm		* unk40;					// 40 BGSSoundDescriptorForm * 
-		BGSSoundDescriptorForm		* unk48;					// 48 BGSSoundDescriptorForm *
-		UInt64						unk50;						// 50
-		BGSImpactDataSet			* unk58;					// 58 BGSImpactDataSet*
-		TESLevItem					* addAmmoList;				// 60 TESLevItem *
-		TESAmmo						* ammo;						// 68 TESAmmo *
-		BGSEquipSlot				* equipSlot;				// 70 BGSEquipSlot*
-		SpellItem					* unk78;					// 78 SpellItem*
-		BGSKeywordForm				* keywords;					// 80
-		BGSAimModel					* aimModel;					// 88 BGSAimModel *
-		BGSZoomData					* zoomData;					// 90 BGSZoomData*
+		BGSSoundDescriptorForm		* attackSound;				// 010
+		BGSSoundDescriptorForm		* attackSound2D;            // 018
+		BGSSoundDescriptorForm		* attackLoop;               // 020
+		BGSSoundDescriptorForm		* attackFailSound;          // 028
+		BGSSoundDescriptorForm		* idleSound;                // 030
+		BGSSoundDescriptorForm		* equipSound;               // 038
+		BGSSoundDescriptorForm		* unEquipSound;             // 040
+		BGSSoundDescriptorForm		* fastEquipSound;           // 048
+		BGSBlockBashData			* blockBashData;			// 050
+		BGSImpactDataSet			* impactDataSet;			// 058
+		TESLevItem					* addAmmoList;				// 060
+		TESAmmo						* ammo;						// 068
+		BGSEquipSlot				* equipSlot;				// 070
+		SpellItem					* effect;					// 078
+		BGSKeywordForm				* keywords;					// 080
+		BGSAimModel					* aimModel;					// 088
+		BGSZoomData					* zoomData;					// 090
 
-		struct FiringData
-		{
+		struct FiringData {
+		public:
 			BGSProjectile	* projectileOverride;	// 00
-			float			unk00;					// 08
+			float			fireSeconds;			// 08
 			float			leftMotorStrength;		// 0C
 			float			rightMotorStrength;		// 10
 			float			duration;				// 14
-			float			unk18;					// 18
-			float			unk1C;					// 1C
+			float			reloadSeconds;			// 18
+			float			boltChargeSeconds;		// 1C
 			float			sightedTransition;		// 20
 			UInt32			period;					// 24
-			UInt32			unk28;					// 28
-			UInt32			numProjectiles;			// 2C
+			UInt32			rumblePattern;			// 28
+			UInt8			numProjectiles;			// 2C
 		};
+		STATIC_ASSERT(sizeof(FiringData) == 0x30);
 
 		FiringData					* firingData;				// 98
 		tArray<EnchantmentItem*>	* enchantments;				// A0
 		tArray<BGSMaterialSwap*>	* materialSwaps;			// A8
 		tArray<DamageTypes>			* damageTypes;				// B0
 		tArray<ValueModifier>		* modifiers;				// B8
-		float						unkC0;						// C0
+		float						attackSeconds;				// C0
 		float						reloadSpeed;				// C4
 		float						speed;						// C8
 		float						reach;						// CC
 		float						minRange;					// D0
 		float						maxRange;					// D4
 		float						attackDelay;				// D8
-		float						unkD8;						// DC
+		float						damageToWeaponMult;			// DC
 		float						outOfRangeMultiplier;		// E0
 		float						secondary;					// E4
 		float						critChargeBonus;			// E8
 		float						weight;						// EC
-		float						unkEC;						// F0
+		float						soundLevelMult;				// F0
 		float						actionCost;					// F4
 		float						fullPowerSeconds;			// F8
 		float						minPowerShot;				// FC
-		UInt32						unk100;						// 100
+		float						colorRemappingIndex;		// 100
 		float						critDamageMult;				// 104
 		UInt32						stagger;					// 108
 		UInt32						value;						// 10C
 
-		enum WeaponFlags
-		{
+		enum WeaponFlags {
 			kFlag_IgnoresNormalResist	= 0x0000002,
 			kFlag_MinorCrime			= 0x0000004,
 			kFlag_ChargingReload		= 0x0000008,
@@ -360,26 +359,24 @@ public:
 		};
 
 		UInt32						flags;						// 110
-		UInt32						unk114;						// 114
-		UInt32						unk118;						// 118
-		UInt32						unk11C;						// 11C
+		UInt32						soundLevel;					// 114
+		UInt32						hitBehavior;				// 118
 		ActorValueInfo				* skill;					// 120
 		ActorValueInfo				* damageResist;				// 128
 		UInt16						ammoCapacity;				// 130
 		UInt16						baseDamage;					// 132
-		UInt16						unk134;						// 134
+		UInt16						rank;						// 134
 		UInt8						accuracyBonus;				// 136
-		UInt8						unk137;						// 137
+		UInt8						type;						// 137
 	};
+	STATIC_ASSERT(sizeof(InstanceData) == 0x138);
 
 	// 150
-	struct Data : public InstanceData
-	{
+	struct Data : public InstanceData {
 	public:
-		BGSModelMaterialSwap*	swap138;	// 138
-		UInt64	unk140;	// 140
-		BGSMod::Attachment::Mod*	embeddedMod;	// 148
+
 	};
+	STATIC_ASSERT(sizeof(Data) == 0x138);
 
 	TESFullName					fullName;			// 068
 	BGSModelMaterialSwap		materialSwap;		// 078	BGSModelMaterialSwap
@@ -395,11 +392,15 @@ public:
 	TESDescription				description;		// 170 TESDescription
 	BGSInstanceNamingRulesForm	namingRules;		// 188 BGSInstanceNamingRulesForm
 	Data						weapData;			// 198 TESObjectWeap::Data
+	BGSModelMaterialSwap		* firstPersonModel; // 2D0
+	TESObjectWEAP				* weaponTemplate;   // 2D8
+	BGSMod::Attachment::Mod		* embeddedWeaponMod;// 2E0
 	BGSAttachParentArray		attachParentArray;	// 2E8 BGSAttachParentArray
 };
 STATIC_ASSERT(offsetof(TESObjectWEAP, previewTransform) == 0x50);
 STATIC_ASSERT(offsetof(TESObjectWEAP, destructible) == 0x0E0);
-STATIC_ASSERT(offsetof(TESObjectWEAP::InstanceData, unk114) == 0x114);
+STATIC_ASSERT(offsetof(TESObjectWEAP::InstanceData, soundLevel) == 0x114);
+STATIC_ASSERT(sizeof(TESObjectWEAP::InstanceData::FiringData) == 0x30);
 STATIC_ASSERT(sizeof(TESObjectWEAP::InstanceData) == 0x138);
 STATIC_ASSERT(sizeof(TESObjectWEAP) == 0x300);
 

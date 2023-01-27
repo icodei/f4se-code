@@ -3,66 +3,78 @@
 #include "f4se/GameTypes.h"
 #include "f4se/NiObjects.h"
 #include "f4se/GameEvents.h"
+#include "f4se/GameAnimation.h"
 
-class BGSEquipSlot;
-class EnchantmentItem;
-class BGSKeyword;
-class BGSSoundDescriptorForm;
-class BGSVoiceType;
-class TESForm;
-class TESObjectARMO;
-class TESRace;
-class BGSInstanceNamingRules;
-class BGSImpactDataSet;
-class BGSMaterialType;
-class TESLevItem;
-class TESAmmo;
-class BGSAimModel;
-class BGSZoomData;
-class BGSBodyPartData;
-class BGSTextureSet;
-class BGSMaterialSwap;
-class BGSTerminal;
-class BGSObjectInstanceExtra;
-class TESObjectARMA;
-class IAnimationGraphManagerHolder;
-class ExtraDataList;
 class ActorValueInfo;
-class Condition;
-class TESObjectREFR;
+class BGSAimModel;
+class BGSBlockBashData;
+class BGSBodyPartData;
 class BGSDamageType;
+class BGSEquipSlot;
+class BGSImpactDataSet;
+class BGSInstanceNamingRules;
+class BGSKeyword;
+class BGSKeywordForm;
+class BGSMaterialSwap;
+class BGSMaterialType;
+class BGSObjectInstanceExtra;
 class BGSRefAlias;
+class BGSSoundDescriptorForm;
+class BGSSoundKeywordMapping;
+class BGSTerminal;
+class BGSTextureSet;
+class BGSVoiceType;
+class BGSZoomData;
+class BSAnimationGraphChannel;
+class BSAnimationGraphManager;
+class BSAnimationGraphVariableCache;
+class BSCloneReserver;
+class BShkbAnimationGraph;
+class BSSoundHandle;
+class Condition;
+class EnchantmentItem;
+class ExtraDataList;
+class QueuedFile;
+class TESAmmo;
+class TESBoundObject;
+class TESForm;
+class TESLevItem;
+class TESObjectARMA;
+class TESObjectARMO;
+class TESObjectREFR;
+class TESObjectWEAP;
+class TESRace;
+
+enum class ATTACK_STATE_ENUM;
 
 typedef bool (* _EvaluationConditions)(Condition ** condition, TESObjectREFR * ref1, TESObjectREFR * ref2);
 extern RelocAddr <_EvaluationConditions> EvaluationConditions; // Evaluates whole condition LinkedList
 
 // 10
-class TBO_InstanceData : public BSIntrusiveRefCounted
-{
+class TBO_InstanceData : public BSIntrusiveRefCounted {
 public:
-	virtual ~TBO_InstanceData();
+	TBO_InstanceData() { CALL_MEMBER_FN(this, ctor)(); };
+	virtual ~TBO_InstanceData();  // 00
 
-	virtual void	Unk_01(void);
-	virtual void	Unk_02(void);
-	virtual void	Unk_03(void);
-	virtual void	Unk_04(void);
-	virtual void	Unk_05(void);
-	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
-	virtual void	Unk_08(void);
-	virtual void	Unk_09(void);
-	virtual void	Unk_0A(void);
-	virtual void	Unk_0B(void);
-	virtual void	Unk_0C(void);
-	virtual void	Unk_0D(void);
-	virtual void	Unk_0E(void);
-	virtual void	Unk_0F(void);
-	virtual void	Unk_10(void);
-	virtual void	Unk_11(void);
-	virtual void	Unk_12(void);
-
-//	void	** _vtbl;	// 00
-//  BSIntrusiveRefCounted refCount; // 08
+	// add
+	virtual BGSKeywordForm* GetKeywordData();
+	virtual void DeleteKeywordData();
+	virtual void CreateKeywordData();
+	virtual BGSBlockBashData* GetBlockBashData();
+	virtual void DeleteBlockBashData();
+	virtual void CreateBlockBashData();
+	virtual BSTArray<EnchantmentItem*>* GetEnchantmentArray();
+	virtual void DeleteEnchantmentArray();
+	virtual void CreateEnchantmentArray();
+	virtual BSTArray<BGSMaterialSwap*>* GetMaterialSwapArray();
+	virtual void DeleteMaterialSwapArray();
+	virtual void CreateMaterialSwapArray();
+	virtual float GetWeight();
+	virtual SInt32 GetValue();
+	virtual UInt32 GetHealth();
+	virtual float GetColorRemappingIndex();
+	virtual void PostAttach3D(NiAVObject * a_obj3D, TESObjectREFR * a_ref);
+	virtual void PostApplyMods(const TESBoundObject*);
 
 	struct DamageTypes
 	{
@@ -75,7 +87,11 @@ public:
 		ActorValueInfo * avInfo;	// 00
 		UInt32			unk08;		// 08
 	};
+
+	MEMBER_FN_PREFIX(TBO_InstanceData);
+	DEFINE_MEMBER_FN(ctor, void, 0x0334BB0);
 };
+//STATIC_ASSERT(sizeof(TBO_InstanceData) == 0x10);
 
 // 08
 class BaseFormComponent
@@ -100,32 +116,33 @@ class IAnimationGraphManagerHolder
 public:
 	virtual ~IAnimationGraphManagerHolder();
 
-	virtual void	Unk_01(void);
-	virtual void	Unk_02(void);
-	virtual void	Unk_03(void);
-	virtual void	Unk_04(void);
-	virtual void	Unk_05(void);
-	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
-	virtual void	Unk_08(void);
-	virtual void	Unk_09(void);
-	virtual void	Unk_0A(void);
-	virtual void	Unk_0B(void);
-	virtual void	Unk_0C(void);
-	virtual void	Unk_0D(void);
-	virtual void	Unk_0E(void);
-	virtual void	Unk_0F(void);
-	virtual void	Unk_10(void);
-	virtual void	Unk_11(void);
-	virtual void	Unk_12(void);
-	virtual void	Unk_13(void);
-	virtual void	Unk_14(void);
-	virtual void	Unk_15(void);
-	virtual void	Unk_16(void);
-	virtual void	Unk_17(void);
-	virtual void	Unk_18(void);
+	// add
+	virtual bool NotifyAnimationGraphImpl_vtble(const BSFixedString& a_eventName);
+	virtual void EventSuccessfullyProcessed() { return; };
+	virtual void ModifyInitialAnimationStateImpl(const bool) { return; };
+	virtual bool GetAnimationGraphManagerImpl(BSAnimationGraphManager* a_animGraphMgr) { return false; };
+	virtual bool SetAnimationGraphManagerImpl(const BSAnimationGraphManager* a_animGraphMgr) { return false; };
+	virtual bool PopulateGraphNodesToTarget(tArray<NiAVObject*> a_nodesToAnimate) { return false; };
+	virtual bool ConstructAnimationGraph(BShkbAnimationGraph* a_animGraph) { return false; };
+	virtual bool InitializeAnimationGraphVariables(const BShkbAnimationGraph* a_newGraph) { return true; };
+	virtual bool SetupAnimEventSinks(const BShkbAnimationGraph* a_newGraph) { return true; };
+	virtual void DoFailedToLoadGraph() { return; };
+	virtual bool CreateAnimationChannels(tArray<BSAnimationGraphChannel*> a_channels) { return false; };
+	virtual void PostCreateAnimationGraphManager(BSAnimationGraphManager* a_animGraphMgr) { return; };
+	virtual void PostChangeAnimationManager(const BSAnimationGraphManager* a_newAnimGraphMgr, const BSAnimationGraphManager* a_oldAnimGraphMgr) { return; };
+	virtual bool ShouldUpdateAnimation() { return true; };
+	virtual UInt32 GetGraphVariableCacheSize() { return 0; };
+	virtual bool GetGraphVariableImpl(UInt32 a_graphVarID, float& a_out) { return false; };
+	virtual bool GetGraphVariableImpl(UInt32 a_graphVarID, bool& a_out) { return false; };
+	virtual bool GetGraphVariableImpl(UInt32 a_graphVarID, SInt32& a_out) { return false; };
+	virtual bool GetGraphVariableImpl(const BSFixedString& a_variable, float& a_out);
+	virtual bool GetGraphVariableImpl(const BSFixedString& a_variable, SInt32& a_out);
+	virtual bool GetGraphVariableImpl(const BSFixedString& a_variable, bool& a_out);
+	virtual void PreUpdateAnimationGraphManager(const BSAnimationGraphManager* a_animGraphMgr) { return; };
+	virtual void PostUpdateAnimationGraphManager(const BSAnimationGraphManager* a_animGraphMgr) { return; };
+	virtual void PreLoadAnimationGraphManager(const BSAnimationGraphManager* a_animGraphMgr) { return; };
+	virtual void PostLoadAnimationGraphManager(const BSAnimationGraphManager* a_animGraphMgr) { return; };
 
-//	void	** _vtbl;
 	MEMBER_FN_PREFIX(IAnimationGraphManagerHolder);
 	DEFINE_MEMBER_FN(GetGraphVariableInt, bool, 0x004DDFE0, const BSFixedString& asVariableName, UInt32 unk2);
 	DEFINE_MEMBER_FN(GetGraphVariableFloat, bool, 0x004DDFF0, const BSFixedString& asVariableName, float unk2);
@@ -164,6 +181,7 @@ public:
 
 //	void	** _vtbl;
 };
+STATIC_ASSERT(sizeof(IKeywordFormBase) == 0x8);
 
 // 08
 class ActorValueOwner
@@ -184,6 +202,7 @@ public:
 
 //	void	** _vtbl;	// 00
 };
+STATIC_ASSERT(sizeof(ActorValueOwner) == 0x8);
 
 // 10
 class TESFullName : public BaseFormComponent
@@ -402,17 +421,45 @@ public:
 };
 
 // 20
-class BGSKeywordForm : public BaseFormComponent
-{
+class BGSKeywordForm : public BaseFormComponent, public IKeywordFormBase {
 public:
-	virtual bool	HasKeyword(void* keyword); //BGSKeyword
-	virtual UInt32	GetDefaultKeyword(void);
+	BGSKeywordForm() { CALL_MEMBER_FN(this, ctor)(); };
 
-	IKeywordFormBase keywordBase;	// 08
+	// override (BaseFormComponent)
+	//void InitializeDataComponent() override;			//02
+	//void ClearDataComponent() override;               //03
+	//void InitComponent() override;		            //04
+	//void CopyComponent(BaseFormComponent*) override;	//06
+
+	// override (IKeywordFormBase)
+	virtual bool	HasKeyword(const BGSKeyword* keyword, const TBO_InstanceData* a_data = nullptr);	//01
+	//void CollectAllKeywords(BSScrapArray<const BGSKeyword*>&, const TBO_InstanceData*);				//02
+
+	//add
+	virtual UInt32	GetDefaultKeyword(void);	//07
+
 	BGSKeyword	** keywords;		// 10 BGSKeyword
 	UInt32		numKeywords;		// 18
 	UInt32		unk14;				// 1C
+
+	MEMBER_FN_PREFIX(BGSKeywordForm);
+	DEFINE_MEMBER_FN(ctor, void, 0x0140F00);
+	DEFINE_MEMBER_FN(AddKeyword, void, 0x01416E0, BGSKeyword*);
+	DEFINE_MEMBER_FN(ClearAllKeywords, void, 0x0141640);
+	DEFINE_MEMBER_FN(ContainsKeyword, bool, 0x0142030, BGSKeyword*);
+
+	void AddKeyword(BGSKeyword* keyword) { CALL_MEMBER_FN(this, AddKeyword)(keyword); };
+	void ClearAllKeywords() { CALL_MEMBER_FN(this, ClearAllKeywords)(); };
+	bool ContainsKeyword(BGSKeyword* keyword) { return CALL_MEMBER_FN(this, ContainsKeyword)(keyword); };
+	BGSKeywordForm* GetFormAsKeywordForm(TESForm* form);
+	const BGSKeywordForm* GetFormAsKeywordFormConst(TESForm* form);
+	BGSKeywordForm* GetInstanceKeywordData(TBO_InstanceData* instanceData);
+	bool IsEmpty();
+	void Load(void* file); //TESFile
+	void ModKeywords(TBO_InstanceData& instanceData, void* mod, TESBoundObject* boundObj, unsigned char unk01);
+	void RemoveKeywords(BGSKeyword* keyword);
 };
+STATIC_ASSERT(sizeof(BGSKeywordForm) == 0x20);
 
 // 18
 class BGSPickupPutdownSounds : public BaseFormComponent
@@ -440,6 +487,20 @@ class BGSDestructibleObjectForm : public BaseFormComponent
 public:
 	void	* data;	// 08
 };
+
+class BGSEquipIndex {
+public:
+	BGSEquipIndex() { index = 0; }
+	BGSEquipIndex(UInt32 newIndex) { index = newIndex; }
+	~BGSEquipIndex() {}
+
+	BGSEquipIndex& operator=(const BGSEquipIndex& newIndex) { index = newIndex.index; return *this; }
+	operator UInt32() const { return index; }
+
+	// members
+	UInt32 index;  // 0
+};
+STATIC_ASSERT(sizeof(BGSEquipIndex) == 0x4);
 
 // 10
 class BGSEquipType : public BaseFormComponent
@@ -855,14 +916,7 @@ public:
 	UInt32 GetWeaponState() { return (flags >> kWeaponStateShift) & kWeaponStateMask; }
 	bool IsWeaponDrawn()	{ return GetWeaponState() >= kWeaponState_Drawn; }
 };
-
-// 08
-class IPostAnimationChannelUpdateFunctor
-{
-	virtual ~IPostAnimationChannelUpdateFunctor();
-
-	virtual void	Unk_01();
-};
+STATIC_ASSERT(sizeof(ActorState) == 0x10);
 
 // 38
 class Condition
@@ -1481,25 +1535,133 @@ public:
 	SlotData	slots[kMaxSlots];
 };
 
+class BGSObjectInstance {
+public:
+	BGSObjectInstance() { BGSObjectInstance(nullptr, nullptr); }
+	BGSObjectInstance(TESForm* a_object, TBO_InstanceData* a_instanceData) { ctor(a_object, a_instanceData); }
+	BGSObjectInstance(BGSObjectInstance& a_copy) { ctorCopy(a_copy); }
+
+	// members
+	TESForm* object;                 // 00
+	TBO_InstanceData* instanceData;  // 08
+
+	MEMBER_FN_PREFIX(BGSObjectInstance);
+	DEFINE_MEMBER_FN(ctor, BGSObjectInstance*, 0x02F7B50, TESForm*, TBO_InstanceData*);
+	DEFINE_MEMBER_FN(ctorCopy, BGSObjectInstance*, 0x02F7BF0, BGSObjectInstance&);
+
+	bool IsValid() { return object != nullptr; };
+
+private:
+	BGSObjectInstance* ctor(TESForm* a_object, TBO_InstanceData* a_instanceData) {
+		return CALL_MEMBER_FN(this, ctor)(a_object, a_instanceData);
+	}
+
+	BGSObjectInstance* ctorCopy(BGSObjectInstance& a_copy) {
+		return CALL_MEMBER_FN(this, ctorCopy)(a_copy);
+	}
+};
+STATIC_ASSERT(sizeof(BGSObjectInstance) == 0x10);
+
+template <class T>
+class BGSObjectInstanceT : public BGSObjectInstance {
+public:
+	BGSObjectInstanceT() : BGSObjectInstance() {}
+	BGSObjectInstanceT(T* a_object, TBO_InstanceData* a_instanceData) : BGSObjectInstance(a_object, a_instanceData) {}
+};
+
 // 08
-class EquippedItemData : public NiRefObject
-{
+class EquippedItemData : public NiRefObject {
 public:
 	virtual ~EquippedItemData();
 };
+//STATIC_ASSERT(sizeof(EquippedItemData) == 0x10);
 
 // 38
-class EquippedWeaponData : public EquippedItemData
-{
+class EquippedWeaponData : public EquippedItemData {
 public:
 	virtual ~EquippedWeaponData();
 
-	TESAmmo		* ammo;		// 10
-	UInt64		unk18;		// 18 ammoCount
-	void		* unk20;	// 20 aimModel
-	UInt64		unk28;		// 28 muzzleFlash
-	NiAVObject	* object;	// 30 fireNode
+	TESAmmo* ammo;																				 // 10
+	UInt32 ammoCount;																			 // 18
+	void* aimModel;																				 // 20
+	void* muzzleFlash;																			 // 28
+	NiAVObject* fireNode;																		 // 30
+	ATTACK_STATE_ENUM attackState;                                                               // 38
+	BSTArray<BSTTuple<UInt32, AnimationStanceFireLocationData<NiPoint3>>> fireLocations;		 // 40
+	NiPointer<QueuedFile> weaponPreload;                                                         // 58
+	NiPointer<QueuedFile> projectilePreload;                                                     // 60
+	NiPointer<BSCloneReserver> reserveProjectileClones;                                          // 68
+
+	UInt64 unk070[(0x98 - 0x70) / 8];															 // 70 - 90
+	/*
+	BSSoundHandle idleSound;                                                                     // 70
+	BSSoundHandle attackSound;                                                                   // 78
+	BSSoundHandle reverbSound;                                                                   // 80
+	BSSoundHandle prevAttack;                                                                    // 88
+	BSSoundHandle prevReverb;                                                                    // 90
+	*/
+	const BGSSoundKeywordMapping* attackSoundData;                                               // 98
+	bool reverbSoundIsTail;                                                                      // A0
+	
 };
+STATIC_ASSERT(sizeof(EquippedWeaponData) == 0xA8);
+
+class EquippedItem {
+public:
+	EquippedItem() { ctor(); }
+	EquippedItem(EquippedItem& a_copy) { ctorCopy(a_copy); }
+	EquippedItem(BGSObjectInstance& a_instanceData, BGSEquipSlot* a_slot, BGSEquipIndex a_index, EquippedItemData* a_data) { ctorAdv(a_instanceData, a_slot, a_index, a_data); }
+
+	// members
+	BGSObjectInstance item;            // 00
+	const BGSEquipSlot* equipSlot;     // 10
+	BGSEquipIndex equipIndex;          // 18
+	NiPointer<EquippedItemData> data;  // 20
+
+	MEMBER_FN_PREFIX(EquippedItem);
+	DEFINE_MEMBER_FN(ctor, EquippedItem*, 0x07133C0);
+	DEFINE_MEMBER_FN(ctorCopy, EquippedItem*, 0x0010920, EquippedItem&);
+	DEFINE_MEMBER_FN(ctorAdv, EquippedItem*, 0x0E335A0, BGSObjectInstance&, BGSEquipSlot*, BGSEquipIndex, EquippedItemData*);
+
+	bool IsValid() { return item.IsValid(); }
+private:
+	EquippedItem* ctor() {
+		return CALL_MEMBER_FN(this, ctor)();
+	}
+	EquippedItem* ctorCopy(EquippedItem& a_copy) { 
+		return CALL_MEMBER_FN(this, ctorCopy)(a_copy);
+	}
+	EquippedItem* ctorAdv(BGSObjectInstance& a_instanceData, BGSEquipSlot* a_slot, BGSEquipIndex a_index, EquippedItemData* a_data) {
+		return CALL_MEMBER_FN(this, ctorAdv)(a_instanceData, a_slot, a_index, a_data);
+	}
+};
+STATIC_ASSERT(sizeof(EquippedItem) == 0x28);
+
+class EquippedWeapon {
+public:
+	EquippedWeapon() { ctor(); }
+	EquippedWeapon(EquippedWeapon& a_copy) { ctorCopy(a_copy); }
+
+	//members
+	BGSObjectInstanceT<TESObjectWEAP> weapon;	// 00
+	const BGSEquipSlot* equipSlot;				// 10
+	BGSEquipIndex equipIndex;					// 18
+	NiPointer<EquippedWeaponData> weaponData;	// 20
+
+	MEMBER_FN_PREFIX(EquippedWeapon);
+	DEFINE_MEMBER_FN(ctor, EquippedWeapon*, 0x07133F0);
+	DEFINE_MEMBER_FN(ctorCopy, EquippedWeapon*, 0x0010970, EquippedWeapon&);
+
+	bool IsValid() { return weapon.IsValid(); }
+private:
+	EquippedWeapon* ctor() {
+		return CALL_MEMBER_FN(this, ctor)();
+	}
+	EquippedWeapon* ctorCopy(EquippedWeapon& a_equippedWeapon) {
+		return CALL_MEMBER_FN(this, ctorCopy)(a_equippedWeapon);
+	}
+};
+STATIC_ASSERT(sizeof(EquippedWeapon) == 0x28);
 
 // 10
 struct BGSInventoryItem

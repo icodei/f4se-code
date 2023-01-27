@@ -44,9 +44,6 @@
     <ClCompile Include="NiRTTI.cpp">
       <Filter>netimmerse</Filter>
     </ClCompile>
-    <ClCompile Include="BSGeometry.cpp">
-      <Filter>netimmerse</Filter>
-    </ClCompile>
     <ClCompile Include="NiExtraData.cpp">
       <Filter>netimmerse</Filter>
     </ClCompile>
@@ -125,9 +122,6 @@
     <ClCompile Include="GameRTTI.cpp">
       <Filter>api</Filter>
     </ClCompile>
-    <ClCompile Include="BSSkin.cpp">
-      <Filter>netimmerse</Filter>
-    </ClCompile>
     <ClCompile Include="GameThreads.cpp">
       <Filter>api</Filter>
     </ClCompile>
@@ -185,9 +179,6 @@
     <ClCompile Include="PapyrusGame.cpp">
       <Filter>papyrus\functions</Filter>
     </ClCompile>
-    <ClCompile Include="BSModelDB.cpp">
-      <Filter>netimmerse</Filter>
-    </ClCompile>
     <ClCompile Include="Serialization.cpp">
       <Filter>internal</Filter>
     </ClCompile>
@@ -199,9 +190,6 @@
     </ClCompile>
     <ClCompile Include="Hooks_Threads.cpp">
       <Filter>hooks</Filter>
-    </ClCompile>
-    <ClCompile Include="BSGraphics.cpp">
-      <Filter>netimmerse</Filter>
     </ClCompile>
     <ClCompile Include="PapyrusEvents.cpp">
       <Filter>papyrus\vm</Filter>
@@ -278,23 +266,11 @@
     <ClCompile Include="PapyrusLocation.cpp">
       <Filter>papyrus\functions</Filter>
     </ClCompile>
-    <ClCompile Include="bhkWorld.cpp">
-      <Filter>netimmerse</Filter>
-    </ClCompile>
     <ClCompile Include="GameWorkshop.cpp">
       <Filter>api</Filter>
     </ClCompile>
     <ClCompile Include="PapyrusDefaultObject.cpp">
       <Filter>papyrus\functions</Filter>
-    </ClCompile>
-    <ClCompile Include="BSLight.cpp">
-      <Filter>netimmerse</Filter>
-    </ClCompile>
-    <ClCompile Include="BSParticleShaderEmitter.cpp">
-      <Filter>netimmerse</Filter>
-    </ClCompile>
-    <ClCompile Include="BSCollision.cpp">
-      <Filter>netimmerse</Filter>
     </ClCompile>
     <ClCompile Include="NiSerialization.cpp">
       <Filter>netimmerse</Filter>
@@ -325,6 +301,84 @@
     </ClCompile>
     <ClCompile Include="GameHandle.cpp">
       <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="GameAI.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="GameAnimation.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSound.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="GameHandlers.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="bhkWorld.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSCollision.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSGeometry.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSGraphics.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSLight.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSModelDB.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSParticleShaderEmitter.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSSkin.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSImageSpace.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSShader.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="BSCulling.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="NiAccumulator.cpp">
+      <Filter>netimmerse</Filter>
+    </ClCompile>
+    <ClCompile Include="Interface3D.cpp">
+      <Filter>others</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageSpace.cpp">
+      <Filter>others</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageSpaceManager.cpp">
+      <Filter>others</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateNS.cpp">
+      <Filter>others</Filter>
+    </ClCompile>
+    <ClCompile Include="NiCamera.cpp">
+      <Filter>netimmerse</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawWorld.cpp">
+      <Filter>others</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMain.cpp">
+      <Filter>api</Filter>
+    </ClCompile>
+    <ClCompile Include="BSUtilities.cpp">
+      <Filter>bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="TES.cpp">
+      <Filter>TES</Filter>
+    </ClCompile>
+    <ClCompile Include="TESEffectShader.cpp">
+      <Filter>TES</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -379,6 +433,15 @@
     <Filter Include="papyrus\functions">
       <UniqueIdentifier>{53266a9e-d65a-4ef4-b936-685b8012d3c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="bethesda">
+      <UniqueIdentifier>{9dd5bc80-86e9-4b3f-80d3-b6bd61ebcf93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="others">
+      <UniqueIdentifier>{90101b44-1113-4c25-81c7-c32c7fd95a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TES">
+      <UniqueIdentifier>{4f154d21-eba1-4825-b714-1c9dfd27c88c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameSettings.h">
@@ -418,9 +481,6 @@
       <Filter>netimmerse</Filter>
     </ClInclude>
     <ClInclude Include="NiRTTI.h">
-      <Filter>netimmerse</Filter>
-    </ClInclude>
-    <ClInclude Include="BSGeometry.h">
       <Filter>netimmerse</Filter>
     </ClInclude>
     <ClInclude Include="NiExtraData.h">
@@ -504,9 +564,6 @@
     <ClInclude Include="GameRTTI.h">
       <Filter>api</Filter>
     </ClInclude>
-    <ClInclude Include="BSSkin.h">
-      <Filter>netimmerse</Filter>
-    </ClInclude>
     <ClInclude Include="GameThreads.h">
       <Filter>api</Filter>
     </ClInclude>
@@ -564,9 +621,6 @@
     <ClInclude Include="Hooks_Input.h">
       <Filter>hooks</Filter>
     </ClInclude>
-    <ClInclude Include="BSModelDB.h">
-      <Filter>netimmerse</Filter>
-    </ClInclude>
     <ClInclude Include="Serialization.h">
       <Filter>internal</Filter>
     </ClInclude>
@@ -578,9 +632,6 @@
     </ClInclude>
     <ClInclude Include="Hooks_Threads.h">
       <Filter>hooks</Filter>
-    </ClInclude>
-    <ClInclude Include="BSGraphics.h">
-      <Filter>netimmerse</Filter>
     </ClInclude>
     <ClInclude Include="PapyrusEvents.h">
       <Filter>papyrus\vm</Filter>
@@ -657,9 +708,6 @@
     <ClInclude Include="PapyrusLocation.h">
       <Filter>papyrus\functions</Filter>
     </ClInclude>
-    <ClInclude Include="bhkWorld.h">
-      <Filter>netimmerse</Filter>
-    </ClInclude>
     <ClInclude Include="GameWorkshop.h">
       <Filter>api</Filter>
     </ClInclude>
@@ -668,15 +716,6 @@
     </ClInclude>
     <ClInclude Include="PapyrusDefaultObject.h">
       <Filter>papyrus\functions</Filter>
-    </ClInclude>
-    <ClInclude Include="BSLight.h">
-      <Filter>netimmerse</Filter>
-    </ClInclude>
-    <ClInclude Include="BSParticleShaderEmitter.h">
-      <Filter>netimmerse</Filter>
-    </ClInclude>
-    <ClInclude Include="BSCollision.h">
-      <Filter>netimmerse</Filter>
     </ClInclude>
     <ClInclude Include="NiSerialization.h">
       <Filter>netimmerse</Filter>
@@ -707,6 +746,93 @@
     </ClInclude>
     <ClInclude Include="GameHandle.h">
       <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="GameAI.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="GameAnimation.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSound.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="GameHandlers.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="bhkWorld.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSCollision.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSGeometry.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSGraphics.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSLight.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSModelDB.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSParticleShaderEmitter.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSSkin.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSImageSpace.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSShader.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSCulling.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="NiAccumulator.h">
+      <Filter>netimmerse</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface3D.h">
+      <Filter>others</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageSpace.h">
+      <Filter>others</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageSpaceManager.h">
+      <Filter>others</Filter>
+    </ClInclude>
+    <ClInclude Include="CreateNS.h">
+      <Filter>others</Filter>
+    </ClInclude>
+    <ClInclude Include="NiCamera.h">
+      <Filter>netimmerse</Filter>
+    </ClInclude>
+    <ClInclude Include="DrawWorld.h">
+      <Filter>others</Filter>
+    </ClInclude>
+    <ClInclude Include="BSCompoundFrustum.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="BSPortalGraph.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="NiCullingProcess.h">
+      <Filter>netimmerse</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMain.h">
+      <Filter>api</Filter>
+    </ClInclude>
+    <ClInclude Include="BSUtilities.h">
+      <Filter>bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="TES.h">
+      <Filter>TES</Filter>
+    </ClInclude>
+    <ClInclude Include="TESEffectShader.h">
+      <Filter>TES</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

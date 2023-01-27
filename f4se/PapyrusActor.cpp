@@ -5,6 +5,7 @@
 #include "f4se/PapyrusArgs.h"
 #include "f4se/PapyrusStruct.h"
 
+#include "f4se/GameAI.h"
 #include "f4se/GameForms.h"
 #include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
@@ -105,19 +106,15 @@ namespace papyrusActor
 		if(!actor)
 			return nullptr;
 
-		auto middleProcess = actor->middleProcess;
+		auto middleProcess = actor->currentProcess->middleHigh;
 		if(!middleProcess)
 			return nullptr;
 
 		UInt32 furnitureHandle = 0;
-		auto data08 = middleProcess->unk08;
-		if(!data08)
-			return nullptr;
-
-		if(actor->actorState.flags & (ActorState::Flags::kUnk1 | ActorState::Flags::kUnk2))
-			furnitureHandle = data08->furnitureHandle2;
+		if(actor->ActorState::flags & (ActorState::Flags::kUnk1 | ActorState::Flags::kUnk2))
+			furnitureHandle = middleProcess->occupiedFurniture.native_handle();
 		else
-			furnitureHandle = data08->furnitureHandle1;
+			furnitureHandle = middleProcess->currentFurniture.native_handle();
 
 		LookupREFRByHandle(furnitureHandle, refr);
 		return refr;

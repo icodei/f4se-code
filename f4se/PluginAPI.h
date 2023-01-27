@@ -201,7 +201,9 @@ struct F4SETaskInterface
 	UInt32	interfaceVersion;
 
 	void	(* AddTask)(ITaskDelegate * task);
+	void	(* AddTaskFunc)(std::function<void()> a_task);
 	void	(* AddUITask)(ITaskDelegate * task);
+	void	(* AddUITaskFunc)(std::function<void()> a_task);
 };
 
 struct F4SEObjectInterface

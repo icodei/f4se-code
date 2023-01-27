@@ -170,7 +170,7 @@ namespace papyrusGame
 				TESCameraState, ThirdPersonState);
 			if(thirdPersonCamera)
 			{
-				thirdPersonCamera->UpdateMode(player->actorState.IsWeaponDrawn());
+				thirdPersonCamera->UpdateMode(player->IsWeaponDrawn());
 			}
 		}
 	}

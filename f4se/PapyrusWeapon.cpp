@@ -9,13 +9,13 @@ namespace papyrusWeapon
 {
 	BGSMod::Attachment::Mod * GetEmbeddedMod(TESObjectWEAP* thisWeapon)
 	{
-		return thisWeapon ? thisWeapon->weapData.embeddedMod : nullptr;
+		return thisWeapon ? thisWeapon->embeddedWeaponMod : nullptr;
 	}
 
 	void SetEmbeddedMod(TESObjectWEAP* thisWeapon, BGSMod::Attachment::Mod * mod)
 	{
 		if(thisWeapon) {
-			thisWeapon->weapData.embeddedMod = mod;
+			thisWeapon->embeddedWeaponMod = mod;
 		}
 	}
 }

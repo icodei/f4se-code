@@ -1,20 +1,35 @@
 #pragma once
 
+#include "f4se/GameAnimation.h"
 #include "f4se/GameForms.h"
 #include "f4se/GameEvents.h"
 #include "f4se/GameCustomization.h"
 #include "f4se/GameHandle.h"
 #include "f4se/NiObjects.h"
 
-class BSActiveGraphIfInactiveEvent;
-class BSAnimationGraphEvent;
-
-class TESObjectCELL;
-class NiNode;
-class ExtraDataList;
-class TESWorldSpace;
+class AIProcess;
 class BGSScene;
+class ExtraDataList;
+class MovementMessageUpdateRequestImmediate;
+class NiNode;
+class TESObjectCELL;
 class TESQuest;
+class TESWorldSpace;
+
+struct BSActiveGraphIfInactiveEvent;
+struct BSAnimationGraphEvent;
+struct ActorCPMEvent;
+
+namespace PerkValueEvents {
+	struct PerkValueChangedEvent;
+	struct PerkEntryUpdatedEvent;
+}
+
+namespace ActorValueEvents {
+	struct ActorValueChangedEvent;
+}
+
+enum class ATTACK_STATE_ENUM;
 
 typedef bool (*_HasDetectionLOS)(Actor* source, TESObjectREFR* target, UInt8* unk1);
 extern RelocAddr<_HasDetectionLOS> HasDetectionLOS;
@@ -53,6 +68,7 @@ public:
 		return m_uiRefCount & kMask_RefCount;
 	}
 };
+STATIC_ASSERT(sizeof(BSHandleRefObject) == 0x10);
 
 // 110
 class TESObjectREFR : public TESForm {
@@ -216,13 +232,16 @@ public:
 	enum { kTypeID = kFormType_REFR };
 
 	// parents
-	BSHandleRefObject							handleRefObject;		// 20
-	BSTEventSink <BSActiveGraphIfInactiveEvent>	activeGraphIfInactive;	// 30
-	BSTEventSink <BSAnimationGraphEvent>		animGraphEventSink;		// 38
-	BSTEventSink <BGSInventoryListEvent::Event>	inventoryListSink;		// 40
-	IAnimationGraphManagerHolder				animGraphHolder;		// 48
-	IKeywordFormBase							keywordFormBase;		// 50
-	ActorValueOwner								actorValueOwner;		// 58
+	BSHandleRefObject											handleRefObject;			// 20
+	BSTEventSink <BSActiveGraphIfInactiveEvent>					activeGraphIfInactive;		// 30
+	BSTEventSink <BSAnimationGraphEvent>						animGraphEventSink;			// 38
+	BSTEventSink <BGSInventoryListEvent::Event>					inventoryListSink;			// 40
+	IAnimationGraphManagerHolder								animGraphHolder;			// 48
+	IKeywordFormBase											keywordFormBase;			// 50
+	ActorValueOwner												actorValueOwner;			// 58
+	BSTEventSource<ActorValueEvents::ActorValueChangedEvent>	actorValueChanged;			// 60
+	
+	/*
 	void*										unk60;					// 60
 	void*										unk68;					// 68
 	UInt32										unk70;					// 70
@@ -236,6 +255,9 @@ public:
 	UInt64										unkA0;					// A0
 	UInt64										unkA8;					// A8
 	UInt64										unkB0;					// B0
+	*/
+
+	// members
 	TESObjectCELL*								parentCell;				// B8
 	NiPoint3									rot;					// C0, C4, C8 - Probably quat?
 	float										unkCC;
@@ -260,11 +282,12 @@ public:
 		// ...
 	};
 
-	LoadedData*									unkF0;					// F0 - Root node at 0x08
-	BGSInventoryList*							inventoryList;			// F8
+	LoadedData*									unkF0;					// 0F0 - Root node at 0x08
+	BGSInventoryList*							inventoryList;			// 0F8
 	ExtraDataList*								extraDataList;			// 100 - ExtraData?
-	UInt32										unk104;					// 104
-	UInt32										unk108;					// 108
+	UInt16										refScale;               // 018
+	UInt8										modelState;             // 10A
+	bool										predestroyed;           // 10B
 
 	void IncRef() { handleRefObject.IncRef(); }
 	void DecRef() { handleRefObject.DecRef(); }
@@ -277,12 +300,28 @@ public:
 	// 7055D6CB4B64E11E63908512704F8871CEC025D3+11E
 	DEFINE_MEMBER_FN_1(ForEachAlias, void, 0x003F7960, IAliasFunctor* functor);
 };
+STATIC_ASSERT(offsetof(TESObjectREFR, handleRefObject) == 0x20);
 STATIC_ASSERT(offsetof(TESObjectREFR, parentCell) == 0xB8);
 STATIC_ASSERT(offsetof(TESObjectREFR, baseForm) == 0xE0);
 STATIC_ASSERT(sizeof(TESObjectREFR) == 0x110);
 
 // 490
-class Actor : public TESObjectREFR {
+class Actor : 
+	public TESObjectREFR,                                           // 000
+	public MagicTarget,                                             // 110
+	public ActorState,                                              // 128
+	public BSTEventSink<BSMovementDataChangedEvent>,                // 138
+	public BSTEventSink<BSTransformDeltaEvent>,                     // 140
+	public BSTEventSink<BSSubGraphActivationUpdate>,                // 148
+	public BSTEventSink<bhkCharacterMoveFinishEvent>,               // 150
+	public BSTEventSink<bhkNonSupportContactEvent>,                 // 158
+	public BSTEventSink<bhkCharacterStateChangeEvent>,              // 160
+	public IPostAnimationChannelUpdateFunctor,                      // 168
+	public BSTEventSource<MovementMessageUpdateRequestImmediate>,   // 170
+	public BSTEventSource<PerkValueEvents::PerkValueChangedEvent>,  // 1C8
+	public BSTEventSource<PerkValueEvents::PerkEntryUpdatedEvent>,  // 220
+	public BSTEventSource<ActorCPMEvent>                            // 278
+{
 public:
 	virtual void	Unk_C4();
 	virtual void	Unk_C5();
@@ -396,16 +435,26 @@ public:
 
 	enum { kTypeID = kFormType_ACHR };
 
-	MagicTarget	magicTarget;	// 110
-	ActorState	actorState;		// 128
+	/*
+	//Below should be inherited not members
+	MagicTarget									magicTarget;			// 110
+	ActorState									actorState;				// 128
 	BSTEventSink<BSMovementDataChangedEvent>	movementDataChanged;	// 138
 	BSTEventSink<BSTransformDeltaEvent>			transformDelta;			// 140
 	BSTEventSink<BSSubGraphActivationUpdate>	subGraphActivation;		// 148
 	BSTEventSink<bhkCharacterMoveFinishEvent>	characterMoveFinished;	// 150
 	BSTEventSink<bhkNonSupportContactEvent>		nonSupportContact;		// 158
 	BSTEventSink<bhkCharacterStateChangeEvent>	characterStateChanged;	// 160
+	
+	IPostAnimationChannelUpdateFunctor                      // 168
+	BSTEventSource<MovementMessageUpdateRequestImmediate>   // 170
+	BSTEventSource<PerkValueEvents::PerkValueChangedEvent>  // 1C8
+	BSTEventSource<PerkValueEvents::PerkEntryUpdatedEvent>  // 220
+	BSTEventSource<ActorCPMEvent>                           // 278
+	*/
+	//UInt64	unk168[(0x2D0 - 0x168) / 8];	// 168
 
-	UInt64	unk168[(0x2D0 - 0x168) / 8];	// 168
+
 	UInt32	actorFlags; // 2D0
 
 	enum ActorFlags
@@ -413,22 +462,24 @@ public:
 		kFlag_Teammate = (1 << 26)
 	};
 
-	UInt32	unk2D4;
-	UInt64	unk2D8[(0x300 - 0x2D8) / 8];	// 2D8
+	float updateTargetTimer;                                             // 2D4
+	NiPoint3 editorLocCoord;                                             // 2D8
+	NiPoint3 editorLocRot;                                               // 2E4
+	TESForm* editorLocForm;                                              // 2F0
+	BGSLocation* editorLocation;                                         // 2F8
 
+	/*
+	// Original f4se code
 	// Lots of misc data goes here, equipping, perks, etc
-	struct MiddleProcess
-	{
+	struct MiddleProcess {
 		void* unk00;	// 00
 
-		struct Data08
-		{
+		struct Data08 {
 			UInt64	unk00[0x280 >> 3];		// 000
 
 			SimpleLock lock;				// 280
 
-			struct EquipData
-			{
+			struct EquipData {
 				TESForm*				item;			// 00
 				TBO_InstanceData*		instanceData;	// 08
 				BGSEquipSlot*			equipSlot;		// 10
@@ -461,47 +512,92 @@ public:
 		DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00E60860, Actor* actor, UInt32 flags);
 	};
 	MiddleProcess* middleProcess;					// 300
-	UInt64	unk308[(0x338 - 0x308) / 8];
+	*/
 
-	struct ActorValueData
-	{
+	AIProcess* currentProcess;                                           // 300
+	UInt64	unk308[(0x338 - 0x308) / 8];								 // 308 - 330
+	/*
+	ActorMover* actorMover;                                              // 308
+	BGSKeyword* speakingAnimArchType;                                    // 310
+	BSTSmartPointer<MovementControllerNPC> movementController;           // 318
+	TESPackage* initialPackage;                                          // 320
+	CombatController* combatController;                                  // 328
+	TESFaction* vendorFaction;                                           // 330
+	ActorValueStorage avStorage;                                         // 338
+	*/
+
+	struct ActorValueData {
 		UInt32	avFormID;	// 00
 		float	value;	// 04
 	};
-	tArray<ActorValueData>	actorValueData;		// 338
 
-	struct Data350 // ActorValue related, not sure what the 3 values are
-	{
+	tArray<ActorValueData>	actorValueData;								 // 338
+
+	struct Data350 { // ActorValue related, not sure what the 3 values are
 		UInt32	avFormID;	// 00
 		float	unk04;		// 04
 		float	unk08;		// 08
 		float	unk0C;		// 0C
 	};
 
-	tArray<Data350>	unk350;				// 350
-	UInt64	unk368[(0x418 - 0x368) / 8];
-	TESRace* race;				// 418
-	UInt64			unk420;				// 420
-	ActorEquipData* equipData;		// 428
-	UInt64	unk430;						// 430
-	UInt32	unk438;						// 438
-	UInt32	uiFlags;					// 43C
-	UInt64	unk440[(0x490 - 0x440) / 8];	// 440
+	tArray<Data350>	unk350;												 // 350
+	UInt64	unk368[(0x418 - 0x368) / 8];								 // 368 - 410
+	/*
+	BGSDialogueBranch* exclusiveBranch;                                  // 370
+	UInt32 criticalStage;												 // 378
+	ObjectRefHandle dialogueItemTarget;                                  // 37C
+	ActorHandle currentCombatTarget;                                     // 380
+	ActorHandle myKiller;                                                // 384
+	float checkMyDeadBodyTimer;                                          // 388
+	float voiceTimer;                                                    // 38C
+	float voiceLengthTotal;                                              // 390
+	float underWaterTimer;                                               // 394
+	UInt32 thiefCrimeStamp;												 // 398
+	UInt32 actionValue;													 // 39C
+	float timeronAction;                                                 // 3A0
+	AITimeStamp calculateVendorFactionTimer;                             // 3A4
+	UInt32 intimidateBribeDayStamp;										 // 3A8
+	float equippedWeight;                                                // 3AC
+	UInt64 addedSpells[(0x3C8 - 0x3B0)/8];                               // 3B0	BSTSmallArray<SpellItem*>
+	ActorMagicCaster* magicCasters[4];                                   // 3C8
+	MagicItem* selectedSpell[4];                                         // 3E8
+	CastPowerItem* castPowerItems;                                       // 408
+	TESForm* selectedPower;                                              // 410
+	*/
+	TESRace* race;														 // 418
+	UInt64			unk420;												 // 420
+	ActorEquipData* equipData;											 // 428
+	UInt64	unk430;														 // 430
+	UInt32	unk438;														 // 438
+	UInt32	uiFlags;													 // 43C
+	UInt32 moreFlags;													 // 440
+	float healthModifiers[3];											 // 444
+	float actionPointsModifiers[3];                                      // 450
+	float staminaModifiers[3];                                           // 45C
+	float radsModifiers[3];                                              // 468
+	float lastUpdate;                                                    // 474
+	UInt32 lastSeenTime;												 // 478
+	float armorRating;                                                   // 47C
+	float armorBaseFactorSum;                                            // 480
+	UInt32 visFlags : 4;												 // 484:00
+	UInt8 raceSwitchPending : 1;										 // 488:0
+	UInt8 soundCallBackSet;												 // 489
+	bool trespassing;                                                    // 48A
 
-	bool IsPlayerTeammate()
-	{
-		return (actorFlags & kFlag_Teammate) == kFlag_Teammate;
-	}
+	bool IsPlayerTeammate() { return (actorFlags & kFlag_Teammate) == kFlag_Teammate; }
 	bool GetEquippedExtraData(UInt32 slotIndex, ExtraDataList** extraData);
+	void HandleItemEquip(bool a1) { CALL_MEMBER_FN(this, HandleItemEquip)(a1); }
 
+private:
 	MEMBER_FN_PREFIX(Actor);
 	DEFINE_MEMBER_FN(QueueUpdate, void, 0x00D8A1F0, bool bDoFaceGen, UInt32 unk2, bool DoQueue, UInt32 flags); // 0, 0, 1, 0
 	DEFINE_MEMBER_FN(IsHostileToActor, bool, 0x00D91080, Actor* actor);
 	DEFINE_MEMBER_FN(UpdateEquipment, void, 0x00408270);
+	DEFINE_MEMBER_FN(HandleItemEquip, void, 0x0D7EB20, bool a1)
 };
-STATIC_ASSERT(offsetof(Actor, equipData) == 0x428);
+//STATIC_ASSERT(offsetof(Actor, equipData) == 0x428);
 STATIC_ASSERT(offsetof(Actor, uiFlags) == 0x43C);
-STATIC_ASSERT(offsetof(Actor::MiddleProcess::Data08, equipData) == 0x288);
+//STATIC_ASSERT(offsetof(Actor::MiddleProcess::Data08, equipData) == 0x288);
 STATIC_ASSERT(sizeof(Actor) == 0x490);
 
 // E10

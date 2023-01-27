@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Hooks.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="Extras.cpp">
+      <Filter>Reversed Things</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomRenderer.cpp">
+      <Filter>CustomRender</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopeRendererManager.cpp">
+      <Filter>CustomRender</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtraCameraManager.cpp">
+      <Filter>CustomRender</Filter>
+    </ClCompile>
+    <ClCompile Include="ScopeCamera.cpp">
+      <Filter>CustomRender</Filter>
+    </ClCompile>
+    <ClCompile Include="ReloadHandlers.cpp" />
+    <ClCompile Include="WeaponHandlers.cpp" />
+    <ClCompile Include="AnimationFunctions.cpp" />
+    <ClCompile Include="ScopeShaders.cpp">
+      <Filter>CustomRender</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Global.h" />
+    <ClInclude Include="Hooks.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="ExtraEvents.h">
+      <Filter>Reversed Things</Filter>
+    </ClInclude>
+    <ClInclude Include="Extras.h">
+      <Filter>Reversed Things</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomRenderer.h">
+      <Filter>CustomRender</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopeRendererManager.h">
+      <Filter>CustomRender</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtraCameraManager.h">
+      <Filter>CustomRender</Filter>
+    </ClInclude>
+    <ClInclude Include="ScopeCamera.h">
+      <Filter>CustomRender</Filter>
+    </ClInclude>
+    <ClInclude Include="ReloadHandlers.h" />
+    <ClInclude Include="WeaponHandlers.h" />
+    <ClInclude Include="AnimationFunctions.h" />
+    <ClInclude Include="ScopeShaders.h">
+      <Filter>CustomRender</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Reversed Things">
+      <UniqueIdentifier>{e81429f7-1942-468a-b8c6-ac207204b88b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CustomRender">
+      <UniqueIdentifier>{4717e6df-99fc-49b4-9550-9d9292ce4d2d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

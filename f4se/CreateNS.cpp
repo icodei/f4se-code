@@ -1,4 +1,4 @@
-#include "Global.h"
+#include "f4se/CreateNS.h"
 
 RelocAddr <_Create_BSEffectShaderProperty> Create_BSEffectShaderProperty_Internal(0x027CBBE0);
 BSEffectShaderProperty* Create_BSEffectShaderProperty() {

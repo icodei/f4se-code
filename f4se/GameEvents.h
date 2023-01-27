@@ -1,9 +1,11 @@
 #pragma once
 
 #include "f4se/GameTypes.h"
+#include "f4se/GameHandle.h"
 
 class Actor;
 class TESObjectREFR;
+class TESBoundObject;
 
 enum EventResult
 {
@@ -60,14 +62,37 @@ private:
 	tArray<BSTEventSink<event_type>*> _pendingUnregisters;			// 38
 	UInt8 _notifying{ 0 };											// 50
 };
-//static_assert(sizeof(BSTEventSource<void*>) == 0x58);
+STATIC_ASSERT(sizeof(BSTEventSource<void*>) == 0x58);
+
+struct ActorCPMEvent {
+
+};
+
+struct ActorInventoryEvent {
+
+};
 
 struct BGSInventoryListEvent
 {
+	enum class Type
+	{
+		kAddStack,
+		kChangedStack,
+		kAddNewItem,
+		kRemoveItem,
+		kClear,
+		UpdateWeight
+	};
+
 	struct Event
 	{
-
+		UInt16 changeType;									// 00
+		BSPointerHandle<TESObjectREFR> owner;				// 04
+		TESBoundObject* objAffected;						// 08
+		UInt32 count;										// 10
+		UInt32 stackID;										// 14
 	};
+	STATIC_ASSERT(sizeof(Event) == 0x18);
 };
 
 struct MenuOpenCloseEvent

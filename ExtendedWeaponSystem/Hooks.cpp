@@ -1,29 +1,5 @@
 #include "Global.h"
 
-bool isEmptyReload = false;
-bool reloadStarted = false;
-bool reloadEnd = true;
-bool processCurrentWeap = false;
-bool processCurrentScope = false;
-bool ignore = false;
-bool readyForRender = false;
-
-int currentAmmoCount = 0;
-int ammoCapacity = 0;
-int totalAmmoCount = 0;
-int incrementor = 0;
-int toAdd = 0;
-
-BSTEventDispatcher<void*>* GetGlobalEventDispatcher(BSTGlobalEvent* globalEvents, const char* dispatcherName) {
-	for (int i = 0; i < globalEvents->eventSources.count; i++) {
-		const char* name = GetObjectClassName(globalEvents->eventSources[i]) + 15;
-		if (strstr(name, dispatcherName) == name) {
-			return &globalEvents->eventSources[i]->eventDispatcher;
-		}
-	}
-	return nullptr;
-}
-
 RelocPtr<float> minCurrentZoom(0x3805130);
 
 typedef void(*_TogglePOV)(void*, ButtonEvent*);
@@ -77,23 +53,28 @@ void ReadyWeaponHandler_Hook(void* arg1, ButtonEvent* event) {
 	ReadyWeaponHandler_Original(arg1, event);
 }
 
-typedef std::uint32_t(*_PlayerUseAmmoEvent_ReceiveEvent)(Actor*, const WeaponData&, std::uint32_t, std::uint32_t);
+typedef std::uint32_t(*_PlayerUseAmmoEvent_ReceiveEvent)(Actor*, const BGSObjectInstanceT<TESObjectWEAP>&, std::uint32_t, std::uint32_t);
 RelocAddr<uintptr_t> PlayerUseAmmoEvent_ReceiveEvent_Target(0x2D438E8 + 0x780);
 _PlayerUseAmmoEvent_ReceiveEvent PlayerUseAmmoEvent_Original;
-std::uint32_t PlayerUseAmmoEvent_ReceiveEvent_Hook(Actor* actor, const WeaponData& a_weapon, std::uint32_t a_equipIndex, std::uint32_t a_shotCount) {
-	if (processCurrentWeap) {
-		if (actor == *g_player) {
-			Actor::MiddleProcess::Data08::EquipData* equipData = GetEquipDataByEquipIndex(EquipIndex::kEquipIndex_Default);
-			TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(a_weapon.item, a_weapon.instanceData);
-			if (weapInst && weapInst != currentWeapInstance) {
-				currentWeapInstance = weapInst;
-				ammoCapacity = currentWeapInstance->ammoCapacity;
-			}
-			currentAmmoCount = equipData->equippedData->unk18;
-			totalAmmoCount = GetInventoryItemCount(actor, weapInst->ammo);
-			logIfNeeded("ammo count: " + std::to_string(currentAmmoCount));
-		}
+std::uint32_t PlayerUseAmmoEvent_ReceiveEvent_Hook(Actor* actor, const BGSObjectInstanceT<TESObjectWEAP>& a_weapon, std::uint32_t a_equipIndex, std::uint32_t a_shotCount) {
+	if (processCurrentWeap == false) {
+		return PlayerUseAmmoEvent_Original(actor, a_weapon, a_equipIndex, a_shotCount);
 	}
+	if (actor != (*g_player)) {
+		return PlayerUseAmmoEvent_Original(actor, a_weapon, a_equipIndex, a_shotCount);
+	}
+	auto equipData = GetPlayerEquippedItemByEquipIndex(EquipIndex::kEquipIndex_Default);
+	TESObjectWEAP::InstanceData* weapInst = GetPlayerWeaponInstanceData(a_weapon.object, a_weapon.instanceData);
+	if (!weapInst) {
+		return PlayerUseAmmoEvent_Original(actor, a_weapon, a_equipIndex, a_shotCount);
+	}
+	if (weapInst != currentWeapInstance) {
+		currentWeapInstance = weapInst;
+		ammoCapacity = currentWeapInstance->ammoCapacity;
+	}
+	currentAmmoCount = ((EquippedWeaponData*)(equipData->data).get())->ammoCount;
+	totalAmmoCount = GetInventoryItemCount(actor, weapInst->ammo);
+	logIfNeeded("ammo count: " + std::to_string(currentAmmoCount));
 	return PlayerUseAmmoEvent_Original(actor, a_weapon, a_equipIndex, a_shotCount);
 }
 
@@ -101,7 +82,6 @@ typedef EventResult(*_MenuOpenCloseEvent_ReceiveEvent)(void*, MenuOpenCloseEvent
 RelocAddr<uintptr_t> MenuOpenCloseEvent_ReceiveEvent_Target(0x2D49200 + 0x08);
 _MenuOpenCloseEvent_ReceiveEvent MenuOpenCloseEvent_ReceiveEvent_Original;
 EventResult MenuOpenCloseEvent_ReceiveEvent_Hook(void* arg1, MenuOpenCloseEvent* evn, void* dispatcher) {
-	static const BSFixedString LoadingMenu("LoadingMenu");
 	if (evn->menuName == LoadingMenu && evn->isOpen) {
 		isEmptyReload = false;
 		ignore = true;
@@ -116,18 +96,12 @@ typedef EventResult(*_PlayerAnimGraphEvent_ReceiveEvent)(void*, BSAnimationGraph
 RelocAddr<uintptr_t> PlayerAnimGraphEvent_ReceiveEvent_Target(0x2D442D8 + 0x8);
 _PlayerAnimGraphEvent_ReceiveEvent PlayerAnimationEvent_Original;
 EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphEvent* evn, void* dispatcher) {
-	static const BSFixedString WeaponFire("WeaponFire");
-	static const BSFixedString ReloadEnd("ReloadEnd");
-	static const BSFixedString ReloadComplete("ReloadComplete");
-	static const BSFixedString Event00("Event00");
-	static const BSFixedString reloadSequentialStart("reloadSequentialStart");
-	static const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
-	static const BSFixedString sightedStateEnter("sightedStateEnter");
-	static const BSFixedString sightedStateExit("sightedStateExit");
-	static const BSFixedString weaponDraw("weaponDraw");
-	static const BSFixedString weaponInstantDown("weaponInstantDown");
 
-	if (currentWeapInstance && processCurrentWeap)	{
+	if (!currentWeapInstance) {
+		return PlayerAnimationEvent_Original(arg1, evn, dispatcher);
+	}
+
+	if (processCurrentWeap)	{
 		if (!reloadStarted && reloadEnd) {
 			if (evn->name == Event00) {
 				reloadStartHandle();
@@ -174,7 +148,7 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 	if (evn->name == weaponInstantDown) {
 		ignore = true;
 	}
-	if (currentWeapInstance && processCurrentScope) {
+	if (processCurrentScope) {
 		if (evn->name == sightedStateEnter) {
 			ignore = false;
 			if (readyForRender && (ignore == false) && ScopeTextureLoader && scopePOV) {
@@ -192,36 +166,52 @@ EventResult PlayerAnimGraphEvent_ReceiveEvent_Hook(void* arg1, BSAnimationGraphE
 //adding too much to this hook causes the equip to stall and do weird things
 //Bingle showed me how threading worked :) hopefully that should fix the issues with the above comment
 EventResult TESEquipEventSink::ReceiveEvent(TESEquipEvent* evn, void* dispatcher) {
-	if (evn->owner == *g_player && evn->isEquipping && ignore == false) {
-		TESForm* form = LookupFormByID(evn->FormID);
-		if (form && form->formType == kFormType_WEAP) {
-			Actor::MiddleProcess::Data08::EquipData* equipData = GetEquipDataByEquipIndex(EquipIndex::kEquipIndex_Default);
-			if (equipData) {
-				TESObjectWEAP* weap = DYNAMIC_CAST(equipData->item, TESForm, TESObjectWEAP);;
-				TESObjectWEAP::InstanceData* weapInst = GetWeaponInstanceData(equipData->item, equipData->instanceData);
-				logIfNeeded(";======================================================================================;");
-				logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
-				std::thread([weapInst]() { HanldeWeaponEquip(weapInst); }).detach();
-				//HanldeWeaponEquip(weapInst);
-				return kEvent_Continue;
-			}
-		}
+	if (ignore == true) {
+		return kEvent_Continue;
 	}
+	if (evn->isEquipping == false) {
+		return kEvent_Continue;
+	}
+	if (evn->owner != *g_player) {
+		return kEvent_Continue;
+	}
+	TESForm* form = LookupFormByID(evn->FormID);
+	if (!form || form->formType != kFormType_WEAP) {
+		return kEvent_Continue;
+	}
+	auto equipData = GetPlayerEquippedItemByEquipIndex(EquipIndex::kEquipIndex_Default);
+	if (!equipData) {
+		return kEvent_Continue;
+	}
+	TESObjectWEAP* weap = DYNAMIC_CAST(equipData->item.object, TESForm, TESObjectWEAP);;
+	TESObjectWEAP::InstanceData* weapInst = GetPlayerWeaponInstanceData(equipData->item.object, equipData->item.instanceData);
+	logIfNeeded(";======================================================================================;");
+	logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
+	std::thread([weapInst]() { HanldeWeaponEquip(weapInst); }).detach();
+	//HanldeWeaponEquip(weapInst);
 	return kEvent_Continue;
 }
 
 EventResult PlayerAmmoCountEventSink::ReceiveEvent(PlayerAmmoCountEvent* evn, void* dispatcher) {
-	if (processCurrentWeap) {
-		if (evn->weapon || evn->weaponInstance || evn->unk08 == 1) {
-			if (evn->unk08 == 1 && evn->weapon && evn->weaponInstance && evn->weaponInstance != currentWeapInstance) {
-				currentWeapInstance = evn->weaponInstance;
-				ammoCapacity = currentWeapInstance->ammoCapacity;
-			}
-			currentAmmoCount = evn->ammoCount;
-			totalAmmoCount = evn->totalAmmoCount;
-			logIfNeeded("ammo count: " + std::to_string(currentAmmoCount));
-		}
+	if (processCurrentWeap == false) {
+		return kEvent_Continue;
 	}
+	if (!evn->weapon) {
+		return kEvent_Continue;
+	}
+	if (!evn->weaponInstance) {
+		return kEvent_Continue;
+	}
+	if (evn->unk08 != 1) {
+		return kEvent_Continue;
+	}
+	if (evn->weaponInstance != currentWeapInstance) {
+		currentWeapInstance = evn->weaponInstance;
+		ammoCapacity = currentWeapInstance->ammoCapacity;
+	}
+	currentAmmoCount = evn->ammoCount;
+	totalAmmoCount = evn->totalAmmoCount;
+	logIfNeeded("ammo count: " + std::to_string(currentAmmoCount));
 	return kEvent_Continue;
 }
 PlayerAmmoCountEventSink playerAmmoCountEventSink;
@@ -368,9 +358,9 @@ bool RegisterAfterLoadEvents() { //Called at LoadingMenu, mostly for global even
 	//	return false;
 	//}
 
-	if (!scopePOV || !scopePOVRoot || !pScopeManagerCullingProc || !pScopeManagerAccumulator || !pScopeManagerShaderParam) {
-		ScopeRendererManager::Setup();
-	}
+	//if (!scopePOV || !scopePOVRoot || !pScopeManagerCullingProc || !pScopeManagerAccumulator || !pScopeManagerShaderParam) {
+	//	ScopeRendererManager::Setup();
+	//}
 
 	//if (!scopeRenderer) {
 	//	//nsScope_CreateRenderer(); //CTD during creation. For some reason the ctor of ScopeCamera is called twice and crashes at the second called ctor

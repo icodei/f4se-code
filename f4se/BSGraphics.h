@@ -15,14 +15,15 @@
 #include "d3d11.h"
 
 class BSBatchRenderer;
+class BSCompoundFrustum;
 class BSCullingGroup;
 class BSCullingProcess;
 class BSGeometryData;
 class BSIStream;
 class BSLight;
 class BSPortalGraphEntry;
-class BSShader;
 class BSSceneGraph;
+class BSShader;
 
 class ShadowSceneNode;
 
@@ -31,176 +32,12 @@ class ImageSpaceEffectParam;
 class ImageSpaceManager;
 class ImageSpaceTexture;
 
+class NiAccumulator;
 class NiCamera;
 class NiCullingProcess;
 class NiVisibleArray;
 
 //Other Stuff
-
-class BSCompoundFrustum {
-public:
-	UInt8 _pad0[208];
-};
-
-class NiAccumulator : public NiObject {
-public:
-	//virtual ~NiAccumulator();
-	//NiAccumulator::StartAccumulating
-	//NiAccumulator::FinishAccumulating
-	//_purecall_0
-	//NiAccumulator::StartGroupingAlphas
-	//NiAccumulator::StopGroupingAlphas
-	//NiAccumulator::RegisterObject
-
-	NiCamera* m_pkCamera;
-};
-
-class NiBackToFrontAccumulator : public NiAccumulator {
-public:
-	//virtual ~NiBackToFrontAccumulator();
-
-	SInt8			_pad[24];
-	SInt32			m_iNumItems;
-	SInt32			m_iMaxItems;
-	BSGeometry**	m_ppkItems;
-	float*			m_pfDepths;
-	SInt32			m_iCurrItem;
-};
-
-class NiAlphaAccumulator : public NiBackToFrontAccumulator {
-public:
-	//virtual ~NiAlphaAccumulator();
-
-	bool m_bObserveNoSortHint;
-	bool m_bSortByClosestPoint;
-	bool m_bInterfaceSort;
-};
-
-class NiCullingProcess {
-public:
-	NiCullingProcess() : m_bUseVirtualAppend(0), m_pkVisibleSet(nullptr), m_pkCamera(nullptr), m_kFrustum(), m_kPlanes(), kCustomCullPlanes(), m_bCameraRelatedUpdates(0), bUpdateAccumulateFlag(0), bIgnorePreprocess(0), bCustomCullPlanes(0), bUnknownBool1(0), bUnknownBool2(0) { CALL_MEMBER_FN(this, ctor)(m_pkVisibleSet); };
-	NiCullingProcess(NiVisibleArray* a1) : m_bUseVirtualAppend(0), m_pkVisibleSet(nullptr) { CALL_MEMBER_FN(this, ctor)(a1); };
-	virtual void GetRTTI() {};
-	virtual void IsNode() {};
-	virtual void IsNode2() {};
-	virtual void IsSwitchNode() {};
-	virtual void IsFadeNode() {};
-	virtual void IsMultiBoundNode() {};
-	virtual void IsGeometry() {};
-	virtual void IsTriStrips() {};
-	virtual void IsTriShape() {};
-	virtual void IsDynamicTriShape() {};
-	virtual void IsSegmentedTriShape() {};
-	virtual void IsSubIndexTriShape() {};
-	virtual void IsNiGeometry() {};
-	virtual void IsNiTriBasedGeom() {};
-	virtual void IsNiTriShape() {};
-	virtual void IsParticlesGeom() {};
-	virtual void IsParticleSystem() {};
-	virtual void IsLinesGeom() {};
-	virtual void IsLight() {};
-	virtual void IsBhkNiCollisionObject() {};
-	virtual void IsBhkBlendCollisionObject() {};
-	virtual void IsBhkRigidBody() {};
-	virtual void IsBhkLimitedHingeConstraint() {};
-	virtual void IsbhkNPCollisionObject() {};
-	virtual ~NiCullingProcess() {};
-	virtual void Process() {};
-	virtual void Process2() {};
-	virtual void AppendVirtual() {};
-
-	const bool m_bUseVirtualAppend;
-	NiVisibleArray* m_pkVisibleSet;
-	NiCamera* m_pkCamera;
-	NiFrustum m_kFrustum;
-	NiFrustumPlanes m_kPlanes;
-	NiFrustumPlanes kCustomCullPlanes;
-	bool m_bCameraRelatedUpdates;
-	bool bUpdateAccumulateFlag;
-	bool bIgnorePreprocess;
-	bool bCustomCullPlanes;
-	bool bUnknownBool1;
-	bool bUnknownBool2;
-
-	MEMBER_FN_PREFIX(NiCullingProcess);
-	DEFINE_MEMBER_FN(ctor, void, 0x01BC4A60, NiVisibleArray*);
-	DEFINE_MEMBER_FN(dtor, void, 0x01BC4A40);
-};
-
-//0x1A0
-class BSCullingProcess : public NiCullingProcess {
-public:
-
-	enum BSCPCullingType {
-		kNormal = 0,
-		kAllPass = 1,
-		kAllFail = 2,
-		kIgnoreMultiBounds = 3,
-		kForceMultiBoundsNoUpdate = 4
-	};
-
-	BSCullingProcess() {};
-	BSCullingProcess(NiVisibleArray* a1) { CALL_MEMBER_FN(this, ctor)(a1); };
-	~BSCullingProcess() { CALL_MEMBER_FN(this, dtor)(); };
-	//virtual void GetRTTI();
-	//virtual void IsNode();
-	//virtual void IsNode2();
-	//virtual void IsSwitchNode();
-	//virtual void IsFadeNode();
-	//virtual void IsMultiBoundNode();
-	//virtual void IsGeometry();
-	//virtual void IsTriStrips();
-	//virtual void IsTriShape();
-	//virtual void IsDynamicTriShape();
-	//virtual void IsSegmentedTriShape();
-	//virtual void IsSubIndexTriShape();
-	//virtual void IsNiGeometry();
-	//virtual void IsNiTriBasedGeom();
-	//virtual void IsNiTriShape();
-	//virtual void IsParticlesGeom();
-	//virtual void IsParticleSystem();
-	//virtual void IsLinesGeom();
-	//virtual void IsLight();
-	//virtual void IsBhkNiCollisionObject();
-	//virtual void IsBhkBlendCollisionObject();
-	//virtual void IsBhkRigidBody();
-	//virtual void IsBhkLimitedHingeConstraint();
-	//virtual void IsbhkNPCollisionObject();
-	//virtual ~BSCullingProcess();
-	//virtual void Process();
-	//virtual void Process2();
-	//virtual void AppendVirtual();
-
-	//add
-	virtual void AppendNonAccum() {};
-	virtual void TestBaseVisibility_BSMultiBound() {};
-	virtual void TestBaseVisibility_BSOcclusionPlane() {};
-	virtual void TestBaseVisibility_NiBound() {};
-
-	SInt32 field_128;
-	SInt32 field_12C;
-	SInt32 field_130;
-	SInt32 field_134;
-	void* field_138;
-	SInt64 gap140;
-	SInt64 field_148;
-	BSPortalGraphEntry* QPortalGraphEntry;
-	BSCPCullingType CullingType;
-	UInt8 gap15C[40];
-	SInt32 field_184;
-	BSCompoundFrustum* field_188;
-	NiPointer<NiAccumulator> Accumulator;
-	bool QRecurseToGeometry;
-
-	MEMBER_FN_PREFIX(BSCullingProcess);
-	DEFINE_MEMBER_FN(ctor, void, 0x01CCDE90, NiVisibleArray*);
-	DEFINE_MEMBER_FN(dtor, void, 0x01CCDF10);
-	DEFINE_MEMBER_FN(SetAccumulator, void, 0x01CCDF70, NiAccumulator*);
-
-	void SetAccumulator(NiAccumulator* accumulator);
-};
-//STATIC_ASSERT(sizeof(BSCullingProcess) == 0x1A0);
-
 
 class BSRenderPass {
 public:
@@ -221,56 +58,245 @@ public:
 	UInt8				m_NumLights;*/
 };
 
+struct PersistentPassList {
+public:
+	// members
+	BSRenderPass* head;  // 00
+	BSRenderPass* tail;  // 08
+};
+STATIC_ASSERT(sizeof(PersistentPassList) == 0x10);
+
 class BSBatchRenderer {
 public:
 
-	// 28
+	enum class GEOMETRY_GROUP_ENUM : UInt32 {
+		kNone = static_cast<std::underlying_type_t<GEOMETRY_GROUP_ENUM>>(-1),
+
+		kLODLand = 0x0,
+		kLODObjects = 0x1,
+		kMultiIndexDecal = 0x2,
+		kOpaqueDecal = 0x3,
+		kBlendedDecal = 0x4,
+		kRefrActive = 0x5,
+		k1stPersonNonRefractive = 0x6,
+		kFading = 0x7,
+		kNoShadow = 0x8,
+		kLowAniso = 0x9,
+		kUnderwaterFog = 0xA,
+		kSSLR = 0xB,
+		kZOnly = 0xC,
+		kPostZOnly = 0xD,
+		kSkyClouds = 0xE,
+		kSmoothAlphaTest = 0xF,
+		kVATSMaskDepthOnly = 0x10,
+		kVATSMask = 0x11,
+		kSunGlare = 0x12,
+		kBloodSpatter = 0x13,
+		kZPrepass = 0x14,
+		kWaterStencil = 0x15,
+		kWaterDepth = 0x16,
+
+		kTotal
+	};
+
+	struct CommandBufferPassesMapAccess;
+	struct RenderPassMapAccess;
+
+	struct CommandBufferPassesData {
+	public:
+		// members
+		UInt8* buffer[1u << 13];    // 00000
+		UInt8** currentBuffer;      // 10000
+		CommandBufferPassesData* next;  // 10008
+		UInt32 frame;            // 10010
+		UInt32 ownerIndex;       // 10014
+	};
+	STATIC_ASSERT(sizeof(CommandBufferPassesData) == 0x10018);
+
+	struct CommandBufferPassesDataEntry {
+	public:
+		// members
+		CommandBufferPassesData* data;  // 00
+		UInt64 groupAndPass;     // 08
+	};
+	STATIC_ASSERT(sizeof(CommandBufferPassesDataEntry) == 0x10);
+
 	class GeometryGroup {
 	public:
-
+		// members
+		BSBatchRenderer* batchRenderer;  // 00
+		PersistentPassList passList;     // 08
+		float depth;                     // 18
+		UInt32 count;             // 1C
+		UInt8 flags;              // 20
+		SInt8 group;               // 21
 	};
-	//STATIC_ASSERT(sizeof(GeometryGroup) == 0x28);
+	STATIC_ASSERT(sizeof(GeometryGroup) == 0x28);
+
+	class PassGroup {
+	public:
+		// members
+		BSRenderPass* passHead;             // 00
+		UInt32 passEnum;             // 08
+		UInt16 nextPassGroup;        // 0C
+		UInt16 commandBufferPasses;  // 0E
+	};
+	STATIC_ASSERT(sizeof(PassGroup) == 0x10);
+
+	virtual ~BSBatchRenderer() = default;  // 00
+
+	BSTArray<PassGroup> renderPasses[13];																					// 008
+	BSTSmallIndexScatterTable<BSTArray<PassGroup>, RenderPassMapAccess> renderPassMap[13];									// 140
+	UInt32 activePassIndexLists[13][2];																						// 2E0
+	UInt32 currentFirstPass;																								// 348
+	UInt32 currentLastPass;																									// 34C
+	bool autoClearPasses;																									// 350
+	GeometryGroup* geometryGroups[static_cast<std::underlying_type_t<GEOMETRY_GROUP_ENUM>>(GEOMETRY_GROUP_ENUM::kTotal)];	// 358
+	GeometryGroup* alphaGroup;																								// 410
+	UInt32 groupingAlphasGroupCount;																						// 418
+	GeometryGroup* groupingAlphasGroup;																						// 420
+	BSTArray<CommandBufferPassesDataEntry> commandBufferPasses;																// 428
+	BSTSmallIndexScatterTable<BSTArray<CommandBufferPassesDataEntry>, CommandBufferPassesMapAccess> commandBufferPassMap;	// 440
+	CommandBufferPassesData* bufferPassesCurr;																				// 460
+	CommandBufferPassesData* bufferPassesHead;																				// 468
+	CommandBufferPassesData** bufferPassesTail;																				// 470
+	UInt32 bufferPassesCurrAllocFrame;																						// 478
 };
+//STATIC_ASSERT(sizeof(BSBatchRenderer) == 0x480);
 
 //GRAPHICS
 struct BSGraphics {
 
 	class BSD3DResourceCreator;
 
-	//class BSRenderManager {
-	//public:
-	//	UInt64				unk2588[0x2590 >> 3];	// 2588
-	//	CRITICAL_SECTION	m_textureLock;			// 2590
-	//
-	//	MEMBER_FN_PREFIX(BSRenderManager);
-	//	DEFINE_MEMBER_FN(CreateBSGeometryData, BSGeometryData*, 0x01D0BD60, UInt32 * blockSize, UInt8 * vertexData, UInt64 vertexDesc, BSGeometryData::TriangleData * triData); // Creates a block with a vertex copy in the resource pool with a reference to the supplied triblock (partial deep copy)
-	//};
-	//STATIC_ASSERT(offsetof(BSRenderManager, m_textureLock) == 0x2590);
+	enum RenderTargetMode {
+		RENDER_TARGET_FRAMEBUFFER = 0x0,
+		RENDER_TARGET_FRAMEBUFFER_COUNT = 0x1,
+		RENDER_TARGET_MAIN = 0x1,
+		RENDER_TARGET_MAIN_COPY = 0x2,
+		RENDER_TARGET_MAIN_SAVE_RES = 0x3,
+		RENDER_TARGET_SSR_PREPASS = 0x4,
+		RENDER_TARGET_SSR = 0x5,
+		RENDER_TARGET_SSR_BLURRED0 = 0x6,
+		RENDER_TARGET_SSR_BLURRED1 = 0x7,
+		RENDER_TARGET_SSR_DEPTH = 0x8,
+		RENDER_TARGET_SSR_BLEND = 0x9,
+		RENDER_TARGET_WATER_DISPLACEMENT = 0xA,
+		RENDER_TARGET_WATER_DISPLACEMENT_SWAP = 0xB,
+		RENDER_TARGET_WATER_REFLECTIONS = 0xC,
+		RENDER_TARGET_WATER_REFRACTION = 0xD,
+		RENDER_TARGET_REFRACTION_NORMALS = 0xE,
+		RENDER_TARGET_MENUBG = 0xF,
+		RENDER_TARGET_VATS_MASK = 0xF,
+		RENDER_TARGET_FACE_CUSTOMIZATION_DIFFUSE = 0x10,
+		RENDER_TARGET_FACE_CUSTOMIZATION_NORMALS = 0x11,
+		RENDER_TARGET_FACE_CUSTOMIZATION_SMOOTHSPEC = 0x12,
+		RENDER_TARGET_LOCAL_MAP = 0x13,
+		RENDER_TARGET_COMPANION_LOCAL_MAP = 0x14,
+		RENDER_TARGET_COMPANION_LOCAL_MAP_NORM = 0x15,
+		RENDER_TARGET_FOG_OF_WAR = 0x16,
+		RENDER_TARGET_COMPANION_FOG_OF_WAR = 0x17,
+		RENDER_TARGET_HUDGLASS = 0x18,
+		RENDER_TARGET_HUDGLASS_SWAP = 0x19,
+		RENDER_TARGET_GB_ALBEDO_SPEC = 0x1A,
+		RENDER_TARGET_GB_NORMAL = 0x1B,
+		RENDER_TARGET_GB_NORMAL_COPY = 0x1C,
+		RENDER_TARGET_GB_ENVMAP = 0x1D,
+		RENDER_TARGET_GB_AMBIENT_MAT = 0x1E,
+		RENDER_TARGET_GB_EMIT = 0x1F,
+		RENDER_TARGET_GB_MOTION_VECTORS = 0x20,
+		RENDER_TARGET_DFLIGHT = 0x21,
+		RENDER_TARGET_DFSPECULAR = 0x22,
+		RENDER_TARGET_DFLIGHT_TILED = 0x23,
+		RENDER_TARGET_DFSPECULAR_TILED = 0x24,
+		RENDER_TARGET_AO = 0x25,
+		RENDER_TARGET_AO_SWAP_0 = 0x26,
+		RENDER_TARGET_AO_2X = 0x27,
+		RENDER_TARGET_SAO_CAMERAZ = 0x28,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_0 = 0x29,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_1 = 0x2A,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_2 = 0x2B,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_3 = 0x2C,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_4 = 0x2D,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_5 = 0x2E,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_6 = 0x2F,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_7 = 0x30,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_8 = 0x31,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_9 = 0x32,
+		RENDER_TARGET_SAO_CAMERAZ_MIP_LEVEL_10 = 0x33,
+		RENDER_TARGET_SAO_RAW_AO = 0x34,
+		RENDER_TARGET_SAO_RAW_AO_2 = 0x35,
+		RENDER_TARGET_SAO_TEMP_BLUR = 0x36,
+		RENDER_TARGET_SAO_RAW_AO_2X = 0x37,
+		RENDER_TARGET_SAO_RAW_AO_2_2X = 0x38,
+		RENDER_TARGET_SAO_TEMP_BLUR_2X = 0x39,
+		RENDER_TARGET_TEMPORAL_AA_ACCUMULATION_1 = 0x3A,
+		RENDER_TARGET_TEMPORAL_AA_ACCUMULATION_2 = 0x3B,
+		RENDER_TARGET_PIPBOY = 0x3C,
+		RENDER_TARGET_PIPBOY_SWAP = 0x3D,
+		RENDER_TARGET_MENU_SCREEN_FULLSIZE = 0x3E,
+		RENDER_TARGET_MENU_SCREEN_FULLSIZE_SWAP = 0x3F,
+		RENDER_TARGET_MENU_TEXT = 0x40,
+		RENDER_TARGET_LENSFLAREVIS = 0x41,
+		RENDER_TARGET_GETHIT_BUFFER = 0x42,
+		RENDER_TARGET_BLURFULL_BUFFER = 0x43,
+		RENDER_TARGET_HDR_BLURSWAP = 0x44,
+		RENDER_TARGET_HDR_BLOOM = 0x45,
+		RENDER_TARGET_HDR_DOWNSAMPLE0 = 0x46,
+		RENDER_TARGET_HDR_DOWNSAMPLE1 = 0x47,
+		RENDER_TARGET_HDR_DOWNSAMPLE2 = 0x48,
+		RENDER_TARGET_HDR_DOWNSAMPLE3 = 0x49,
+		RENDER_TARGET_HDR_DOWNSAMPLE4 = 0x4A,
+		RENDER_TARGET_HDR_DOWNSAMPLE5 = 0x4B,
+		RENDER_TARGET_HDR_DOWNSAMPLE6 = 0x4C,
+		RENDER_TARGET_HDR_DOWNSAMPLE7 = 0x4D,
+		RENDER_TARGET_HDR_DOWNSAMPLE8 = 0x4E,
+		RENDER_TARGET_HDR_DOWNSAMPLE9 = 0x4F,
+		RENDER_TARGET_HDR_DOWNSAMPLE10 = 0x50,
+		RENDER_TARGET_HDR_DOWNSAMPLE11 = 0x51,
+		RENDER_TARGET_HDR_DOWNSAMPLE12 = 0x52,
+		RENDER_TARGET_HDR_DOWNSAMPLE13 = 0x53,
+		RENDER_TARGET_DOF_1 = 0x54,
+		RENDER_TARGET_DOF_2 = 0x55,
+		RENDER_TARGET_RAIN_OCCLUSIONMAP = 0x56,
+		RENDER_TARGET_EDITOR_TERRAIN_TEXTURE_GENERATION = 0x57,
+		RENDER_TARGET_EDITOR_TERRAIN_TEXTURE_GENERATION_FINAL = 0x58,
+		RENDER_TARGET_EDITOR_MAP_MAKER = 0x59,
+		RENDER_TARGET_EDITOR_MAP_MAKER_SWAP = 0x5A,
+		RENDER_TARGET_GODRAYS_PHASE_LUT = 0x5B,
+		RENDER_TARGET_GODRAYS_ACCUMULATION = 0x5C,
+		RENDER_TARGET_GODRAYS_RESOLVED = 0x5D,
+		RENDER_TARGET_GODRAYS_RESOLVED_DEPTH = 0x5E,
+		RENDER_TARGET_GODRAYS_FILTERED_0 = 0x5F,
+		RENDER_TARGET_GODRAYS_FILTERED_1 = 0x60,
+		RENDER_TARGET_GODRAYS_FILTERED_DEPTH_0 = 0x61,
+		RENDER_TARGET_GODRAYS_FILTERED_DEPTH_1 = 0x62,
+		RENDER_TARGET_MONITOR_SCREENSHOT = 0x63,
 
-	enum RenderTargetType : UInt32 {
-		unkN1 = 0xFFFFFFFF, //None??
-		unk00 = 0, //Buffer??
-		unk01 = 1, //Main??
-		unk02 = 2, //MainCopy??
-		unk03 = 3,
+		RENDER_TARGET_COUNT
+	};
 
-		unk14 = 14, //RefractionNormals??
-		unk15 = 15, //ClearMask?? MenuBG??
-		unk16 = 16, //FaceCustomizationDiffuse
-		unk17 = 17, //FaceCustomizationNormals
-		unk18 = 18, //FaceCustomizationSmoothSpec
+	enum RenderTargetCubeMapMode {
+		RENDER_TARGET_CUBEMAP_REFLECTIONS,
 
-		unk21 = 21, //LocalMapCompanion??
+		RENDER_TARGET_CUBEMAP_COUNT
+	};
 
-		unk26 = 26, //part of DrawWorld::MainRenderSetup
-		unk27 = 27, //LocalMap?? part of DrawWorld::MainRenderSetup
-		
-		unk29 = 29, //part of DrawWorld::MainRenderSetup
-		unk30 = 30, //part of DrawWorld::MainRenderSetup
-		unk31 = 31, //part of DrawWorld::MainRenderSetup
-		unk32 = 32, //LoadingMenu?? part of DrawWorld::MainRenderSetup
+	enum DepthStencilDepthMode {
+		DEPTH_STENCIL_NONE,
+		DEPTH_STENCIL_MAIN_DEPTH,
+		DEPTH_STENCIL_MAIN_DEPTH_HALF,
+		DEPTH_STENCIL_PIPBOY,
+		DEPTH_STENCIL_VATS,
+		DEPTH_STENCIL_SHADOW_MAP,
+		DEPTH_STENCIL_SHADOW_MAP_ARRAY,
+		DEPTH_STENCIL_CUBEMAP_REFLECTIONS,
+		DEPTH_STENCIL_RAIN_OCCLUSION_MAP,
+		DEPTH_STENCIL_VLS_SLICE_STENCIL,
+		DEPTH_STENCIL_GODRAYS_DEPTH,
+		DEPTH_STENCIL_COMPANION_LOCAL_MAP_DEPTH,
 
-		unk63 = 63, //ScreenShot??
+		DEPTH_STENCIL_COUNT
 	};
 	
 	enum SetRenderTargetMode : UInt32 { //Unconfirmed
@@ -283,8 +309,9 @@ struct BSGraphics {
 		SRTM_INIT = 0x6,
 	};
 
-	enum Format {};
-	enum DepthStencilDepthMode {};
+	enum Format {
+		
+	};
 	
 	enum Usage { //Uncomfirmed
 		USAGE_DEFAULT = 0,
@@ -462,7 +489,7 @@ struct BSGraphics {
 		IDXGISwapChain* swapChain;
 		RenderTarget swapChainRenderTarget;
 	};
-	//STATIC_ASSERT(sizeof(RendererWindow) == 0x50);
+	STATIC_ASSERT(sizeof(RendererWindow) == 0x50);
 
 	class RendererData {
 	public:
@@ -552,6 +579,7 @@ struct BSGraphics {
 #define MAX_CUBEMAP_RENDER_TARGETS	0x1
 
 		enum TARGET_PERSISTENCY {
+			TARGET_PERSISTENCY_ALWAYS,
 		};
 
 		struct SharedTargetInfo {
@@ -626,538 +654,16 @@ struct BSGraphics {
 };
 STATIC_ASSERT(std::is_empty_v<BSGraphics>);
 
-//SHADERS
-
-struct BSReloadShaderI {
-public:
-
-	// add
-	virtual void ReloadShaders(BSIStream* a_stream) = 0;  // 00
-};
-STATIC_ASSERT(sizeof(BSReloadShaderI) == 0x8);
-
-class BSShader : public NiRefObject, public BSReloadShaderI {
-public:
-
-	// add
-	virtual bool SetupTechnique(UInt32 a_currentPass) = 0;													// 02
-	virtual void RestoreTechnique(UInt32 a_currentPass) = 0;												// 03
-	virtual void SetupMaterial(const BSShaderMaterial* a_material) { return; }								// 04
-	virtual void RestoreMaterial(const BSShaderMaterial* a_material) { return; }							// 05
-	virtual void SetupMaterialSecondary(const BSShaderMaterial* a_material) { return; }						// 06
-	virtual void SetupGeometry(BSRenderPass* a_currentPass) = 0;                                            // 07
-	virtual void RestoreGeometry(BSRenderPass* a_currentPass) = 0;                                          // 08
-	virtual void GetTechniqueName(UInt32 a_techniqueID, char* a_buffer, UInt32 a_bufferSize);				// 09
-	virtual void RecreateRendererData() { return; }                                                         // 0A
-	virtual void ReloadShaders(bool a_clear);                                                               // 0B
-	virtual SInt32 GetBonesVertexConstant() const { return 0; }												// 0C
-
-	// members
-	SInt32 shaderType;																// 018
-	//BSShaderTechniqueIDMap::MapType<BSGraphics::VertexShader*> vertexShaders;     // 020
-	//BSShaderTechniqueIDMap::MapType<BSGraphics::HullShader*> hullShaders;         // 050
-	//BSShaderTechniqueIDMap::MapType<BSGraphics::DomainShader*> domainShaders;     // 080
-	//BSShaderTechniqueIDMap::MapType<BSGraphics::PixelShader*> pixelShaders;       // 0B0
-	//BSShaderTechniqueIDMap::MapType<BSGraphics::ComputeShader*> computeShaders;   // 0E0
-	const char* fxpFilename;														// 110
-};
-//STATIC_ASSERT(sizeof(BSShader) == 0x118);
-
-namespace BSShaderUtil {
-	void AccumulateSceneArray(NiCamera* cam, BSTArray<NiPointer<NiAVObject>>* objs, BSCullingProcess& cullproc, bool a1);
-	void AccumulateScene(NiCamera* cam, NiAVObject* obj, BSCullingProcess& cullproc, bool a1);
-}
-typedef void (*_AccumulateSceneArray)(NiCamera* cam, BSTArray<NiPointer<NiAVObject>>* objs, BSCullingProcess& cullproc, bool a1);
-extern RelocAddr<_AccumulateSceneArray> AccumulateSceneArray_Internal;
-typedef void (*_AccumulateScene)(NiCamera* cam, NiAVObject* obj, BSCullingProcess& cullproc, bool a1);
-extern RelocAddr<_AccumulateScene> AccumulateScene_Internal;
-
-class BSUtilityShader : public BSShader {
-public:
-
-	// members
-	UInt32 currentTechniqueID;  // 118
-	UInt32 currentDecl;         // 11C
-};
-//STATIC_ASSERT(sizeof(BSUtilityShader) == 0x120);
-
-class BSShaderResourceManager {
-public:
-	virtual ~BSShaderResourceManager();
-
-	virtual void CreateTriShape1();
-	virtual void CreateTriShape2();
-	virtual void CreateTriShape3();
-	virtual void CreateTriShapeRendererData();
-	virtual void CreateSubIndexTriShape();
-	virtual void IncGeometryRef(BSGeometryData* geomData);
-	virtual void DefGeometryRef(BSGeometryData* geomData); // Will auto-destroy the block when it reaches zero
-	//... 
-
-};
-
-class BSShaderManager {
-public:
-
-#define NUM_RENDERFLAG_BITS 0x10
-
-	enum Int32 {
-		BSS_AMBIENT						= 0x1,
-		BSS_DIFFUSE						= 0x2,
-		BSS_TEXTURE						= 0x4,
-		BSS_SPECULAR					= 0x8,
-		BSS_SHADOWS						= 0x10,
-		BSS_FULLMULTIPASSLIGHTING		= 0x0F,
-		BSS_FULLMULTIPASSLIGHTING_PROJ	= 0x0F
-	};
-
-	enum UInt32 {
-		BSSM_DISABLED = 0x0FFFFFFFF
-	};
-
-	enum eShadowMode {};
-
-	enum etRenderMode : UInt16 {
-		unk0 = 0,
-
-		unk18 = 18,
-	};
-
-	enum usRenderFlags : UInt16 {};
-
-	class State {
-	public:
-		ShadowSceneNode					* pShadowSceneNode[4];
-		UInt8							gap20[8];
-		float							timerMode[5];
-		float							field_3C;
-		UInt32							uiFrameCount;
-		NiColorA						loadedRange;
-		bool							isInterior;
-		bool							bLightBrite;
-		UInt8							unk56;
-		bool							rgbspecMAYBE;
-		bool							usePremultAlpha;
-		bool							field_59;
-		float							opacityAlpha;
-		bool							useCharacterLighting;
-		SInt8							bScreenSpaceReflections;
-		bool							bScreenSpaceSubsurfaceScattering;
-		UInt32							uiPipboyScreenTarget;
-		NiPointer<NiTexture>			pipboyFXTexture;
-		float							fPipboyScreenEmitIntensityPA;
-		float							menuDiffuseIntensity;
-		float							menuEmitIntensityWA;
-		float							menuDiffuseIntensityWA;
-		SInt64							field_80;
-		float							field_88;
-		float							fLeafAnimDampenDistStart;
-		float							fLeafAnimDampenDistEnd;
-		NiPoint2						field_94;
-		NiPoint2						field_9C;
-		float							field_A4;
-		UInt8							field_A8;
-		SInt8							uiCurrentSceneGraph;
-		BSShaderManager::etRenderMode	etRenderMode;
-		UInt8							gapB0[16];
-		NiTransform						QDirectionalAmbientTransform;
-		NiTransform						QLocalDirectionalAmbientTransform;
-		NiColorA						QAmbientSpecular;
-		SInt8							field_150;
-		UInt32							QTextureTransformBufferIndex;
-		UInt32							QTextureTransformFlipMode;
-		UInt32							uiCameraInWaterState;
-		float							camFrustrumFar;
-		float							camFrustrumNear;
-		float							fWaterIntersect;
-		SInt32							field_16C;
-		SInt32							field_170;
-		SInt32							field_174;
-		SInt64							field_178;
-		SInt64							field_180;
-		float							field_188;
-		float							field_18C;
-		NiPoint3						field_190;
-		NiPoint3						field_19C;
-		NiPoint3						field_1A8;
-		BSGeometry						* geom_1B8;
-		UInt8							gap1C0[4];
-		float							fUIMaskRectEdgeSharpness;
-		float							field_1C8;
-		float							opacity;
-		UInt8							gap1D0[8];
-		SInt64							field_1D8;
-		UInt8							gap1E0[248];
-		SInt64							field_2D8;
-		UInt8							gap2E0[240];
-		float							characterLightRimStrength;
-		float							characterLightFillStrength;
-		SInt32							field_3D8;
-		SInt32							field_3DC;
-		SInt32							field_3E0;
-		bool							vatsEffectOff;
-		SInt8							field_3E5;
-		SInt8							field_3E6;
-		SInt8							field_3E7;
-		SInt8							field_3E8;
-		bool							field_3E9;
-		bool							field_3EA;
-		bool							field_3EB;
-	};
-	MEMBER_FN_PREFIX(BSShaderManager);
-	DEFINE_MEMBER_FN(GetTexture, void, 0x027D61F0, const char* filePath, bool a2, NiPointer<NiTexture>& returnTex, bool a4, bool a5, bool a6);
-
-
-	void GetTexture(const char* filePath, bool a2, NiPointer<NiTexture>& returnTex, bool a4, bool a5, bool a6);
-};
-
-class BSShaderAccumulator : public NiAlphaAccumulator {
-public:
-	
-	enum BATCHRENDERER_CREATION_MODE {};
-	
-	BSShaderAccumulator() { CALL_MEMBER_FN(this, ctor)(); };
-	//virtual ~BSShaderAccumulator();
-	
-	//BSShaderAccumulator::StartAccumulating
-	//BSShaderAccumulator::FinishAccumulating
-	//NiAlphaAccumulator::RegisterObjectArray
-	//BSShaderAccumulator::StartGroupingAlphas
-	//BSShaderAccumulator::StopGroupingAlphas
-	//BSShaderAccumulator::RegisterObject
-	//BSShaderAccumulator::FinishAccumulatingPreResolveDepth
-	//BSShaderAccumulator::FinishAccumulatingPostResolveDepth
-
-	SInt32							field_58;
-	SInt8							field_5C;
-	float							StoredSunOcclustionPercent;
-	BSGraphics::OcclusionQuery		* occlusionQuery;
-	SInt64							field_70;
-	SInt32							field_78;
-	SInt8							field_7C;
-	SInt64							field_80;
-	SInt64							field_88;
-	SInt32							field_90;
-	SInt8							field_94;
-	SInt64							field_98;
-	SInt64							field_A0;
-	SInt32							field_A8;
-	SInt32							field_AC;
-	bool							m_firstPerson;
-	bool							QZPrePass;
-	NiColorA						QSilhouetteColor;
-	SInt8							QRenderDecals;
-	SInt8							field_C5;
-	BSBatchRenderer					BatchRenderer;
-	SInt64							field_548;
-	SInt8							field_550;
-	ShadowSceneNode					* ShadowSceneNode;
-	BSShaderManager::etRenderMode	renderMode;
-	BSLight							* shadowLight;
-	NiPoint3						QEyePosition;
-	UInt32							QDepthPassIndex;
-
-	MEMBER_FN_PREFIX(BSShaderAccumulator);
-	DEFINE_MEMBER_FN(ctor, void, 0x0282CC00);
-	DEFINE_MEMBER_FN(ClearActivePasses, void, 0x0282F080, bool);
-	DEFINE_MEMBER_FN(ClearEffectPasses, void, 0x0282EED0);
-	DEFINE_MEMBER_FN(ClearGroupPasses, void, 0x0282EAD0, SInt32, bool);
-	DEFINE_MEMBER_FN(RenderBatches, void, 0x0282EF70, SInt32, bool, SInt32);
-	DEFINE_MEMBER_FN(RenderBlendedDecals, void, 0x0282E300);
-	DEFINE_MEMBER_FN(RenderOpaqueDecals, void, 0x0282E190);
-
-	void ClearActivePasses(bool a1);
-	void ClearEffectPasses();
-	void ClearGroupPasses(SInt32 a1, bool a2);
-	void RenderBatches(SInt32 a1, bool a2, SInt32 a3);
-	void RenderBlendedDecals();
-	void RenderOpaqueDecals();
-};
-
-namespace BSShaderUtil {
-	typedef void (*_SetSceneFOV)(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
-	void SetCameraFOV(BSSceneGraph* scene, float FOV, bool a3, NiCamera* cam, bool a4);
-
-	typedef void (*_SetCameraFOV)(NiCamera* cam, float FOV, float f_far, float f_near);
-	void SetCameraFOV(NiCamera* cam, float FOV, float f_far, float f_near);
-}
-
-//IMAGESPACE
-
-class ImageSpaceEffectParam {
-public:
-	virtual ~ImageSpaceEffectParam() {};
-
-	MEMBER_FN_PREFIX(ImageSpaceEffectParam);
-
-};
-
-class ImageSpaceShaderParam : public ImageSpaceEffectParam {
-public:
-	ImageSpaceShaderParam() { CALL_MEMBER_FN(this, ctor)(); };
-	//virtual ~ImageSpaceShaderParam();
-
-	MEMBER_FN_PREFIX(ImageSpaceShaderParam);
-	DEFINE_MEMBER_FN(ctor, void, 0x0282C200);
-	DEFINE_MEMBER_FN(ResizeConstantGroup, void, 0x001E0C80, SInt32, SInt32);
-	DEFINE_MEMBER_FN(SetPixelConstant, void, 0x0282C460, SInt32, float, float, float, float);
-
-	void ResizeConstantGroup(SInt32 a1, SInt32 a2);
-	void SetPixelConstant(SInt32 a1, float a2, float a3, float a4, float a5);
-};
-
-class ImageSpaceEffect {
-public:
-	class EffectInput {
-	public:
-
-	};
-	class EffectDesc {
-	public:
-
-	};
-
-	virtual ~ImageSpaceEffect() {};
-	virtual void Render(BSTriShape*, ImageSpaceEffectParam*) {};
-	virtual void Dispatch(ImageSpaceEffectParam*, bool, UInt32, EffectDesc*) {};
-	virtual void Setup(ImageSpaceManager*, ImageSpaceEffectParam*) {};
-	virtual void Shutdown(void) {};
-	virtual void BorrowTextures(ImageSpaceEffectParam*) {};
-	virtual void ReturnTextures(void) {};
-	virtual void UpdateComputeShaderParam(UInt32) {};
-	virtual bool IsActive(void) {};
-	virtual bool UpdateParams(ImageSpaceEffectParam*) {};
-	virtual bool SetRenderStates(ImageSpaceEffectParam*) {};
-	virtual bool RestoreRenderStates(ImageSpaceEffectParam*) {};
-
-	UInt64 unk08;
-	NiTArray<ImageSpaceEffect*> pImageSpaceEffectArray;
-	NiTArray<ImageSpaceEffectParam*> pImageSpaceEffectParamArray;
-	NiTArray<ImageSpaceTexture*> texArray;
-	NiTArray<ImageSpaceTexture*> field_58;
-	NiTArray<EffectInput*> pEffectInputArray;
-	NiTArray<int*> pIntArray;
-	bool field_A0;
-	UInt8 field_A1;
-	UInt32 field_A4;
-	bool UseDynamicResolution;
-	NiPointer<NiTexture> tex_B0;
-	NiPointer<NiTexture> field_B8;
-	UInt32 field_C0;
-	UInt8 field_C4;
-	UInt8 field_C5;
-	UInt8 field_C6;
-	UInt8 field_C7;
-	UInt8 field_C8;
-	UInt64 field_D0;
-	UInt64 field_D8;
-	BSTArray<void*> field_E0;
-	BSTArray<void*> field_F8;
-	UInt8 gap110[44];
-	UInt8 field_13C;
-
-	MEMBER_FN_PREFIX(ImageSpaceEffect);
-};
-
-class ImageSpaceTexture {
-public:
-
-	MEMBER_FN_PREFIX(ImageSpaceTexture);
-};
-
-class ImageSpaceBaseData {
-public:
-
-	float hdrData[9];
-	float cinematicData[3];
-	float tintData[4];
-	float dofData[6];
-};
-
-class ImageSpaceLUTData {
-public:
-
-	BSFixedString field_0;
-	UInt8 gap8[24];
-	BSFixedString field_20;
-	NiPointer<NiTexture> field_28;
-	NiPointer<NiTexture> field_30;
-	UInt64 field_38;
-	UInt64 field_40;
-	UInt64 field_48;
-	UInt64 final1;
-};
-
-class ImageSpaceManager {
-public:
-
-	enum ImageSpaceEffectEnum {
-		kRefraction = 5,
-		kGetHit = 11,
-		kVatsTarget = 12,
-		kFullScreenColor = 13,
-		
-		kMap = 22,
-
-		kNoise = 62,
-		kRainSplash = 63,
-		
-		kPipboyScreen = 66,
-		kHUDGlass = 67,
-		kModMenu = 68,
-
-		kBSCopy = 72,
-		kBSCopyScaleBias = 73,
-		kBSCopyVisAlpha = 74,
-		kBSGreyScale = 75,
-		kBSDownsampleDepth = 76,
-		kBSCopyStencil = 77,
-		kBSCopyWaterMask = 78,
-		
-		kBSRefraction = 80,
-		kBSDoubleVision = 81,
-		kBSTextureMask = 82,
-		kBSMap = 83,
-
-		kBSDepthOfFieldFogged = 87,
-		kBSDepthOfFieldSplitScreen = 88,
-		
-		kBSNoiseScrollAndBlend = 150,
-		kBSNoiseNormalmap = 151,
-		kBSLocalMap = 152,
-		kBSLocalMapCompanion = 153,
-		kBSAlphaBlend = 154,
-		kBSPipboyScreen = 155,
-		kBSHUDGlass = 156,
-		kBSHUDGlassDropShadow = 157,
-		kBSHUDGlassBlurY = 158,
-		kBSHUDGlassBlurX = 159,
-		kBSHUDGlassMarkers = 160,
-		kBSVatsTargetDebug = 161,
-		kBSVatsTarget = 162,
-		kBSModMenuEffect = 163,
-		kBSModMenuGlowComposite = 164,
-		kBSAmbientOcclusion = 165,
-		kBSAmbientOcclusionBlur = 166,
-		kBSVLSSpotLight = 167,
-		kBSVLSApplication = 168,
-		kBSVLSComposite = 169,
-		kBSVLSSliceCoord = 170,
-		kBSVLSSliceInterp = 171,
-		kBSVLSSliceStencil = 172,
-
-		kBSTemporalAAPipboy = 191,
-		kBSTemporalAAPowerArmorPipboy = 192,
-
-		kBSRainSplash = 200,
-		kBSRainSplashUpdate = 201,
-		kBSRainSplashDraw = 202,
-
-		kBSFullScreenColor = 205,
-
-		kBSHUDGlassCopy = 207,
-	};
-
-	UInt64 field_0;
-	UInt64 field_8;
-	NiTArray<ImageSpaceEffect> effectArray;
-	NiPointer<BSTriShape> ScreenTriShape;
-	BSTriShape* ScreenTriShapeColors;
-	NiPointer<BSTriShape> DynamicScreenTriShape;
-	NiPointer<BSTriShape> PartialScreenTriShape;
-	bool field_48;
-	UInt32 field_4C;
-	UInt64 field_50;
-	UInt32 field_58;
-	UInt32 field_5C;
-	ImageSpaceBaseData* CurrentBaseData;
-	ImageSpaceBaseData* OverrideBaseData;
-	ImageSpaceBaseData* UnderwaterBaseData;
-	ImageSpaceBaseData* ConsoleBaseData;
-	ImageSpaceBaseData field_80;
-	UInt8 gapD8[88];
-	ImageSpaceLUTData field_130;
-	UInt8 gap188[24];
-	ImageSpaceLUTData* imageSpaceLUT;
-	UInt8 gap1A8[8];
-	UInt32 field_1B0;
-	UInt8 field_1B4;
-	UInt8 field_1B5;
-	UInt8 field_1B6;
-
-	MEMBER_FN_PREFIX(ImageSpaceManager);
-
-	DEFINE_MEMBER_FN(GetEffect, ImageSpaceEffect*, 0x001E0660, ImageSpaceEffectEnum);
-
-	DEFINE_MEMBER_FN(RenderEffect_1, void, 0x027DA130, ImageSpaceEffectEnum, SInt32, ImageSpaceEffectParam*);
-	DEFINE_MEMBER_FN(RenderEffect_2, void, 0x027DA240, ImageSpaceEffect*, SInt32, SInt32, ImageSpaceEffectParam*);
-	DEFINE_MEMBER_FN(RenderEffect_3, void, 0x027DA3B0, ImageSpaceEffect*, SInt32, SInt32, SInt32, ImageSpaceEffectParam*);
-
-	DEFINE_MEMBER_FN(RenderEffectHelper_2, void, 0x027DA0D0, ImageSpaceEffectEnum, SInt32, SInt32, ImageSpaceEffectParam*);
-
-	DEFINE_MEMBER_FN(RenderEffect_Tex_1, void, 0x027DA780, ImageSpaceEffect*, NiTexture*, SInt32, ImageSpaceEffectParam*);
-	DEFINE_MEMBER_FN(RenderEffect_Tex_2, void, 0x027DA5C0, ImageSpaceEffectEnum, NiTexture*, NiTexture*, SInt32, ImageSpaceEffectParam*);
-
-	DEFINE_MEMBER_FN(RenderEffectHelper_Tex_1, void, 0x027DA560, ImageSpaceEffectEnum, NiTexture*, SInt32, ImageSpaceEffectParam*);
-
-	DEFINE_MEMBER_FN(SelectScreenShape, NiPointer<BSTriShape>&, 0x027E14E0, ImageSpaceEffect*);
-
-	ImageSpaceEffect* GetEffect(ImageSpaceEffectEnum);
-
-	void RenderEffect_1(ImageSpaceEffectEnum, SInt32, ImageSpaceEffectParam*);
-	void RenderEffect_2(ImageSpaceEffect*, SInt32, SInt32, ImageSpaceEffectParam*);
-	void RenderEffect_3(ImageSpaceEffect*, SInt32, SInt32, SInt32, ImageSpaceEffectParam*);
-
-	void RenderEffectHelper_2(ImageSpaceEffectEnum, SInt32, SInt32, ImageSpaceEffectParam*);
-
-	void RenderEffect_Tex_1(ImageSpaceEffect*, NiTexture*, SInt32, ImageSpaceEffectParam*);
-	void RenderEffect_Tex_2(ImageSpaceEffectEnum, NiTexture*, NiTexture*, SInt32, ImageSpaceEffectParam*);
-
-	void RenderEffectHelper_Tex_1(ImageSpaceEffectEnum, NiTexture*, SInt32, ImageSpaceEffectParam*);
-
-	NiPointer<BSTriShape>& SelectScreenShape(ImageSpaceEffect*);
-};
-
-class BSImagespaceShader : public BSShader, public ImageSpaceEffect {
-public:
-	BSImagespaceShader() = delete;
-	BSImagespaceShader(const char* fxpName) { };
-
-	//virtual ~BSImagespaceShader();
-	//virtual void Render(BSTriShape*, ImageSpaceEffectParam*) override;
-	//virtual void Dispatch(ImageSpaceEffectParam*, bool, UInt32, EffectDesc*) override;
-	//virtual void Setup(ImageSpaceManager*, ImageSpaceEffectParam*);
-	//virtual void Shutdown(void) override;
-	//virtual void BorrowTextures(ImageSpaceEffectParam*);
-	//virtual void ReturnTextures(void);
-	//virtual void UpdateComputeShaderParam(UInt32);
-	//virtual bool IsActive(void);
-	//virtual bool UpdateParams(ImageSpaceEffectParam*);
-	//virtual bool SetRenderStates(ImageSpaceEffectParam*);
-	//virtual bool RestoreRenderStates(ImageSpaceEffectParam*);
-
-	MEMBER_FN_PREFIX(BSImagespaceShader);
-};
-
 //EXTERN
 
-extern RelocPtr <BSGraphics::Context*>					pCurContext;
-extern RelocPtr <BSGraphics::Context*>					pDefaultContext;
-extern RelocPtr <BSGraphics::Renderer>					BSGraphics_gRenderer;
-extern RelocPtr <BSGraphics::RendererData*>				pRendererData;
-extern RelocPtr <BSGraphics::RendererWindow*>			pRendererWindow;
-extern RelocPtr <BSGraphics::State>						BSGraphics_gState;
-extern RelocPtr <BSGraphics::RenderTargetManager>		BSGraphics_gRenderTargetManager;
-extern RelocPtr <BSShaderAccumulator*>					pCurrentShaderAccumulator;
-extern RelocPtr <BSShaderManager::State>				ShaderManager_gState;
-extern RelocPtr <BSShaderManager>						gShaderManagerInstance;
-extern RelocPtr <NiCamera*>								BSShaderManager_spCamera;
-extern RelocPtr <BSShaderMaterial*>						pShaderMaterialDefault;
-extern RelocPtr <BSShaderResourceManager>				gShaderResourceManagerInstance;
-extern RelocPtr <ID3D11Device*>							pDevice;
-extern RelocPtr <ID3D11DeviceContext*>					pImmediateContext;
-extern RelocPtr <ID3D11DeviceContext*>					pMainContext;
-extern RelocPtr <ID3D11DeviceContext*>					pContext;
-extern RelocPtr <ImageSpaceManager*>					ImageSpaceManager_pInstance;
-extern RelocPtr <ImageSpaceShaderParam>					BSImagespaceShader_DefaultParam;
-extern RelocPtr <ImageSpaceShaderParam*>				BSImagespaceShader_pCurrentParam;
+extern RelocPtr <BSGraphics::Context*>				pCurContext;
+extern RelocPtr <BSGraphics::Context*>				pDefaultContext;
+extern RelocPtr <BSGraphics::Renderer>				BSGraphics_gRenderer;
+extern RelocPtr <BSGraphics::RendererData*>			pRendererData;
+extern RelocPtr <BSGraphics::RendererWindow*>		pRendererWindow;
+extern RelocPtr <BSGraphics::State>					BSGraphics_gState;
+extern RelocPtr <BSGraphics::RenderTargetManager>	BSGraphics_gRenderTargetManager;
+extern RelocPtr <ID3D11Device*>						pDevice;
+extern RelocPtr <ID3D11DeviceContext*>				pImmediateContext;
+extern RelocPtr <ID3D11DeviceContext*>				pMainContext;
+extern RelocPtr <ID3D11DeviceContext*>				pContext;

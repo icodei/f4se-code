@@ -111,6 +111,33 @@ protected:
 	SimpleLock* m_lock;
 };
 
+class BSSpinLock : public BSReadWriteLock
+{
+public:
+	/*
+	void lock(const char* a_id = nullptr)
+	{
+		return;
+	}
+
+	bool try_lock()
+	{
+		return false;
+	}
+
+	void unlock()
+	{
+
+	}
+	*/
+private:
+	// members
+	//volatile SInt32	threadID;	// 00
+	//volatile SInt32	lockCount;	// 04
+
+};
+STATIC_ASSERT(sizeof(BSSpinLock) == 0x8);
+
 // 80808
 class StringCache
 {
@@ -451,14 +478,13 @@ public:
 
 // Because aliasing via using doesn't work in this version of C++
 template <class T, int nGrow = 10, int nShrink = 10>
-class BSTArray : public tArray<T, nGrow, nShrink>
-{
+class BSTArray : public tArray<T, nGrow, nShrink> {
 public:
+
 };
 
 template<class T>
-class tMutexArray : public tArray<T>
-{
+class tMutexArray : public tArray<T> {
 public:
 	SimpleLock lock;	// 18
 };
@@ -1979,13 +2005,28 @@ private:
 STATIC_ASSERT(sizeof(BSTScatterTableHeapAllocator<void*, 8>) == 0x10);
 
 
+// maps a key to a uint32_t index
+// the value of the index is provided externally (typically just some counter)
+// this index is used to index an array, which is also provided externally
+template <class T, class Accessor>
+class BSTSmallIndexScatterTable
+{
+public:
+	UInt64 pad;       // 00
+	UInt32* table;    // 08
+	UInt32 size;      // 10
+	UInt32 mask;      // 14
+	UInt32 avail;     // 18
+	UInt32 lastFree;  // 1C
+};
+
+
 template <class Key, class T, class Hash = BSHash::CRC32Hash<Key>, class KeyEqual = std::equal_to<Key>>
 class BSTHashMap : public BSTScatterTable<BSTScatterTableTraits<Key, T>, 8, BSTScatterTableHeapAllocator, Hash, KeyEqual>
 {
 public:
 };
 STATIC_ASSERT(sizeof(BSTHashMap<UInt32, void*>) == 0x30);
-
 
 template <class Key>
 struct BSTSetTraits

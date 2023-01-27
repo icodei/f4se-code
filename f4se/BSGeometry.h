@@ -98,14 +98,14 @@ public:
 // 160
 class BSGeometry : public NiAVObject {
 public:
-	virtual void Unk_39();
-	virtual void Unk_3A();
-	virtual void Unk_3B();
-	virtual void Unk_3C();
-	virtual void Unk_3D();
-	virtual void Unk_3E();
-	virtual void Unk_3F();
-	virtual void Unk_40();
+	virtual void Unk_39() { return; };
+	virtual void Unk_3A() { return; };
+	virtual void Unk_3B() { return; };
+	virtual void Unk_3C() { return; };
+	virtual void Unk_3D() { return; };
+	virtual void Unk_3E() { return; };
+	virtual void Unk_3F() { return; };
+	virtual void Unk_40() { return; };
 
 	NiBound kModelBound;					// 120
 	NiPointer<NiProperty> effectState;		// 130

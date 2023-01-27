@@ -7,31 +7,31 @@
 
 #include <functional>
 
-struct ModInfo;
-class TESForm;
-class TESNPC;
-class BGSColorForm;
-class BGSHeadPart;
-class BSFile;
-class TESGlobal;
 class ActorValueInfo;
-class TESEffectShader;
-class BGSProjectile;
-class BGSPerk;
-class BGSExplosion;
 class BGSArtObject;
-class TESImageSpaceModifier;
-class TESObjectLIGH;
-class BGSEncounterZone;
-class BGSMusicType;
-class IFormFactory;
-class TESObjectMISC;
-class TESImageSpace;
-class SpellItem;
-class TESObjectLAND;
-class TESWorldSpace;
-class bhkWorld;
+class BGSColorForm;
 class BGSComponent;
+class BGSEncounterZone;
+class BGSExplosion;
+class BGSHeadPart;
+class BGSMusicType;
+class BGSPerk;
+class BGSProjectile;
+class bhkWorld;
+class BSFile;
+class IFormFactory;
+class SpellItem;
+class TESEffectShader;
+class TESForm;
+class TESGlobal;
+class TESImageSpace;
+class TESImageSpaceModifier;
+class TESNPC;
+class TESObjectLAND;
+class TESObjectLIGH;
+class TESObjectMISC;
+class TESWorldSpace;
+struct ModInfo;
 
 typedef TESForm* (* _LookupFormByID)(UInt32 id);
 extern RelocAddr <_LookupFormByID> LookupFormByID;
@@ -477,6 +477,7 @@ public:
 	UInt8	unk1B;		// 1B
 	UInt32	pad1C;		// 1C
 };
+STATIC_ASSERT(sizeof(TESForm) == 0x20);
 
 // 38
 class BGSDefaultObject : public TESForm
@@ -769,6 +770,7 @@ public:
 	UInt32    unk18C;                       // 18C
 };
 STATIC_ASSERT(offsetof(ActorValueInfo, avName) == 0x68);
+STATIC_ASSERT(sizeof(ActorValueInfo) == 0x190);
 
 // 80
 class BGSMaterialType : public TESForm
@@ -1919,3 +1921,29 @@ struct ObjectModMiscPair
 };
 
 extern RelocPtr <tHashSet<ObjectModMiscPair, BGSMod::Attachment::Mod*>> g_modAttachmentMap;
+
+struct IDLE_DATA {
+public:
+	// members
+	UInt8 loopMin;        // 0
+	UInt8 loopMax;        // 1
+	UInt8 flags;          // 2
+	UInt16 replayDelay;	  // 4
+};
+STATIC_ASSERT(sizeof(IDLE_DATA) == 0x6);
+
+class TESIdleForm : public TESForm {
+public:
+
+	// members
+	UInt64 conditions;				  // 20
+	IDLE_DATA data;                   // 28
+	void* childIdles;				  // 30
+	TESIdleForm* parentIdle;          // 38
+	TESIdleForm* prevIdle;            // 40
+	BSFixedString behaviorGraphName;  // 48
+	BSFixedString animEventName;      // 50
+	BSFixedString animFileName;       // 58
+	BSString formEditorID;			  // 60
+};
+STATIC_ASSERT(sizeof(TESIdleForm) == 0x70);

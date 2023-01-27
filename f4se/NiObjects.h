@@ -28,7 +28,7 @@ class TESObjectREFR;
 typedef void (* _WorldToScreen)(NiPoint3 * in, NiPoint3 * out);
 extern RelocAddr <_WorldToScreen> WorldToScreen_Internal;
 // 10
-class NiRefObject {
+class __declspec(novtable) alignas(0x08) NiRefObject {
 public:
 	NiRefObject() : m_uiRefCount(0) { };
 	virtual ~NiRefObject() { };
@@ -42,6 +42,7 @@ public:
 	//	void	** _vtbl;		// 00
 	volatile SInt32	m_uiRefCount;	// 08
 };
+STATIC_ASSERT(sizeof(NiRefObject) == 0x10);
 
 // 10
 class NiObject : public NiRefObject {

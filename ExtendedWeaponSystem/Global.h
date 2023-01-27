@@ -1,7 +1,15 @@
 #pragma once
-#include "f4se/xbyak/xbyak.h"
+#include "f4se/BSCompoundFrustum.h"
+#include "f4se/BSCulling.h"
 #include "f4se/BSGeometry.h"
 #include "f4se/BSGraphics.h"
+#include "f4se/BSImageSpace.h"
+#include "f4se/BSPortalGraph.h"
+#include "f4se/BSShader.h"
+#include "f4se/BSUtilities.h"
+#include "f4se/CreateNS.h"
+#include "f4se/DrawWorld.h"
+#include "f4se/GameAI.h"
 #include "f4se/GameAPI.h"
 #include "f4se/GameCamera.h"
 #include "f4se/GameData.h"
@@ -10,11 +18,19 @@
 #include "f4se/GameFormComponents.h"
 #include "f4se/GameForms.h"
 #include "f4se/GameInput.h"
+#include "f4se/GameMain.h"
 #include "f4se/GameObjects.h"
 #include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
 #include "f4se/GameStreams.h"
 #include "f4se/GameTypes.h"
+#include "f4se/ImageSpace.h"
+#include "f4se/ImageSpaceManager.h"
+#include "f4se/Interface3D.h"
+#include "f4se/NiAccumulator.h"
+#include "f4se/NiAccumulator.h"
+#include "f4se/NiCamera.h"
+#include "f4se/NiCullingProcess.h"
 #include "f4se/NiMaterials.h"
 #include "f4se/NiNodes.h"
 #include "f4se/NiObjects.h"
@@ -23,6 +39,9 @@
 #include "f4se/NiTextures.h"
 #include "f4se/NiTypes.h"
 #include "f4se/PapyrusVM.h"
+#include "f4se/TES.h"
+#include "f4se/TESEffectShader.h"
+#include "f4se/xbyak/xbyak.h"
 
 #include "f4se_common/BranchTrampoline.h"
 #include "f4se_common/f4se_version.h"
@@ -30,15 +49,23 @@
 #include "f4se_common/SafeWrite.h"
 #include "f4se_common/Utilities.h"
 
+#include "ExtraEvents.h"
 #include "Extras.h"
-#include "Hooks.h"
-#include "Interface3D.h"
-#include "Util.h"
+
+#include "AnimationFunctions.h"
 #include "CustomRenderer.h"
-#include "CreateNS.h"
+#include "ExtraCameraManager.h"
+#include "Hooks.h"
+#include "ReloadHandlers.h"
+#include "ScopeRendererManager.h"
+#include "ScopeCamera.h"
+#include "ScopeShaders.h"
+#include "WeaponHandlers.h"
+#include "Util.h"
 
 #include <chrono>
 #include <ctime>
+#include <functional>
 #include <iostream> 
 #include <sstream> 
 #include <stdio.h>
@@ -52,22 +79,21 @@
 #define PLUGIN_NAME	"ExtendedWeaponSystem"
 #define PLUGIN_VERSION MAKE_EXE_VERSION(1, 0, 0)
 
+extern bool ignore;
 extern bool isEmptyReload;
 extern bool logEnabled;
 extern bool oncePerSession;
-extern bool ignore;
 extern bool processCurrentScope;
 extern bool processCurrentWeap;
+extern bool readyForRender;
 extern bool reloadEnd;
 extern bool reloadStarted;
-extern bool readyForRender;
 
 extern int ammoCapacity;
 extern int currentAmmoCount;
 extern int incrementor;
 extern int toAdd;
 extern int totalAmmoCount;
-
 
 extern BGSKeyword* reloadSequentialKeyword;
 extern BGSKeyword* ThermalScopeKeyword;
@@ -77,6 +103,18 @@ extern TESObjectWEAP::InstanceData* currentWeapInstance;
 extern BSGeometry* ScopeTextureLoader;
 extern BSEffectShaderData* effectShaderData;
 extern TESEffectShader* ThermalFXS;
+
+static const BSFixedString WeaponFire("WeaponFire");
+static const BSFixedString ReloadEnd("ReloadEnd");
+static const BSFixedString ReloadComplete("ReloadComplete");
+static const BSFixedString Event00("Event00");
+static const BSFixedString reloadSequentialStart("reloadSequentialStart");
+static const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
+static const BSFixedString sightedStateEnter("sightedStateEnter");
+static const BSFixedString sightedStateExit("sightedStateExit");
+static const BSFixedString weaponDraw("weaponDraw");
+static const BSFixedString weaponInstantDown("weaponInstantDown");
+static const BSFixedString LoadingMenu("LoadingMenu");
 
 #define GET_EVENT_DISPATCHER(EventName) (BSTEventDispatcher<EventName>*) GetGlobalEventDispatcher(*g_globalEvents, #EventName);
 

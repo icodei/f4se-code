@@ -1,5 +1,6 @@
 #pragma once
 
+#include "f4se_common/Utilities.h"
 #include "f4se/NiTypes.h"
 #include "f4se/GameTypes.h"
 
