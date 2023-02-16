@@ -1,0 +1,13 @@
+{
+  "name": "extendedweaponsystem",
+  "version-string": "1.0.0",
+  "description": "A project built using CommonLibF4",
+  "homepage": "https://github.com/Ryan-rsm-McKenzie/CommonLibF4",
+  "license": "MIT",
+  "dependencies": [
+    "boost-stl-interfaces",
+    "fmt",
+    "mmio",
+    "spdlog"
+  ]
+}
