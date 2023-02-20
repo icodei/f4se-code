@@ -16,16 +16,16 @@
 
 namespace RE
 {
-	class BGSLoadFormBuffer;
-	class BGSSaveFormBuffer;
-	class hknpBSWorld;
-	class hknpShape;
-	class NiAVObject;
-	class NiNode;
-	class OtherEventEnabledEvent;
-	class TESCamera;
-	class TESCameraState;
 	class UserEventEnabledEvent;
+	class TESCameraState;
+	class TESCamera;
+	class OtherEventEnabledEvent;
+	class NiNode;
+	class NiAVObject;
+	class hknpShape;
+	class hknpBSWorld;
+	class BGSSaveFormBuffer;
+	class BGSLoadFormBuffer;
 	struct IdleInputEvent;
 
 	struct CameraStates
@@ -56,9 +56,11 @@ namespace RE
 		public BSInputEventUser        // 00
 	{
 	public:
-		static constexpr auto RTTI{ RTTI::TESCamera };
-		static constexpr auto VTABLE{ VTABLE::TESCamera };
-		static constexpr auto STATE{ CameraStates::k3rdPerson };
+		static constexpr auto RTTI{ RTTI::TESCameraState };
+		static constexpr auto VTABLE{ VTABLE::TESCameraState };
+
+		TESCameraState() = delete;
+		TESCameraState(TESCamera& cam, std::uint32_t ID) { ctor(cam, ID); }
 
 		virtual ~TESCameraState();  // 00
 
@@ -75,15 +77,24 @@ namespace RE
 		// members
 		TESCamera* camera;                                // 18
 		stl::enumeration<CameraState, std::uint32_t> id;  // 20
+
+	private:
+		TESCameraState* ctor(TESCamera& cam, std::uint32_t ID)
+		{
+			using func_t = decltype(&TESCameraState::ctor);
+			REL::Relocation<func_t> func{ REL::ID(1277606), 0x3 };
+			return func(this, cam, ID);
+		}
 	};
+	static_assert(offsetof(TESCameraState, camera) == 0x18);
 	static_assert(sizeof(TESCameraState) == 0x28);
 
 	class __declspec(novtable) ThirdPersonState :
 		public TESCameraState  // 000
 	{
 	public:
-		static constexpr auto RTTI{ RTTI::TESCamera };
-		static constexpr auto VTABLE{ VTABLE::TESCamera };
+		static constexpr auto RTTI{ RTTI::ThirdPersonState };
+		static constexpr auto VTABLE{ VTABLE::ThirdPersonState };
 		static constexpr auto STATE{ CameraStates::k3rdPerson };
 
 		// add
@@ -170,8 +181,8 @@ namespace RE
 		public BSTSingletonSDM<PlayerCamera>          // 060
 	{
 	public:
-		static constexpr auto RTTI{ RTTI::TESCamera };
-		static constexpr auto VTABLE{ VTABLE::TESCamera };
+		static constexpr auto RTTI{ RTTI::PlayerCamera };
+		static constexpr auto VTABLE{ VTABLE::PlayerCamera };
 
 		[[nodiscard]] static PlayerCamera* GetSingleton()
 		{

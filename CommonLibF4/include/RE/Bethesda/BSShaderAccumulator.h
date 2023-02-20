@@ -25,37 +25,50 @@ namespace RE
 		BSShaderAccumulator() { ctor(); };
 		//virtual ~BSShaderAccumulator();
 
-		//BSShaderAccumulator::StartAccumulating
-		//BSShaderAccumulator::FinishAccumulating
-		//NiAlphaAccumulator::RegisterObjectArray
-		//BSShaderAccumulator::StartGroupingAlphas
-		//BSShaderAccumulator::StopGroupingAlphas
-		//BSShaderAccumulator::RegisterObject
-		//BSShaderAccumulator::FinishAccumulatingPreResolveDepth
-		//BSShaderAccumulator::FinishAccumulatingPostResolveDepth
+		//add
+		virtual void FinishAccumulatingPreResolveDepth();
+		virtual void FinishAccumulatingPostResolveDepth();
 
-		void ClearActivePasses(bool a1)  //0x0282F080
+		void ClearActivePasses(bool a1)
 		{
+			using func_t = decltype(&BSShaderAccumulator::ClearActivePasses);
+			REL::Relocation<func_t> func{ REL::ID(596187) };
+			return func(this, a1);
 		}
 
-		void ClearEffectPasses()  //0x0282EED0
+		void ClearEffectPasses()
 		{
+			using func_t = decltype(&BSShaderAccumulator::ClearEffectPasses);
+			REL::Relocation<func_t> func{ REL::ID(1407520) };
+			return func(this);
 		}
 
-		void ClearGroupPasses(std::int32_t a1, bool a2)  //0x0282EAD0
+		void ClearGroupPasses(std::int32_t a1, bool a2)
 		{
+			using func_t = decltype(&BSShaderAccumulator::ClearGroupPasses);
+			REL::Relocation<func_t> func{ REL::ID(226148) };
+			return func(this, a1, a2);
 		}
 
-		void RenderBatches(std::int32_t a1, bool a2, std::int32_t a3)  //0x0282EF70
+		void RenderBatches(std::int32_t a1, bool a2, std::int32_t a3)
 		{
+			using func_t = decltype(&BSShaderAccumulator::RenderBatches);
+			REL::Relocation<func_t> func{ REL::ID(1048494) };
+			return func(this, a1, a2, a3);
 		}
 
-		void RenderBlendedDecals()  //0x0282E300
+		void RenderBlendedDecals()
 		{
+			using func_t = decltype(&BSShaderAccumulator::RenderBlendedDecals);
+			REL::Relocation<func_t> func{ REL::ID(761249) };
+			return func(this);
 		}
 
-		void RenderOpaqueDecals()  //0x0282E190
+		void RenderOpaqueDecals()
 		{
+			using func_t = decltype(&BSShaderAccumulator::RenderOpaqueDecals);
+			REL::Relocation<func_t> func{ REL::ID(163409) };
+			return func(this);
 		}
 
 		//members
@@ -89,8 +102,11 @@ namespace RE
 		std::uint32_t QDepthPassIndex;
 
 	private:
-		BSShaderAccumulator* ctor()  //0x0282CC00
+		BSShaderAccumulator* ctor()
 		{
+			using func_t = decltype(&BSShaderAccumulator::ctor);
+			REL::Relocation<func_t> func{ REL::ID(690952) };
+			return func(this);
 		}
 	};
 }

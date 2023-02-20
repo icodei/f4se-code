@@ -11,6 +11,7 @@ namespace RE
 	class NiCamera;
 	class TESPageCache;
 	class BSPortalGraphEntry;
+	class SceneGraph;
 
 	struct PositionPlayerEvent;
 
@@ -49,6 +50,34 @@ namespace RE
 			return *singleton;
 		}
 
+		[[nodiscard]] static BSPortalGraphEntry* GetCameraPortalGraphEntry()
+		{
+			using func_t = decltype(&Main::GetCameraPortalGraphEntry);
+			REL::Relocation<func_t> func{ REL::ID(515799) };
+			return func();
+		}
+
+		[[nodiscard]] static BSMultiBoundRoom* GetCameraRootMultiBound()
+		{
+			using func_t = decltype(&Main::GetCameraRootMultiBound);
+			REL::Relocation<func_t> func{ REL::ID(1220834) };
+			return func();
+		}
+
+		[[nodiscard]] static SceneGraph* GetWorldSceneGraph()
+		{
+			using func_t = decltype(&Main::GetWorldSceneGraph);
+			REL::Relocation<func_t> func{ REL::ID(1376648), 0x30 };
+			return func();
+		}
+
+		[[nodiscard]] static NiNode* WeatherRootNode()
+		{
+			using func_t = decltype(&Main::WeatherRootNode);
+			REL::Relocation<func_t> func{ REL::ID(1246373), 0x4 };
+			return func();
+		}
+
 		[[nodiscard]] static NiCamera* WorldRootCamera()
 		{
 			using func_t = decltype(&Main::WorldRootCamera);
@@ -56,9 +85,14 @@ namespace RE
 			return func();
 		}
 
-		BSPortalGraphEntry* GetCameraPortalGraphEntry() {
-
+		[[nodiscard]] static NiNode* WorldRootNode()
+		{
+			using func_t = decltype(&Main::WorldRootNode);
+			REL::Relocation<func_t> func{ REL::ID(407532), 0xC };
+			return func();
 		}
+
+		
 
 		// members
 		BSTArray<BSTTuple<float, BSPointerHandle<Actor>>> sortedVisibleHighActors;  // 08

@@ -20,14 +20,14 @@ namespace RE
 		template <class Y>
 		explicit NiPointer(Y* a_rhs)  //
 			requires(std::convertible_to<Y*, element_type*>) :
-			_ptr(static_cast<element_type*>(a_rhs))
+			m_pObject(static_cast<element_type*>(a_rhs))
 		{
 			TryAttach();
 		}
 
 		// 9a)
 		NiPointer(const NiPointer& a_rhs) :
-			_ptr(a_rhs._ptr)
+			m_pObject(a_rhs.m_pObject)
 		{
 			TryAttach();
 		}
@@ -36,21 +36,21 @@ namespace RE
 		template <class Y>
 		NiPointer(const NiPointer<Y>& a_rhs)  //
 			requires(std::convertible_to<Y*, element_type*>) :
-			_ptr(static_cast<element_type*>(a_rhs._ptr))
+			m_pObject(static_cast<element_type*>(a_rhs.m_pObject))
 		{
 			TryAttach();
 		}
 
 		// 10a)
 		NiPointer(NiPointer&& a_rhs) noexcept :
-			_ptr(std::exchange(a_rhs._ptr, nullptr))
+			m_pObject(std::exchange(a_rhs.m_pObject, nullptr))
 		{}
 
 		// 10b)
 		template <class Y>
 		NiPointer(NiPointer<Y>&& a_rhs) noexcept  //
 			requires(std::convertible_to<Y*, element_type*>) :
-			_ptr(static_cast<element_type*>(std::exchange(a_rhs._ptr, nullptr)))
+			m_pObject(static_cast<element_type*>(std::exchange(a_rhs.m_pObject, nullptr)))
 		{}
 
 		~NiPointer() noexcept { reset(); }
@@ -60,7 +60,7 @@ namespace RE
 		{
 			if (this != std::addressof(a_rhs)) {
 				TryDetach();
-				_ptr = a_rhs._ptr;
+				m_pObject = a_rhs.m_pObject;
 				TryAttach();
 			}
 			return *this;
@@ -72,7 +72,7 @@ namespace RE
 			requires(std::convertible_to<Y*, element_type*>)
 		{
 			TryDetach();
-			_ptr = static_cast<element_type*>(a_rhs._ptr);
+			m_pObject = static_cast<element_type*>(a_rhs.m_pObject);
 			TryAttach();
 			return *this;
 		}
@@ -82,7 +82,7 @@ namespace RE
 		{
 			if (this != std::addressof(a_rhs)) {
 				TryDetach();
-				_ptr = std::exchange(a_rhs._ptr, nullptr);
+				m_pObject = std::exchange(a_rhs.m_pObject, nullptr);
 			}
 			return *this;
 		}
@@ -93,8 +93,45 @@ namespace RE
 			requires(std::convertible_to<Y*, element_type*>)
 		{
 			TryDetach();
-			_ptr = std::exchange(a_rhs._ptr, nullptr);
+			m_pObject = std::exchange(a_rhs.m_pObject, nullptr);
 			return *this;
+		}
+
+		// 
+		template <class Y>
+		NiPointer& operator=(Y* pObject)  //
+			requires(std::convertible_to<Y*, element_type*>)
+		{
+			if (m_pObject != pObject) {
+				TryDetach();
+				m_pObject = static_cast<element_type*>(pObject);;
+				TryAttach();
+				return *this;
+			}
+		}
+
+		[[nodiscard]] element_type& operator*() const noexcept
+		{
+			assert(static_cast<bool>(*this));
+			return *m_pObject;
+		}
+
+		[[nodiscard]] element_type* operator->() const noexcept
+		{
+			assert(static_cast<bool>(*this));
+			return m_pObject;
+		}
+
+		template <class Y>
+		bool operator!=(Y* pObject) const
+		{
+			return (m_pObject != pObject);
+		}
+
+		template <class Y>
+		bool operator==(const NiPointer& ptr) const
+		{
+			return (m_pObject == ptr.m_pObject);
 		}
 
 		// 1)
@@ -105,28 +142,16 @@ namespace RE
 		void reset(Y* a_ptr)  //
 			requires(std::convertible_to<Y*, element_type*>)
 		{
-			if (_ptr != a_ptr) {
+			if (m_pObject != a_ptr) {
 				TryDetach();
-				_ptr = static_cast<element_type*>(a_ptr);
+				m_pObject = static_cast<element_type*>(a_ptr);
 				TryAttach();
 			}
 		}
 
-		[[nodiscard]] element_type* get() const noexcept { return _ptr; }
+		[[nodiscard]] element_type* get() const noexcept { return m_pObject; }
 
-		[[nodiscard]] element_type& operator*() const noexcept
-		{
-			assert(static_cast<bool>(*this));
-			return *_ptr;
-		}
-
-		[[nodiscard]] element_type* operator->() const noexcept
-		{
-			assert(static_cast<bool>(*this));
-			return _ptr;
-		}
-
-		[[nodiscard]] explicit operator bool() const noexcept { return _ptr != nullptr; }
+		[[nodiscard]] explicit operator bool() const noexcept { return m_pObject != nullptr; }
 
 	protected:
 		template <class>
@@ -134,23 +159,23 @@ namespace RE
 
 		void TryAttach()
 		{
-			if (_ptr) {
-				_ptr->IncRefCount();
+			if (m_pObject) {
+				m_pObject->IncRefCount();
 			}
 		}
 
 		void TryDetach()
 		{
-			if (_ptr) {
-				_ptr->DecRefCount();
-				_ptr = nullptr;
+			if (m_pObject) {
+				m_pObject->DecRefCount();
+				m_pObject = nullptr;
 			}
 		}
 
 		// members
-		element_type* _ptr{ nullptr };  // 0
+		element_type* m_pObject{ nullptr };  // 0
 	};
-	//static_assert(sizeof(NiPointer<void*>) == 0x8);
+	static_assert(sizeof(NiPointer<void*>) == 0x8);
 
 	template <class T, class... Args>
 	[[nodiscard]] NiPointer<T> make_nismart(Args&&... a_args)

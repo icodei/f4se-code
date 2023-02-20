@@ -53,7 +53,9 @@ set(SOURCES
 	include/RE/Bethesda/BSPointerHandle.h
 	include/RE/Bethesda/BSPreCulledObjects.h
 	include/RE/Bethesda/BSResource.h
+	include/RE/Bethesda/BSResource/BSModelDB.h
 	include/RE/Bethesda/BSResource/BSResourceEnums.h
+	include/RE/Bethesda/BSResource/BSTextureDB.h
 	include/RE/Bethesda/BSResource/LooseFileStreamBase.h
 	include/RE/Bethesda/BSResource/Stream.h
 	include/RE/Bethesda/BSResource/StreamBase.h
@@ -118,8 +120,10 @@ set(SOURCES
 	include/RE/Bethesda/BSSemaphore.h
 	include/RE/Bethesda/BSShader.h
 	include/RE/Bethesda/BSShaderAccumulator.h
+	include/RE/Bethesda/BSShaderData.h
 	include/RE/Bethesda/BSShaderManager.h
 	include/RE/Bethesda/BSShaderMaterial.h
+	include/RE/Bethesda/BSShaderProperty.h
 	include/RE/Bethesda/BSShaderUtil.h
 	include/RE/Bethesda/BSSkin.h
 	include/RE/Bethesda/BSSoundHandle.h
@@ -292,6 +296,7 @@ set(SOURCES
 	include/RE/NetImmerse/NiTexture.h
 	include/RE/NetImmerse/NiTimeController.h
 	include/RE/NetImmerse/NiTransform.h
+	include/RE/NetImmerse/NiUpdateData.h
 	include/RE/NiRTTI_IDs.h
 	include/RE/RTTI.h
 	include/RE/RTTI_IDs.h

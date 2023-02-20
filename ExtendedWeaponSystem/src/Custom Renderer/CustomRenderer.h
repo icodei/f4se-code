@@ -23,11 +23,30 @@ public:
 	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
 };
 
-void nsScope_CreateRenderer();
-ScopeRenderer* nsScope_InitRenderer();
-void nsScope_Render();
+namespace nsScope {
+
+	//functions
+	void CreateRenderer();
+	void DestroyRenderer();
+	ScopeRenderer* InitRenderer();
+	void Render();
+
+	//members
+	static ScopeRenderer* scopeRenderer;
+	static BSSpinLock scopeRendererLock;
+}
+
+
+class AccumulateSceneFunctor {
+public:
+	std::uint32_t operator()(TESObjectCELL* a_cell) {
+
+	}
+
+	//members
+	ScopeRenderer* renderer;
+	bool interior;
+};
+
 
 void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeaccum, std::uint32_t a1, std::uint32_t a2, std::uint32_t a3);
-
-extern ScopeRenderer* scopeRenderer;
-extern BSReadWriteLock scopeRendererLock;

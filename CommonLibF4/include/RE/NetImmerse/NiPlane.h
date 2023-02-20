@@ -9,6 +9,14 @@ namespace RE
 		NiPlane() { ctor(); }
 		NiPlane(NiPlane& a_copy) { ctorCopy(a_copy); } 
 
+		enum
+		{
+			NO_SIDE = 0x0,
+			POSITIVE_SIDE = 0x1,
+			NEGATIVE_SIDE = 0x2,
+		};
+
+
 		//members
 		NiPoint3 m_kNormal;
 		float m_fConstant;

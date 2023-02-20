@@ -1,7 +1,7 @@
 #include "Global.h"
 
-ScopeRenderer* scopeRenderer;
-BSReadWriteLock scopeRendererLock;
+//ScopeRenderer* scopeRenderer;
+//BSSpinLock scopeRendererLock;
 
 ScopeRenderer::ScopeRenderer() {
 	logIfNeeded("ScopeRenderer ctor Starting...");
@@ -396,25 +396,25 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	return renderedTexture;
 }
 
-void nsScope_CreateRenderer() {
+void nsScope::CreateRenderer() {
 	logIfNeeded("ScopeRenderer Creation Starting...");
 	
 	//create a spinlock
-	scopeRendererLock = *(new BSReadWriteLock());
-	//scopeRendererLock = (*(BSReadWriteLock*)Heap_Allocate(sizeof(BSReadWriteLock)));
+	scopeRendererLock = *(new BSSpinLock());
 	logIfNeeded("ScopeRendererLock Allocated...");
-	new(&scopeRendererLock) BSReadWriteLock();
+	new (&scopeRendererLock) BSSpinLock();
 	
 	if (scopeRenderer != nullptr) {
-
+		return;
 	}
 
 	//if renderer is null
 	if (!scopeRenderer) {
-		scopeRenderer = nsScope_InitRenderer();
+		scopeRenderer = InitRenderer();
 		//in nsPipboy_LocalMap::CreateRenderer this is where the localMapCameraUpdateEvent stuff would also be created
 	}
 
+	/*
 	//Unlock?
 	//if ((&scopeRendererLock)->lockValue == 1) {
 	//	(&scopeRendererLock)->threadID = (&scopeRendererLock)->lockValue -1;
@@ -423,13 +423,17 @@ void nsScope_CreateRenderer() {
 	//} else {
 	//	InterlockedDecrement(&(&scopeRendererLock)->lockValue);
 	//}
-	(&scopeRendererLock)->unlock_write();
-	(&scopeRendererLock)->unlock_read();
+	*/
+	(&scopeRendererLock)->unlock();
 
 	logIfNeeded("ScopeRenderer Creation Complete.");
 }
 
-ScopeRenderer* nsScope_InitRenderer() {
+void nsScope::DestroyRenderer() {
+
+}
+
+ScopeRenderer* nsScope::InitRenderer() {
 	logIfNeeded("ScopeRenderer Init Starting...");
 
 	ScopeRenderer* renderer;
@@ -446,39 +450,43 @@ ScopeRenderer* nsScope_InitRenderer() {
 	} else {
 		newRenderer = nullptr;
 	}
-	//a2 = g_player->data.location.NiPoint3;
-	//if (TESObjectREFR::GetWorldSpace(pPlayer._ptr) && (TESObjectREFR::GetWorldSpace(pc)->flags & 0x40) == 0) {
-	//	WorldSpace = TESObjectREFR::GetWorldSpace(pPlayer._ptr);
-	//	TESWorldSpace::AdjustMapMarkerCoord(WorldSpace, &a2, 0);
-	//}
-	//(&newRenderer->scopeCam)->SetInitialPosition(&a2);
-	//(&newRenderer->scopeCam)->SetMinFrustum(value, value * 0.5625);
-	//nsPipboy_LocalMap::GetLoadedAreaExtents(&a3, &v11, a1);
-	//(&newRenderer->scopeCam)->SetExtents(&v12, &v11);
-	//parentCell = pPlayer._ptr->parentCell;
-	//if (parentCell) {
-	//	NorthRotation = TESObjectCELL::GetNorthRotation(parentCell);
-	//	(&newRenderer->scopeCam)->SetZRotation(&newLocalMapRenderer->LocalMapCamera, COERCE_FLOAT(LODWORD(NorthRotation) ^ _xmm.v.vector4_i.x));
-	//}
+	/*
+	a2 = g_player->data.location.NiPoint3;
+	if (TESObjectREFR::GetWorldSpace(pPlayer._ptr) && (TESObjectREFR::GetWorldSpace(pc)->flags & 0x40) == 0) {
+		WorldSpace = TESObjectREFR::GetWorldSpace(pPlayer._ptr);
+		TESWorldSpace::AdjustMapMarkerCoord(WorldSpace, &a2, 0);
+	}
+	(&newRenderer->scopeCam)->SetInitialPosition(&a2);
+	(&newRenderer->scopeCam)->SetMinFrustum(value, value * 0.5625);
+	nsPipboy_LocalMap::GetLoadedAreaExtents(&a3, &v11, a1);
+	(&newRenderer->scopeCam)->SetExtents(&v12, &v11);
+	parentCell = pPlayer._ptr->parentCell;
+	if (parentCell) {
+		NorthRotation = TESObjectCELL::GetNorthRotation(parentCell);
+		(&newRenderer->scopeCam)->SetZRotation(&newLocalMapRenderer->LocalMapCamera, COERCE_FLOAT(LODWORD(NorthRotation) ^ _xmm.v.vector4_i.x));
+	}
+	*/
 
 	logIfNeeded("ScopeRenderer Init Complete.");
 	return newRenderer;
 }
 
-void nsScope_Render() {
+void nsScope::Render() {
 	
 	NiTexture* renderedTexture;
 
 	
-	(&scopeRendererLock)->lock_read();
+	(&scopeRendererLock)->lock();
 	if (scopeRenderer) {
 		renderedTexture = (scopeRenderer)->Render(1);
 		if (renderedTexture) {
-			//if (texID string init) {
-			//	stuff about localMapTextureID
-			//	stuff
-			//}
+			/*
+			if (texID string init) {
+				//stuff about localMapTextureID
+				//stuff
+			}
 			//here there would be stuff for setting the renderedTexture to be the scaleform texture
+			*/
 
 			NiPointer<BSShaderProperty> shaderProperty;
 
@@ -488,33 +496,35 @@ void nsScope_Render() {
 			effectShaderProperty = (BSEffectShaderProperty*)(shaderProperty.get());
 			if (shaderProperty.get()) {
 				effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
-				effectShaderMaterial->spBaseTexture = renderedTexture;
+				effectShaderMaterial->spBaseTexture.reset(renderedTexture);
 				effectShaderMaterial->fBaseColorScale = 1.0;
 				effectShaderMaterial->kBaseColor = NiColorA(1.0, 1.0, 1.0, 1.0);
 			}
 
-			//BSLightingShaderProperty* lightingShaderProperty;
-			//BSLightingShaderMaterial* lightingShaderMaterial;
-			//shaderProperty = ni_cast(ScopeTextureLoader->shaderProperty, BSShaderProperty);
-			//lightingShaderProperty = ni_cast(shaderProperty, BSLightingShaderProperty);
-			//if (shaderProperty.get()) {
-			//	lightingShaderMaterial = static_cast<BSLightingShaderMaterial*>(shaderProperty->shaderMaterial);
-			//}
+			/*
+			BSLightingShaderProperty* lightingShaderProperty;
+			BSLightingShaderMaterial* lightingShaderMaterial;
+			shaderProperty.reset((BSShaderProperty*)ScopeTextureLoader->shaderProperty.get());
+			lightingShaderProperty = (BSLightingShaderProperty*)(shaderProperty.get());
+			if (shaderProperty.get()) {
+				lightingShaderMaterial = static_cast<BSLightingShaderMaterial*>(shaderProperty->material);
+			}
+			*/
 		}
 	}
 
+	/*
 	//This seems to be unlocking the spinlock of the renderer after it's finished creating the renderer
-	//if ((&scopeRendererLock)->lockValue == 1) {
-	//	(&scopeRendererLock)->threadID = 0;
-	//	_mm_mfence();
-	//	InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, 0, (&scopeRendererLock)->lockValue);
-	//} else {
-	//	InterlockedDecrement(&(&scopeRendererLock)->lockValue);
-	//}
+	if ((&scopeRendererLock)->lockValue == 1) {
+		(&scopeRendererLock)->threadID = 0;
+		_mm_mfence();
+		InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, 0, (&scopeRendererLock)->lockValue);
+	} else {
+		InterlockedDecrement(&(&scopeRendererLock)->lockValue);
+	}
+	*/
 	
-	
-	scopeRendererLock.unlock_read();
-	scopeRendererLock.unlock_write();
+	scopeRendererLock.unlock();
 }
 
 void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, std::uint32_t a1, std::uint32_t a2, std::uint32_t a3) {
@@ -528,22 +538,22 @@ void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, std::uint3
 	}
 	(BSGraphics__gRenderTargetManager)->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 	(BSGraphics__gRenderTargetManager)->SetCurrentViewportForceToRenderTargetDimensions();
-	(BSGraphics__gRenderer).get().SetClearColor(0.0, 0.0, 0.0, 0.0);
-	(BSGraphics__gRenderer).get().ClearColor();
-	(BSGraphics__gRenderer).get().Flush();
+	(&BSGraphics__gRenderer.get())->SetClearColor(0.0, 0.0, 0.0, 0.0);
+	(&BSGraphics__gRenderer.get())->ClearColor();
+	(&BSGraphics__gRenderer.get())->Flush();
 	//Threaded stuff happens here in RenderLocalMapScene
 	//stuff
 	//more stuff
-	(BSGraphics__gState).get().SetCameraData(cam, 0, 0.0, 1.0);
-	(BSGraphics__gRenderer).get().DoZPrePass(0, 0, 0.0, 1.0, 0.0, 1.0);
+	(&BSGraphics__gState.get())->SetCameraData(cam, 0, 0.0, 1.0);
+	(&BSGraphics__gRenderer.get())->DoZPrePass(0, 0, 0.0, 1.0, 0.0, 1.0);
 	shadeAccum->RenderOpaqueDecals();
 	shadeAccum->RenderBatches(4, 0, -1);
 	shadeAccum->RenderBlendedDecals();
 	//BSGraphics::pDefaultContext stuff happens here in RenderLocalMapScene
 	//stuff
 	//more stuff
-	(BSGraphics__gRenderer).get().Flush();
-	(BSGraphics__gRenderer).get().SetClearColor(1.0, 1.0, 1.0, 1.0);
+	(&BSGraphics__gRenderer.get())->Flush();
+	(&BSGraphics__gRenderer.get())->SetClearColor(1.0, 1.0, 1.0, 1.0);
 	//more context stuff
 	//more things
 	shadeAccum->ClearEffectPasses();

@@ -1,12 +1,36 @@
 #pragma once
 
 #include "RE/Bethesda/BSGraphics.h"
+#include "RE/NetImmerse/NiColor.h"
+#include "RE/NetImmerse/NiPoint2.h"
+#include "RE/NetImmerse/NiPoint3.h"
 #include "RE/NetImmerse/NiRefObject.h"
 
 namespace RE
 {
-	class BSIStream;
+	class BSDynamicLines;
+	class BSDynamicTriShape;
 	class BSGeometryData;
+	class BSIStream;
+	class BSLines;
+	class BSMeshLODTriShape;
+	class BSMultiStreamInstanceTriShape;
+	class BSSubIndexTriShape;
+	class BSTriShape;
+	class NiAVObject;
+	class NiDefaultAVObjectPalette;
+	class NiNode;
+	class NiPick;
+	class NiShadeProperty;
+	class NiStream;
+
+	class IRendererResourceManager	// TODO - Move to different file
+	{
+	public:
+		class FadeNodeSettings
+		{
+		};
+	};
 
 	struct __declspec(novtable) BSReloadShaderI
 	{
@@ -67,17 +91,64 @@ namespace RE
 	class BSShaderResourceManager
 	{
 	public:
+		static constexpr auto RTTI{ RTTI::BSShaderResourceManager };
+		static constexpr auto VTABLE{ VTABLE::BSShaderResourceManager };
 		virtual ~BSShaderResourceManager();
 
-		virtual void CreateTriShape1();
-		virtual void CreateTriShape2();
-		virtual void CreateTriShape3();
-		virtual void CreateTriShapeRendererData();
-		virtual void CreateSubIndexTriShape();
-		virtual void IncGeometryRef(BSGeometryData* geomData);
-		virtual void DefGeometryRef(BSGeometryData* geomData);  // Will auto-destroy the block when it reaches zero
-																//...
+		//add
+		virtual BSTriShape* CreateTriShape(std::uint32_t, std::uint16_t*, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, NiPoint3*, NiPoint3*, NiPoint3*, NiColorA*, NiColorA*, std::uint8_t*, NiColorA*, NiColorA*, float*, bool);
+		virtual BSTriShape* CreateTriShape(std::uint32_t, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, std::uint16_t*);
+		virtual BSTriShape* CreateTriShape(NiStream&, std::uint64_t, std::uint32_t, std::uint32_t, char*&);
+		virtual void* CreateTriShapeRendererData(void*, std::uint64_t, std::uint16_t*, std::uint32_t);
+		virtual BSSubIndexTriShape* CreateSubIndexTriShape(std::uint32_t, std::uint32_t, std::uint16_t*, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, NiPoint3*, NiPoint3*, NiPoint3*, NiColorA*, NiColorA*, std::uint8_t*, NiColorA*, NiColorA*, float*);
+		virtual void IncRefTriShape(void* geomData);
+		virtual void DecRefTriShape(void* geomData);
+		virtual BSDynamicTriShape* CreateDynamicTriShape(std::uint32_t, std::uint32_t, std::uint16_t*, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, NiPoint3*, NiPoint3*, NiPoint3*, NiColorA*, NiColorA*, std::uint8_t*, NiColorA*, NiColorA*, float*);
+		virtual BSDynamicTriShape* CreateDynamicTriShape(std::uint32_t, std::uint32_t, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, std::uint16_t*);
+		virtual void IncRefDynamicTriShape(void*);
+		virtual void DecRefDynamicTriShape(void*);
+		virtual void ConvertBSTriShapeToBSDynamicTriShape(NiNode*, NiDefaultAVObjectPalette*);
+		virtual void ApplyMaterials(NiAVObject*);
+		virtual void SetTriShapeStreamDynamicFlags(std::uint32_t);
+		virtual void* CreateParticleShape();
+		virtual void IncRefParticleShape(void*);
+		virtual void DecRefParticleShape(void*);
+		virtual BSLines* CreateLineShape(std::uint32_t, std::uint16_t*, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, NiPoint3*, NiPoint3*, NiPoint3*, NiColorA*, NiColorA*, std::uint8_t*, NiColorA*, NiColorA*, float*);
+		virtual BSDynamicLines* CreateDynamicLineShape(std::uint32_t, std::uint32_t, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, std::uint16_t*);
+		virtual void* CreateDynamicLineShape(NiStream&, std::uint64_t, std::uint32_t, std::uint32_t);
+		virtual BSDynamicLines* CreateDynamicLineShape(std::uint32_t, std::uint32_t, std::uint16_t*, std::uint32_t, NiPoint3*, NiPoint2*, NiColorA*, NiPoint3*, NiPoint3*, NiPoint3*, NiColorA*, NiColorA*, std::uint8_t*, NiColorA*, NiColorA*, float*);
+		virtual void IncRefLines(void*);
+		virtual void DecRefLines(void*);
+		virtual void IncRefDynamicLines(void*);
+		virtual void DecRefDynamicLines(void*);
+		virtual void LoadTexture(NiTexture*);
+		virtual void CreateStreamingTexture(NiTexture*, void*, void*);
+		virtual bool ReadStreamingTextureData(NiTexture*, void*);
+		virtual bool CreateStreamingTextureArraySlice(NiTexture*, void*, void*, std::uint32_t);
+		virtual bool ReadStreamingTextureDataToArraySlice(NiTexture*, void*, std::uint32_t);
+		virtual void FinishStreamingTexture(NiTexture*);
+		virtual void IncRefTexture(BSGraphics::Texture*);
+		virtual void DecRefTexture(BSGraphics::Texture*);
+		virtual void GetTextureWidthHeight(NiTexture*, std::uint32_t&, std::uint32_t&);
+		virtual std::uint32_t GetTextureFormat(NiTexture*);
+		virtual bool UpdateTextureToDesiredMipLevel(NiTexture*, std::uint32_t&);
+		virtual void LoadUpgradeTextureData(NiTexture*);
+		virtual bool UpdateStreamingTextureToDesiredMipLevel(NiTexture*, std::uint32_t&, void*, void*);
+		virtual void FinishStreamingTextureUpgade(NiTexture*);
+		virtual void* CreateVertexBuffer(std::uint32_t&, void*, std::uint32_t, std::uint64_t);
+		virtual void DecRefVertexBuffer(void*);
+		virtual NiShadeProperty* CreateDefaultEffectShaderProperty(bool, bool);
+		virtual BSMeshLODTriShape* CreateMeshLODTriShape(std::uint32_t*, std::uint32_t, std::uint64_t, std::uint32_t, std::uint32_t, void*);
+		virtual BSMeshLODTriShape* CreateMeshLODTriShape(BSTriShape*, std::uint32_t*, std::uint32_t);
+		virtual std::uint32_t UpdateIndexBufferForInstancing(BSMultiStreamInstanceTriShape*, std::uint32_t);
+		virtual bool FindIntersectionsTriShapeFastPath(NiPoint3&, NiPoint3&, NiPick&, BSTriShape*);
+		virtual void CreateTangentSpace(std::uint32_t, std::uint16_t*, std::uint32_t, NiPoint3*, NiPoint2*, NiPoint3*, NiPoint3*, NiPoint3*);
+		virtual float GetShaderFrameCount();
+		virtual float GetShaderTimerDelta();
+		virtual void GetFadeNodeSettings(IRendererResourceManager::FadeNodeSettings&);
+		virtual void GetCameraVectors(NiPoint3&, NiPoint3&, NiPoint3&);
 	};
+	static_assert(sizeof(BSShaderResourceManager) == 0x8);
 
-	REL::Relocation<BSShaderResourceManager> gShaderResourceManagerInstance(0x038CBDC0);
+	REL::Relocation<BSShaderResourceManager> gShaderResourceManagerInstance(1416967);
 }

@@ -48,7 +48,7 @@ ScopeCamera::~ScopeCamera() { //TODO
 
 }
 
-void ScopeCamera::SetCameraNode(NiNode* node) { //TODO
+void ScopeCamera::SetCameraRoot(NiNode* node) {  //TODO
 
 }
 
@@ -230,14 +230,14 @@ void ScopeCamera::Update3D() {
 			}
 			logIfNeeded("Found the scope camera.");
 		}
-		if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
+		if (currentCam && !InterlockedDecrement(&currentCam->refCount)) {
 			currentCam->DeleteThis();
 		}
 	}
 	//TODO: add actor value or something similar to set what the FOV should be on the camera of each scope
 	if (scopePOV) {
 		//float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
-		BSShaderUtil::SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0 / 4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
+		BSShaderUtil::SetSceneGraphCameraFOV(Main::GetWorldSceneGraph(), (float)(90.0 / 4.0), 0, scopePOV, 1);  //TEMP. Right now I just have it as 4x zoom
 	}
 
 	//if (scopePOV && scopeRenderer) {
@@ -254,9 +254,9 @@ void ScopeCamera::Update3D() {
 
 ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) : TESCameraState(cam, ID) { //TODO: Add new members and add each new state
 	logIfNeeded("ScopeCamera::DefaultState ctor Starting...");
-	m_refCount = 0;
+	refCount = 0;
 	camera = &cam;
-	stateID = ID;
+	id.set(CameraState, ID);
 
 	initialPosition = NiPoint3_ZERO;
 	translation = NiPoint3_ZERO;
@@ -272,11 +272,11 @@ ScopeCamera::DefaultState::~DefaultState() {
 	logIfNeeded("ScopeCamera::DefaultState dtor Completed.");
 }
 
-bool ScopeCamera::DefaultState::ShouldHandleEvent(InputEvent* inputEvent) { //TODO
+bool ScopeCamera::DefaultState::ShouldHandleEvent(const InputEvent* inputEvent) { //TODO
 	return false; //TEMP
 }
 
-void ScopeCamera::DefaultState::OnButtonEvent(ButtonEvent* inputEvent) { //TODO
+void ScopeCamera::DefaultState::HandleEvent(const ButtonEvent* inputEvent) {  //TODO
 
 }
 
@@ -289,15 +289,15 @@ void ScopeCamera::DefaultState::End() { //TODO
 
 }
 
-void ScopeCamera::DefaultState::Update(TESCameraState* arg) { //TODO
+void ScopeCamera::DefaultState::Update(BSTSmartPointer<TESCameraState>& a_nextState) {  //TODO
 
 }
 
-void ScopeCamera::DefaultState::GetRotation(NiQuaternion* out) { //TODO
+void ScopeCamera::DefaultState::GetRotation(NiQuaternion& a_rotation) const {  //TODO
 
 }
 
-void ScopeCamera::DefaultState::GetPosition(NiPoint3* out) { //TODO
+void ScopeCamera::DefaultState::GetTranslation(NiPoint3& a_translation) const {  //TODO
 
 }
 

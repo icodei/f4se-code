@@ -6,48 +6,52 @@ extern NiNode* scopePOVRoot;
 extern NiCamera* scopePOV_BACKUP;
 extern NiNode* scopePOVRoot_BACKUP;
 
-
 class ScopeCamera : public TESCamera {
 public:
 	ScopeCamera();
 
 	virtual ~ScopeCamera();
 
-	virtual void SetCameraNode(NiNode* node) override;
+	virtual void SetCameraRoot(NiNode* node) override;
 	virtual void SetEnabled(bool enabled) override;
 	virtual void Update() override;
 
-	enum {
-		kCameraState_Default = 0,
-		kCameraState_Thermal,
-		kCameraState_NightVision,
+	struct CameraStates {
+		enum CameraState : unsigned {
+			kDefault = 0,
+			kThermal,
+			kNightVision,
 
-		kNumCameraStates
+			kTotal
+		};
 	};
+	using ScopeCameraState = CameraStates::CameraState;
 
 	class DefaultState : public TESCameraState {
 	public:
+		static constexpr auto STATE{ ScopeCameraState::kDefault };
+
 		DefaultState() = delete;
 		DefaultState(TESCamera& cam, std::uint32_t ID);
 
 		virtual ~DefaultState();
 
-		virtual bool ShouldHandleEvent(InputEvent* inputEvent = nullptr) override;
-		virtual void OnKinectEvent(KinectEvent* inputEvent) override { };
-		virtual void OnDeviceConnectEvent(DeviceConnectEvent* inputEvent) override { };
-		virtual void OnThumbstickEvent(ThumbstickEvent* inputEvent) override { };
-		virtual void OnCursorMoveEvent(CursorMoveEvent* inputEvent) override { };
-		virtual void OnMouseMoveEvent(MouseMoveEvent* inputEvent) override { };
-		virtual void OnCharacterEvent(CharacterEvent* inputEvent) override { };
-		virtual void OnButtonEvent(ButtonEvent* inputEvent) override;
+		virtual bool ShouldHandleEvent(const InputEvent* inputEvent = nullptr) override;
+		virtual void HandleEvent(const KinectEvent* inputEvent) override;
+		virtual void HandleEvent(const DeviceConnectEvent* inputEvent) override;
+		virtual void HandleEvent(const ThumbstickEvent* inputEvent) override;
+		virtual void HandleEvent(const CursorMoveEvent* inputEvent) override;
+		virtual void HandleEvent(const MouseMoveEvent* inputEvent) override;
+		virtual void HandleEvent(const CharacterEvent* inputEvent) override;
+		virtual void HandleEvent(const ButtonEvent* inputEvent) override;
 		virtual void Begin() override;
 		virtual void End() override;
-		virtual void Update(TESCameraState* arg) override;
-		virtual void GetRotation(NiQuaternion* out) override;
-		virtual void GetPosition(NiPoint3* out) override;
-		virtual void SaveGame(BGSSaveFormBuffer* save) override { };
-		virtual void LoadGame(BGSSaveFormBuffer* save) override { };
-		virtual void Revert(BGSSaveFormBuffer* save) override { };
+		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) override;
+		virtual void GetRotation(NiQuaternion& a_rotation) const override;
+		virtual void GetTranslation(NiPoint3& a_translation) const override;
+		virtual void SaveGame([[maybe_unused]] BGSSaveFormBuffer* a_saveGameBuffer) override;
+		virtual void LoadGame([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
+		virtual void Revert([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
 
 		//functions
 		void SetInitialPosition(NiPoint3& newPos);
@@ -78,22 +82,22 @@ public:
 
 		virtual ~ThermalState();
 
-		virtual bool ShouldHandleEvent(InputEvent* inputEvent = nullptr) override;
-		virtual void OnKinectEvent(KinectEvent* inputEvent) override { };
-		virtual void OnDeviceConnectEvent(DeviceConnectEvent* inputEvent) override { };
-		virtual void OnThumbstickEvent(ThumbstickEvent* inputEvent) override { };
-		virtual void OnCursorMoveEvent(CursorMoveEvent* inputEvent) override { };
-		virtual void OnMouseMoveEvent(MouseMoveEvent* inputEvent) override { };
-		virtual void OnCharacterEvent(CharacterEvent* inputEvent) override { };
-		virtual void OnButtonEvent(ButtonEvent* inputEvent) override;
+		virtual bool ShouldHandleEvent(const InputEvent* inputEvent = nullptr) override;
+		virtual void HandleEvent(const KinectEvent* inputEvent) override;
+		virtual void HandleEvent(const DeviceConnectEvent* inputEvent) override;
+		virtual void HandleEvent(const ThumbstickEvent* inputEvent) override;
+		virtual void HandleEvent(const CursorMoveEvent* inputEvent) override;
+		virtual void HandleEvent(const MouseMoveEvent* inputEvent) override;
+		virtual void HandleEvent(const CharacterEvent* inputEvent) override;
+		virtual void HandleEvent(const ButtonEvent* inputEvent) override;
 		virtual void Begin() override;
 		virtual void End() override;
-		virtual void Update(TESCameraState* arg) override;
-		virtual void GetRotation(NiQuaternion* out) override;
-		virtual void GetPosition(NiPoint3* out) override;
-		virtual void SaveGame(BGSSaveFormBuffer* save) override { };
-		virtual void LoadGame(BGSSaveFormBuffer* save) override { };
-		virtual void Revert(BGSSaveFormBuffer* save) override { };
+		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) override;
+		virtual void GetRotation(NiQuaternion& a_rotation) const override;
+		virtual void GetTranslation(NiPoint3& a_translation) const override;
+		virtual void SaveGame([[maybe_unused]] BGSSaveFormBuffer* a_saveGameBuffer) override;
+		virtual void LoadGame([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
+		virtual void Revert([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
 
 		//functions
 
@@ -109,22 +113,22 @@ public:
 
 		virtual ~NightVisionState();
 
-		virtual bool ShouldHandleEvent(InputEvent* inputEvent = nullptr) override;
-		virtual void OnKinectEvent(KinectEvent* inputEvent) override { };
-		virtual void OnDeviceConnectEvent(DeviceConnectEvent* inputEvent) override { };
-		virtual void OnThumbstickEvent(ThumbstickEvent* inputEvent) override { };
-		virtual void OnCursorMoveEvent(CursorMoveEvent* inputEvent) override { };
-		virtual void OnMouseMoveEvent(MouseMoveEvent* inputEvent) override { };
-		virtual void OnCharacterEvent(CharacterEvent* inputEvent) override { };
-		virtual void OnButtonEvent(ButtonEvent* inputEvent) override;
+		virtual bool ShouldHandleEvent(const InputEvent* inputEvent = nullptr) override;
+		virtual void HandleEvent(const KinectEvent* inputEvent) override;
+		virtual void HandleEvent(const DeviceConnectEvent* inputEvent) override;
+		virtual void HandleEvent(const ThumbstickEvent* inputEvent) override;
+		virtual void HandleEvent(const CursorMoveEvent* inputEvent) override;
+		virtual void HandleEvent(const MouseMoveEvent* inputEvent) override;
+		virtual void HandleEvent(const CharacterEvent* inputEvent) override;
+		virtual void HandleEvent(const ButtonEvent* inputEvent) override;
 		virtual void Begin() override;
 		virtual void End() override;
-		virtual void Update(TESCameraState* arg) override;
-		virtual void GetRotation(NiQuaternion* out) override;
-		virtual void GetPosition(NiPoint3* out) override;
-		virtual void SaveGame(BGSSaveFormBuffer* save) override { };
-		virtual void LoadGame(BGSSaveFormBuffer* save) override { };
-		virtual void Revert(BGSSaveFormBuffer* save) override { };
+		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) override;
+		virtual void GetRotation(NiQuaternion& a_rotation) const override;
+		virtual void GetTranslation(NiPoint3& a_translation) const override;
+		virtual void SaveGame([[maybe_unused]] BGSSaveFormBuffer* a_saveGameBuffer) override;
+		virtual void LoadGame([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
+		virtual void Revert([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
 
 		//functions
 
@@ -148,10 +152,9 @@ public:
 	NiPoint3& QMinExtent();
 
 	//members
-	TESCameraState* cameraStates[kNumCameraStates];
+	BSTSmartPointer<TESCameraState> cameraStates[CameraStates::kTotal];
 	NiPointer<NiCamera> camera;
 	NiAVObject* renderPlane;
 	NiPoint3 maxExtent;
 	NiPoint3 minExtent;
-
 };

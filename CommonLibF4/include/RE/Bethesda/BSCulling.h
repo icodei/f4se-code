@@ -65,7 +65,11 @@ namespace RE
 		virtual void TestBaseVisibility_BSOcclusionPlane(){};
 		virtual void TestBaseVisibility_NiBound(){};
 
-		void SetAccumulator(NiAccumulator* accumulator) {}
+		void SetAccumulator(NiAccumulator* accumulator) {
+			using func_t = decltype(&BSCullingProcess::SetAccumulator);
+			REL::Relocation<func_t> func{ REL::ID(236955) };
+			return func(this, accumulator);
+		}
 
 		//members
 		std::uint32_t field_128;

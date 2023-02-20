@@ -38,6 +38,12 @@ namespace RE
 			REL::Relocation<func_t> func{ REL::ID(899120) };
 			return func(a_camera, a_objects, a_cullingprocess, a1);
 		}
+
+		void RenderScene(NiCamera* a_camera, BSShaderAccumulator* a_accumulator, bool a1) {
+			using func_t = decltype(&BSShaderUtil::RenderScene);
+			REL::Relocation<func_t> func{ REL::ID(1310228) };
+			return func(a_camera, a_accumulator, a1);
+		}
 	
 	}
 }

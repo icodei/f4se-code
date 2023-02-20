@@ -4,6 +4,7 @@
 #include "RE/Bethesda/BSTHashMap.h"
 #include "RE/Bethesda/BSBound.h"
 #include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSkin.h"
 
 namespace RE
 {

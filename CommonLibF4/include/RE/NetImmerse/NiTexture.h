@@ -31,12 +31,18 @@ namespace RE
 
 		[[nodiscard]] std::string_view GetName() const { return name; }
 
-		NiTexture* Create(BSFixedString& name, bool a1, bool a2) {
-		
+		static NiTexture* Create(BSFixedString& name, [[maybe_unused]] bool a1, bool a2)
+		{
+			using func_t = decltype(&NiTexture::Create);
+			REL::Relocation<func_t> func{ REL::ID(1071950) };
+			return func(name, a1, a2);
 		}
 
-		NiTexture* CreateEmpty(BSFixedString& name, bool a2, bool a3) {
-
+		static NiTexture* CreateEmpty(BSFixedString& name, bool isDDX, [[maybe_unused]] bool a1)
+		{
+			using func_t = decltype(&NiTexture::CreateEmpty);
+			REL::Relocation<func_t> func{ REL::ID(1255534) };
+			return func(name, isDDX, a1);
 		}
 
 		// members

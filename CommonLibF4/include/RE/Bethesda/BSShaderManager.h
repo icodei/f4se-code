@@ -1,6 +1,7 @@
 #pragma once
 #include "RE/Bethesda/BSTArray.h"
 #include "RE/NetImmerse/NiColor.h"
+#include "RE/NetImmerse/NiPoint2.h"
 #include "RE/NetImmerse/NiPoint3.h"
 #include "RE/NetImmerse/NiSmartPointer.h"
 #include "RE/NetImmerse/NiTransform.h"
@@ -26,7 +27,6 @@ namespace RE
 		using GarbageCollectorCallback_t = void (*)(NiAVObject*);
 		using TimerFunction_t = float (*)(int, bool);
 
-
 		enum
 		{
 			BSS_AMBIENT = 0x1,
@@ -38,21 +38,107 @@ namespace RE
 			BSS_FULLMULTIPASSLIGHTING_PROJ = 0x0F
 		};
 
+		enum ShaderEnum
+		{
+			BSSM_SHADER_EFFECT,
+			BSSM_SHADER_UTILITY,
+			BSSM_SHADER_DISTANTTREE,
+			BSSM_SHADER_PARTICLE,
+			BSSM_SHADER_DFPREPASS,
+			BSSM_SHADER_DFLIGHT,
+			BSSM_SHADER_DFCOMPOSITE,
+			BSSM_SHADER_SKY,
+			BSSM_SHADER_LIGHTING,
+			BSSM_SHADER_BLOODSPLATTER,
+			BSSM_SHADER_WATER,
+			BSSM_SHADER_FACE_CUSTOMIZATION,
+			BSSM_SHADER_IMAGESPACE,
+
+			BSSM_SHADER_COUNT
+		};
+
 		enum
 		{
 			BSSM_DISABLED = 0x0FFFFFFFF
 		};
 
+		enum eCameraInWaterState
+		{
+			CAMERA_STATE_ABOVE_WATER,
+			CAMERA_STATE_PARTIALLY_ABOVE_WATER,
+			CAMERA_STATE_PARTIALLY_UNDER_WATER,
+			CAMERA_STATE_UNDER_WATER,
+		};
+
 		enum etShadowMode
 		{
+			BSSM_SHADOW_ISFILTER,
+			BSSM_SHADOW_PCF4,
+			BSSM_SHADOW_PCF9,
+			BSSM_SHADOW_LOOPFILTER,
+		};
 
+		enum etRenderFlag
+		{
+			BSSM_RENDERFLAG_COLORWRITEDISABLE
 		};
 
 		enum etRenderMode : std::uint16_t
 		{
-			unk0 = 0,
+			BSSM_RENDER_NORMAL,
+			BSSM_RENDER_NUMLIGHTS,
+			BSSM_RENDER_NUMNONSHADOWLIGHTS,
+			BSSM_RENDER_NUMSHADOWLIGHTS,
+			BSSM_RENDER_NUMPASSES,
+			BSSM_RENDER_SINGLEPASS,
+			BSSM_RENDER_TEXUSAGE,
+			BSSM_RENDER_DEGRADE,
+			BSSM_RENDER_FADE,
+			BSSM_RENDER_SHADOWSPLITDEBUG,
+			BSSM_RENDER_TEXSIZE,
+			BSSM_RENDER_FADENODETRIDEBUG,
+			BSSM_RENDER_OVERDRAW,
+			BSSM_RENDER_DEPTHPREPASS,
+			BSSM_RENDER_OCCLUSION_MAP,
+			BSSM_RENDER_SHADOWMAP,
+			BSSM_RENDER_SHADOWMAP_DIR,
+			BSSM_RENDER_SHADOWMAP_PB,
+			BSSM_RENDER_LOCALMAP,
+			BSSM_RENDER_FROZEN,
+			BSSM_RENDER_SCREEN_SPLATTER,
+			BSSM_RENDER_LODONLYNONOISE,
+			BSSM_RENDER_SILHOUETTELOD,
+			BSSM_RENDER_SILHOUETTE,
+			BSSM_RENDER_DEFERRED_GBUFFER,
+			BSSM_RENDER_DEFERRED_GB_0,
+			BSSM_RENDER_DEFERRED_GB_DEBUGSTART,
+			BSSM_RENDER_DEFERRED_GB_1,
+			BSSM_RENDER_DEFERRED_GB_2,
+			BSSM_RENDER_DEFERRED_GB_3,
+			BSSM_RENDER_DEFERRED_GB_4,
+			BSSM_RENDER_DEFERRED_GB_5,
+			BSSM_RENDER_DEFERRED_GB_DEBUGEND,
+			BSSM_RENDER_DEFERRED_GB_ALL,
+			BSSM_RENDER_LIGHTVIS,
+			BSSM_RENDER_VATS_MASK,
+			BSSM_RENDER_VATS_MASK_DEBUG,
+			BSSM_RENDER_VATS_MASK_PREPASS,
+			BSSM_RENDER_VATS_QUERY,
+			BSSM_RENDER_MAP_MAKER,
+			BSSM_RENDER_SIMPLE_LIGHTING,
 
-			unk18 = 18,
+			BSSM_RENDER_COUNT
+		};
+
+		enum eSceneGraphEnum
+		{
+			BSSM_SSN_WORLD,
+			BSSM_SSN_UI_OLD,
+			BSSM_SSN_PREVIEW,
+			BSSM_SSN_UI_LOADING_MENU,
+			BSSM_SSN_UI,
+
+			BSSM_SSN_COUNT
 		};
 
 		enum usRenderFlags : std::uint16_t
@@ -60,87 +146,84 @@ namespace RE
 
 		};
 
+		enum BSShaderTimerMode
+		{
+			TIMER_MODE_DEFAULT,
+			TIMER_MODE_DELTA,
+			TIMER_MODE_SYSTEM,
+			TIMER_MODE_REAL_DELTA,
+			TIMER_MODE_FRAME_COUNT,
+			TIMER_MODE_ACCUMULATED_DELTA,
+
+			TIMER_MODE_COUNT
+		};
+
 		class State
 		{
 		public:
-
 			//members
-			ShadowSceneNode* pShadowSceneNode[4];
-			std::uint8_t gap20[8];
-			float timerMode[5];
-			float field_3C;
+			ShadowSceneNode* pShadowSceneNode[5];
+			float fTimerValues[6];
 			std::uint32_t uiFrameCount;
-			NiColorA loadedRange;
-			bool isInterior;
-			bool bLightBrite;
-			std::uint8_t unk56;
-			bool rgbspecMAYBE;
-			bool usePremultAlpha;
-			bool field_59;
-			float opacityAlpha;
-			bool useCharacterLighting;
-			std::int8_t bScreenSpaceReflections;
-			bool bScreenSpaceSubsurfaceScattering;
+			NiColorA LoadedRange;
+			BSRenderPass* pCurrentRenderPass;
+			bool bInterior;
+			bool bLiteBrite;
+			bool bDeferredRGBEmit;
+			bool bDeferredRGBSpec;
+			bool bMenuScreenPremultAlpha;
+			bool bMenuScreenPostAA;
+			float fMenuScreenAlpha;
+			bool CharacterLightEnabled;
+			bool ScreenSpaceReflectionsEnabled;
+			bool ScreenSpaceSubsurfaceScatteringEnabled;
 			std::uint32_t uiPipboyScreenTarget;
-			NiPointer<NiTexture> pipboyFXTexture;
-			float fPipboyScreenEmitIntensityPA;
-			float menuDiffuseIntensity;
-			float menuEmitIntensityWA;
-			float menuDiffuseIntensityWA;
-			std::int64_t field_80;
-			float field_88;
-			float fLeafAnimDampenDistStart;
-			float fLeafAnimDampenDistEnd;
-			NiPoint2 field_94;
-			NiPoint2 field_9C;
-			float field_A4;
-			std::uint8_t field_A8;
-			std::int8_t uiCurrentSceneGraph;
-			BSShaderManager::etRenderMode etRenderMode;
-			std::uint8_t gapB0[16];
-			NiTransform QDirectionalAmbientTransform;
-			NiTransform QLocalDirectionalAmbientTransform;
-			NiColorA QAmbientSpecular;
-			std::int8_t field_150;
-			std::uint32_t QTextureTransformBufferIndex;
-			std::uint32_t QTextureTransformFlipMode;
+			NiPointer<NiTexture> spPipboyFXTexture;
+			float fPipboyScreenEmitIntensity;
+			float fPipboyScreenDiffuseIntensity;
+			float fPipboyScreenEmitIntensityWA;
+			float fPipboyScreenDiffuseIntensityWA;
+			float fSpecularLODStartFadeSquared;
+			float fSpecularLODEndSquared;
+			float fLandLOFadeSeconds;
+			float fLeafAnimDampenDistStartSPU;
+			float fLeafAnimDampenDistEndSPU;
+			NiPoint2 kOldGridArrayCenter;
+			NiPoint2 kGridArrayCenter;
+			float kfGriddArrayLerpStart;
+			bool bLODFadeInProgress;
+			std::uint8_t cSceneGraph;
+			BSShaderManager::etRenderMode usDebugMode;
+			std::uint32_t uiDebugColorWrite;
+			NiTransform DirectionalAmbientTransform;
+			NiTransform LocalDirectionalAmbientTransform;
+			NiColorA AmbientSpecular;
+			bool bAmbientSpecularEnabled;
+			std::uint32_t uiTextureTransformCurrentBuffer;
+			std::uint32_t uiTextureTransformFlipMode;
 			std::uint32_t uiCameraInWaterState;
-			float camFrustrumFar;
-			float camFrustrumNear;
+			float fCameraNear;
+			float fCameraFar;
 			float fWaterIntersect;
-			std::int32_t field_16C;
-			std::int32_t field_170;
-			std::int32_t field_174;
-			std::int64_t field_178;
-			std::int64_t field_180;
-			float field_188;
-			float field_18C;
-			NiPoint3 field_190;
-			NiPoint3 field_19C;
-			NiPoint3 field_1A8;
-			BSGeometry* geom_1B8;
-			std::uint8_t gap1C0[4];
-			float fUIMaskRectEdgeSharpness;
-			float field_1C8;
-			float opacity;
-			std::uint8_t gap1D0[8];
-			std::int64_t field_1D8;
-			std::uint8_t gap1E0[248];
-			std::int64_t field_2D8;
-			std::uint8_t gap2E0[240];
-			float characterLightRimStrength;
-			float characterLightFillStrength;
-			std::int32_t field_3D8;
-			std::int32_t field_3DC;
-			std::int32_t field_3E0;
-			bool vatsEffectOff;
-			std::int8_t field_3E5;
-			std::int8_t field_3E6;
-			std::int8_t field_3E7;
-			std::int8_t field_3E8;
-			bool field_3E9;
-			bool field_3EA;
-			bool field_3EB;
+			NiColorA MenuScreenBlendParams;
+			NiColorA DebugTintColor;
+			float fBoneTintingTiming;
+			NiPoint3 ForwardLightOffset;
+			NiPoint3 ClipVolume[2];
+			NiPointer<BSGeometry> spClipVolumeGeom;
+			NiColorA MaskRectParams;
+			NiColorA pUIMaskRectsA[16];
+			NiColorA pUIMaskRectColorsA[16];
+			NiColorA CharacterLightParams;
+			std::uint32_t uiForceDisableFrame;
+			bool bEffectShaderVATSHighlight;
+			bool ForceEffectShaderPremultAlpha;
+			bool ForceDisableSSR;
+			bool ForceDisableGodrays;
+			bool ForceDisableDirLights;
+			bool PendingForceDisableSSR;
+			bool PendingForceDisableGodrays;
+			bool PendingForceDisableDirLights;
 		};
 		static_assert(sizeof(State) == 0x3F0);
 	};
@@ -153,57 +236,57 @@ namespace RE
 	REL::Relocation<BSShaderManager::etRenderMode> BSShaderManager__usRenderMode{ REL::ID(1028217) };                             //146721AB8
 	REL::Relocation<bool> BSShaderManager__bInitialized{ REL::ID(346773) };                                                       //146721ABC
 	REL::Relocation<bool> BSShaderManager__bImageSpaceEffects{ REL::ID(572286) };                                                 //146721ABD
-	//REL::Relocation<bool> BSShaderManager__bTransparencyMultisampling{ REL::ID() };                                               //146721ABE
-	//REL::Relocation<bool> BSShaderManager__bAnisoMinFiltering{ REL::ID() };                                                       //146721ABF
-	REL::Relocation<BSShaderManager::TimerFunction_t> BSShaderManager__pTimerFunction{ REL::ID(1247963) };  //146721AC0
-	//REL::Relocation<unsigned short> BSShaderManager__usRenderFlags{ REL::ID() };                                                  //146721AC8
-	//REL::Relocation<bool> BSShaderManager__bOcclusionQuery{ REL::ID() };                                                          //146721ACA
-	//REL::Relocation<bool> BSShaderManager__bSLIMode{ REL::ID() };                                                                 //146721ACB
-	//REL::Relocation<int> BSShaderManager__iSelfIllumCount{ REL::ID() };                                                           //146721ACC
-	//REL::Relocation<unsigned int> BSShaderManager__uiStencilRenderTarget{ REL::ID() };                                            //146721AD0
-	//REL::Relocation<float> BSShaderManager__fWindAngle{ REL::ID() };                                                              //146721AD4
-	//REL::Relocation<float> BSShaderManager__fWindMinSpeed{ REL::ID() };                                                           //146721AD8
-	//REL::Relocation<BSShaderManager::etShadowMode> BSShaderManager__eShadowMode{ REL::ID() };                                     //146721ADC
-	REL::Relocation<NiCamera*> BSShaderManager__spCamera{ REL::ID(543218) };  //146721AE0
-	//REL::Relocation<float> BSShaderManager__fShadowLODStartFadeSquared{ REL::ID() };                                              //146721AE8
-	//REL::Relocation<float> BSShaderManager__fShadowLODEndSquared{ REL::ID() };                                                    //146721AEC
-	//REL::Relocation<bool> BSShaderManager__bUseHardDriveCache{ REL::ID() };                                                       //146721AF0
-	//REL::Relocation<bool> BSShaderManager__bDisplayLODLand{ REL::ID() };                                                          //146721AF1
-	//REL::Relocation<bool> BSShaderManager__bWireframeDecals{ REL::ID() };                                                         //146721AF2
-	//REL::Relocation<bool> BSShaderManager__bDynamicWindowReflections{ REL::ID() };                                                //146721AF3
-	//REL::Relocation<float> BSShaderManager__fEnvMapLODStartFade{ REL::ID() };                                                     //146721AF4
-	//REL::Relocation<float[4]> BSShaderManager__CloudParameters{ REL::ID() };                                                      //146721AF8
-	//REL::Relocation<float> BSShaderManager__fEnvMapLODEnd{ REL::ID() };                                                           //146721B08
-	//REL::Relocation<float> BSShaderManager__fEyeEnvMapLODStartFade{ REL::ID() };                                                  //146721B0C
-	//REL::Relocation<float> BSShaderManager__fEyeEnvMapLODEnd{ REL::ID() };                                                        //146721B10
-	//REL::Relocation<float> BSShaderManager__fDecalLODStartFade{ REL::ID() };                                                      //146721B14
-	//REL::Relocation<float> BSShaderManager__fDecalLODEnd{ REL::ID() };                                                            //146721B18
-	//REL::Relocation<float> BSShaderManager__fSkinnedDecalLODStartFade{ REL::ID() };                                               //146721B1C
-	//REL::Relocation<float> BSShaderManager__fSkinnedDecalLODEnd{ REL::ID() };                                                     //146721B20
-	//REL::Relocation<bool> BSShaderManager__bInLODWorld{ REL::ID() };                                                              //146721B24
-	//REL::Relocation<bool> BSShaderManager__bFreezeGeometryBatch{ REL::ID() };                                                     //146721B25
-	//REL::Relocation<bool> BSShaderManager__bFrozenBatchAcquired{ REL::ID() };                                                     //146721B26
-	//REL::Relocation<bool> BSShaderManager__bFreezeCamera{ REL::ID() };                                                            //146721B27
-	//REL::Relocation<bool> BSShaderManager__bMTRendering{ REL::ID() };                                                             //146721B28
-	//REL::Relocation<bool> BSShaderManager__bLODNoiseAniso{ REL::ID() };                                                           //146721B29
-	//REL::Relocation<bool> BSShaderManager__bTintMipMaps{ REL::ID() };                                                             //146721B2A
-	//REL::Relocation<bool> BSShaderManager__bFullScreenMotionBlurVATS{ REL::ID() };                                                //146721B2B
-	//REL::Relocation<float> BSShaderManager__fLODNoiseMipBias{ REL::ID() };                                                        //146721B2C
-	//REL::Relocation<int> BSShaderManager__iObjectMotionBlurCount{ REL::ID() };                                                    //146721B30
-	//REL::Relocation<float> BSShaderManager__fMinAmbient{ REL::ID() };                                                             //146721B34
-	//REL::Relocation<bool> BSShaderManager__bFakeFullScreenMotionBlur{ REL::ID() };                                                //146721B38
-	REL::Relocation<BSShaderManager> BSShaderManager__Instance{ REL::ID(16321) };  //146721B39
-	//REL::Relocation<BSPerformanceTimer> TimerImageSpace{ REL::ID() };                                                             //146721B3A
-	REL::Relocation<BSTArray<NiPointer<BSInstanceGroup>>> BSShaderManager__InstanceGroups{ REL::ID(10442) };  //146721B40
-	REL::Relocation<BSTArray<BSShaderTextureSet*>> BSShaderManager__DismembermentTextureArray{ REL::ID() };   //146721B58
-	REL::Relocation<BSShaderManager::State> BSShaderManager__State{ REL::ID(1327069) };                       //146721B70
-	REL::Relocation<NiPointer<BSShader>> BSShaderManager__pspShader{ REL::ID(487858) };                       //146721F60
-	REL::Relocation<NiPointer<NiCamera>> BSShaderManager__spMainCamera{ REL::ID(175576) };                    //146721FC8
-	REL::Relocation<DirectX::XMMATRIX> BSShaderManager__xmPipBoyWorldView{ REL::ID(394640) };                 //146721FD0
-	REL::Relocation<NiColor> BSShaderManager__kBackgroundColor{ REL::ID(567603) };                            //146722010
-	REL::Relocation<NiColorA> BSShaderManager__fpInterfaceTint{ REL::ID(1006044) };                           //146722020
-	REL::Relocation<NiColor[2][3]> BSShaderManager__DirectionalAmbientColorsA{ REL::ID(1444949) };            //146722030
-	REL::Relocation<NiColor[2][3]> BSShaderManager__LocalDirectionalAmbientColorsA{ REL::ID(474137) };        //146722080
-	//REL::Relocation<NiColorA> BSShaderManager__pHairTint{ REL::ID() };                                                            //1467220C8
-	REL::Relocation<bool> BSShaderManager__binstancing{ REL::ID(1304977) };  //1467220D8
+	REL::Relocation<bool> BSShaderManager__bTransparencyMultisampling{ (0x6721ABE) };                                             //146721ABE
+	REL::Relocation<bool> BSShaderManager__bAnisoMinFiltering{ (0x6721ABF) };                                                     //146721ABF
+	REL::Relocation<BSShaderManager::TimerFunction_t> BSShaderManager__pTimerFunction{ REL::ID(1247963) };                        //146721AC0
+	REL::Relocation<unsigned short> BSShaderManager__usRenderFlags{ (0x6721AC8) };                                                //146721AC8
+	REL::Relocation<bool> BSShaderManager__bOcclusionQuery{ (0x6721ACA) };                                                        //146721ACA
+	REL::Relocation<bool> BSShaderManager__bSLIMode{ (0x6721ACB) };                                                               //146721ACB
+	REL::Relocation<int> BSShaderManager__iSelfIllumCount{ (0x6721ACC) };                                                         //146721ACC
+	REL::Relocation<std::uint32_t> BSShaderManager__uiStencilRenderTarget{ (0x6721AD0) };                                          //146721AD0
+	REL::Relocation<float> BSShaderManager__fWindAngle{ (0x6721AD4) };                                                            //146721AD4
+	REL::Relocation<float> BSShaderManager__fWindMinSpeed{ (0x6721AD8) };                                                         //146721AD8
+	REL::Relocation<BSShaderManager::etShadowMode> BSShaderManager__eShadowMode{ (0x6721ADC) };                                   //146721ADC
+	REL::Relocation<NiCamera*> BSShaderManager__spCamera{ REL::ID(543218) };                                                      //146721AE0
+	REL::Relocation<float> BSShaderManager__fShadowLODStartFadeSquared{ (0x6721AE8) };                                            //146721AE8
+	REL::Relocation<float> BSShaderManager__fShadowLODEndSquared{ (0x6721AEC) };                                                  //146721AEC
+	REL::Relocation<bool> BSShaderManager__bUseHardDriveCache{ (0x6721AF0) };                                                     //146721AF0
+	REL::Relocation<bool> BSShaderManager__bDisplayLODLand{ (0x6721AF1) };                                                        //146721AF1
+	REL::Relocation<bool> BSShaderManager__bWireframeDecals{ (0x6721AF2) };                                                       //146721AF2
+	REL::Relocation<bool> BSShaderManager__bDynamicWindowReflections{ (0x6721AF3) };                                              //146721AF3
+	REL::Relocation<float> BSShaderManager__fEnvMapLODStartFade{ (0x6721AF4) };                                                   //146721AF4
+	REL::Relocation<float[4]> BSShaderManager__CloudParameters{ (0x6721AF8) };                                                    //146721AF8
+	REL::Relocation<float> BSShaderManager__fEnvMapLODEnd{ (0x6721B08) };                                                         //146721B08
+	REL::Relocation<float> BSShaderManager__fEyeEnvMapLODStartFade{ (0x6721B0C) };                                                //146721B0C
+	REL::Relocation<float> BSShaderManager__fEyeEnvMapLODEnd{ (0x6721B10) };                                                      //146721B10
+	REL::Relocation<float> BSShaderManager__fDecalLODStartFade{ (0x6721B14) };                                                    //146721B14
+	REL::Relocation<float> BSShaderManager__fDecalLODEnd{ (0x6721B18) };                                                          //146721B18
+	REL::Relocation<float> BSShaderManager__fSkinnedDecalLODStartFade{ (0x6721B1C) };                                             //146721B1C
+	REL::Relocation<float> BSShaderManager__fSkinnedDecalLODEnd{ (0x6721B20) };                                                   //146721B20
+	REL::Relocation<bool> BSShaderManager__bInLODWorld{ (0x6721B24) };                                                            //146721B24
+	REL::Relocation<bool> BSShaderManager__bFreezeGeometryBatch{ (0x6721B25) };                                                   //146721B25
+	REL::Relocation<bool> BSShaderManager__bFrozenBatchAcquired{ (0x6721B26) };                                                   //146721B26
+	REL::Relocation<bool> BSShaderManager__bFreezeCamera{ (0x6721B27) };                                                          //146721B27
+	REL::Relocation<bool> BSShaderManager__bMTRendering{ (0x6721B28) };                                                           //146721B28
+	REL::Relocation<bool> BSShaderManager__bLODNoiseAniso{ (0x6721B29) };                                                         //146721B29
+	REL::Relocation<bool> BSShaderManager__bTintMipMaps{ (0x6721B2A) };                                                           //146721B2A
+	REL::Relocation<bool> BSShaderManager__bFullScreenMotionBlurVATS{ (0x6721B2B) };                                              //146721B2B
+	REL::Relocation<float> BSShaderManager__fLODNoiseMipBias{ (0x6721B2C) };                                                      //146721B2C
+	REL::Relocation<int> BSShaderManager__iObjectMotionBlurCount{ (0x6721B30) };                                                  //146721B30
+	REL::Relocation<float> BSShaderManager__fMinAmbient{ (0x6721B34) };                                                           //146721B34
+	REL::Relocation<bool> BSShaderManager__bFakeFullScreenMotionBlur{ (0x6721B38) };                                              //146721B38
+	REL::Relocation<BSShaderManager> BSShaderManager__Instance{ REL::ID(16321) };                                                 //146721B39
+	REL::Relocation<BSPerformanceTimer> TimerImageSpace{ (0x6721B3A) };                                                           //146721B3A
+	REL::Relocation<BSTArray<NiPointer<BSInstanceGroup>>> BSShaderManager__InstanceGroups{ REL::ID(10442) };                      //146721B40
+	REL::Relocation<BSTArray<BSShaderTextureSet*>> BSShaderManager__DismembermentTextureArray{ REL::ID() };                       //146721B58
+	REL::Relocation<BSShaderManager::State> BSShaderManager__State{ REL::ID(1327069) };                                           //146721B70
+	REL::Relocation<NiPointer<BSShader>> BSShaderManager__pspShader{ REL::ID(487858) };                                           //146721F60
+	REL::Relocation<NiPointer<NiCamera>> BSShaderManager__spMainCamera{ REL::ID(175576) };                                        //146721FC8
+	REL::Relocation<DirectX::XMMATRIX> BSShaderManager__xmPipBoyWorldView{ REL::ID(394640) };                                     //146721FD0
+	REL::Relocation<NiColor> BSShaderManager__kBackgroundColor{ REL::ID(567603) };                                                //146722010
+	REL::Relocation<NiColorA> BSShaderManager__fpInterfaceTint{ REL::ID(1006044) };                                               //146722020
+	REL::Relocation<NiColor[2][3]> BSShaderManager__DirectionalAmbientColorsA{ REL::ID(1444949) };                                //146722030
+	REL::Relocation<NiColor[2][3]> BSShaderManager__LocalDirectionalAmbientColorsA{ REL::ID(474137) };                            //146722080
+	REL::Relocation<NiColorA> BSShaderManager__pHairTint{ (0x67220C8) };                                                          //1467220C8
+	REL::Relocation<bool> BSShaderManager__binstancing{ REL::ID(1304977) };                                                       //1467220D8
 }
