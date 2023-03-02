@@ -6,30 +6,24 @@ extern NiNode* scopePOVRoot;
 extern NiCamera* scopePOV_BACKUP;
 extern NiNode* scopePOVRoot_BACKUP;
 
+struct ScopeCameraStates {
+	enum CameraState : unsigned {
+		kDefault = 0,
+		kThermal,
+		kNightVision,
+
+		kTotal
+	};
+};
+using ScopeCameraState = ScopeCameraStates::CameraState;
+
 class ScopeCamera : public TESCamera {
 public:
-	ScopeCamera();
-
-	virtual ~ScopeCamera();
-
-	virtual void SetCameraRoot(NiNode* node) override;
-	virtual void SetEnabled(bool enabled) override;
-	virtual void Update() override;
-
-	struct CameraStates {
-		enum CameraState : unsigned {
-			kDefault = 0,
-			kThermal,
-			kNightVision,
-
-			kTotal
-		};
-	};
-	using ScopeCameraState = CameraStates::CameraState;
+	
 
 	class DefaultState : public TESCameraState {
 	public:
-		static constexpr auto STATE{ ScopeCameraState::kDefault };
+		static constexpr auto STATE{ ScopeCameraStates::kDefault };
 
 		DefaultState() = delete;
 		DefaultState(TESCamera& cam, std::uint32_t ID);
@@ -77,6 +71,8 @@ public:
 
 	class ThermalState : public DefaultState {
 	public:
+		static constexpr auto STATE{ ScopeCameraStates::kThermal };
+
 		ThermalState() = delete;
 		ThermalState(TESCamera& cam, std::uint32_t ID);
 
@@ -108,6 +104,8 @@ public:
 
 	class NightVisionState : public DefaultState {
 	public:
+		static constexpr auto STATE{ ScopeCameraStates::kNightVision };
+
 		NightVisionState() = delete;
 		NightVisionState(TESCamera& cam, std::uint32_t ID);
 
@@ -137,6 +135,14 @@ public:
 		//members
 	};
 
+	ScopeCamera();
+
+	virtual ~ScopeCamera();
+
+	virtual void SetCameraRoot(NiNode* node) override;
+	virtual void SetEnabled(bool enabled) override;
+	virtual void Update() override;
+
 	//functions
 	void Init3D();
 	void Reset();
@@ -152,7 +158,7 @@ public:
 	NiPoint3& QMinExtent();
 
 	//members
-	BSTSmartPointer<TESCameraState> cameraStates[CameraStates::kTotal];
+	BSTSmartPointer<TESCameraState> cameraStates[ScopeCameraStates::kTotal];
 	NiPointer<NiCamera> camera;
 	NiAVObject* renderPlane;
 	NiPoint3 maxExtent;

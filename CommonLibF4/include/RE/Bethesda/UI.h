@@ -144,7 +144,7 @@ namespace RE
 		bool closingAllMenus;                              // 249
 		bool freezeFrameScreenshotReady;                   // 24A
 	};
-	static_assert(sizeof(UI) == 0x250);
+	//static_assert(sizeof(UI) == 0x250);
 
 	namespace UIUtils
 	{

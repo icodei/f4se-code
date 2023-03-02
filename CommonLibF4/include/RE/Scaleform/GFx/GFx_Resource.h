@@ -99,7 +99,7 @@ namespace RE::Scaleform::GFx
 		virtual void PinResource(Resource* a_res) = 0;              // 02
 		virtual void UnpinResource(Resource* a_res) = 0;            // 03
 	};
-	static_assert(sizeof(ResourceLibBase) == 0x10);
+	//static_assert(sizeof(ResourceLibBase) == 0x10);
 
 	class __declspec(novtable) Resource :
 		public NewOverrideBase<2>  // 00

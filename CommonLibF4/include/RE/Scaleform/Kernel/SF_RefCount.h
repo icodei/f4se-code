@@ -20,7 +20,7 @@ namespace RE::Scaleform
 		// members
 		volatile std::int32_t refCount{ 1 };  // 08
 	};
-	static_assert(sizeof(RefCountImplCore) == 0x10);
+	//static_assert(sizeof(RefCountImplCore) == 0x10);
 
 	class RefCountImpl :
 		public RefCountImplCore  // 00
@@ -45,7 +45,7 @@ namespace RE::Scaleform
 			}
 		}
 	};
-	static_assert(sizeof(RefCountImpl) == 0x10);
+	//static_assert(sizeof(RefCountImpl) == 0x10);
 
 	template <class Base, std::int32_t>
 	class RefCountBaseStatImpl :

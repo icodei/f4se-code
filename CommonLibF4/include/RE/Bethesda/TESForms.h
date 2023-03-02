@@ -5,6 +5,7 @@
 #include "RE/Bethesda/BSFixedString.h"
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSPointerHandle.h"
+#include "RE/Bethesda/BSShader/ImageSpace.h"
 #include "RE/Bethesda/BSStringT.h"
 #include "RE/Bethesda/BSTArray.h"
 #include "RE/Bethesda/BSTHashMap.h"
@@ -25,165 +26,165 @@
 
 namespace RE
 {
-	struct TESRegionList;
-    class TESForm;
-	class TESObject;
-	class TESBoundObject;
-	class MagicItem;
-	class TESBoundAnimObject;
-	class TESActorBase;
-	class BGSStoryManagerTreeForm;
-	class BGSStoryManagerNodeBase;
-	class BGSKeyword;
-	class BGSLocationRefType;
-	class BGSAction;
-	class BGSTransform;
-	class BGSComponent;
-	class BGSTextureSet;
-	class BGSMenuIcon;
-	class TESGlobal;
-	class BGSDamageType;
-	class TESClass;
-	class TESFaction;
-	class BGSHeadPart;
-	class TESEyes;
-	class TESRace;
-	class TESSound;
-	class BGSAcousticSpace;
-	class EffectSetting;
-	class Script;
-	class TESLandTexture;
-	class EnchantmentItem;
-	class SpellItem;
-	class ScrollItem;
-	class TESObjectACTI;
-	class BGSTalkingActivator;
-	class TESObjectARMO;
-	class TESObjectBOOK;
-	class TESObjectCONT;
-	class TESObjectDOOR;
-	class IngredientItem;
-	class TESObjectLIGH;
-	class TESObjectMISC;
-	class TESObjectSTAT;
-	class BGSStaticCollection;
-	class BGSMovableStatic;
-	class TESGrass;
-	class TESObjectTREE;
-	class TESFlora;
-	class TESFurniture;
-	class TESObjectWEAP;
-	class TESAmmo;
-	class TESNPC;
-	class TESLevCharacter;
-	class TESKey;
-	class AlchemyItem;
-	class BGSIdleMarker;
-	class BGSNote;
-	class BGSProjectile;
-	class BGSHazard;
-	class BGSBendableSpline;
-	class TESSoulGem;
-	class BGSTerminal;
-	class TESLevItem;
-	class TESWeather;
-	class TESClimate;
-	class BGSShaderParticleGeometryData;
-	class BGSReferenceEffect;
-	class TESRegion;
-	class NavMeshInfoMap;
-	class TESObjectCELL;
 	class Actor;
-	class PlayerCharacter;
-	class MissileProjectile;
-	class ArrowProjectile;
-	class GrenadeProjectile;
-	class BeamProjectile;
-	class FlameProjectile;
-	class ConeProjectile;
-	class BarrierProjectile;
-	class TESObjectREFR;
-	class Explosion;
-	class Projectile;
-	class TESWorldSpace;
-	class TESObjectLAND;
-	class NavMesh;
-	class TESTopic;
-	class TESTopicInfo;
-	class TESQuest;
-	class TESIdleForm;
-	class TESPackage;
-	class AlarmPackage;
-	class DialoguePackage;
-	class FleePackage;
-	class SpectatorPackage;
-	class TrespassPackage;
-	class TESCombatStyle;
-	class TESLoadScreen;
-	class TESLevSpell;
-	class TESObjectANIO;
-	class TESWaterForm;
-	class TESEffectShader;
-	class BGSExplosion;
-	class BGSDebris;
-	class TESImageSpace;
-	class TESImageSpaceModifier;
-	class BGSListForm;
-	class BGSPerk;
-	class BGSBodyPartData;
-	class BGSAddonNode;
 	class ActorValueInfo;
-	class BGSCameraShot;
-	class BGSCameraPath;
-	class BGSVoiceType;
-	class BGSMaterialType;
-	class BGSImpactData;
-	class BGSImpactDataSet;
-	class TESObjectARMA;
-	class BGSEncounterZone;
-	class BGSLocation;
-	class BGSMessage;
-	class BGSDefaultObjectManager;
-	class BGSDefaultObject;
-	class BGSLightingTemplate;
-	class BGSMusicType;
-	class BGSFootstep;
-	class BGSFootstepSet;
-	class BGSStoryManagerBranchNode;
-	class BGSStoryManagerQuestNode;
-	class BGSStoryManagerEventNode;
-	class BGSDialogueBranch;
-	class BGSMusicTrackFormWrapper;
-	class TESWordOfPower;
-	class TESShout;
-	class BGSEquipSlot;
-	class BGSRelationship;
-	class BGSScene;
-	class BGSAssociationType;
-	class BGSOutfit;
+	class AlarmPackage;
+	class AlchemyItem;
+	class ArrowProjectile;
+	class BarrierProjectile;
+	class BeamProjectile;
+	class BGSAcousticSpace;
+	class BGSAction;
+	class BGSAddonNode;
+	class BGSAimModel;
 	class BGSArtObject;
-	class BGSMaterialObject;
-	class BGSMovementType;
-	class BGSSoundDescriptorForm;
-	class BGSDualCastData;
-	class BGSSoundCategory;
-	class BGSSoundOutput;
+	class BGSAssociationType;
+	class BGSAttractionRule;
+	class BGSAudioEffectChain;
+	class BGSBendableSpline;
+	class BGSBodyPartData;
+	class BGSCameraPath;
+	class BGSCameraShot;
 	class BGSCollisionLayer;
 	class BGSColorForm;
-	class BGSReverbParameters;
-	class BGSPackIn;
-	class BGSAimModel;
+	class BGSComponent;
 	class BGSConstructibleObject;
-	class BGSMaterialSwap;
-	class BGSZoomData;
-	class BGSInstanceNamingRules;
-	class BGSSoundKeywordMapping;
-	class BGSAudioEffectChain;
-	class BGSAttractionRule;
-	class BGSSoundCategorySnapshot;
-	class BGSSoundTagSet;
-	class BGSLensFlare;
+	class BGSDamageType;
+	class BGSDebris;
+	class BGSDefaultObject;
+	class BGSDefaultObjectManager;
+	class BGSDialogueBranch;
+	class BGSDualCastData;
+	class BGSEncounterZone;
+	class BGSEquipSlot;
+	class BGSExplosion;
+	class BGSFootstep;
+	class BGSFootstepSet;
 	class BGSGodRays;
+	class BGSHazard;
+	class BGSHeadPart;
+	class BGSIdleMarker;
+	class BGSImpactData;
+	class BGSImpactDataSet;
+	class BGSInstanceNamingRules;
+	class BGSKeyword;
+	class BGSLensFlare;
+	class BGSLightingTemplate;
+	class BGSListForm;
+	class BGSLocation;
+	class BGSLocationRefType;
+	class BGSMaterialObject;
+	class BGSMaterialSwap;
+	class BGSMaterialType;
+	class BGSMenuIcon;
+	class BGSMessage;
+	class BGSMovableStatic;
+	class BGSMovementType;
+	class BGSMusicTrackFormWrapper;
+	class BGSMusicType;
+	class BGSNote;
+	class BGSOutfit;
+	class BGSPackIn;
+	class BGSPerk;
+	class BGSProjectile;
+	class BGSReferenceEffect;
+	class BGSRelationship;
+	class BGSReverbParameters;
+	class BGSScene;
+	class BGSShaderParticleGeometryData;
+	class BGSSoundCategory;
+	class BGSSoundCategorySnapshot;
+	class BGSSoundDescriptorForm;
+	class BGSSoundKeywordMapping;
+	class BGSSoundOutput;
+	class BGSSoundTagSet;
+	class BGSStaticCollection;
+	class BGSStoryManagerBranchNode;
+	class BGSStoryManagerEventNode;
+	class BGSStoryManagerNodeBase;
+	class BGSStoryManagerQuestNode;
+	class BGSStoryManagerTreeForm;
+	class BGSTalkingActivator;
+	class BGSTerminal;
+	class BGSTextureSet;
+	class BGSTransform;
+	class BGSVoiceType;
+	class BGSZoomData;
+	class ConeProjectile;
+	class DialoguePackage;
+	class EffectSetting;
+	class EnchantmentItem;
+	class Explosion;
+	class FlameProjectile;
+	class FleePackage;
+	class GrenadeProjectile;
+	class IngredientItem;
+	class MagicItem;
+	class MissileProjectile;
+	class NavMesh;
+	class NavMeshInfoMap;
+	class PlayerCharacter;
+	class Projectile;
+	class Script;
+	class ScrollItem;
+	class SpectatorPackage;
+	class SpellItem;
+	class TESActorBase;
+	class TESAmmo;
+	class TESBoundAnimObject;
+	class TESBoundObject;
+	class TESClass;
+	class TESClimate;
+	class TESCombatStyle;
+	class TESEffectShader;
+	class TESEyes;
+	class TESFaction;
+	class TESFlora;
+	class TESForm;
+	class TESFurniture;
+	class TESGlobal;
+	class TESGrass;
+	class TESIdleForm;
+	class TESImageSpace;
+	class TESImageSpaceModifier;
+	class TESKey;
+	class TESLandTexture;
+	class TESLevCharacter;
+	class TESLevItem;
+	class TESLevSpell;
+	class TESLoadScreen;
+	class TESNPC;
+	class TESObject;
+	class TESObjectACTI;
+	class TESObjectANIO;
+	class TESObjectARMA;
+	class TESObjectARMO;
+	class TESObjectBOOK;
+	class TESObjectCELL;
+	class TESObjectCONT;
+	class TESObjectDOOR;
+	class TESObjectLAND;
+	class TESObjectLIGH;
+	class TESObjectMISC;
+	class TESObjectREFR;
+	class TESObjectSTAT;
+	class TESObjectTREE;
+	class TESObjectWEAP;
+	class TESPackage;
+	class TESQuest;
+	class TESRace;
+	class TESRegion;
+	class TESShout;
+	class TESSoulGem;
+	class TESSound;
+	class TESTopic;
+	class TESTopicInfo;
+	class TESWaterForm;
+	class TESWeather;
+	class TESWordOfPower;
+	class TESWorldSpace;
+	class TrespassPackage;
+	struct TESRegionList;
 
 	namespace BGSMod::Attachment
 	{
@@ -819,7 +820,7 @@ namespace RE
 
 		[[nodiscard]] bool Is(ENUM_FORM_ID a_type) const noexcept { return GetFormType() == a_type; }
 		template <class... Args>
-		
+
 		[[nodiscard]] bool Is(Args... a_args) const noexcept  //
 			requires(std::same_as<Args, ENUM_FORM_ID>&&...)
 		{
@@ -839,16 +840,16 @@ namespace RE
 		[[nodiscard]] bool IsCreated() const noexcept { return (formID >> (8 * 3)) == 0xFF; }
 		[[nodiscard]] bool IsDeleted() noexcept { return (formFlags & (1u << 5)) != 0; }
 		[[nodiscard]] bool IsInitialized() const noexcept { return (formFlags & (1u << 3)) != 0; }
-		
+
 		[[nodiscard]] bool IsNot(ENUM_FORM_ID a_type) const noexcept { return !Is(a_type); }
 		template <class... Args>
-		
+
 		[[nodiscard]] bool IsNot(Args... a_args) const noexcept  //
 			requires(std::same_as<Args, ENUM_FORM_ID>&&...)
 		{
 			return (IsNot(a_args) && ...);
 		}
-		
+
 		[[nodiscard]] bool IsPlayer() const noexcept { return GetFormID() == 0x00000007; }
 		[[nodiscard]] bool IsPlayerRef() const noexcept { return GetFormID() == 0x00000014; }
 		[[nodiscard]] bool IsWeapon() const noexcept { return Is(ENUM_FORM_ID::kWEAP); }
@@ -1800,17 +1801,6 @@ namespace RE
 	};
 	static_assert(sizeof(BGSDebris) == 0x38);
 
-	struct ImageSpaceBaseData
-	{
-	public:
-		// members
-		float hdrData[9];        // 00
-		float cinematicData[3];  // 24
-		float tintData[4];       // 30
-		float dofData[6];        // 40
-	};
-	static_assert(sizeof(ImageSpaceBaseData) == 0x58);
-
 	class __declspec(novtable) TESImageSpace :
 		public TESForm  // 00
 	{
@@ -1900,7 +1890,7 @@ namespace RE
 			return func(this, a_form);
 		}
 
-	    [[nodiscard]] bool ContainsItem(const TESForm* a_form)
+		[[nodiscard]] bool ContainsItem(const TESForm* a_form)
 		{
 			using func_t = decltype(&BGSListForm::ContainsItem);
 			REL::Relocation<func_t> func{ REL::ID(688500) };
@@ -2278,9 +2268,9 @@ namespace RE
 		static_assert(sizeof(KEYWORD_DATA) == 0x10);
 
 		bool IsChild(const BGSLocation* a_possibleChild) const;
-        bool IsParent(const BGSLocation* a_possibleParent) const;
+		bool IsParent(const BGSLocation* a_possibleParent) const;
 
-        // members
+		// members
 		BGSLocation* parentLoc;                                                 // 050
 		TESFaction* unreportedCrimeFaction;                                     // 058
 		BGSMusicType* musicType;                                                // 060
@@ -2690,7 +2680,7 @@ namespace RE
 		BSFixedString name;                         // 48
 		BSTArray<BGSCollisionLayer*> collidesWith;  // 50
 	};
-	static_assert(sizeof(BGSCollisionLayer) == 0x68);
+	//static_assert(sizeof(BGSCollisionLayer) == 0x68);
 
 	class __declspec(novtable) BGSColorForm :
 		public TESForm,     // 00

@@ -5,6 +5,14 @@ namespace RE
 	class NiColor
 	{
 	public:
+		NiColor() : r(0.0), g(0.0), b(0.0) {}
+		NiColor(float red, float green, float blue)
+		{
+			r = red;
+			g = green;
+			b = blue;
+		}
+
 		// members
 		float r;  // 0
 		float g;  // 4
@@ -15,6 +23,14 @@ namespace RE
 	class NiColorA
 	{
 	public:
+		NiColorA() : r(0.0), g(0.0), b(0.0), a(1.0) {}
+		NiColorA(float red, float green, float blue, float alpha) {
+			r = red;
+			g = green;
+			b = blue;
+			a = alpha;
+		}
+
 		// members
 		float r;  // 0
 		float g;  // 4

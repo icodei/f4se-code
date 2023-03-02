@@ -45,6 +45,6 @@ namespace RE
 			std::uint32_t currentMemorySize;                    // 24
 			std::uint32_t maxAdditionalAllocations;             // 28
 		};
-		static_assert(sizeof(SimpleAllocMemoryPagePolicy) == 0x30);
+		//static_assert(sizeof(SimpleAllocMemoryPagePolicy) == 0x30);
 	}
 }

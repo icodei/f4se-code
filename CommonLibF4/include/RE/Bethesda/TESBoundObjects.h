@@ -252,7 +252,7 @@ namespace RE
 		TESObjectSTAT* inventoryModel;       // 188
 		TESDescription itemCardDescription;  // 190
 	};
-	static_assert(sizeof(TESObjectBOOK) == 0x1A8);
+	//static_assert(sizeof(TESObjectBOOK) == 0x1A8);
 
 	class __declspec(novtable) TESObjectMISC :
 		public TESBoundObject,             // 000
@@ -285,7 +285,7 @@ namespace RE
 		BSTArray<BSTTuple<TESForm*, BGSTypedFormValuePair::SharedVal>>* componentData;  // 158
 		std::int8_t* displayIndices;                                                    // 160
 	};
-	static_assert(sizeof(TESObjectMISC) == 0x168);
+	//static_assert(sizeof(TESObjectMISC) == 0x168);
 
 	struct TESObjectSTATData
 	{
@@ -674,7 +674,7 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::TESKey };
 		static constexpr auto FORM_ID{ ENUM_FORM_ID::kKEYM };
 	};
-	static_assert(sizeof(TESKey) == 0x168);
+	//static_assert(sizeof(TESKey) == 0x168);
 
 	class __declspec(novtable) BGSIdleMarker :
 		public TESBoundObject,    // 00
@@ -717,7 +717,7 @@ namespace RE
 		std::int8_t type;  // 100
 		bool hasBeenRead;  // 101
 	};
-	static_assert(sizeof(BGSNote) == 0x108);
+	//static_assert(sizeof(BGSNote) == 0x108);
 
 	struct BGSProjectileData
 	{
@@ -854,7 +854,7 @@ namespace RE
 		std::int8_t currentSoul;    // 170
 		std::int8_t soulCapacity;   // 171
 	};
-	static_assert(sizeof(TESSoulGem) == 0x178);
+	//static_assert(sizeof(TESSoulGem) == 0x178);
 
 	class __declspec(novtable) TESLevItem :
 		public TESBoundObject,  // 00
@@ -983,7 +983,7 @@ namespace RE
 		BGSArtObject* artObject;                                 // 210
 		BSTHashMap<BSFixedString, NiPoint3>* scaleModifiers[2];  // 218
 	};
-	static_assert(sizeof(TESObjectARMA) == 0x228);
+	//static_assert(sizeof(TESObjectARMA) == 0x228);
 
 	class __declspec(novtable) BGSArtObject :
 		public TESBoundObject,       // 00

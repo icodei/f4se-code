@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSGraphics.h"
+#include "RE/Bethesda/BSGraphics/BSGraphics.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
 #include "RE/NetImmerse/NiObject.h"
 

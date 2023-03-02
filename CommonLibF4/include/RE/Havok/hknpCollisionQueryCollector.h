@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RE/Havok/hkBaseObject.h"
-#include "RE/Havok/hkSimdFloat.h"
+#include "RE/Havok/Common/Base/Math/Vector/hkSimdFloat.h"
+#include "RE/Havok/Common/Base/Object/hkBaseObject.h"
 
 namespace RE
 {

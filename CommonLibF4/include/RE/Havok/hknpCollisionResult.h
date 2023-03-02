@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RE/Havok/hkBaseTypes.h"
-#include "RE/Havok/hkVector4.h"
+#include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
+#include "RE/Havok/Common/Base/Math/Vector/hkVector4.h"
 #include "RE/Havok/hknpBodyId.h"
 #include "RE/Havok/hknpMaterialId.h"
 

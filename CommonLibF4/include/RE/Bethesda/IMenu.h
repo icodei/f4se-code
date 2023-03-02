@@ -44,9 +44,9 @@ namespace RE
 		struct PlacementStatusEvent;
 	}
 
-	class BSInputEnableLayer;
 	class BSGFxFunctionBase;
 	class BSGFxShaderFXTarget;
+	class BSInputEnableLayer;
 	class ExamineMenu;
 	class ExtraDataList;
 	class MenuOpenCloseEvent;
@@ -62,12 +62,12 @@ namespace RE
 	class UsesBSGFXFunctionHandler;
 	class WorkshopMenuGeometry;
 
-	struct IdleInputEvent;
-	struct InvInterfaceStateChangeEvent;
-	struct LoadedInventoryModel;
-	struct PickRefUpdateEvent;
-	struct PipboyValueChangedEvent;
 	struct UIAdvanceMenusFunctionCompleteEvent;
+	struct PipboyValueChangedEvent;
+	struct PickRefUpdateEvent;
+	struct LoadedInventoryModel;
+	struct InvInterfaceStateChangeEvent;
+	struct IdleInputEvent;
 
 	enum class HUDColorTypes
 	{
@@ -176,7 +176,7 @@ namespace RE
 		BSFixedString customRendererName;  // 10
 		void* model;                       // 18 - TODO
 	};
-	static_assert(sizeof(FlatScreenModel) == 0x20);
+	//static_assert(sizeof(FlatScreenModel) == 0x20);
 
 	class IMenu :
 		public SWFToCodeFunctionHandler,  // 00

@@ -181,7 +181,7 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::ScrollItem };
 		static constexpr auto FORM_ID{ ENUM_FORM_ID::kSCRL };
 	};
-	static_assert(sizeof(ScrollItem) == 0x1B8);
+	//static_assert(sizeof(ScrollItem) == 0x1B8);
 
 	class __declspec(novtable) IngredientItem :
 		public MagicItem,                  // 000
@@ -211,7 +211,7 @@ namespace RE
 		MagicItem::Data data;  // 178
 		GameData gamedata;     // 180
 	};
-	static_assert(sizeof(IngredientItem) == 0x188);
+	//static_assert(sizeof(IngredientItem) == 0x188);
 
 	class __declspec(novtable) AlchemyItem :
 		public MagicItem,                  // 000

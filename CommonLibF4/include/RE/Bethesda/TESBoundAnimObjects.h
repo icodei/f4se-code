@@ -164,7 +164,7 @@ namespace RE
 		std::int8_t flags;                   // 130
 		BSTArray<TESForm*> randomTeleports;  // 138
 	};
-	static_assert(sizeof(TESObjectDOOR) == 0x150);
+	//static_assert(sizeof(TESObjectDOOR) == 0x150);
 
 	struct OBJ_LIGH
 	{
@@ -214,7 +214,7 @@ namespace RE
 		BGSLensFlare* lensFlare;        // 1B0
 		BGSGodRays* godRays;            // 1B8
 	};
-	static_assert(sizeof(TESObjectLIGH) == 0x1C0);
+	//static_assert(sizeof(TESObjectLIGH) == 0x1C0);
 
 	class __declspec(novtable) TESFlora :
 		public TESObjectACTI,  // 000

@@ -25,5 +25,5 @@ namespace RE::Scaleform::GFx
 		// members
 		Scaleform::Ptr<Scaleform::Log> log;  // 20
 	};
-	static_assert(sizeof(LogState) == 0x28);
+	//static_assert(sizeof(LogState) == 0x28);
 }

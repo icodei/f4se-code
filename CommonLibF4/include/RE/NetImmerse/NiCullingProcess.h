@@ -3,6 +3,7 @@
 #include "RE/Bethesda/BSPortalGraph.h"
 #include "RE/NetImmerse/NiAccumulator.h"
 #include "RE/NetImmerse/NiFrustumPlanes.h"
+#include "RE/NetImmerse/NiFrustum.h"
 
 namespace RE
 {

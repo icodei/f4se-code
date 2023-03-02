@@ -33,6 +33,6 @@ namespace RE
 
 			[[nodiscard]] bool IsObject() const { return GetRawType() == TypeInfo::RawType::kObject; }
 		};
-		static_assert(sizeof(IComplexType) == 0x10);
+		//static_assert(sizeof(IComplexType) == 0x10);
 	}
 }

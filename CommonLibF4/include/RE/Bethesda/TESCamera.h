@@ -8,7 +8,7 @@
 #include "RE/Bethesda/BSTPoint.h"
 #include "RE/Bethesda/BSTSingleton.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/Havok/hkRefPtr.h"
+#include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
 #include "RE/NetImmerse/NiPoint2.h"
 #include "RE/NetImmerse/NiPoint3.h"
 #include "RE/NetImmerse/NiQuaternion.h"
@@ -52,8 +52,9 @@ namespace RE
 	using CameraState = CameraStates::CameraState;
 
 	class TESCameraState :
-		public BSIntrusiveRefCounted,  // 10
-		public BSInputEventUser        // 00
+		public BSInputEventUser,      // 00
+		public BSIntrusiveRefCounted  // 10
+
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::TESCameraState };
@@ -62,21 +63,21 @@ namespace RE
 		TESCameraState() = delete;
 		TESCameraState(TESCamera& cam, std::uint32_t ID) { ctor(cam, ID); }
 
-		virtual ~TESCameraState();  // 00
+		virtual ~TESCameraState() {}  // 00
 
 		// add
 		virtual void Begin() { return; }                                                         // 09
 		virtual void End() { return; }                                                           // 0A
-		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState);                       // 0B
-		virtual void GetRotation(NiQuaternion& a_rotation) const;                                // 0C
-		virtual void GetTranslation(NiPoint3& a_translation) const;                              // 0D
+		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) { return; }            // 0B
+		virtual void GetRotation(NiQuaternion& a_rotation) const { return; }                     // 0C
+		virtual void GetTranslation(NiPoint3& a_translation) const { return; }                   // 0D
 		virtual void SaveGame([[maybe_unused]] BGSSaveFormBuffer* a_saveGameBuffer) { return; }  // 0E
 		virtual void LoadGame([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) { return; }  // 0F
 		virtual void Revert([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) { return; }    // 10
 
 		// members
-		TESCamera* camera;                                // 18
-		stl::enumeration<CameraState, std::uint32_t> id;  // 20
+		TESCamera* camera;  // 18
+		std::uint32_t id;   // 20
 
 	private:
 		TESCameraState* ctor(TESCamera& cam, std::uint32_t ID)
@@ -87,7 +88,31 @@ namespace RE
 		}
 	};
 	static_assert(offsetof(TESCameraState, camera) == 0x18);
+	static_assert(offsetof(TESCameraState, id) == 0x20);
 	static_assert(sizeof(TESCameraState) == 0x28);
+
+	class __declspec(novtable) TESCamera
+	{
+	public:
+		static constexpr auto RTTI{ RTTI::TESCamera };
+		static constexpr auto VTABLE{ VTABLE::TESCamera };
+
+		virtual ~TESCamera();  // 00
+
+		// add
+		virtual void SetCameraRoot(NiNode* a_cameraRoot);                 // 01
+		virtual void SetEnabled(bool a_enabled) { enabled = a_enabled; }  // 02
+		virtual void Update();                                            // 03
+
+		// members
+		BSTPoint2<float> rotationInput;                // 08
+		BSTPoint3<float> translationInput;             // 10
+		float zoomInput;                               // 1C
+		NiPointer<NiNode> cameraRoot;                  // 20
+		BSTSmartPointer<TESCameraState> currentState;  // 28
+		bool enabled;                                  // 30
+	};
+	static_assert(sizeof(TESCamera) == 0x38);
 
 	class __declspec(novtable) ThirdPersonState :
 		public TESCameraState  // 000
@@ -148,29 +173,6 @@ namespace RE
 		bool ironSights;                     // 130
 	};
 	static_assert(sizeof(ThirdPersonState) == 0x138);
-
-	class __declspec(novtable) TESCamera
-	{
-	public:
-		static constexpr auto RTTI{ RTTI::TESCamera };
-		static constexpr auto VTABLE{ VTABLE::TESCamera };
-
-		virtual ~TESCamera();  // 00
-
-		// add
-		virtual void SetCameraRoot(NiNode* a_cameraRoot);                 // 01
-		virtual void SetEnabled(bool a_enabled) { enabled = a_enabled; }  // 02
-		virtual void Update();                                            // 03
-
-		// members
-		BSTPoint2<float> rotationInput;                // 08
-		BSTPoint3<float> translationInput;             // 10
-		float zoomInput;                               // 1C
-		NiPointer<NiNode> cameraRoot;                  // 20
-		BSTSmartPointer<TESCameraState> currentState;  // 28
-		bool enabled;                                  // 30
-	};
-	static_assert(sizeof(TESCamera) == 0x38);
 
 	class __declspec(novtable) PlayerCamera :
 		public TESCamera,                             // 000

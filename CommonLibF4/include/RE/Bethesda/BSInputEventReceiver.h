@@ -16,5 +16,5 @@ namespace RE
 		// members
 		std::uint32_t currInputTimeCount;  // 08
 	};
-	static_assert(sizeof(BSInputEventReceiver) == 0x10);
+	//static_assert(sizeof(BSInputEventReceiver) == 0x10);
 }

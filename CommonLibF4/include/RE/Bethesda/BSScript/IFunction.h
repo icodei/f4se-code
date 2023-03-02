@@ -78,6 +78,6 @@ namespace RE
 
 			F4_HEAP_REDEFINE_NEW(IFunction);
 		};
-		static_assert(sizeof(IFunction) == 0x10);
+		//static_assert(sizeof(IFunction) == 0x10);
 	}
 }

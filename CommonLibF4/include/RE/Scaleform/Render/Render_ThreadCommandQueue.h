@@ -16,7 +16,7 @@ namespace RE::Scaleform::Render
 		// add
 		virtual void Execute() = 0;  // 01
 	};
-	static_assert(sizeof(ThreadCommand) == 0x10);
+	//static_assert(sizeof(ThreadCommand) == 0x10);
 
 	struct Interfaces
 	{

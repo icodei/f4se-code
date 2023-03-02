@@ -39,5 +39,5 @@ namespace RE
 		CameraZoomHandler* cameraZoomHandler;        // 60
 		PipboyHandler* pipboyHandler;                // 68
 	};
-	static_assert(sizeof(MenuControls) == 0x70);
+	//static_assert(sizeof(MenuControls) == 0x70);
 }

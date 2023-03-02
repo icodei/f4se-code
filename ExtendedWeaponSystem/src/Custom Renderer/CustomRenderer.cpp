@@ -12,20 +12,19 @@ ScopeRenderer::ScopeRenderer() {
 	BSShaderAccumulator* pShaderAccum;
 
 	logIfNeeded("ScopeRenderer - Creating BSCullingProcess...");
-	new(&scopeCullingProc) BSCullingProcess(0);
+	new (&scopeCullingProc) BSCullingProcess(0);
 	logIfNeeded("ScopeRenderer - Creating ScopeCamera...");
-	new(&scopeCam) ScopeCamera();
+	new (&scopeCam) ScopeCamera();
 	logIfNeeded("ScopeRenderer - Creating ImageSpaceShaderParam...");
-	new(&params) ImageSpaceShaderParam();
+	new (&params) ImageSpaceShaderParam();
 	//spScopeAccumulator = nullptr;
 
 	shaderAccum = (BSShaderAccumulator*)RE::malloc(0x590);
 	if (shaderAccum) {
-		new(shaderAccum) BSShaderAccumulator();
+		new (shaderAccum) BSShaderAccumulator();
 		newShaderAccum = shaderAccum;
 		logIfNeeded("ScopeRenderer - Created BSShaderAccumulator");
-	}
-	else {
+	} else {
 		newShaderAccum = nullptr;
 		logIfNeeded("ScopeRenderer - BSShaderAccumulator Creation FAILED");
 	}
@@ -47,7 +46,7 @@ ScopeRenderer::ScopeRenderer() {
 	pShaderAccum->QSilhouetteColor.b = 1.0;
 	pShaderAccum->QSilhouetteColor.a = 1.0;
 	(&scopeCullingProc)->SetAccumulator(spScopeAccumulator.get());
-	scopeCullingProc.CullingType = BSCullingProcess::BSCPCullingType::kIgnoreMultiBounds;
+	scopeCullingProc.CullingType = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
 	scopeCullingProc.m_bCameraRelatedUpdates = 0;
 	(&params)->ResizeConstantGroup(0, 1);
 	//field_2A4 = 18; //LocalMapRenderer
@@ -93,14 +92,13 @@ ScopeRenderer& ScopeRenderer::operator=(const ScopeRenderer& rhs) {
 }
 
 NiTexture* ScopeRenderer::Render(bool a1) {
-
 	ScopeRenderer* pScopeRenderer = (this);
 	ScopeCamera* scopeCam = (&pScopeRenderer->scopeCam);
 
 	NiCamera* shaderCam = (BSShaderManager__spCamera).get();
 
 	BSCullingProcess scopeCulling{ BSCullingProcess(0) };
-	new(&scopeCulling) BSCullingProcess(0); //Is this still needed with the above statement?
+	new (&scopeCulling) BSCullingProcess(0);  //Is this still needed with the above statement?
 
 	ShadowSceneNode* pShadow = (BSShaderManager__State).get().pShadowSceneNode[0];
 	ShadowSceneNode* pShadow2 = (BSShaderManager__State).get().pShadowSceneNode[0];
@@ -126,7 +124,7 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 
 	(&BSGraphics__gState.get())->SetCameraData(scopeCam->camera.get(), 0, 0.0, 1.0);
 	(&scopeCulling)->SetAccumulator(pScopeRenderer->spScopeAccumulator.get());
-	(&scopeCulling)->CullingType = BSCullingProcess::BSCPCullingType::kIgnoreMultiBounds;
+	(&scopeCulling)->CullingType = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
 	(&scopeCulling)->m_bCameraRelatedUpdates = 0;
 	(&scopeCulling)->m_pkCamera = scopeCam->camera.get();
 
@@ -158,9 +156,14 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	//BSShaderAccumulator::bSimpleWaterMode = 1;
 	//bWaterSimple = waterSimpleEnabled;
 
-	pScopeRenderer->spScopeAccumulator.get()->renderMode = BSShaderManager::etRenderMode::unk18;
+	pScopeRenderer->spScopeAccumulator.get()->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_VATS_MASK;
 	pScopeRenderer->spScopeAccumulator.get()->QEyePosition = scopeCam->camera->world.translate;
 	(&BSGraphics__gRenderer.get())->ResetZPrePass();
+	AccumulateSceneFunctor acummulateFunctor;
+	acummulateFunctor.renderer = pScopeRenderer;
+	if (TES::GetSingleton()->GetWorldSpace() || (acummulateFunctor.interior = 0, TES::GetSingleton()->GetWorldSpace()->flags & 0x40) == 0) {
+		acummulateFunctor.interior = 1;
+	}
 
 	//In LocalMapRenderer::Render this is where the going through arrays of TESObjectCells starts
 	//if (!bCullLocalMap._value) {
@@ -169,7 +172,7 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	//		goto LABEL_10;
 	//	}
 	//	//while loop stuff of GridCellArrays and then AccumulateSceneFunctor on those GridCell Arrays
-	//	if (cells) {	
+	//	if (cells) {
 	//		while(thing == 1) {
 	//			stuff
 	//			more stuff
@@ -253,15 +256,14 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	//			BSTArrayHeapAllocator::Deallocate(&array);
 	//			array.QSize = 0;
 	//		}
-	//		BSTArrayBase::~BSTArrayBase(&array.BSTArrayBase);
-	//		BSTArrayHeapAllocator::~BSTArrayHeapAllocator(&array);
+	//		(&array)->~BSTArray();
 	//		BSTObjectArena<TESObjectCELL*, BSTObjectArenaScrapAlloc, 32>::~BSTObjectArena<TESObjectCELL*, BSTObjectArenaScrapAlloc, 32>(&objArenaCell);
 	//	} else {
 	//		next = objArenaCell._next;
 	//		ppCell = *(TESObjectCELL***)&objArenaCell._size;
 	//		v31 = 1;
 	//		v32 = objArenaCell._next + 32;
-	//		*(_OWORD*)&pCull2 = *(_OWORD*)&pCull;
+	//		&pCull2 = &pCull;
 	//		if (a2_120) {
 	//			do {
 	//				--arraySizeMaybe;
@@ -297,31 +299,26 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	}
 	if (pShadow->children.size() > 9) {
 		pChildAt9 = pShadow->children[9].get();
-	}
-	else {
+	} else {
 		pChildAt9 = nullptr;
 	}
 	BSShaderUtil::AccumulateScene(scopeCam->camera.get(), pChildAt9, scopeCulling, 0);
 	NiAVObject* pChildAt8;
 	if (pShadow->children.size() > 8) {
 		pChildAt8 = pShadow->children[8].get();
-	}
-	else {
+	} else {
 		pChildAt8 = nullptr;
 	}
 	BSShaderUtil::AccumulateScene(scopeCam->camera.get(), pChildAt8, scopeCulling, 0);
-	(&BSShaderManager__State.get())->uiCurrentSceneGraph = 0;
+	(&BSShaderManager__State.get())->cSceneGraph = BSShaderManager::BSSM_SSN_WORLD;
 	(&BSShaderManager__State.get())->pShadowSceneNode[0]->ProcessQueuedLights(&scopeCulling);
 	(&BSGraphics__gRenderer.get())->ResetState();
 	int depthTarget = 1;
-	int renderTarget = 27;
+	BSGraphics::RenderTargetMode renderTarget = (BSGraphics::RenderTargetMode)27;
 	int newRenderTarget = 22;
-	if (pScopeRenderer->type == 20) {
-		depthTarget = 11;
-	}
 	newRenderTarget = (pScopeRenderer->type == 20) + 22;
 	if (pScopeRenderer->type == 20) {
-		renderTarget = 21;
+		renderTarget = (BSGraphics::RenderTargetMode)21;
 	}
 	if (pScopeRenderer->type == 20) {
 		(BSGraphics__gRenderTargetManager)->AcquireDepthStencil(depthTarget);
@@ -336,12 +333,7 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	//stuff and things
 	//
 	(BSGraphics__gRenderTargetManager)->SetCurrentDepthStencilTarget(0, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, 0);
-	(&pScopeRenderer->params)->SetPixelConstant(
-		0,
-		1.0 / (float)(int)(*BSGraphics__gRenderTargetManager).pRenderTargetDataA[pScopeRenderer->type].uiWidth,
-		1.0 / (float)(int)(*BSGraphics__gRenderTargetManager).pRenderTargetDataA[pScopeRenderer->type].uiHeight,
-		0.0,
-		0.0);
+	(&pScopeRenderer->params)->SetPixelConstant(0, 1.0 / (float)(int)(*BSGraphics__gRenderTargetManager).pRenderTargetDataA[pScopeRenderer->type].uiWidth, 1.0 / (float)(int)(*BSGraphics__gRenderTargetManager).pRenderTargetDataA[pScopeRenderer->type].uiHeight, 0.0, 0.0);
 	(BSGraphics__gRenderTargetManager)->SetTextureDepth(1, depthTarget);
 	(BSGraphics__gRenderTargetManager)->SetTextureRenderTarget(2, renderTarget, 0);
 	int effect = ((pScopeRenderer->type == 20) + 152);
@@ -398,32 +390,21 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 
 void nsScope::CreateRenderer() {
 	logIfNeeded("ScopeRenderer Creation Starting...");
-	
+
 	//create a spinlock
 	scopeRendererLock = *(new BSSpinLock());
 	logIfNeeded("ScopeRendererLock Allocated...");
 	new (&scopeRendererLock) BSSpinLock();
-	
-	if (scopeRenderer != nullptr) {
+
+	if (&scopeRenderer != nullptr) {
 		return;
 	}
 
 	//if renderer is null
-	if (!scopeRenderer) {
+	if (!&scopeRenderer) {
 		scopeRenderer = InitRenderer();
 		//in nsPipboy_LocalMap::CreateRenderer this is where the localMapCameraUpdateEvent stuff would also be created
 	}
-
-	/*
-	//Unlock?
-	//if ((&scopeRendererLock)->lockValue == 1) {
-	//	(&scopeRendererLock)->threadID = (&scopeRendererLock)->lockValue -1;
-	//	_mm_mfence();
-	//	InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, (&scopeRendererLock)->lockValue - 1, (&scopeRendererLock)->lockValue);
-	//} else {
-	//	InterlockedDecrement(&(&scopeRendererLock)->lockValue);
-	//}
-	*/
 	(&scopeRendererLock)->unlock();
 
 	logIfNeeded("ScopeRenderer Creation Complete.");
@@ -441,11 +422,9 @@ ScopeRenderer* nsScope::InitRenderer() {
 
 	//allocate our renderer
 	renderer = new ScopeRenderer();
-	//renderer = (ScopeRenderer*)Heap_Allocate(sizeof(ScopeRenderer)); //LocalMapRenderer allocates 0x2B0 (688)
 	logIfNeeded("ScopeRenderer Allocated...");
 	//if allocated succesful
 	if (renderer) {
-		//new(renderer) ScopeRenderer();
 		newRenderer = renderer;
 	} else {
 		newRenderer = nullptr;
@@ -472,12 +451,10 @@ ScopeRenderer* nsScope::InitRenderer() {
 }
 
 void nsScope::Render() {
-	
 	NiTexture* renderedTexture;
 
-	
 	(&scopeRendererLock)->lock();
-	if (scopeRenderer) {
+	if (&scopeRenderer) {
 		renderedTexture = (scopeRenderer)->Render(1);
 		if (renderedTexture) {
 			/*
@@ -492,7 +469,7 @@ void nsScope::Render() {
 
 			BSEffectShaderProperty* effectShaderProperty;
 			BSEffectShaderMaterial* effectShaderMaterial;
-			shaderProperty.reset((BSShaderProperty*)ScopeTextureLoader->shaderProperty.get());
+			shaderProperty.reset((BSShaderProperty*)(ScopeTextureLoader->shaderProperty.get()));
 			effectShaderProperty = (BSEffectShaderProperty*)(shaderProperty.get());
 			if (shaderProperty.get()) {
 				effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
@@ -512,18 +489,6 @@ void nsScope::Render() {
 			*/
 		}
 	}
-
-	/*
-	//This seems to be unlocking the spinlock of the renderer after it's finished creating the renderer
-	if ((&scopeRendererLock)->lockValue == 1) {
-		(&scopeRendererLock)->threadID = 0;
-		_mm_mfence();
-		InterlockedCompareExchange(&(&scopeRendererLock)->lockValue, 0, (&scopeRendererLock)->lockValue);
-	} else {
-		InterlockedDecrement(&(&scopeRendererLock)->lockValue);
-	}
-	*/
-	
 	scopeRendererLock.unlock();
 }
 
@@ -533,7 +498,7 @@ void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, std::uint3
 	(BSGraphics__gRenderTargetManager)->SetCurrentRenderTarget(1, a2, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 	(BSGraphics__gRenderTargetManager)->SetCurrentRenderTarget(2, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 	(BSGraphics__gRenderTargetManager)->SetCurrentRenderTarget(3, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	if ((BSShaderManager__State).get().unk56) {
+	if ((BSShaderManager__State).get().bDeferredRGBEmit) {
 		(BSGraphics__gRenderTargetManager)->SetCurrentRenderTarget(4, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 	}
 	(BSGraphics__gRenderTargetManager)->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);

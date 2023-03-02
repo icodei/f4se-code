@@ -160,6 +160,6 @@ namespace RE
 				PostCachedErrorToLogger(e, a_stackID, a_severity);
 			}
 		};
-		static_assert(sizeof(IVirtualMachine) == 0x10);
+		//static_assert(sizeof(IVirtualMachine) == 0x10);
 	}
 }

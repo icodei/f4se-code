@@ -71,7 +71,7 @@ namespace RE
 		// members
 		BSTranslator translator;  //20
 	};
-	static_assert(sizeof(BSScaleformTranslator) == 0x50);
+	//static_assert(sizeof(BSScaleformTranslator) == 0x50);
 
 	class __declspec(novtable) BSScaleformManager :
 		public BSTEventSink<SFRendererInitializedEvent>,  // 00

@@ -15,12 +15,10 @@ public:
 
 	//members
 	BSCullingProcess scopeCullingProc{ BSCullingProcess(0) };
-	ScopeCamera scopeCam;
-	NiPointer<BSShaderAccumulator> spScopeAccumulator;
-	ImageSpaceShaderParam params;
-	std::uint32_t type;
-
-	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
+	ScopeCamera scopeCam{ ScopeCamera() };
+	NiPointer<BSShaderAccumulator> spScopeAccumulator{ DrawWorld__spDrawPersonAccum.get() };
+	ImageSpaceShaderParam params{ BSImagespaceShader__DefaultParam.get() };
+	std::uint32_t type{ 20 };
 };
 
 namespace nsScope {
@@ -36,17 +34,21 @@ namespace nsScope {
 	static BSSpinLock scopeRendererLock;
 }
 
-
 class AccumulateSceneFunctor {
 public:
-	std::uint32_t operator()(TESObjectCELL* a_cell) {
+	AccumulateSceneFunctor() : renderer(nullptr), interior(0){}
+	AccumulateSceneFunctor(ScopeRenderer* pRenderer, bool isInterior) {
+		renderer = pRenderer;
+		interior = isInterior;
+	}
 
+	std::uint32_t operator()(TESObjectCELL* a_cell) {
+		//TODO
 	}
 
 	//members
-	ScopeRenderer* renderer;
-	bool interior;
+	ScopeRenderer* renderer{ nullptr };
+	bool interior{ 0 };
 };
-
 
 void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeaccum, std::uint32_t a1, std::uint32_t a2, std::uint32_t a3);

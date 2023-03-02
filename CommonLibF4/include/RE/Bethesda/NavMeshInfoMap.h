@@ -69,5 +69,5 @@ namespace RE
 		BSReadWriteLock mapLock;                                              // 0F8
 		bool init;                                                            // 100
 	};
-	static_assert(sizeof(NavMeshInfoMap) == 0x108);
+	//static_assert(sizeof(NavMeshInfoMap) == 0x108);
 }

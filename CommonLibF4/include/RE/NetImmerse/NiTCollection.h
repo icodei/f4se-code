@@ -20,7 +20,7 @@ namespace RE
 	class NiTMallocInterface
 	{
 	public:
-		[[nodiscard]] static T* allocate(std::size_t a_num) { return NiMalloc(sizeof(T) * a_num); }
+		[[nodiscard]] static T* allocate(std::size_t a_num) { return (T*)NiMalloc(sizeof(T) * a_num); }
 		static void deallocate(T* a_ptr) { NiFree(a_ptr); }
 	};
 

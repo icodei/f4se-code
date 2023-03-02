@@ -31,30 +31,74 @@ set(SOURCES
 	include/RE/Bethesda/BGSStoryManagerTreeForm.h
 	include/RE/Bethesda/BGSSynchronizedAnimationManager.h
 	include/RE/Bethesda/BGSTextureSet.h
-	include/RE/Bethesda/BSBatchRenderer.h
+	include/RE/Bethesda/BSAnimation/AnimationSpeedInfo.h
+	include/RE/Bethesda/BSAnimation/AnimationStanceData.h
+	include/RE/Bethesda/BSAnimation/BSAnimationGraphManager.h
+	include/RE/Bethesda/BSAnimation/BSLinearInterpolator.h
 	include/RE/Bethesda/BSBound.h
 	include/RE/Bethesda/BSCompoundFrustum.h
 	include/RE/Bethesda/BSContainer.h
-	include/RE/Bethesda/BSCulling.h
 	include/RE/Bethesda/BSExtraData.h
-	include/RE/Bethesda/BSFadeNode.h
 	include/RE/Bethesda/BSFixedString.h
 	include/RE/Bethesda/BSGeometry.h
-	include/RE/Bethesda/BSGraphics.h
-	include/RE/Bethesda/BSHavok.h
-	include/RE/Bethesda/BSImageSpace.h
+	include/RE/Bethesda/BSGraphics/BSGraphics.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsHandles.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsRenderTargetManager.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsRenderer.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsResourceCache.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsTypes.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsUtility.h
+	include/RE/Bethesda/BSHavok/BSClothExtraData.h
+	include/RE/Bethesda/BSHavok/BSClothUtils.h
+	include/RE/Bethesda/BSHavok/BSConnectPoint.h
+	include/RE/Bethesda/BSHavok/BSHavok.h
+	include/RE/Bethesda/BSHavok/DecalCaster.h
+	include/RE/Bethesda/BSHavok/bhkCharProxyController.h
+	include/RE/Bethesda/BSHavok/bhkCharProxyManager.h
+	include/RE/Bethesda/BSHavok/bhkCharRigidBodyController.h
+	include/RE/Bethesda/BSHavok/bhkCharRigidBodyManager.h
+	include/RE/Bethesda/BSHavok/bhkCharacterController.h
+	include/RE/Bethesda/BSHavok/bhkCharacterProxy.h
+	include/RE/Bethesda/BSHavok/bhkCharacterRigidBody.h
+	include/RE/Bethesda/BSHavok/bhkCharacterState.h
+	include/RE/Bethesda/BSHavok/bhkCharacterStateClimbing.h
+	include/RE/Bethesda/BSHavok/bhkCharacterStateFloating.h
+	include/RE/Bethesda/BSHavok/bhkCharacterStateFlying.h
+	include/RE/Bethesda/BSHavok/bhkCharacterStateInAir.h
+	include/RE/Bethesda/BSHavok/bhkCharacterStateJumping.h
+	include/RE/Bethesda/BSHavok/bhkCharacterStateOnGround.h
+	include/RE/Bethesda/BSHavok/bhkCharacterStateSwimming.h
+	include/RE/Bethesda/BSHavok/bhkCollisionFilter.h
+	include/RE/Bethesda/BSHavok/bhkCollisionQuery.h
+	include/RE/Bethesda/BSHavok/bhkConvert.h
+	include/RE/Bethesda/BSHavok/bhkIWorldstepListener.h
+	include/RE/Bethesda/BSHavok/bhkNPCollisionObject.h
+	include/RE/Bethesda/BSHavok/bhkPhysicsSystem.h
+	include/RE/Bethesda/BSHavok/bhkWorld.h
 	include/RE/Bethesda/BSInputDeviceManager.h
 	include/RE/Bethesda/BSInputEventReceiver.h
 	include/RE/Bethesda/BSInputEventSingleUser.h
 	include/RE/Bethesda/BSInputEventUser.h
 	include/RE/Bethesda/BSLock.h
-	include/RE/Bethesda/BSMTAManager.h
+	include/RE/Bethesda/BSMain/BSCullingProcess.h
+	include/RE/Bethesda/BSMain/BSUtilities.h
 	include/RE/Bethesda/BSMemStorage.h
 	include/RE/Bethesda/BSPointerHandle.h
 	include/RE/Bethesda/BSPreCulledObjects.h
-	include/RE/Bethesda/BSResource.h
 	include/RE/Bethesda/BSResource/BSModelDB.h
+	include/RE/Bethesda/BSResource/BSResource.h
+	include/RE/Bethesda/BSResource/BSResourceArchive2.h
+	include/RE/Bethesda/BSResource/BSResourceDirectory.h
+	include/RE/Bethesda/BSResource/BSResourceEntry.h
+	include/RE/Bethesda/BSResource/BSResourceEntryDB.h
+	include/RE/Bethesda/BSResource/BSResourceEntryQueue.h
 	include/RE/Bethesda/BSResource/BSResourceEnums.h
+	include/RE/Bethesda/BSResource/BSResourceID.h
+	include/RE/Bethesda/BSResource/BSResourceLocation.h
+	include/RE/Bethesda/BSResource/BSResourceStream.h
+	include/RE/Bethesda/BSResource/BSResourceStreamBase.h
+	include/RE/Bethesda/BSResource/BSResourceStreamer.h
+	include/RE/Bethesda/BSResource/BSResourceUtil.h
 	include/RE/Bethesda/BSResource/BSTextureDB.h
 	include/RE/Bethesda/BSResource/LooseFileStreamBase.h
 	include/RE/Bethesda/BSResource/Stream.h
@@ -118,13 +162,57 @@ set(SOURCES
 	include/RE/Bethesda/BSScript/Variable.h
 	include/RE/Bethesda/BSScriptUtil.h
 	include/RE/Bethesda/BSSemaphore.h
-	include/RE/Bethesda/BSShader.h
-	include/RE/Bethesda/BSShaderAccumulator.h
-	include/RE/Bethesda/BSShaderData.h
-	include/RE/Bethesda/BSShaderManager.h
-	include/RE/Bethesda/BSShaderMaterial.h
-	include/RE/Bethesda/BSShaderProperty.h
-	include/RE/Bethesda/BSShaderUtil.h
+	include/RE/Bethesda/BSShader/BSBatchRenderer.h
+	include/RE/Bethesda/BSShader/BSComputeShader.h
+	include/RE/Bethesda/BSShader/BSFadeNode.h
+	include/RE/Bethesda/BSShader/BSImagespace.h
+	include/RE/Bethesda/BSShader/BSMTAManager.h
+	include/RE/Bethesda/BSShader/BSShader.h
+	include/RE/Bethesda/BSShader/BSShaderAccumulator.h
+	include/RE/Bethesda/BSShader/BSShaderData.h
+	include/RE/Bethesda/BSShader/BSShaderManager.h
+	include/RE/Bethesda/BSShader/BSShaderMaterial.h
+	include/RE/Bethesda/BSShader/BSShaderProperty.h
+	include/RE/Bethesda/BSShader/BSShaderPropertyLightData.h
+	include/RE/Bethesda/BSShader/BSShaderRenderTargets.h
+	include/RE/Bethesda/BSShader/BSShaderTextureSet.h
+	include/RE/Bethesda/BSShader/BSShaderUtil.h
+	include/RE/Bethesda/BSShader/ImageSpace.h
+	include/RE/Bethesda/BSShader/ImageSpaceManager.h
+	include/RE/Bethesda/BSShader/ImageSpaceShaderParam.h
+	include/RE/Bethesda/BSShader/Shaders/BSBloodSplatterShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSBloodSplatterShaderProperty.h
+	include/RE/Bethesda/BSShader/Shaders/BSDFCompositeShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSDFCompositeShaderCommon.h
+	include/RE/Bethesda/BSShader/Shaders/BSDFLightShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSDFLightShaderCommon.h
+	include/RE/Bethesda/BSShader/Shaders/BSDFPrePassShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSDFPrePassShaderCommon.h
+	include/RE/Bethesda/BSShader/Shaders/BSDFTiledLighting.h
+	include/RE/Bethesda/BSShader/Shaders/BSDistantTreeShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSEffectShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSEffectShaderData.h
+	include/RE/Bethesda/BSShader/Shaders/BSEffectShaderMaterial.h
+	include/RE/Bethesda/BSShader/Shaders/BSEffectShaderProperty.h
+	include/RE/Bethesda/BSShader/Shaders/BSGrassShaderProperty.h
+	include/RE/Bethesda/BSShader/Shaders/BSImagespaceShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSImagespaceShaderLensFlare.h
+	include/RE/Bethesda/BSShader/Shaders/BSImagespaceShaderVLS.h
+	include/RE/Bethesda/BSShader/Shaders/BSLightingShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSLightingShaderCommon.h
+	include/RE/Bethesda/BSShader/Shaders/BSLightingShaderMaterial.h
+	include/RE/Bethesda/BSShader/Shaders/BSLightingShaderProperty.h
+	include/RE/Bethesda/BSShader/Shaders/BSParticleShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSParticleShaderCommon.h
+	include/RE/Bethesda/BSShader/Shaders/BSParticleShaderEmitter.h
+	include/RE/Bethesda/BSShader/Shaders/BSSkyShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSSkyShaderProperty.h
+	include/RE/Bethesda/BSShader/Shaders/BSUtilityShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSUtilityShaderCommon.h
+	include/RE/Bethesda/BSShader/Shaders/BSWaterShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSWaterShaderCommon.h
+	include/RE/Bethesda/BSShader/Shaders/BSWaterShaderMaterial.h
+	include/RE/Bethesda/BSShader/Shaders/BSWaterShaderProperty.h
 	include/RE/Bethesda/BSSkin.h
 	include/RE/Bethesda/BSSoundHandle.h
 	include/RE/Bethesda/BSSpring.h
@@ -153,7 +241,6 @@ set(SOURCES
 	include/RE/Bethesda/BSTextureSet.h
 	include/RE/Bethesda/BSTextureStreamer.h
 	include/RE/Bethesda/BSTimer.h
-	include/RE/Bethesda/BSUtilities.h
 	include/RE/Bethesda/CELLJobs.h
 	include/RE/Bethesda/CRC.h
 	include/RE/Bethesda/Calendar.h
@@ -171,13 +258,12 @@ set(SOURCES
 	include/RE/Bethesda/HUDModes.h
 	include/RE/Bethesda/IMenu.h
 	include/RE/Bethesda/IMovementInterface.h
-	include/RE/Bethesda/ImageSpace.h
-	include/RE/Bethesda/ImageSpaceManager.h
 	include/RE/Bethesda/InputDevice.h
 	include/RE/Bethesda/InputEvent.h
 	include/RE/Bethesda/Interface3D.h
 	include/RE/Bethesda/InventoryUserUIUtils.h
 	include/RE/Bethesda/ItemCrafted.h
+	include/RE/Bethesda/LocalMap.h
 	include/RE/Bethesda/MagicItems.h
 	include/RE/Bethesda/Main.h
 	include/RE/Bethesda/MemoryManager.h
@@ -203,6 +289,7 @@ set(SOURCES
 	include/RE/Bethesda/Settings.h
 	include/RE/Bethesda/ShadowSceneNode.h
 	include/RE/Bethesda/SplineUtils.h
+	include/RE/Bethesda/TES.h
 	include/RE/Bethesda/TESBoundAnimObjects.h
 	include/RE/Bethesda/TESBoundObjects.h
 	include/RE/Bethesda/TESCamera.h
@@ -224,26 +311,48 @@ set(SOURCES
 	include/RE/Bethesda/UserEvents.h
 	include/RE/Bethesda/VATS.h
 	include/RE/Bethesda/Workshop.h
-	include/RE/Bethesda/bhkCharacterController.h
 	include/RE/Fallout.h
-	include/RE/Havok/hkArray.h
-	include/RE/Havok/hkBaseObject.h
-	include/RE/Havok/hkBaseTypes.h
-	include/RE/Havok/hkBlockStream.h
-	include/RE/Havok/hkHandle.h
-	include/RE/Havok/hkLifoAllocator.h
-	include/RE/Havok/hkMemoryAllocator.h
-	include/RE/Havok/hkMemoryRouter.h
-	include/RE/Havok/hkMemorySystem.h
-	include/RE/Havok/hkRefPtr.h
-	include/RE/Havok/hkReferencedObject.h
-	include/RE/Havok/hkSimdFloat.h
-	include/RE/Havok/hkVector4.h
+	include/RE/Havok/Common/Base/Container/Array/hkArray.h
+	include/RE/Havok/Common/Base/Container/Array/hkFixedInPlaceArray.h
+	include/RE/Havok/Common/Base/Container/BlockStream/hkBlockStream.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkMatrix3.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkMatrix3f.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkMatrix4.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkMatrix4f.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkMatrix6.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkMatrix6f.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkRotation.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkRotationf.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkTransform.h
+	include/RE/Havok/Common/Base/Math/Matrix/hkTransformf.h
+	include/RE/Havok/Common/Base/Math/Quaternion/hkQuaternion.h
+	include/RE/Havok/Common/Base/Math/Quaternion/hkQuaternionf.h
+	include/RE/Havok/Common/Base/Math/Vector/hkSimdFloat.h
+	include/RE/Havok/Common/Base/Math/Vector/hkVector4.h
+	include/RE/Havok/Common/Base/Math/Vector/hkVector4f.h
+	include/RE/Havok/Common/Base/Memory/Allocator/Lifo/hkLifoAllocator.h
+	include/RE/Havok/Common/Base/Memory/Allocator/hkMemoryAllocator.h
+	include/RE/Havok/Common/Base/Memory/Router/hkMemoryRouter.h
+	include/RE/Havok/Common/Base/Memory/System/hkMemorySystem.h
+	include/RE/Havok/Common/Base/Object/hkBaseObject.h
+	include/RE/Havok/Common/Base/Object/hkReferencedObject.h
+	include/RE/Havok/Common/Base/Types/Geometry/Aabb/hkAabb.h
+	include/RE/Havok/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h
+	include/RE/Havok/Common/Base/Types/Physics/ContactPoint/hkContactPointMaterial.h
+	include/RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h
+	include/RE/Havok/Common/Base/Types/Physics/hkHandle.h
+	include/RE/Havok/Common/Base/Types/Physics/hkRefPtr.h
+	include/RE/Havok/Common/Base/Types/Physics/hkStepInfo.h
+	include/RE/Havok/Physics/Physics/Dynamics/World/hknpWorld.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/Proxy/hknpCharacterProxy.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidBody.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidBodyCInfo.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterContext.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterState.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/hknpCharacterSurfaceInfo.h
+	include/RE/Havok/Physics/Physics/Extensions/PhysicsSystem/hknpPhysicsSystem.h
 	include/RE/Havok/hknpAllHitsCollector.h
 	include/RE/Havok/hknpBodyId.h
-	include/RE/Havok/hknpCharacterContext.h
-	include/RE/Havok/hknpCharacterState.h
-	include/RE/Havok/hknpCharacterSurfaceInfo.h
 	include/RE/Havok/hknpClosestUniqueBodyIdHitCollector.h
 	include/RE/Havok/hknpCollisionQueryCollector.h
 	include/RE/Havok/hknpCollisionResult.h

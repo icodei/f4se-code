@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RE/Havok/hkBaseTypes.h"
-#include "RE/Havok/hkBlockStream.h"
-#include "RE/Havok/hkReferencedObject.h"
+#include "RE/Havok/Common/Base/Container/BlockStream/hkBlockStream.h"
+#include "RE/Havok/Common/Base/Object/hkReferencedObject.h"
+#include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
 
 namespace RE
 {

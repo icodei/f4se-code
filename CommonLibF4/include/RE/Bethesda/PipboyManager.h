@@ -34,6 +34,37 @@ namespace RE
 	};
 	static_assert(sizeof(PipboyRadioController) == 0x04);
 
+	class PipboyCommandResult
+	{
+	public:
+		static constexpr auto RTTI{ RTTI::PipboyCommandResult };
+		static constexpr auto VTABLE{ VTABLE::PipboyCommandResult };
+
+		virtual ~PipboyCommandResult();
+
+		//members
+		std::uint32_t unk08;  //00
+		bool unk0C;           //0C
+		bool unk0D;           //0D
+	};
+	static_assert(sizeof(PipboyCommandResult) == 0x10);
+
+	class PipboyCommand
+	{
+	public:
+		static constexpr auto RTTI{ RTTI::PipboyCommand };
+		static constexpr auto VTABLE{ VTABLE::PipboyCommand };
+
+		virtual ~PipboyCommand();
+
+		//members
+		void* unk00;
+		std::uint32_t unk08;
+		void* unk10;
+		void* unk18;
+		bool unk20;
+	};
+
 	class __declspec(novtable) PipboyManager :
 		public BSTEventSink<BSAnimationGraphEvent>,  // 00
 		public BSInputEventUser,                     // 08

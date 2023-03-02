@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Havok/hkVector4.h"
+#include "RE/Havok/Common/Base/Math/Vector/hkVector4.h"
 #include "RE/Havok/hknpUniqueBodyIdHitCollector.h"
 
 namespace RE

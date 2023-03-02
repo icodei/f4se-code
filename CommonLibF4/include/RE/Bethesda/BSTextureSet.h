@@ -2,12 +2,11 @@
 
 #include "RE/NetImmerse/NiObject.h"
 #include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/Bethesda/BSShaderProperty.h"
+#include "RE/Bethesda/BSShader/BSShaderProperty.h"
 
 namespace RE
 {
 	class NiTexture;
-
 
 	class __declspec(novtable) BSTextureSet :
 		public NiObject  // 00

@@ -17,4 +17,4 @@ public:
 	static NiTexture* Render(bool save);
 
 };
-STATIC_ASSERT(std::is_empty_v<ScopeRendererManager>);
+static_assert(std::is_empty_v<ScopeRendererManager>);

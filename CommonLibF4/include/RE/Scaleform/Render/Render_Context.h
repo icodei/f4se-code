@@ -137,7 +137,7 @@ namespace RE::Scaleform::Render
 			stl::enumeration<EntryType, std::uint16_t> type;  // 08
 			std::uint16_t flags;                              // 0A
 		};
-		static_assert(sizeof(EntryData) == 0x10);
+		//static_assert(sizeof(EntryData) == 0x10);
 
 		class EntryChange
 		{

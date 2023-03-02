@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Havok/hkHandle.h"
+#include "RE/Havok/Common/Base/Types/Physics/hkHandle.h"
 
 namespace RE
 {

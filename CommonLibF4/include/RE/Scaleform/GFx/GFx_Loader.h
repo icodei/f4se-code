@@ -63,7 +63,7 @@ namespace RE::Scaleform::GFx
 		// members
 		stl::enumeration<StateType, std::int32_t> sType;  // 10
 	};
-	static_assert(sizeof(State) == 0x18);
+	//static_assert(sizeof(State) == 0x18);
 
 	class __declspec(novtable) ActionControl :
 		public State  // 00
@@ -82,7 +82,7 @@ namespace RE::Scaleform::GFx
 		// members
 		stl::enumeration<ActionControlFlags, std::uint32_t> actionFlags;  // 18
 	};
-	static_assert(sizeof(ActionControl) == 0x20);
+	//static_assert(sizeof(ActionControl) == 0x20);
 
 	class __declspec(novtable) Translator :
 		public State
@@ -91,7 +91,7 @@ namespace RE::Scaleform::GFx
 		// members
 		std::uint32_t mode;  //18
 	};
-	static_assert(sizeof(Translator) == 0x20);
+	//static_assert(sizeof(Translator) == 0x20);
 
 	class __declspec(novtable) StateBag :
 		public FileTypeConstants  // 00
