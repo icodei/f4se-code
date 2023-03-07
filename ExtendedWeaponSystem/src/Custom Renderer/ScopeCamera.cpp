@@ -17,7 +17,7 @@ ScopeCamera::ScopeCamera() : TESCamera() {
 	//defaultState init
 	camDefaultState = new DefaultState(*this, 0);
 	if (camDefaultState) { //TODO: Add each state to the cameraStates array
-		cameraStates[0] = camDefaultState;
+		cameraStates[0].reset(camDefaultState);
 		logIfNeeded("ScopeCamera - Created ScopeCamera::DefaultState");
 	}
 	else {
@@ -29,18 +29,18 @@ ScopeCamera::ScopeCamera() : TESCamera() {
 	//nightVisionState init
 
 	//oldState
-	oldCamState = currentState;
+	oldCamState = currentState.get();
 	if (camDefaultState != oldCamState) {
 		if (camDefaultState) {
-			InterlockedIncrement(&camDefaultState->m_refCount);
+			InterlockedIncrement(&camDefaultState->refCount);
 		}
-		currentState = camDefaultState;
-		if (oldCamState && !InterlockedDecrement(&oldCamState->m_refCount)) {
+		currentState.reset(camDefaultState);
+		if (oldCamState && !InterlockedDecrement(&oldCamState->refCount)) {
 			oldCamState->~TESCameraState();
 		}
 	}
 	//set state to default
-	this->SetState(cameraStates[0]);
+	this->SetState(cameraStates[0].get());
 	logIfNeeded("ScopeCamera ctor Completed.");
 }
 
@@ -95,9 +95,8 @@ void ScopeCamera::Init3D() {
 	NiAVObject* newGeo;
 	NiAVObject* currentGeo;
 
-	cam = Create_NiCamera();
+	cam = new NiCamera();
 	if (cam) {
-		new(cam) NiCamera();
 		newCam = cam;
 		logIfNeeded("ScopeCamera - Created NiCamera");
 	}
@@ -108,17 +107,16 @@ void ScopeCamera::Init3D() {
 	currentCam = camera;
 	if (currentCam != newCam) {
 		if (newCam) {
-			InterlockedIncrement(&newCam->m_uiRefCount);
+			InterlockedIncrement(&newCam->refCount);
 		}
 		camera = newCam;
-		if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
+		if (currentCam && !InterlockedDecrement(&currentCam->refCount)) {
 			currentCam->DeleteThis();
 		}
 	}
 
-	node = Create_NiNode();
+	node = new NiNode(0);
 	if (node) {
-		new(node) NiNode(1);
 		newNode = node;
 		logIfNeeded("ScopeCamera - Created NiNode");
 	}
@@ -126,21 +124,20 @@ void ScopeCamera::Init3D() {
 		newNode = nullptr;
 		logIfNeeded("ScopeCamera - NiNode Creation FAILED");
 	}
-	currentNode = cameraNode;
+	currentNode = cameraRoot.get();
 	if (currentNode != newNode) {
 		if (newNode) {
-			InterlockedIncrement(&newNode->m_uiRefCount);
+			InterlockedIncrement(&newNode->refCount);
 		}
-		cameraNode = newNode;
-		if (currentNode && !InterlockedDecrement(&currentNode->m_uiRefCount)) {
+		cameraRoot = newNode;
+		if (currentNode && !InterlockedDecrement(&currentNode->refCount)) {
 			currentNode->DeleteThis();
 		}
 	}
-	cameraNode->AttachChild(camera, true);
+	cameraRoot->AttachChild(camera, true);
 
-	geo = Create_BSTriShape();
+	geo = new BSTriShape();
 	if (geo) {
-		new(geo) BSTriShape();
 		newGeo = geo;
 		logIfNeeded("ScopeCamera - Created BSTriShape");
 	}
@@ -151,10 +148,10 @@ void ScopeCamera::Init3D() {
 	currentGeo = renderPlane;
 	if (currentGeo != newGeo) {
 		if (newGeo) {
-			InterlockedIncrement(&newGeo->m_uiRefCount);
+			InterlockedIncrement(&newGeo->refCount);
 		}
 		renderPlane = newGeo;
-		if (currentGeo && !InterlockedDecrement(&currentGeo->m_uiRefCount)) {
+		if (currentGeo && !InterlockedDecrement(&currentGeo->refCount)) {
 			currentGeo->DeleteThis();
 		}
 	}
@@ -175,21 +172,21 @@ void ScopeCamera::SetState(TESCameraState* newCameraState) {
 	TESCameraState* oldState;
 	TESCameraState* newState;
 
-	pOldState = currentState;
+	pOldState = currentState.get();
 	if (pOldState) {
 		pOldState->End();
 	}
-	oldState = currentState;
+	oldState = currentState.get();
 	if (newCameraState != oldState) {
 		if (newCameraState) {
-			InterlockedIncrement(&newCameraState->m_refCount);
+			InterlockedIncrement(&newCameraState->refCount);
 		}
-		currentState = newCameraState;
-		if (oldState && !InterlockedDecrement(&oldState->m_refCount)) {
+		currentState.reset(newCameraState);
+		if (oldState && !InterlockedDecrement(&oldState->refCount)) {
 			oldState->~TESCameraState();
 		}
 	}
-	newState = currentState;
+	newState = currentState.get();
 	if (newState) {
 		newState->Begin();
 	}
@@ -225,8 +222,8 @@ void ScopeCamera::Update3D() {
 	if (currentCam != newCam) {
 		if (newCam) {
 			scopePOV = newCam;
-			if (scopePOV->m_parent) {
-				scopePOVRoot = scopePOV->m_parent;
+			if (scopePOV->parent) {
+				scopePOVRoot = scopePOV->parent;
 			}
 			logIfNeeded("Found the scope camera.");
 		}
@@ -256,7 +253,7 @@ ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) : TESC
 	logIfNeeded("ScopeCamera::DefaultState ctor Starting...");
 	refCount = 0;
 	camera = &cam;
-	id.set(CameraState, ID);
+	id = ID;
 
 	initialPosition = NiPoint3_ZERO;
 	translation = NiPoint3_ZERO;
@@ -268,7 +265,7 @@ ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) : TESC
 
 ScopeCamera::DefaultState::~DefaultState() {
 	logIfNeeded("ScopeCamera::DefaultState dtor Starting...");
-	Heap_Free(this);
+	RE::free(this);
 	logIfNeeded("ScopeCamera::DefaultState dtor Completed.");
 }
 
@@ -345,13 +342,11 @@ ScopeCamera::ThermalState::~ThermalState()
 {
 }
 
-bool ScopeCamera::ThermalState::ShouldHandleEvent(InputEvent* inputEvent)
-{
+bool ScopeCamera::ThermalState::ShouldHandleEvent(const InputEvent* inputEvent) {
 	return false;
 }
 
-void ScopeCamera::ThermalState::OnButtonEvent(ButtonEvent* inputEvent)
-{
+void ScopeCamera::ThermalState::HandleEvent(const ButtonEvent* inputEvent) {
 }
 
 void ScopeCamera::ThermalState::Begin()
@@ -362,16 +357,13 @@ void ScopeCamera::ThermalState::End()
 {
 }
 
-void ScopeCamera::ThermalState::Update(TESCameraState* arg)
-{
+void ScopeCamera::ThermalState::Update(BSTSmartPointer<TESCameraState>& a_nextState) {
 }
 
-void ScopeCamera::ThermalState::GetRotation(NiQuaternion* out)
-{
+void ScopeCamera::ThermalState::GetRotation(NiQuaternion& a_rotation) const {
 }
 
-void ScopeCamera::ThermalState::GetPosition(NiPoint3* out)
-{
+void ScopeCamera::ThermalState::GetTranslation(NiPoint3& a_translation) const {
 }
 
 ScopeCamera::NightVisionState::NightVisionState(TESCamera& cam, std::uint32_t ID) : DefaultState(cam, ID) {
@@ -382,13 +374,12 @@ ScopeCamera::NightVisionState::~NightVisionState()
 {
 }
 
-bool ScopeCamera::NightVisionState::ShouldHandleEvent(InputEvent* inputEvent)
+bool ScopeCamera::NightVisionState::ShouldHandleEvent(const InputEvent* inputEvent)
 {
 	return false;
 }
 
-void ScopeCamera::NightVisionState::OnButtonEvent(ButtonEvent* inputEvent)
-{
+void ScopeCamera::NightVisionState::HandleEvent(const ButtonEvent* inputEvent) {
 }
 
 void ScopeCamera::NightVisionState::Begin()
@@ -399,14 +390,11 @@ void ScopeCamera::NightVisionState::End()
 {
 }
 
-void ScopeCamera::NightVisionState::Update(TESCameraState* arg)
-{
+void ScopeCamera::NightVisionState::Update(BSTSmartPointer<TESCameraState>& a_nextState) {
 }
 
-void ScopeCamera::NightVisionState::GetRotation(NiQuaternion* out)
-{
+void ScopeCamera::NightVisionState::GetRotation(NiQuaternion& a_rotation) const {
 }
 
-void ScopeCamera::NightVisionState::GetPosition(NiPoint3* out)
-{
+void ScopeCamera::NightVisionState::GetTranslation(NiPoint3& a_translation) const {
 }

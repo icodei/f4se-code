@@ -13,7 +13,7 @@ void ScopeRendererManager::Setup() {
 	BSCullingProcess* cullingProcess;
 	BSCullingProcess* newCullingProcess;
 
-	cullingProcess = (BSCullingProcess*)Heap_Allocate(0x1A0);
+	cullingProcess = (BSCullingProcess*)RE::malloc(0x1A0);
 	if (cullingProcess) {
 		new(cullingProcess) BSCullingProcess(0);
 		newCullingProcess = cullingProcess;
@@ -38,10 +38,8 @@ void ScopeRendererManager::Setup() {
 	NiCamera* cam;
 	NiCamera* newCam;
 
-	cam = Create_NiCamera();
+	cam = new NiCamera();
 	if (cam) {
-		//CreateNS_NiCamera_Create already constructs using NiCamera::NiCamera() we do not need to do it again
-		//new(cam) NiCamera();
 		newCam = cam;
 		logIfNeeded("ScopeRendererManager - Created NiCamera");
 	}
@@ -52,11 +50,11 @@ void ScopeRendererManager::Setup() {
 	currentCam = scopePOV;
 	if (currentCam != newCam) {
 		if (newCam) {
-			InterlockedIncrement(&newCam->m_uiRefCount);
+			InterlockedIncrement(&newCam->refCount);
 		}
 		scopePOV = newCam;
 		scopePOV_BACKUP = newCam;
-		if (currentCam && !InterlockedDecrement(&currentCam->m_uiRefCount)) {
+		if (currentCam && !InterlockedDecrement(&currentCam->refCount)) {
 			currentCam->DeleteThis();
 		}
 	}
@@ -66,13 +64,12 @@ void ScopeRendererManager::Setup() {
 	NiNode* node;
 	NiNode* newNode;
 
-	node = Create_NiNode();
+	node = new NiNode(1);
 	if (node) {
-		new(node) NiNode(1);
-		if ((*g_playerCamera)) {
-			node->m_localTransform.pos.x = (*g_playerCamera)->translationInput.x;
-			node->m_localTransform.pos.y = (*g_playerCamera)->translationInput.y + 5.0;
-			node->m_localTransform.pos.z = (*g_playerCamera)->translationInput.z;
+		if ((PlayerCamera::GetSingleton())) {
+			node->local.translate.x = (PlayerCamera::GetSingleton())->translationInput.x;
+			node->local.translate.y = (PlayerCamera::GetSingleton())->translationInput.y + 5.0;
+			node->local.translate.z = (PlayerCamera::GetSingleton())->translationInput.z;
 		}
 		newNode = node;
 		logIfNeeded("ScopeRendererManager - Created NiNode");
@@ -85,13 +82,13 @@ void ScopeRendererManager::Setup() {
 	currentNode = scopePOVRoot;
 	if (currentNode != newNode) {
 		if (newNode) {
-			InterlockedIncrement(&newNode->m_uiRefCount);
+			InterlockedIncrement(&newNode->refCount);
 		}
 		scopePOVRoot = newNode;
 		scopePOVRoot_BACKUP = newNode;
 		//float FOV = (*g_playerCamera)->fDefault1stPersonFOV;
-		BSShaderUtil::SetCameraFOV((*Main__spWorldSceneGraph), (float)(90.0 / 4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
-		if (currentNode && !InterlockedDecrement(&currentNode->m_uiRefCount)) {
+		BSShaderUtil::SetSceneGraphCameraFOV(Main::GetWorldSceneGraph(), (float)(90.0 / 4.0), 0, scopePOV, 1); //TEMP. Right now I just have it as 4x zoom
+		if (currentNode && !InterlockedDecrement(&currentNode->refCount)) {
 			currentNode->DeleteThis();
 		}
 	}
@@ -103,7 +100,7 @@ void ScopeRendererManager::Setup() {
 	ImageSpaceShaderParam* shaderParam;
 	ImageSpaceShaderParam* newShaderParam;
 
-	shaderParam = (ImageSpaceShaderParam*)Heap_Allocate(0x90);
+	shaderParam = (ImageSpaceShaderParam*)RE::malloc(0x90);
 	if (shaderParam) {
 		new(shaderParam) ImageSpaceShaderParam();
 		newShaderParam = shaderParam;
@@ -126,7 +123,7 @@ void ScopeRendererManager::Setup() {
 	BSShaderAccumulator* shaderAccumulator;
 	BSShaderAccumulator* newShaderAccumulator;
 
-	shaderAccumulator = (BSShaderAccumulator*)Heap_Allocate(0x590);
+	shaderAccumulator = (BSShaderAccumulator*)RE::malloc(0x590);
 	if (shaderAccumulator) {
 		new(shaderAccumulator) BSShaderAccumulator();
 		newShaderAccumulator = shaderAccumulator;
@@ -139,10 +136,10 @@ void ScopeRendererManager::Setup() {
 	currentShaderAccumulator = pScopeManagerAccumulator;
 	if (currentShaderAccumulator != newShaderAccumulator) {
 		if (newShaderAccumulator) {
-			InterlockedIncrement(&newShaderAccumulator->m_uiRefCount);
+			InterlockedIncrement(&newShaderAccumulator->refCount);
 		}
 		pScopeManagerAccumulator = newShaderAccumulator;
-		if (currentShaderAccumulator && !InterlockedDecrement(&currentShaderAccumulator->m_uiRefCount)) {
+		if (currentShaderAccumulator && !InterlockedDecrement(&currentShaderAccumulator->refCount)) {
 			currentShaderAccumulator->DeleteThis();
 		}
 	}
@@ -214,7 +211,7 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	NiAVObject* obj = (*ShaderManager_gState).pShadowSceneNode[0]->m_children.m_data[3];
 	NiAVObject* pObj = obj;
 	if (obj) {
-		InterlockedIncrement(&obj->m_uiRefCount);
+		InterlockedIncrement(&obj->refCount);
 	}
 	bool objCullFlag = obj->flags & 1;
 	obj->SetAppCulled(1);
@@ -222,7 +219,7 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	//grassNode = BSTSingletonSDMBase<BGSGrassManager>::QInstancePtr::pinstanceS->QGrassNode;
 	//pGrassNode = grassNode;
 	//if ( grassNode ) {
-	//	InterlockedIncrement(&grassNode->m_uiRefCount);
+	//	InterlockedIncrement(&grassNode->refCount);
 	//}
 	//grassNodeCullFlag = grassNode->flags & 1;
 	//bGrassNodeCullFlag = grassNodeCullFlag;
@@ -528,11 +525,11 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	//scopeCulling->~BSCullingProcess();
 	//pOldGrassNode = pGrassNode;
 	//pGrassNode->SetAppCulled(pGrassNode, grassNodeCullFlag);
-	//if (!InterlockedDecrement(&pOldGrassNode->m_uiRefCount)) {
+	//if (!InterlockedDecrement(&pOldGrassNode->refCount)) {
 	//	pOldGrassNode->DeleteThis(pOldGrassNode);
 	//}
 	obj->SetAppCulled(objCullFlag);
-	if (!InterlockedDecrement(&obj->m_uiRefCount)) {
+	if (!InterlockedDecrement(&obj->refCount)) {
 		obj->DeleteThis();
 	}
 	return renderedTexture;

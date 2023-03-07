@@ -67,4 +67,5 @@ namespace RE
 			return func(this);
 		}
 	};
+	static_assert(sizeof(ImageSpaceShaderParam) == 0x90);
 }

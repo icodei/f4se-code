@@ -1,10 +1,10 @@
 #pragma once
-#include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
+#include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 
 namespace RE
 {
-	namespace BSGraphics 
+	namespace BSGraphics
 	{
 		class RendererData
 		{
@@ -115,9 +115,9 @@ namespace RE
 			}
 
 			// members
-			bool skipNextPresent;                     // 00
+			bool skipNextPresent;                   // 00
 			ResetRenderTargets resetRenderTargets;  // 08
-			RendererData data;                        // 10
+			RendererData data;                      // 10
 		};
 		static_assert(sizeof(Renderer) == 0x25D0);
 	}

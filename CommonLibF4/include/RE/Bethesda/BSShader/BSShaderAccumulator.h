@@ -100,6 +100,7 @@ namespace RE
 		BSLight* shadowLight;
 		NiPoint3 QEyePosition;
 		std::uint32_t QDepthPassIndex;
+		std::uint64_t gap[(0x590 - 0x580) / 6];
 
 	private:
 		BSShaderAccumulator* ctor()
@@ -109,4 +110,5 @@ namespace RE
 			return func(this);
 		}
 	};
+	static_assert(sizeof(BSShaderAccumulator) == 0x590);
 }

@@ -92,13 +92,13 @@ namespace RE
 		{
 		public:
 			//members
-			char* __ptr32 pData;
+			char* pData;
 			std::uint64_t uiVertexDesc;
 			std::uint32_t uiRefCount;
-			std::uint16_t* __ptr32 pIndices;
+			std::uint16_t* pIndices;
 		};
 
-		enum Usage
+		enum class Usage
 		{
 			USAGE_DEFAULT,
 			USAGE_IMMUTABLE,
@@ -327,7 +327,7 @@ namespace RE
 			std::uint32_t uiTextureTarget;
 			bool bEnableFastClear;
 		};
-		static_assert(sizeof(RenderTargetProperties) == 0x20);
+		static_assert(sizeof(RenderTargetProperties) == 0x20); //28
 
 		class RendererShadowState
 		{

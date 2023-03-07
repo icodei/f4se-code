@@ -48,7 +48,7 @@ namespace RE
 		// members
 		BSFixedString name;                          // 10
 		std::uint32_t flags;                         // 18
-		NiTexture* prev;                             // 29
+		NiTexture* prev;                             // 20
 		NiTexture* next;                             // 28
 		BSTSmartPointer<BSResource::Stream> stream;  // 30
 		BSGraphics::Texture* rendererTexture;        // 38

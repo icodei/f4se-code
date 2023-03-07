@@ -95,5 +95,5 @@ namespace RE
 			return func(this, a_array);
 		};
 	};
-	//static_assert(sizeof(BSCullingProcess) == 0x1A0);
+	static_assert(sizeof(BSCullingProcess) == 0x1A0);
 }

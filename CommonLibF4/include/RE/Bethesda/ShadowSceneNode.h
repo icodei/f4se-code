@@ -8,7 +8,7 @@
 namespace RE
 {
 	class BSShadowDirectionalLight;
-	class BSFogProperty;
+	class BSFogProperty; //sizeof 0x88
 	class BSPortalGraph;
 	class BSLight;
 	class NiTexture;
@@ -19,6 +19,19 @@ namespace RE
 		class BSDFDecal
 		{};
 	};
+
+	//SceneGraphInit
+	//	World ShadowSceneNode
+	//	0	SkyRoot
+	//	1	WeatherRoot
+	//	2	LandLOD
+	//		0	LandAndObjectLOD
+	//		1	WaterLOD
+	//		2	LODTrees
+	//	3	ObjectLOD
+	//	4	Unk
+	//	5	BSParticleSystemManager
+	//
 
 	class ShadowSceneNode : public NiNode
 	{
@@ -76,4 +89,5 @@ namespace RE
 		NiTexture* WetnessEnvMap;
 		float WindMagnitude;
 	};
+	static_assert(sizeof(ShadowSceneNode) == 0x330);
 }

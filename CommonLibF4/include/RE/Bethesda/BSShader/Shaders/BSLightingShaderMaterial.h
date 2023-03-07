@@ -3,6 +3,7 @@
 
 namespace RE
 {
+	class BSLightingShaderMaterialEnvmap;
 	class NiTexture;
 
 	class BSLightingShaderMaterialBase : public BSShaderMaterial

@@ -1,10 +1,6 @@
 #pragma once
 #include "Global.h"
 
-extern BSCullingProcess* pScopeManagerCullingProc;
-extern BSShaderAccumulator* pScopeManagerAccumulator;
-extern ImageSpaceShaderParam* pScopeManagerShaderParam;
-
 //This will technically do everything that ScopeRenderer and ScopeCamera does but without allocating the custom classes
 class ScopeRendererManager {
 public:
@@ -16,5 +12,8 @@ public:
 	static void RenderHelper(bool save);
 	static NiTexture* Render(bool save);
 
+	static BSCullingProcess* pScopeManagerCullingProc;
+	static BSShaderAccumulator* pScopeManagerAccumulator;
+	static ImageSpaceShaderParam* pScopeManagerShaderParam;
 };
 static_assert(std::is_empty_v<ScopeRendererManager>);

@@ -32,6 +32,10 @@ namespace RE
 			REL::Relocation<func_t> func{ REL::ID(993788) };
 			return func(this);
 		}
+
+		//members
+		std::byte gap[0x138 - 0x10];	//TODO
 	};
+	static_assert(sizeof(TES) == 0x138);
 
 }

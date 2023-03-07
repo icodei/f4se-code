@@ -151,7 +151,7 @@ namespace RE
 			FORMAT_COUNT
 		};
 
-		enum TextureAddressMode
+		enum class TextureAddressMode
 		{
 			TEXTURE_ADDRESS_MODE_CLAMP_S_CLAMP_T,
 			TEXTURE_ADDRESS_MODE_CLAMP_S_WRAP_T,
@@ -378,7 +378,7 @@ namespace RE
 			CLEAR_DEPTH_STENCIL_TARGET_ALL = 0x3,
 		};
 
-		enum SetRenderTargetMode : std::uint32_t
+		enum class SetRenderTargetMode : std::uint32_t
 		{
 			SRTM_CLEAR,
 			SRTM_CLEAR_DEPTH,

@@ -81,6 +81,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSShaderResourceManager };
 		static constexpr auto VTABLE{ VTABLE::BSShaderResourceManager };
+
 		virtual ~BSShaderResourceManager();
 
 		//add

@@ -16,6 +16,16 @@ namespace RE
 	public:
 		//ImageSpaceTexture::GetRenderTarget(): This is not a render target.  Use QIsRenderTarget() first.
 		//ImageSpaceTexture::GetDepthStencilBuffer(): This is not depth stencil buffer.  Use QIsDepthStencilBuffer() first
+
+		//members
+		bool unk01;
+		NiPointer<NiTexture> tex;
+		int RenderTarget;
+		int DepthBuffer;
+		int StencilBuffer;
+		BSGraphics::TextureFilterMode FilterMode;
+		BSGraphics::TextureAddressMode ClampMode;
+		bool isAcquired;
 	};
 
 	class ImageSpaceEffectParam
@@ -87,20 +97,6 @@ namespace RE
 		std::uint8_t field_A1;
 		std::uint32_t field_A4;
 		bool UseDynamicResolution;
-		NiPointer<NiTexture> tex_B0;
-		NiPointer<NiTexture> field_B8;
-		std::uint32_t field_C0;
-		std::uint8_t field_C4;
-		std::uint8_t field_C5;
-		std::uint8_t field_C6;
-		std::uint8_t field_C7;
-		std::uint8_t field_C8;
-		std::uint64_t field_D0;
-		std::uint64_t field_D8;
-		BSTArray<void*> field_E0;
-		BSTArray<void*> field_F8;
-		std::uint8_t gap110[44];
-		std::uint8_t field_13C;
 
 	private:
 		ImageSpaceEffect* ctor()

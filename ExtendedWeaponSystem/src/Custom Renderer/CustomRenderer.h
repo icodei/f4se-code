@@ -5,6 +5,7 @@
 class ScopeRenderer {
 public:
 	ScopeRenderer();
+	ScopeRenderer(BSCullingProcess *cullingProcess, ScopeCamera *camera, BSShaderAccumulator* accumulator, ImageSpaceShaderParam* params);
 	~ScopeRenderer();
 
 	//operators
@@ -14,11 +15,11 @@ public:
 	NiTexture* Render(bool a1);
 
 	//members
-	BSCullingProcess scopeCullingProc{ BSCullingProcess(0) };
+	BSCullingProcess* pScopeCullingProc{ nullptr };
 	ScopeCamera scopeCam{ ScopeCamera() };
-	NiPointer<BSShaderAccumulator> spScopeAccumulator{ DrawWorld__spDrawPersonAccum.get() };
-	ImageSpaceShaderParam params{ BSImagespaceShader__DefaultParam.get() };
-	std::uint32_t type{ 20 };
+	BSShaderAccumulator* pScopeAccumulator{ nullptr };
+	ImageSpaceShaderParam shaderParams;
+	std::uint32_t renderTarget{ 19 };
 };
 
 namespace nsScope {
@@ -51,4 +52,4 @@ public:
 	bool interior{ 0 };
 };
 
-void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeaccum, std::uint32_t a1, std::uint32_t a2, std::uint32_t a3);
+void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, std::uint32_t target, std::uint32_t depthTarget);

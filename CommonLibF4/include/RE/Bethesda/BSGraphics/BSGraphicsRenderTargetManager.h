@@ -14,7 +14,7 @@ namespace RE
 		class RenderTargetManager
 		{
 		public:
-			enum TARGET_PERSISTENCY
+			enum class TARGET_PERSISTENCY
 			{
 				TARGET_PERSISTENCY_SHARED,
 				TARGET_PERSISTENCY_ALWAYS,
@@ -136,14 +136,44 @@ namespace RE
 			void QOnlyIncreaseWhenMoving();                           //TODO
 			void SetNbFramePause();                                   //TODO
 
-			void SetTextureRenderTarget(std::int32_t a1, std::int32_t renderTargetID, bool copyView)
+
+			//notes about texture render target
+			//BSImagespaceShaderCopy::CopyRenderTarget calls SetTextureRenderTarget(0, RenderTarget, 0)
+			//LocalMapRenderer::Render calls SetTextureRenderTarget(2, iLocalMapRenderTarget, 0)
+			//BSBloodSplatterShader::SetupTechnique calls SetTextureRenderTarget(3, iAdaptedLightRenderTarget, 0)
+			//BSDFPrePassShader::SetupTechnique calls SetTextureRenderTarget(4, uiPipboyScreenTarget, 0)
+			//BSEffectShader::SetupMaterial calls SetTextureRenderTarget(6, uiPipboyScreenTarget, 0)
+			//BSLightingShader::SetupTechnique calls SetTextureRenderTarget(12, uiPipboyScreenTarget, 0)
+			//
+			//0
+			//1
+			//2
+			//3
+			//4
+			//5
+			//6
+			//7
+			//8
+			//9
+			//10
+			//11
+			//12
+			//13
+			//14
+
+			void SetTextureRenderTarget(std::int32_t textureID, std::int32_t renderTargetID, bool copyView)
 			{
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureRenderTarget);
 				REL::Relocation<func_t> func{ REL::ID(1433009) };
-				return func(this, a1, renderTargetID, copyView);
+				return func(this, textureID, renderTargetID, copyView);
 			}
 
-			void SetTextureRenderTarget_2();  //TODO
+			void SetTextureRenderTarget_2(std::uint32_t textureID, std::int32_t renderTargetID, BSGraphics::TextureAddressMode texMode, bool copyView)
+			{
+				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureRenderTarget_2);
+				REL::Relocation<func_t> func{ REL::ID(1513035) };
+				return func(this, textureID, renderTargetID, texMode, copyView);
+			}
 
 			void SetTextureDepth(std::int32_t a1, std::int32_t depthStencilTargetID)
 			{

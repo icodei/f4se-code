@@ -1,4 +1,4 @@
-#include "RE/Bethesda/BSResource.h"
+#include "RE/Bethesda/BSResource/BSResource.h"
 
 namespace RE
 {

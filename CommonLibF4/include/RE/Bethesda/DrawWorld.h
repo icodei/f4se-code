@@ -21,6 +21,10 @@ namespace RE
 		using VATSEffectRenderFunc_t = void (*)(NiCamera*);
 	};
 
+	//...
+	//NOTES - DrawWorld::Begin asaigns this SSN with BSShaderManager::State.pShadowSceneNode[0]
+	REL::Relocation<ShadowSceneNode*> DrawWorld__pShadowSceneNode{ REL::ID(879298) };	//1467231B0 
+	//...
 	REL::Relocation<NiAVObject*> DrawWorld__p1stPerson{ REL::ID(1491228) };  //146723200
 	REL::Relocation<NiAVObject*> DrawWorld__pInterior{ REL::ID(127974) };    //146723208
 	//...

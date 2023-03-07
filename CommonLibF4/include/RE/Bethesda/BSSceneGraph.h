@@ -3,6 +3,9 @@
 
 namespace RE
 {
+	class BSCullingProcess;
+	class NiCamera;
+
 	class BSSceneGraph : public NiNode
 	{
 	public:
@@ -14,8 +17,15 @@ namespace RE
 		virtual ~BSSceneGraph();
 
 		//add
-		virtual void GetFarDistance();
-		virtual void GetNearDistance();
-		virtual void SetViewDistanceBasedOnFrameRate();
+		virtual float GetFarDistance();
+		virtual float GetNearDistance();
+		virtual void SetViewDistanceBasedOnFrameRate(float distance);
+
+		//members
+		NiCamera* cam;						//140
+		void* field_148;					//148 Something Ni
+		BSCullingProcess* cullingProcess;	//150
+		bool menu;							//158
+		float camFOV;						//15C
 	};
 }

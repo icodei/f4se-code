@@ -14,7 +14,8 @@ namespace RE
 		BSImagespaceShader() = delete;
 		BSImagespaceShader(const char* fxpName) { ctor(fxpName); }
 
-		//virtual ~BSImagespaceShader();
+		virtual ~BSImagespaceShader();
+
 		//virtual void Render(BSTriShape*, ImageSpaceEffectParam*) override;
 		//virtual void Dispatch(ImageSpaceEffectParam*, bool, std::uint32_t, EffectDesc*) override;
 		//virtual void Setup(ImageSpaceManager*, ImageSpaceEffectParam*);
@@ -44,6 +45,7 @@ namespace RE
 			return func(this, fxpName);
 		}
 	};
+
 	REL::Relocation<ImageSpaceShaderParam> BSImagespaceShader__DefaultParam{ REL::ID(455011) };
 	REL::Relocation<ImageSpaceShaderParam*> BSImagespaceShader__pCurrentParam{ REL::ID(16045) };
 }

@@ -7,7 +7,7 @@
 namespace RE
 {
 	class BSMultiBoundRoom;
-	class BSMultiBoundNode;
+	class BSMultiBoundNode;	//sizeof 0x150
 	class NiAVObject;
 	class NiNode;
 

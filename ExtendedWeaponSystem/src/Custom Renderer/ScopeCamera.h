@@ -159,7 +159,7 @@ public:
 
 	//members
 	BSTSmartPointer<TESCameraState> cameraStates[ScopeCameraStates::kTotal];
-	NiPointer<NiCamera> camera;
+	NiCamera* camera;
 	NiAVObject* renderPlane;
 	NiPoint3 maxExtent;
 	NiPoint3 minExtent;

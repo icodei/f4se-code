@@ -13,41 +13,69 @@ namespace RE
 	class ImageSpaceLUTData;
 	class NiTexture;
 
+	//ImageSpaceManager instance is created by BSShaderManager::Initialize
 	class ImageSpaceManager
 	{
 	public:
 		enum ImageSpaceEffectEnum
 		{
-			kRefraction = 5,
-
-			kGetHit = 11,
+			kUnk0,
+			kUnk1,
+			kSunbeams,
+			kHDR,
+			kHDRCS,
+			kRefraction,
+			kDOF,
+			kDOFSplitScreen,
+			kRadialBlur,
+			kFullScreenBlur,
+			kMotionBlur,
+			kGetHit,
 			kVatsTarget,
-			kFullScreenColor = 13,
+			kFullScreenColor,
+			kBSGammaCorrect,
+			kBSGammaCorrectLUT,
+			kBSGammaCorrectResize,
+			kBSFXAA,
+			kTemporalAA,
+			kUnk19,
+			kBokehDOF,
+			kUpsampleDynamicResolution,
+			kMap,
 
-			kMap = 22,
+			kBlurStart = 23,
+			
+			kBlurEnd = 60,
 
-			kNoise = 62,
-			kRainSplash = 63,
-
-			kPipboyScreen = 66,
+			kWaterDisplacement,
+			kNoise,
+			kRainSplash,
+			kVLSLight,
+			kVLS,
+			kPipboyScreen,
 			kHUDGlass,
-			kModMenu = 68,
-
-			kBSCopy = 72,
+			kModMenu,
+			kAO,
+			kScalableAO,
+			kScalableAOCS,
+			kBSCopy,
 			kBSCopyScaleBias,
 			kBSCopyVisAlpha,
 			kBSGreyScale,
 			kBSDownsampleDepth,
 			kBSCopyStencil,
-			kBSCopyWaterMask = 78,
-
-			kBSRefraction = 80,
+			kBSCopyWaterMask,
+			kBSCopyShadowMapToArray,
+			kBSRefraction,
 			kBSDoubleVision,
 			kBSTextureMask,
-			kBSMap = 83,
+			kBSMap,
+			kUnk84,
+			kUnk85,
+			kBSDOF,
+			kBSDOFFogged,
+			kBSDOFSplitScreen,
 
-			kBSDepthOfFieldFogged = 87,
-			kBSDepthOfFieldSplitScreen = 88,
 
 			kBSNoiseScrollAndBlend = 150,
 			kBSNoiseNormalmap,
@@ -71,14 +99,14 @@ namespace RE
 			kBSVLSComposite,
 			kBSVLSSliceCoord,
 			kBSVLSSliceInterp,
-			kBSVLSSliceStencil = 172,
+			kBSVLSSliceStencil,
 
 			kBSTemporalAAPipboy = 191,
-			kBSTemporalAAPowerArmorPipboy = 192,
+			kBSTemporalAAPowerArmorPipboy,
 
 			kBSRainSplash = 200,
 			kBSRainSplashUpdate,
-			kBSRainSplashDraw = 202,
+			kBSRainSplashDraw,
 
 			kBSFullScreenColor = 205,
 
