@@ -14,9 +14,9 @@
 #include "RE/Bethesda/BSTTuple.h"
 #include "RE/Bethesda/IMovementInterface.h"
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/NetImmerse/NiTMap.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiTMap.h"
 
 namespace RE
 {

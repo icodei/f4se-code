@@ -6,7 +6,7 @@
 #include "RE/Bethesda/BSTEvent.h"
 #include "RE/Bethesda/TESBoundObjects.h"
 #include "RE/Bethesda/UserEvents.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 #include "RE/Scaleform/GFx/GFx_Player.h"
 
 namespace RE

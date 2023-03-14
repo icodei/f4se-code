@@ -33,6 +33,19 @@ namespace RE
 			return func(this);
 		}
 
+		void SetDiffuseTexture(NiTexture* newTex) {
+			using func_t = decltype(&BSLightingShaderProperty::SetDiffuseTexture);
+			REL::Relocation<func_t> func{ REL::ID(61252) };
+			return func(this, newTex);
+		}
+
+		void SetNormalTexture(NiTexture* newTex)
+		{
+			using func_t = decltype(&BSLightingShaderProperty::SetNormalTexture);
+			REL::Relocation<func_t> func{ REL::ID(760865), 0xB };
+			return func(this, newTex);
+		}
+
 		static NiObject* CreateObject()
 		{
 			using func_t = decltype(&BSLightingShaderProperty::CreateObject);

@@ -8,8 +8,8 @@
 #include "RE/Bethesda/BSTEvent.h"
 #include "RE/Bethesda/BSTSingleton.h"
 #include "RE/Bethesda/IMovementInterface.h"
-#include "RE/NetImmerse/NiPoint2.h"
-#include "RE/NetImmerse/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE
 {

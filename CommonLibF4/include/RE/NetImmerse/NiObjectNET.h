@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RE/Bethesda/BSFixedString.h"
-#include "RE/NetImmerse/NiObject.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiObject.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

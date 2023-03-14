@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/NetImmerse/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE
 {

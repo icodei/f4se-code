@@ -25,13 +25,13 @@
 #include "RE/Bethesda/UIMessage.h"
 #include "RE/Bethesda/UIShaderFXInfo.h"
 #include "RE/Bethesda/UserEvents.h"
-#include "RE/NetImmerse/NiMatrix3.h"
-#include "RE/NetImmerse/NiPoint2.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiQuaternion.h"
-#include "RE/NetImmerse/NiRect.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/NetImmerse/NiTexture.h"
+#include "RE/NetImmerse/NiMain/NiMatrix3.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiQuaternion.h"
+#include "RE/NetImmerse/NiMain/NiRect.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiTexture.h"
 
 namespace RE
 {
@@ -211,7 +211,7 @@ namespace RE
 			return func(this, a_event);
 		}
 
-		void HandleEvent(const ButtonEvent* a_event) override  // 08
+		void HandleButtonEvent(const ButtonEvent* a_event) override  // 08
 		{
 			if (menuObj.IsObject()) {
 				auto strUserEvent = a_event->QUserEvent();
@@ -1572,10 +1572,10 @@ namespace RE
 		virtual void OnMenuStackChanged(const BSFixedString& a_topMenuName, bool a_passesTopMenuTest) override;  // 09
 
 		// override (BSInputEventUser)
-		virtual bool ShouldHandleEvent(const InputEvent*) override;  // 01
-		virtual void HandleEvent(const ThumbstickEvent*) override;   // 04
-		virtual void HandleEvent(const CursorMoveEvent*) override;   // 05
-		virtual void HandleEvent(const ButtonEvent*) override;       // 08
+		virtual bool ShouldHandleEvent(const InputEvent*) override;           // 01
+		virtual void HandleThumbstickEvent(const ThumbstickEvent*) override;  // 04
+		virtual void HandleCursorMoveEvent(const CursorMoveEvent*) override;  // 05
+		virtual void HandleButtonEvent(const ButtonEvent*) override;          // 08
 
 		// add
 		virtual void OnHideMenu();                                 // 14
@@ -1766,10 +1766,10 @@ namespace RE
 		virtual bool TryCreate() override;                                            // 1B
 
 		// override (BSInputEventUser)
-		virtual bool ShouldHandleEvent(const InputEvent*) override;  // 01
-		virtual void HandleEvent(const ThumbstickEvent*) override;   // 04
-		virtual void HandleEvent(const CursorMoveEvent*) override;   // 05
-		virtual void HandleEvent(const ButtonEvent*) override;       // 08
+		virtual bool ShouldHandleEvent(const InputEvent*) override;           // 01
+		virtual void HandleThumbstickEvent(const ThumbstickEvent*) override;  // 04
+		virtual void HandleCursorMoveEvent(const CursorMoveEvent*) override;  // 05
+		virtual void HandleButtonEvent(const ButtonEvent*) override;          // 08
 
 		// add
 		virtual EQUIP_TYPE GetInventoryEntryEquipState(const InventoryUserUIInterfaceEntry& a_entry);                                                    // 1C
@@ -1900,10 +1900,10 @@ namespace RE
 		virtual bool OnButtonEventRelease(const BSFixedString& a_eventName) override;  // 0F
 
 		// override (BSInputEventUser)
-		virtual bool ShouldHandleEvent(const InputEvent*) override;  // 01
-		virtual void HandleEvent(const ThumbstickEvent*) override;   // 04
-		virtual void HandleEvent(const MouseMoveEvent*) override;    // 06
-		virtual void HandleEvent(const ButtonEvent*) override;       // 08
+		virtual bool ShouldHandleEvent(const InputEvent*) override;           // 01
+		virtual void HandleThumbstickEvent(const ThumbstickEvent*) override;  // 04
+		virtual void HandleMouseMoveEvent(const MouseMoveEvent*) override;    // 06
+		virtual void HandleButtonEvent(const ButtonEvent*) override;          // 08
 
 		static void OpenLockpickingMenu(TESObjectREFR* a_lockedRef)
 		{

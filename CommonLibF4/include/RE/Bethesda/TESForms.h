@@ -18,11 +18,11 @@
 #include "RE/Bethesda/Settings.h"
 #include "RE/Bethesda/TESCondition.h"
 #include "RE/Bethesda/TESFile.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiFlags.h"
-#include "RE/NetImmerse/NiPoint2.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiFlags.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

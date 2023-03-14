@@ -3,11 +3,11 @@
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSShader/BSShaderMaterial.h"
 #include "RE/Bethesda/BSTArray.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiPlane.h"
-#include "RE/NetImmerse/NiShadeProperty.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/NetImmerse/NiTexture.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiPlane.h"
+#include "RE/NetImmerse/NiMain/NiShadeProperty.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiTexture.h"
 
 namespace RE
 {
@@ -154,7 +154,14 @@ namespace RE
 			BSSP_HINT_GROUP_WATER_DEPTH = 0x1D,
 		};
 
-		class ForEachVisitor;
+		class ForEachVisitor
+		{
+		public:
+			void operator()()
+			{
+				//TODO
+			}
+		};
 
 		class RenderPassArray
 		{
@@ -173,10 +180,10 @@ namespace RE
 		virtual BSRenderPass* CreateVatsMaskRenderPass(BSGeometry*) { return nullptr; }                                                    // 2E
 		virtual std::uint16_t GetNumberofPasses([[maybe_unused]] BSGeometry* a_geom) { return 1; }                                         // 2F
 		virtual BSRenderPass* GetRenderDepthPass(BSGeometry*) { return nullptr; }                                                          // 30
-		virtual bool CanMerge(const BSShaderProperty* a_prop);                                                                             // 31
+		virtual bool CanMerge(const BSShaderProperty* a_prop) { return false; }                                                            // 31
 		virtual void SetMaterialAlpha(float) { return; }                                                                                   // 32
 		virtual float QMaterialAlpha() const { return 1.0F; }                                                                              // 33
-		virtual const BSFixedString& GetRootName() const;                                                                                  // 34
+		virtual const BSFixedString& GetRootName() const { return name; }                                                                  // 34
 		virtual std::int32_t ForEachTexture(ForEachVisitor&) { return 1; }                                                                 // 35
 		virtual std::int32_t QShader() const { return 0; }                                                                                 // 36
 		virtual void ClearUnusedMaterialValues() { return; }                                                                               // 37
@@ -188,6 +195,13 @@ namespace RE
 		virtual std::uint32_t DetermineUtilityShaderDecl() const { return 0; }                                                             // 3D
 		virtual std::uint32_t GetMaterialType() const { return 0; }                                                                        // 3E
 		virtual void DoClearRenderPasses() { return; }                                                                                     // 3F
+
+		void SetEffectShaderData(BSEffectShaderData* shaderData)
+		{
+			using func_t = decltype(&BSShaderProperty::SetEffectShaderData);
+			REL::Relocation<func_t> func{ REL::ID(19696) };
+			return func(this, shaderData);
+		}
 
 		// members
 		float alpha;                                   // 28

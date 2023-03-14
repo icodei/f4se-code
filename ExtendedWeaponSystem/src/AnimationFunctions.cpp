@@ -1,34 +1,21 @@
 #include "Global.h"
 
-typedef void(*_SetAnimationVariableBoolPapyrus)(VirtualMachine* vm, std::uint32_t stackId, TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal);
-RelocAddr <_SetAnimationVariableBoolPapyrus> SetAnimationVariableBoolPapyrusInternal(0x140EB30);
-void SetAnimationVariableBoolPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, bool newVal) {
-	SetAnimationVariableBoolPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
+void SetPlayerAnimationVariableBool(BSFixedString& asVariableName, bool newVal) {
+	(pc)->SetGraphVariableBool(asVariableName, newVal);
 }
 
-typedef void(*_SetAnimationVariableIntPapyrus)(VirtualMachine* vm, std::uint32_t stackId, TESObjectREFR* ref, BSFixedString& asVariableName, int newVal);
-RelocAddr <_SetAnimationVariableIntPapyrus> SetAnimationVariableIntPapyrusInternal(0x140EC70);
-void SetAnimationVariableIntPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, int newVal) {
-	SetAnimationVariableIntPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
+void SetPlayerAnimationVariableInt(BSFixedString& asVariableName, int newVal) {
+	(pc)->SetGraphVariableInt(asVariableName, newVal);
 }
 
-typedef void(*_SetAnimationVariableFloatPapyrus)(VirtualMachine* vm, std::uint32_t stackId, TESObjectREFR* ref, BSFixedString& asVariableName, float newVal);
-RelocAddr <_SetAnimationVariableFloatPapyrus> SetAnimationVariableFloatPapyrusInternal(0x140EBD0);
-void SetAnimationVariableFloatPapyrus(TESObjectREFR* ref, BSFixedString& asVariableName, float newVal) {
-	SetAnimationVariableFloatPapyrusInternal((*g_gameVM)->m_virtualMachine, 1, ref, asVariableName, newVal);
+void SetPlayerAnimationVariableFloat(BSFixedString& asVariableName, float newVal) {
+	(pc)->SetGraphVariableFloat(asVariableName, newVal);
 }
-
-typedef void(*_SetSubGraphFloatVariablePapyrus)(VirtualMachine* vm, std::uint32_t stackId, Actor* actor, BSFixedString asVariableName, float newVal);
-RelocAddr <_SetSubGraphFloatVariablePapyrus> SetSubGraphFloatVariablePapyrusInternal(0x138B430);
-void SetSubGraphFloatVariablePapyrus(Actor* actor, BSFixedString& asVariableName, float newVal) {
-	SetSubGraphFloatVariablePapyrusInternal((*g_gameVM)->m_virtualMachine, 0, actor, asVariableName, newVal);
-}
-
 
 void ReloadSubgraph() {
-	(taskInterface)->AddTaskFunc([]() {
-		
-	});
+	//(taskInterface)->AddTaskFunc([]() {
+	//	
+	//});
 }
 
 /*

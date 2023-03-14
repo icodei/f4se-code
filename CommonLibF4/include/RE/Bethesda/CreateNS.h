@@ -1,25 +1,22 @@
 #pragma once
-#include "f4se_common/Utilities.h"
 
-class NiObject;
-class BSEffectShaderProperty;
-class BSLightingShaderProperty;
-class BSTriShape;
-class NiCamera;
-class NiNode;
+namespace RE
+{
+	class NiObject;
+	class BSEffectShaderProperty;
+	class BSLightingShaderProperty;
+	class BSTriShape;
+	class NiCamera;
+	class NiNode;
 
-typedef NiObject* (*_Create_BSEffectShaderProperty)();
-BSEffectShaderProperty* Create_BSEffectShaderProperty();
+	//static BSEffectShaderProperty* Create_BSEffectShaderProperty() { return nullptr; }
 
-typedef NiObject* (*_Create_BSLightingShaderProperty)();
-BSLightingShaderProperty* Create_BSLightingShaderProperty();
+	//static BSLightingShaderProperty* Create_BSLightingShaderProperty() { return nullptr; }
 
-typedef NiObject* (*_Create_BSTriShape)();
-BSTriShape* Create_BSTriShape();
+	//static BSTriShape* Create_BSTriShape() { return nullptr; }
 
-typedef NiObject* (*_Create_NiCamera)();
-NiCamera* Create_NiCamera();
+	//static NiCamera* Create_NiCamera() { return nullptr; }
 
-typedef NiObject* (*_Create_NiNode)();
-NiNode* Create_NiNode();
+	//static NiNode* Create_NiNode() { return nullptr; }
+}
 

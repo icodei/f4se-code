@@ -1,9 +1,9 @@
 #pragma once
 
 #include "RE/Bethesda/BSResource/BSResourceEnums.h"
-#include "RE/Bethesda/BSResource/Stream.h"
+#include "RE/Bethesda/BSResource/BSResourceStream.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/NetImmerse/NiBinaryStream.h"
+#include "RE/NetImmerse/NiSystem/NiBinaryStream.h"
 
 namespace RE
 {

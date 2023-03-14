@@ -1,6 +1,6 @@
 #pragma once
 #include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/NetImmerse/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
 
 namespace RE
 {
@@ -11,6 +11,14 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSShaderMaterial };
 		static constexpr auto VTABLE{ VTABLE::BSShaderMaterial };
+
+		enum : std::int32_t
+		{
+			BSMATERIAL_TYPE_BASE = 0x0,
+			BSMATERIAL_TYPE_EFFECT = 0x1,
+			BSMATERIAL_TYPE_LIGHTING = 0x2,
+			BSMATERIAL_TYPE_WATER = 0x3,
+		};
 
 		enum ShaderTypes
 		{
@@ -43,7 +51,6 @@ namespace RE
 			MD_END = 0x1,
 		};
 
-
 		virtual ~BSShaderMaterial();
 
 		//add
@@ -56,6 +63,12 @@ namespace RE
 		virtual void ReceiveValuesFromRootMaterial(BSShaderProperty* a_property);
 		virtual bool DoIsCopy(const BSShaderMaterial* other);
 
+		static BSShaderMaterial* GetDefaultMaterial()
+		{
+			REL::Relocation<BSShaderMaterial**> singleton{ REL::ID(95118) };
+			return *singleton;
+		}
+
 		//members
 		NiPoint2 textCoordOffset[2];  // 0C
 		NiPoint2 textCoordScale[2];   // 1C
@@ -64,6 +77,4 @@ namespace RE
 		std::uint32_t uiUniqueCode;   // 34
 	};
 	static_assert(sizeof(BSShaderMaterial) == 0x38);
-
-	REL::Relocation<BSShaderMaterial*> BSShaderMaterial__pDefault(95118);
 }

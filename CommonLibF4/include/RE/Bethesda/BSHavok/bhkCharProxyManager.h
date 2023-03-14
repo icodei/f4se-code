@@ -7,7 +7,7 @@
 #include "RE/Havok/Physics/Physics/Extensions/CharacterControl/Proxy/hknpCharacterProxy.h"
 #include "RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidbody.h"
 #include "RE/Havok/hknpBodyId.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

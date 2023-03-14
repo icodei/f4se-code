@@ -1,6 +1,5 @@
 #include "RE/Bethesda/TESObjectREFRs.h"
-
-#include "RE/NetImmerse/NiAVObject.h"
+#include "RE/NetImmerse/NiMain/NiAVObject.h"
 
 namespace RE
 {

@@ -14,10 +14,10 @@
 #include "RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterState.h"
 #include "RE/Havok/Physics/Physics/Extensions/CharacterControl/hknpCharacterSurfaceInfo.h"
 #include "RE/Havok/hknpBodyId.h"
-#include "RE/NetImmerse/NiCollisionObject.h"
-#include "RE/NetImmerse/NiFlags.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiCollisionObject.h"
+#include "RE/NetImmerse/NiMain/NiFlags.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

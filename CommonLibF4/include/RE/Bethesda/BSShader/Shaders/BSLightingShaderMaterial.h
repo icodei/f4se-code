@@ -11,6 +11,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialBase };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialBase };
+		static constexpr auto TYPE{ BSMATERIAL_TYPE_LIGHTING };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES
 		{
@@ -52,6 +53,12 @@ namespace RE
 		virtual void OnLoadTextureSet(const BSTextureSet*);
 		virtual void DoReceiveValuesFromRootMaterial(const BSShaderData& a_data);
 
+		static BSLightingShaderMaterialBase* GetDefaultMaterial()
+		{
+			REL::Relocation<BSLightingShaderMaterialBase**> singleton{ REL::ID(1060450) };
+			return *singleton;
+		}
+
 		//members
 		NiColor kSpecularColor;                            // 38
 		NiPointer<NiTexture> spDiffuseTexture;             // 48
@@ -79,8 +86,6 @@ namespace RE
 		BSNonReentrantSpinLock LoadTextureSetLock;         // BC
 	};
 	static_assert(sizeof(BSLightingShaderMaterialBase) == 0xC0);
-
-	REL::Relocation<BSLightingShaderMaterialBase*> BSLightingShaderMaterialBase__pLightingDefault(1060450);
 
 	class BSLightingShaderMaterial : public BSLightingShaderMaterialBase
 	{

@@ -5,8 +5,8 @@
 #include "RE/Bethesda/BSTSingleton.h"
 #include "RE/Bethesda/TESFile.h"
 #include "RE/Bethesda/TESForms.h"
-#include "RE/NetImmerse/NiTArray.h"
-#include "RE/NetImmerse/NiTList.h"
+#include "RE/NetImmerse/NiMain/NiTArray.h"
+#include "RE/NetImmerse/NiMain/NiTList.h"
 
 namespace RE
 {

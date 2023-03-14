@@ -3,9 +3,9 @@
 #include <xmmintrin.h>
 
 #include "RE/Bethesda/BSTArray.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiTransform.h"
-#include "RE/Netimmerse/NiObject.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiTransform.h"
+#include "RE/Netimmerse/NiMain/NiObject.h"
 
 namespace RE
 {

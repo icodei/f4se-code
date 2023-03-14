@@ -22,7 +22,6 @@
 #include <memory>
 #include <new>
 #include <optional>
-#include <random>
 #include <source_location>
 #include <span>
 #include <sstream>
@@ -47,7 +46,6 @@ static_assert(
 #include <spdlog/spdlog.h>
 #pragma warning(pop)
 
-#pragma warning(disable: 2784);
 #pragma warning(disable: 4100);
 
 #include "F4SE/Impl/WinAPI.h"

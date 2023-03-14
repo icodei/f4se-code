@@ -5,7 +5,7 @@
 #include "RE/Bethesda/BSFixedString.h"
 #include "RE/Bethesda/BSTArray.h"
 #include "RE/Bethesda/BSTHashMap.h"
-#include "RE/NetImmerse/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE
 {

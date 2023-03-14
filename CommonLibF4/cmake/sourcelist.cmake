@@ -38,14 +38,22 @@ set(SOURCES
 	include/RE/Bethesda/BSBound.h
 	include/RE/Bethesda/BSCompoundFrustum.h
 	include/RE/Bethesda/BSContainer.h
+	include/RE/Bethesda/BSCore/BSCoreUtils.h
+	include/RE/Bethesda/BSCore/BSSafeSleep.h
+	include/RE/Bethesda/BSCore/BSSpinLock.h
+	include/RE/Bethesda/BSCore/BSTLocklessQueue.h
+	include/RE/Bethesda/BSCore/BSThread.h
+	include/RE/Bethesda/BSDevices/BSInputEvent.h
 	include/RE/Bethesda/BSExtraData.h
 	include/RE/Bethesda/BSFixedString.h
 	include/RE/Bethesda/BSGeometry.h
 	include/RE/Bethesda/BSGraphics/BSGraphics.h
 	include/RE/Bethesda/BSGraphics/BSGraphicsHandles.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsLibType.h
 	include/RE/Bethesda/BSGraphics/BSGraphicsRenderTargetManager.h
 	include/RE/Bethesda/BSGraphics/BSGraphicsRenderer.h
 	include/RE/Bethesda/BSGraphics/BSGraphicsResourceCache.h
+	include/RE/Bethesda/BSGraphics/BSGraphicsState.h
 	include/RE/Bethesda/BSGraphics/BSGraphicsTypes.h
 	include/RE/Bethesda/BSGraphics/BSGraphicsUtility.h
 	include/RE/Bethesda/BSHavok/BSClothExtraData.h
@@ -75,17 +83,22 @@ set(SOURCES
 	include/RE/Bethesda/BSHavok/bhkNPCollisionObject.h
 	include/RE/Bethesda/BSHavok/bhkPhysicsSystem.h
 	include/RE/Bethesda/BSHavok/bhkWorld.h
+	include/RE/Bethesda/BSHavokMigration/bhkRefObject.h
 	include/RE/Bethesda/BSInputDeviceManager.h
 	include/RE/Bethesda/BSInputEventReceiver.h
 	include/RE/Bethesda/BSInputEventSingleUser.h
 	include/RE/Bethesda/BSInputEventUser.h
 	include/RE/Bethesda/BSLock.h
 	include/RE/Bethesda/BSMain/BSCullingProcess.h
+	include/RE/Bethesda/BSMain/BSModelDB.h
+	include/RE/Bethesda/BSMain/BSNiNode.h
+	include/RE/Bethesda/BSMain/BSTextureDB.h
 	include/RE/Bethesda/BSMain/BSUtilities.h
+	include/RE/Bethesda/BSMain/QueuedFiles.h
 	include/RE/Bethesda/BSMemStorage.h
 	include/RE/Bethesda/BSPointerHandle.h
+	include/RE/Bethesda/BSPortalGraph.h
 	include/RE/Bethesda/BSPreCulledObjects.h
-	include/RE/Bethesda/BSResource/BSModelDB.h
 	include/RE/Bethesda/BSResource/BSResource.h
 	include/RE/Bethesda/BSResource/BSResourceArchive2.h
 	include/RE/Bethesda/BSResource/BSResourceDirectory.h
@@ -99,10 +112,7 @@ set(SOURCES
 	include/RE/Bethesda/BSResource/BSResourceStreamBase.h
 	include/RE/Bethesda/BSResource/BSResourceStreamer.h
 	include/RE/Bethesda/BSResource/BSResourceUtil.h
-	include/RE/Bethesda/BSResource/BSTextureDB.h
 	include/RE/Bethesda/BSResource/LooseFileStreamBase.h
-	include/RE/Bethesda/BSResource/Stream.h
-	include/RE/Bethesda/BSResource/StreamBase.h
 	include/RE/Bethesda/BSResourceNiBinaryStream.h
 	include/RE/Bethesda/BSScaleformManager.h
 	include/RE/Bethesda/BSSceneGraph.h
@@ -164,19 +174,29 @@ set(SOURCES
 	include/RE/Bethesda/BSSemaphore.h
 	include/RE/Bethesda/BSShader/BSBatchRenderer.h
 	include/RE/Bethesda/BSShader/BSComputeShader.h
+	include/RE/Bethesda/BSShader/BSDistanceObjectInstanceRenderer.h
 	include/RE/Bethesda/BSShader/BSFadeNode.h
 	include/RE/Bethesda/BSShader/BSImagespace.h
+	include/RE/Bethesda/BSShader/BSLeafAnimNode.h
+	include/RE/Bethesda/BSShader/BSLight.h
 	include/RE/Bethesda/BSShader/BSMTAManager.h
+	include/RE/Bethesda/BSShader/BSMTRManagerDefs.h
+	include/RE/Bethesda/BSShader/BSMeshLODTriShape.h
 	include/RE/Bethesda/BSShader/BSShader.h
 	include/RE/Bethesda/BSShader/BSShaderAccumulator.h
 	include/RE/Bethesda/BSShader/BSShaderData.h
+	include/RE/Bethesda/BSShader/BSShaderLibType.h
 	include/RE/Bethesda/BSShader/BSShaderManager.h
 	include/RE/Bethesda/BSShader/BSShaderMaterial.h
 	include/RE/Bethesda/BSShader/BSShaderProperty.h
 	include/RE/Bethesda/BSShader/BSShaderPropertyLightData.h
 	include/RE/Bethesda/BSShader/BSShaderRenderTargets.h
+	include/RE/Bethesda/BSShader/BSShaderSDM.h
+	include/RE/Bethesda/BSShader/BSShaderTechniqueIDMap.h
 	include/RE/Bethesda/BSShader/BSShaderTextureSet.h
 	include/RE/Bethesda/BSShader/BSShaderUtil.h
+	include/RE/Bethesda/BSShader/BSShadowDirectionalLight_Compute.h
+	include/RE/Bethesda/BSShader/BSTreeNode.h
 	include/RE/Bethesda/BSShader/ImageSpace.h
 	include/RE/Bethesda/BSShader/ImageSpaceManager.h
 	include/RE/Bethesda/BSShader/ImageSpaceShaderParam.h
@@ -219,6 +239,7 @@ set(SOURCES
 	include/RE/Bethesda/BSStorage.h
 	include/RE/Bethesda/BSStringPool.h
 	include/RE/Bethesda/BSStringT.h
+	include/RE/Bethesda/BSSystem/BSSystemMonitorEvent.h
 	include/RE/Bethesda/BSSystemFile.h
 	include/RE/Bethesda/BSSystemFileStreamer.h
 	include/RE/Bethesda/BSSystemUtility.h
@@ -247,6 +268,7 @@ set(SOURCES
 	include/RE/Bethesda/CombatFormulas.h
 	include/RE/Bethesda/Console.h
 	include/RE/Bethesda/ControlMap.h
+	include/RE/Bethesda/CreateNS.h
 	include/RE/Bethesda/DrawWorld.h
 	include/RE/Bethesda/Events.h
 	include/RE/Bethesda/FavoritesManager.h
@@ -336,19 +358,22 @@ set(SOURCES
 	include/RE/Havok/Common/Base/Memory/System/hkMemorySystem.h
 	include/RE/Havok/Common/Base/Object/hkBaseObject.h
 	include/RE/Havok/Common/Base/Object/hkReferencedObject.h
+	include/RE/Havok/Common/Base/Reflection/hkClassEnum.h
 	include/RE/Havok/Common/Base/Types/Geometry/Aabb/hkAabb.h
 	include/RE/Havok/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h
 	include/RE/Havok/Common/Base/Types/Physics/ContactPoint/hkContactPointMaterial.h
+	include/RE/Havok/Common/Base/Types/Physics/hkBaseDefs.h
 	include/RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h
 	include/RE/Havok/Common/Base/Types/Physics/hkHandle.h
 	include/RE/Havok/Common/Base/Types/Physics/hkRefPtr.h
 	include/RE/Havok/Common/Base/Types/Physics/hkStepInfo.h
 	include/RE/Havok/Physics/Physics/Dynamics/World/hknpWorld.h
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/Proxy/hknpCharacterProxy.h
-	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidBody.h
-	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidBodyCInfo.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidbody.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidbodyCInfo.h
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterContext.h
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterState.h
+	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterStateManager.h
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/hknpCharacterSurfaceInfo.h
 	include/RE/Havok/Physics/Physics/Extensions/PhysicsSystem/hknpPhysicsSystem.h
 	include/RE/Havok/hknpAllHitsCollector.h
@@ -359,52 +384,102 @@ set(SOURCES
 	include/RE/Havok/hknpMaterialId.h
 	include/RE/Havok/hknpShape.h
 	include/RE/Havok/hknpUniqueBodyIdHitCollector.h
-	include/RE/NetImmerse/NiAVObject.h
 	include/RE/NetImmerse/NiAccumulator.h
-	include/RE/NetImmerse/NiAlphaProperty.h
-	include/RE/NetImmerse/NiBinaryStream.h
-	include/RE/NetImmerse/NiBound.h
-	include/RE/NetImmerse/NiCamera.h
-	include/RE/NetImmerse/NiCollisionObject.h
-	include/RE/NetImmerse/NiColor.h
-	include/RE/NetImmerse/NiController.h
-	include/RE/NetImmerse/NiCullingProcess.h
-	include/RE/NetImmerse/NiExtraData.h
-	include/RE/NetImmerse/NiFile.h
-	include/RE/NetImmerse/NiFlags.h
-	include/RE/NetImmerse/NiFrustum.h
-	include/RE/NetImmerse/NiFrustumPlanes.h
-	include/RE/NetImmerse/NiMatrix3.h
+	include/RE/NetImmerse/NiAnimation/BSAnimNote.h
+	include/RE/NetImmerse/NiAnimation/NiBlendInterpolator.h
+	include/RE/NetImmerse/NiAnimation/NiBlendTransformInterpolator.h
+	include/RE/NetImmerse/NiAnimation/NiControllerManager.h
+	include/RE/NetImmerse/NiAnimation/NiControllerSequence.h
+	include/RE/NetImmerse/NiAnimation/NiInterpController.h
+	include/RE/NetImmerse/NiAnimation/NiInterpolator.h
+	include/RE/NetImmerse/NiAnimation/NiMultiTargetTransformController.h
+	include/RE/NetImmerse/NiAnimation/NiQuatTransform.h
+	include/RE/NetImmerse/NiAnimation/NiStringPalette.h
+	include/RE/NetImmerse/NiAnimation/NiTextKey.h
+	include/RE/NetImmerse/NiAnimation/NiTextKeyExtraData.h
+	include/RE/NetImmerse/NiMain/BSDynamicTriShape.h
+	include/RE/NetImmerse/NiMain/BSFlattenedBoneTree.h
+	include/RE/NetImmerse/NiMain/BSGeometry.h
+	include/RE/NetImmerse/NiMain/BSGeometrySegmentData.h
+	include/RE/NetImmerse/NiMain/BSGeometrySegmentID.h
+	include/RE/NetImmerse/NiMain/BSSkinInstance.h
+	include/RE/NetImmerse/NiMain/BSTriShape.h
+	include/RE/NetImmerse/NiMain/IRendererResourceManager.h
+	include/RE/NetImmerse/NiMain/NiAVObject.h
+	include/RE/NetImmerse/NiMain/NiAVObjectPalette.h
+	include/RE/NetImmerse/NiMain/NiAbstractPoolAllocator.h
+	include/RE/NetImmerse/NiMain/NiAlphaProperty.h
+	include/RE/NetImmerse/NiMain/NiBool.h
+	include/RE/NetImmerse/NiMain/NiBound.h
+	include/RE/NetImmerse/NiMain/NiCamera.h
+	include/RE/NetImmerse/NiMain/NiClone.h
+	include/RE/NetImmerse/NiMain/NiCloningProcess.h
+	include/RE/NetImmerse/NiMain/NiCollisionObject.h
+	include/RE/NetImmerse/NiMain/NiColor.h
+	include/RE/NetImmerse/NiMain/NiCullingProcess.h
+	include/RE/NetImmerse/NiMain/NiDefaultAVObjectPalette.h
+	include/RE/NetImmerse/NiMain/NiExtraData.h
+	include/RE/NetImmerse/NiMain/NiFlags.h
+	include/RE/NetImmerse/NiMain/NiFrustum.h
+	include/RE/NetImmerse/NiMain/NiFrustumPlanes.h
+	include/RE/NetImmerse/NiMain/NiGeometry.h
+	include/RE/NetImmerse/NiMain/NiGeometryData.h
+	include/RE/NetImmerse/NiMain/NiGeometryDataIterators.h
+	include/RE/NetImmerse/NiMain/NiLight.h
+	include/RE/NetImmerse/NiMain/NiMath.h
+	include/RE/NetImmerse/NiMain/NiMatrix3.h
+	include/RE/NetImmerse/NiMain/NiNode.h
+	include/RE/NetImmerse/NiMain/NiObject.h
+	include/RE/NetImmerse/NiMain/NiPlane.h
+	include/RE/NetImmerse/NiMain/NiPoint2.h
+	include/RE/NetImmerse/NiMain/NiPoint3.h
+	include/RE/NetImmerse/NiMain/NiPoint4.h
+	include/RE/NetImmerse/NiMain/NiProperty.h
+	include/RE/NetImmerse/NiMain/NiQuatTransform.h
+	include/RE/NetImmerse/NiMain/NiQuaternion.h
+	include/RE/NetImmerse/NiMain/NiRTTI.h
+	include/RE/NetImmerse/NiMain/NiRect.h
+	include/RE/NetImmerse/NiMain/NiRefObject.h
+	include/RE/NetImmerse/NiMain/NiShadeProperty.h
+	include/RE/NetImmerse/NiMain/NiSkinData.h
+	include/RE/NetImmerse/NiMain/NiSkinInstance.h
+	include/RE/NetImmerse/NiMain/NiSkinPartition.h
+	include/RE/NetImmerse/NiMain/NiSmartPointer.h
+	include/RE/NetImmerse/NiMain/NiStream.h
+	include/RE/NetImmerse/NiMain/NiStringExtraData.h
+	include/RE/NetImmerse/NiMain/NiSwitchNode.h
+	include/RE/NetImmerse/NiMain/NiTArray.h
+	include/RE/NetImmerse/NiMain/NiTCollection.h
+	include/RE/NetImmerse/NiMain/NiTConvertingStrideIterator.h
+	include/RE/NetImmerse/NiMain/NiTDefaultAllocator.h
+	include/RE/NetImmerse/NiMain/NiTLargeArray.h
+	include/RE/NetImmerse/NiMain/NiTList.h
+	include/RE/NetImmerse/NiMain/NiTListBase.h
+	include/RE/NetImmerse/NiMain/NiTMap.h
+	include/RE/NetImmerse/NiMain/NiTMapBase.h
+	include/RE/NetImmerse/NiMain/NiTPointerAllocator.h
+	include/RE/NetImmerse/NiMain/NiTPointerListBase.h
+	include/RE/NetImmerse/NiMain/NiTPointerMap.h
+	include/RE/NetImmerse/NiMain/NiTPtrSet.h
+	include/RE/NetImmerse/NiMain/NiTSet.h
+	include/RE/NetImmerse/NiMain/NiTStringMap.h
+	include/RE/NetImmerse/NiMain/NiTexture.h
+	include/RE/NetImmerse/NiMain/NiTimeController.h
+	include/RE/NetImmerse/NiMain/NiTransform.h
+	include/RE/NetImmerse/NiMain/NiTriBasedGeom.h
+	include/RE/NetImmerse/NiMain/NiTriBasedGeomData.h
+	include/RE/NetImmerse/NiMain/NiTriShape.h
+	include/RE/NetImmerse/NiMain/NiTriShapeData.h
+	include/RE/NetImmerse/NiMain/NiTriStrips.h
+	include/RE/NetImmerse/NiMain/NiTriStripsData.h
+	include/RE/NetImmerse/NiMain/NiViewerStrings.h
 	include/RE/NetImmerse/NiMemStream.h
-	include/RE/NetImmerse/NiNode.h
-	include/RE/NetImmerse/NiObject.h
 	include/RE/NetImmerse/NiObjectNET.h
-	include/RE/NetImmerse/NiPlane.h
-	include/RE/NetImmerse/NiPoint2.h
-	include/RE/NetImmerse/NiPoint3.h
-	include/RE/NetImmerse/NiPoint4.h
-	include/RE/NetImmerse/NiProperty.h
-	include/RE/NetImmerse/NiQuaternion.h
-	include/RE/NetImmerse/NiRTTI.h
-	include/RE/NetImmerse/NiRect.h
-	include/RE/NetImmerse/NiRefObject.h
-	include/RE/NetImmerse/NiShadeProperty.h
-	include/RE/NetImmerse/NiSmartPointer.h
-	include/RE/NetImmerse/NiStream.h
-	include/RE/NetImmerse/NiTArray.h
-	include/RE/NetImmerse/NiTCollection.h
-	include/RE/NetImmerse/NiTDefaultAllocator.h
-	include/RE/NetImmerse/NiTLargeArray.h
-	include/RE/NetImmerse/NiTList.h
-	include/RE/NetImmerse/NiTListBase.h
-	include/RE/NetImmerse/NiTMap.h
-	include/RE/NetImmerse/NiTMapBase.h
-	include/RE/NetImmerse/NiTPointerAllocator.h
-	include/RE/NetImmerse/NiTPointerListBase.h
-	include/RE/NetImmerse/NiTPointerMap.h
-	include/RE/NetImmerse/NiTexture.h
-	include/RE/NetImmerse/NiTimeController.h
-	include/RE/NetImmerse/NiTransform.h
+	include/RE/NetImmerse/NiSystem/NiAllocator.h
+	include/RE/NetImmerse/NiSystem/NiBinaryStream.h
+	include/RE/NetImmerse/NiSystem/NiFile.h
+	include/RE/NetImmerse/NiSystem/NiMemObject.h
+	include/RE/NetImmerse/NiSystem/NiSystemDesc.h
 	include/RE/NetImmerse/NiUpdateData.h
 	include/RE/NiRTTI_IDs.h
 	include/RE/RTTI.h
@@ -455,6 +530,15 @@ set(SOURCES
 	src/RE/Bethesda/Actor.cpp
 	src/RE/Bethesda/BGSInventoryItem.cpp
 	src/RE/Bethesda/BSExtraData.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphics.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsHandles.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsLibType.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsRenderTargetManager.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsRenderer.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsResourceCache.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsState.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsTypes.cpp
+	src/RE/Bethesda/BSGraphics/BSGraphicsUtility.cpp
 	src/RE/Bethesda/BSResource.cpp
 	src/RE/Bethesda/BSResource/Stream.cpp
 	src/RE/Bethesda/BSResource/StreamBase.cpp
@@ -471,6 +555,10 @@ set(SOURCES
 	src/RE/Bethesda/BSScript/StructTypeInfo.cpp
 	src/RE/Bethesda/BSScript/TypeInfo.cpp
 	src/RE/Bethesda/BSScript/Variable.cpp
+	src/RE/Bethesda/BSShader/BSShaderManager.cpp
+	src/RE/Bethesda/BSShader/ImageSpace.cpp
+	src/RE/Bethesda/BSShader/ImageSpaceManager.cpp
+	src/RE/Bethesda/BSShader/Shaders/BSImagespaceShader.cpp
 	src/RE/Bethesda/CRC.cpp
 	src/RE/Bethesda/Calendar.cpp
 	src/RE/Bethesda/FormComponents.cpp
@@ -479,10 +567,12 @@ set(SOURCES
 	src/RE/Bethesda/TESForms.cpp
 	src/RE/Bethesda/TESObjectREFRs.cpp
 	src/RE/Fallout.cpp
-	src/RE/NetImmerse/NiAVObject.cpp
-	src/RE/NetImmerse/NiBinaryStream.cpp
+	src/RE/NetImmerse/NiMain/NiAVObject.cpp
+	src/RE/NetImmerse/NiMain/NiColor.cpp
+	src/RE/NetImmerse/NiMain/NiPoint3.cpp
+	src/RE/NetImmerse/NiMain/NiRect.cpp
 	src/RE/NetImmerse/NiObjectNET.cpp
-	src/RE/NetImmerse/NiRect.cpp
+	src/RE/NetImmerse/NiSystem/NiBinaryStream.cpp
 	src/RE/Scaleform/GFx/GFx_Player.cpp
 	src/REL/Relocation.cpp
 )

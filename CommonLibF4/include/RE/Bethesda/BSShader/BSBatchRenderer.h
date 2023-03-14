@@ -59,8 +59,10 @@ namespace RE
 		struct CommandBufferPassesData
 		{
 		public:
+			static constexpr auto MAX_DRAWS{ 0x2000 };
+
 			// members
-			std::byte* buffer[1u << 13];    // 00000
+			std::byte* buffer[MAX_DRAWS];   // 00000
 			std::byte** currentBuffer;      // 10000
 			CommandBufferPassesData* next;  // 10008
 			std::uint32_t frame;            // 10010
@@ -101,7 +103,7 @@ namespace RE
 		};
 		static_assert(sizeof(PassGroup) == 0x10);
 
-		virtual ~BSBatchRenderer();  // 00
+		virtual ~BSBatchRenderer() {}  // 00
 
 		BSTArray<PassGroup> renderPasses[13];                                                                                  // 008
 		BSTSmallIndexScatterTable<BSTArray<PassGroup>, RenderPassMapAccess> renderPassMap[13];                                 // 140

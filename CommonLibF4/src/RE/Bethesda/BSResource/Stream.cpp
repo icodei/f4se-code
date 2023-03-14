@@ -1,4 +1,4 @@
-#include "RE/Bethesda/BSResource/Stream.h"
+#include "RE/Bethesda/BSResource/BSResourceStream.h"
 
 namespace RE
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiRect.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiRect.h"
 
 namespace RE
 {

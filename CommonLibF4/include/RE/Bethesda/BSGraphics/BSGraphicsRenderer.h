@@ -51,6 +51,13 @@ namespace RE
 			using ResetRenderTargets = void (*)();
 
 		public:
+
+			[[nodiscard]] static Renderer& GetSingleton()
+			{
+				REL::Relocation<Renderer*> singleton{ REL::ID(1378294) };
+				return *singleton;
+			}
+
 			void IncRef(Buffer* vertexBuffer)
 			{
 				using func_t = decltype(&BSGraphics::Renderer::IncRef);
@@ -121,6 +128,4 @@ namespace RE
 		};
 		static_assert(sizeof(Renderer) == 0x25D0);
 	}
-	REL::Relocation<BSGraphics::Renderer> BSGraphics__gRenderer{ REL::ID(1378294) };
-	REL::Relocation<BSGraphics::RendererData*> BSGraphics__pRendererData{ REL::ID(1235449) };
 }

@@ -1,8 +1,8 @@
 #include "Global.h"
 
-BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent* globalEvents, const char* globalName) {
-	BSTArray<BSTGlobalEvent::EventSource<void*>>* sources = reinterpret_cast<BSTArray<BSTGlobalEvent::EventSource<void*>>*>(globalEvents->eventSourceSDMKiller.GetSinks());
-	for (auto elem = sources->begin(); elem != sources->end(); ++elem) {
+BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName) {
+	auto sources = (globalEvents->eventSources);
+	for (auto elem = sources.begin(); elem != sources.end(); ++elem) {
 		const char* name = GetObjectClassName(elem) + 15;
 		if (globalName == name) {
 			return (BSTEventSource<void*>*)&((elem));
@@ -93,7 +93,7 @@ bool IsHoldingButton(ButtonEvent* btnEvent) {
 	return false;
 }
 
-bool IsThrowableWeapon(std::uint32_t equipIndex) {
+bool IsThrowableWeapon(uint32_t equipIndex) {
 	return equipIndex == EquipIndex::kEquipIndex_Throwable;
 }
 
@@ -110,7 +110,7 @@ bool IsWeaponReloadable() {
 
 	EquippedItem* equipData = nullptr;
 	for (auto& elem : equipDataArr) {
-		std::uint32_t equipIndex = elem.equipIndex.index;
+		uint32_t equipIndex = elem.equipIndex.index;
 		if (equipIndex == 0) {
 			equipData = const_cast<EquippedItem*>(&elem);
 			break;
@@ -130,7 +130,7 @@ bool IsWeaponReloadable() {
 	return !func(&wrapper, equipData);
 }
 
-typedef bool (*_WornHasKeywordActor)(BSScript::IVirtualMachine* vm, std::uint32_t stackId, Actor* akTarget, BGSKeyword* akKeyword);
+typedef bool (*_WornHasKeywordActor)(BSScript::IVirtualMachine* vm, uint32_t stackId, Actor* akTarget, BGSKeyword* akKeyword);
 bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword) {
 	GameVM* g_gameVM = GameVM::GetSingleton();
 	using func_t = _WornHasKeywordActor;
@@ -141,7 +141,7 @@ bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword) {
 	return false;
 }
 
-typedef bool (*_IKeywordFormBase_HasKeyword)(IKeywordFormBase* keywordFormBase, BGSKeyword* keyword, std::uint32_t unk3);
+typedef bool (*_IKeywordFormBase_HasKeyword)(IKeywordFormBase* keywordFormBase, BGSKeyword* keyword, uint32_t unk3);
 bool HasKeyword(TESForm* form, BGSKeyword* keyword) {
 	IKeywordFormBase* keywordFormBase = form->As<IKeywordFormBase>();
 	if (!keywordFormBase) {
@@ -171,7 +171,7 @@ bool HasKeywordInstWEAP(TESObjectWEAP::InstanceData* thisInstance, BGSKeyword* k
 		return true;
 	}
 
-	for (std::uint32_t i = 0; i < keywordForm->numKeywords; i++) {
+	for (uint32_t i = 0; i < keywordForm->numKeywords; i++) {
 		BGSKeyword* curr = keywordForm->keywords[i];
 		if (curr == kwdToCheck) {
 			return true;
@@ -180,24 +180,24 @@ bool HasKeywordInstWEAP(TESObjectWEAP::InstanceData* thisInstance, BGSKeyword* k
 	return false;
 }
 
-TESForm* GetFormFromIdentifier(const std::string& identifier) {
+TESForm* GetFormFromIdentifier(const string& identifier) {
 	auto delimiter = identifier.find('|');
-	if (delimiter != std::string::npos) {
-		std::string modName = identifier.substr(0, delimiter);
-		std::string modForm = identifier.substr(delimiter + 1);
+	if (delimiter != string::npos) {
+		string modName = identifier.substr(0, delimiter);
+		string modForm = identifier.substr(delimiter + 1);
 
 		TESDataHandler* g_dataHandler = TESDataHandler::GetSingleton();
 
 		const TESFile* mod = (g_dataHandler)->LookupModByName(modName.c_str());
 		uint8_t modIndex = mod->compileIndex;
 		if (mod && modIndex != -1) {
-			std::uint32_t formID = std::stoul(modForm, nullptr, 16) & 0xFFFFFF;
-			std::uint32_t flags = GetOffset<std::uint32_t>(mod, 0x334);
+			uint32_t formID = stoul(modForm, nullptr, 16) & 0xFFFFFF;
+			uint32_t flags = GetOffset<uint32_t>(mod, 0x334);
 			if (flags & (1 << 9)) {
 				// ESL
 				formID &= 0xFFF;
 				formID |= 0xFE << 24;
-				formID |= GetOffset<std::uint32_t>(mod, 0x372) << 12;  // ESL load order
+				formID |= GetOffset<uint32_t>(mod, 0x372) << 12;  // ESL load order
 			} else {
 				formID |= (modIndex) << 24;
 			}
@@ -217,10 +217,10 @@ bool GetForms() {
 	if (!ThermalScopeKeyword) {
 		log("Unable to get ThermalScopeKeyword, you are lacking some file/files");
 	}
-	ThermalFXS = reinterpret_cast<TESEffectShader*>(GetFormFromIdentifier("Code_SharedAttachments.esm|5BCB"));
-	if (!ThermalFXS) {
-		log("Unable to get ThermalFXS, you are lacking some file/files");
-	}
+	//ThermalFXS = reinterpret_cast<TESEffectShader*>(GetFormFromIdentifier("Code_SharedAttachments.esm|5BCB"));
+	//if (!ThermalFXS) {
+	//	log("Unable to get ThermalFXS, you are lacking some file/files");
+	//}
 	return true;
 }
 
@@ -242,7 +242,7 @@ const BSTArray<EquippedItem>* GetPlayerEquippedItemArray() {
 	return equipDataArray;
 }
 
-const EquippedItem* GetPlayerEquippedItemByFormID(std::uint32_t formId) {
+const EquippedItem* GetPlayerEquippedItemByFormID(uint32_t formId) {
 	const BSTArray<EquippedItem>* equipDataArray = GetPlayerEquippedItemArray();
 	if (!equipDataArray) {
 		return nullptr;
@@ -269,8 +269,8 @@ const EquippedItem* GetPlayerEquippedItemByEquipIndex(EquipIndex equipIndex) {
 		return nullptr;
 	}
 	for (auto elem = equipDataArray->begin(); elem != equipDataArray->end(); ++elem) {
-		std::uint32_t eIdx = elem->equipIndex.index;
-		if (eIdx == equipIndex) {
+		uint32_t eIdx = elem->equipIndex.index;
+		if (eIdx == (uint32_t)equipIndex) {
 			return elem;
 		}
 	}
@@ -295,8 +295,8 @@ const EquippedWeapon* GetPlayerEquippedWeaponByEquipIndex(EquipIndex equipIndex)
 		return nullptr;
 	}
 	for (auto elem = equipDataArray->begin(); elem != equipDataArray->end(); ++elem) {
-		std::uint32_t eIdx = elem->equipIndex.index;
-		if (eIdx == equipIndex) {
+		uint32_t eIdx = elem->equipIndex.index;
+		if (eIdx == (uint32_t)equipIndex) {
 			return elem;
 		}
 	}
@@ -357,7 +357,7 @@ const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedWeapon& a
 	return weapInstData;
 }
 
-const std::uint32_t GetInventoryItemCount(Actor* actor, TESForm* item) {
+const uint32_t GetInventoryItemCount(Actor* actor, TESForm* item) {
 	if (!actor || !item) {
 		return NULL;
 	}
@@ -367,7 +367,7 @@ const std::uint32_t GetInventoryItemCount(Actor* actor, TESForm* item) {
 		return NULL;
 	}
 
-	std::uint32_t totalItemCount = 0;
+	uint32_t totalItemCount = 0;
 	inventory->rwLock.lock_read();
 	for (auto& elem : inventory->data) {
 		if (elem.object == item) {
@@ -421,8 +421,20 @@ const NiAVObject* GetByNameHelper(const BSFixedString& name) {
 	*/
 }
 
+char tempbuf[8192] = { 0 };
+char* _MESSAGE(const char* fmt, ...) {
+	va_list args;
+
+	va_start(args, fmt);
+	vsnprintf(tempbuf, sizeof(tempbuf), fmt, args);
+	va_end(args);
+	spdlog::log(spdlog::level::warn, tempbuf);
+
+	return tempbuf;
+}
+
 // Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-const std::string currentDateTime() {
+const string currentDateTime() {
 	time_t now = time(0);
 	struct tm tstruct;
 	char buf[80];
@@ -434,20 +446,20 @@ const std::string currentDateTime() {
 	return buf;
 }
 
-const std::string prefixLog() {
+const string prefixLog() {
 	std::stringstream buffer;
 	buffer << "[" << currentDateTime() << "] [EWS] ";
 	return (buffer.str());
 }
 
 //Write message log only if logEnabled == True
-void logIfNeeded(std::string text) {
+void logIfNeeded(string text) {
 	if (logEnabled) {
 		_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
 	}
 }
 
 //Write message log always
-void log(std::string text) {
+void log(string text) {
 	_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
 }

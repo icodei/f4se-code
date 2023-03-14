@@ -7,9 +7,9 @@
 #include "RE/Bethesda/BSTEvent.h"
 #include "RE/Bethesda/CELLJobs.h"
 #include "RE/Bethesda/TESObjectREFRs.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/NetImmerse/NiTransform.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiTransform.h"
 
 namespace RE
 {

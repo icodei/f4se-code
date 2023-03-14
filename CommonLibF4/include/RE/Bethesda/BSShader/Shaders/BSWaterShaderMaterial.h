@@ -1,8 +1,8 @@
 #pragma once
 #include "RE/Bethesda/BSShader/BSShaderMaterial.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiPlane.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiPlane.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
@@ -13,6 +13,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSWaterShaderMaterial };
 		static constexpr auto VTABLE{ VTABLE::BSWaterShaderMaterial };
+		static constexpr auto TYPE{ BSMATERIAL_TYPE_WATER };
 
 		//members
 		NiPointer<NiTexture> spStaticReflectionMap;

@@ -12,9 +12,9 @@
 #include "RE/Bethesda/TESForms.h"
 #include "RE/Havok/hknpBodyId.h"
 #include "RE/Havok/hknpClosestUniqueBodyIdHitCollector.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiQuaternion.h"
-#include "RE/NetImmerse/NiRefObject.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiQuaternion.h"
+#include "RE/NetImmerse/NiMain/NiRefObject.h"
 
 namespace RE
 {

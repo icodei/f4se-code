@@ -9,10 +9,10 @@
 #include "RE/Bethesda/BSTSingleton.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
-#include "RE/NetImmerse/NiPoint2.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiQuaternion.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiQuaternion.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
@@ -63,7 +63,7 @@ namespace RE
 		TESCameraState() = delete;
 		TESCameraState(TESCamera& cam, std::uint32_t ID) { ctor(cam, ID); }
 
-		virtual ~TESCameraState() {}  // 00
+		virtual ~TESCameraState() { return; }  // 00
 
 		// add
 		virtual void Begin() { return; }                                                         // 09
@@ -97,12 +97,12 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::TESCamera };
 		static constexpr auto VTABLE{ VTABLE::TESCamera };
 
-		virtual ~TESCamera();  // 00
+		virtual ~TESCamera() { return; }  // 00
 
 		// add
-		virtual void SetCameraRoot(NiNode* a_cameraRoot);                 // 01
-		virtual void SetEnabled(bool a_enabled) { enabled = a_enabled; }  // 02
-		virtual void Update();                                            // 03
+		virtual void SetCameraRoot(NiNode* a_cameraRoot) { cameraRoot = a_cameraRoot; }  // 01
+		virtual void SetEnabled(bool a_enabled) { enabled = a_enabled; }                 // 02
+		virtual void Update() { return; }                                                // 03
 
 		// members
 		BSTPoint2<float> rotationInput;                // 08

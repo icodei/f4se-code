@@ -3,8 +3,8 @@
 #include "RE/Bethesda/BSShader/BSShaderProperty.h"
 #include "RE/Bethesda/BSShader/BSShaderPropertyLightData.h"
 #include "RE/Bethesda/BSTArray.h"
-#include "RE/NetImmerse/NiNode.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiNode.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

@@ -10,7 +10,7 @@
 #include "RE/Bethesda/FormComponents.h"
 #include "RE/Bethesda/TESCondition.h"
 #include "RE/Bethesda/TESForms.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

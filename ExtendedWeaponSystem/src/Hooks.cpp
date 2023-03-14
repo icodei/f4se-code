@@ -39,6 +39,7 @@ BSEventNotifyControl PlayerAmmoCountEventSink::ProcessEvent(const PlayerAmmoCoun
 	return BSEventNotifyControl::kContinue;
 }
 
+#pragma region PlayerAnimGraphEventSink
 BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimationGraphEvent& a_event, BSTEventSource<BSAnimationGraphEvent>* a_source) {
 	FnProcessEvent fn = fnHash.at(*(uintptr_t*)this);
 	if (!currentWeapInstance) {
@@ -91,17 +92,15 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 	}
 	if (a_event.name == weaponInstantDown) {
 		ignore = true;
+		if (processCurrentScope) {
+			nsScope::DestroyRenderer();
+		}
 	}
 	if (processCurrentScope) {
 		if (a_event.name == sightedStateEnter) {
 			ignore = false;
-			if (readyForRender && (ignore == false) && ScopeTextureLoader && scopePOV) {
-				ScopeRendererManager::RenderHelper(true);
-			}
-			//(ThermalFXS)->StartEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData, true);
 		} else if (a_event.name == sightedStateExit) {
 			ignore = true;
-			//(ThermalFXS)->StopEffectShader(ThermalFXS, ScopeTextureLoader, effectShaderData);
 		}
 	}
 	return fn ? (this->*fn)(const_cast<BSAnimationGraphEvent&>(a_event), a_source) : BSEventNotifyControl::kContinue;
@@ -116,8 +115,12 @@ void PlayerAnimGraphEventSink::HookSink() {
 	}
 }
 
+std::unordered_map<uintptr_t, PlayerAnimGraphEventSink::FnProcessEvent> PlayerAnimGraphEventSink::fnHash;
+#pragma endregion
+
+#pragma region PlayerSetWeaponStateEventSink
 BSEventNotifyControl PlayerSetWeaponStateEventSink::ProcessEvent(const PlayerSetWeaponStateEvent& a_event, BSTEventSource<PlayerSetWeaponStateEvent>* a_source) {
-	bool isDrawing;
+	bool isDrawing = false;
 	if (a_event.optionalValue.value() == WEAPON_STATE::kDrawing) {
 		logIfNeeded("Weapon is being equiped.");
 		isDrawing = true;
@@ -134,12 +137,16 @@ BSEventNotifyControl PlayerSetWeaponStateEventSink::ProcessEvent(const PlayerSet
 	}
 	return BSEventNotifyControl::kContinue;
 }
+#pragma endregion
 
+#pragma region PlayerWeaponReloadEventSink
 BSEventNotifyControl PlayerWeaponReloadEventSink::ProcessEvent(const PlayerWeaponReloadEvent& a_event, BSTEventSource<PlayerWeaponReloadEvent>* a_source) {
 	//logIfNeeded("PlayerWeaponReloadEvent");
 	return BSEventNotifyControl::kContinue;
 }
+#pragma endregion
 
+#pragma region TESEquipEventSink
 //adding too much to this hook causes the equip to stall and do weird things
 //Bingle showed me how threading worked :) hopefully that should fix the issues with the above comment
 BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_event, BSTEventSource<TESEquipEvent>* a_source) {
@@ -165,9 +172,10 @@ BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_even
 	logIfNeeded(";======================================================================================;");
 	logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
 	std::thread([weapInst]() { HanldeWeaponEquip(weapInst); }).detach();
-	//HanldeWeaponEquip(weapInst);
+
 	return BSEventNotifyControl::kContinue;
 }
+#pragma endregion
 
 //TODO: check what furniture the player is getting into. Might be able to ignore power armor frame
 BSEventNotifyControl TESFurnitureEventSink::ProcessEvent(const TESFurnitureEvent& a_event, BSTEventSource<TESFurnitureEvent>* a_source) {
@@ -189,7 +197,7 @@ BSEventNotifyControl TESLoadGameEventSink::ProcessEvent(const TESLoadGameEvent& 
 }
 
 void PlayerUpdate_Hook(void* player, float a1) {
-	if (processCurrentScope && readyForRender && (ignore == false) && ScopeTextureLoader && scopePOV) {
+	if (processCurrentScope && readyForRender && (ignore == false)) {
 		//ScopeRendererManager::RenderHelper(true);
 	}
 	return;
@@ -342,10 +350,6 @@ bool RegisterAfterLoadEvents()  // TODO - This function might be called more tha
 
 	//if (!scopePOV || !scopePOVRoot || !pScopeManagerCullingProc || !pScopeManagerAccumulator || !pScopeManagerShaderParam) {
 	//	ScopeRendererManager::Setup();
-	//}
-
-	//if (!scopeRenderer) {
-	//	//nsScope_CreateRenderer(); //CTD during creation. For some reason the ctor of ScopeCamera is called twice and crashes at the second called ctor
 	//}
 
 	return true;

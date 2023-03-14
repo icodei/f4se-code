@@ -1,6 +1,6 @@
 #pragma once
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
-#include "RE/NetImmerse/NiObject.h"
+#include "RE/NetImmerse/NiMain/NiObject.h"
 
 namespace RE
 {

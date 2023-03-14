@@ -6,7 +6,7 @@
 #include "RE/Bethesda/BSTHashMap.h"
 #include "RE/Bethesda/BSTList.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/NetImmerse/NiFile.h"
+#include "RE/NetImmerse/NiSystem/NiFile.h"
 
 namespace RE
 {

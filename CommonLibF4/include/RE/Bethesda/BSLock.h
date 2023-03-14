@@ -7,6 +7,7 @@ namespace RE
 	public:
 		constexpr BSNonReentrantSpinLock() noexcept {}  // NOLINT(modernize-use-equals-default)
 
+	private:
 		// members
 		std::uint32_t lock{ 0 };  // 0
 	};
@@ -15,6 +16,18 @@ namespace RE
 	class BSSpinLock
 	{
 	public:
+		bool IsLocked()
+		{
+			return _lockCount != 0;
+		}
+
+		bool IsLockedByUs()
+		{
+			using func_t = decltype(&BSSpinLock::IsLockedByUs);
+			REL::Relocation<func_t> func{ REL::ID(1477730) };
+			return func(this);
+		}
+
 		void lock(const char* a_id = nullptr)
 		{
 			using func_t = decltype(&BSSpinLock::lock);
@@ -41,7 +54,7 @@ namespace RE
 			}
 		}
 
-	private:
+	protected:
 		// members
 		std::uint32_t _owningThread{ 0 };        // 0
 		volatile std::uint32_t _lockCount{ 0 };  // 4

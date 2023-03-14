@@ -28,7 +28,7 @@ T SafeWrite64Function(uintptr_t addr, T data) {
 	return olddata;
 }
 
-BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent* globalEvents, const char* globalName);
+BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName);
 const char* GetObjectClassName(void* objBase);
 
 enum AmmoType {
@@ -45,7 +45,7 @@ enum EquipIndex {
 };
 
 struct IsReloadableData {
-	std::uint64_t unk00;
+	uint64_t unk00;
 	Actor* actor;
 };
 
@@ -60,42 +60,32 @@ bool IsFirstPerson();
 bool IsThirdPerson();
 bool IsWeaponDrawn();
 bool IsWeaponReloadable();
-bool IsThrowableWeapon(std::uint32_t equipIndex);
+bool IsThrowableWeapon(uint32_t equipIndex);
 bool IsButtonPressed(ButtonEvent* btnEvent);
 bool IsHoldingButton(ButtonEvent* btnEvent);
 
 bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword);
 bool HasKeyword(TESForm* form, BGSKeyword* keyword);
 bool HasKeywordInstWEAP(TESObjectWEAP::InstanceData* thisInstance, BGSKeyword* kwdToCheck);
-TESForm* GetFormFromIdentifier(const std::string& identifier);
+TESForm* GetFormFromIdentifier(const string& identifier);
 bool GetForms();
-std::string GetFullNameWEAP(TESObjectWEAP* weap);
+string GetFullNameWEAP(TESObjectWEAP* weap);
 
 const BSTArray<EquippedItem>* GetPlayerEquippedItemArray();
-const EquippedItem* GetPlayerEquippedItemByFormID(std::uint32_t formId);
+const EquippedItem* GetPlayerEquippedItemByFormID(uint32_t formId);
 const EquippedItem* GetPlayerEquippedItemByEquipIndex(EquipIndex equipIndex);
 const EquippedWeapon* GetPlayerEquippedWeaponByEquipIndex(EquipIndex equipIndex);
 const EquippedWeaponData* GetPlayerEquippedWeaponDataByEquipIndex(EquipIndex equipIndex);
 const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(TESForm* weapForm, TBO_InstanceData* weapInst);
 const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedItem& a_item);
 const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedWeapon& a_weapon);
-const std::uint32_t GetInventoryItemCount(Actor* actor, TESForm* item);
+const uint32_t GetInventoryItemCount(Actor* actor, TESForm* item);
 
 const NiAVObject* GetByNameHelper(const BSFixedString& name);
 
-char tempbuf[8192] = { 0 };
-char* _MESSAGE(const char* fmt, ...) {
-	va_list args;
+char* _MESSAGE(const char* fmt, ...);
 
-	va_start(args, fmt);
-	vsnprintf(tempbuf, sizeof(tempbuf), fmt, args);
-	va_end(args);
-	spdlog::log(spdlog::level::warn, tempbuf);
-
-	return tempbuf;
-}
-
-const std::string currentDateTime();
-const std::string prefixLog();
-void logIfNeeded(std::string text);
-void log(std::string text);
+const string currentDateTime();
+const string prefixLog();
+void logIfNeeded(string text);
+void log(string text);

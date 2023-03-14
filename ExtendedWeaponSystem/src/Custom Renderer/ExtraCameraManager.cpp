@@ -1,10 +1,6 @@
 #include "Global.h"
 
-std::unordered_map<const char*, NiCamera*> s_extraCamerasMap;
-
-
 bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAttach, char nodeName) {
-
 	NiCamera* cam;
 	NiCamera** pCam;
 
@@ -14,36 +10,30 @@ bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAtta
 		NiNode* targetNode = (NiNode*)GetByNameHelper(sNodeName);
 		if (targetNode) {
 			if (std::get<bool>(s_extraCamerasMap.insert(std::pair<const char*, NiCamera*>(camName, *pCam)))) {
-				*pCam = cam = Create_NiCamera();
-				InterlockedIncrement(&cam->m_uiRefCount);
-				cam->m_name = sCamName;
-				cam->viewFrustum.m_fNear = 5.0;
-				cam->viewFrustum.m_fFar = 353840.0;
-				cam->minNearPlaneDist = 1.0;
-				cam->maxFarNearRatio = 70768.0;
-				cam->lodAdjust = 0.001;
-
-				scopePOV = cam;
-				scopePOV_BACKUP = cam;
+				*pCam = cam = NiCamera::Create();
+				InterlockedIncrement(&cam->refCount);
+				cam->name = sCamName;
+				cam->viewFrustum.nearPlane = 5.0F;
+				cam->viewFrustum.farPlane = 353840.0F;
+				cam->minNearPlaneDist = 1.0F;
+				cam->maxFarNearRatio = 70768.0F;
+				cam->lodAdjust = 0.001F;
+			} else {
+				cam = *pCam;
 			}
-			else { cam = *pCam; }
-			if (cam->m_parent != targetNode) {
+			if (cam->parent != targetNode) {
 				targetNode->AttachChild(cam, 1);
-				NiAVObject::NiUpdateData camUpdateParams;
-				new(&camUpdateParams) NiAVObject::NiUpdateData();
-				camUpdateParams.unk00 = 0; //time = 0.0
-				memset(camUpdateParams.pCamera, 0, 20);
-				cam->Update(camUpdateParams);
+				NiUpdateData camUpdateParams;
+				cam->UpdateDownwardPass(camUpdateParams, 0);
 			}
 		}
-	}
-	else {
+	} else {
 		auto findCam = s_extraCamerasMap.find(camName);
 		if (findCam != s_extraCamerasMap.end()) {
 			cam = findCam->second;
 			s_extraCamerasMap.erase(camName);
-			if (cam->m_parent) {
-				cam->m_parent->RemoveChild(cam);
+			if (cam->parent) {
+				cam->parent->DetachChild(cam);
 			}
 			cam->DeleteThis();
 		}
@@ -52,36 +42,36 @@ bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAtta
 }
 
 void ExtraCameraManager::GenerateExtraCameraTexture(TESObjectCELL* cell, NiCamera* camera, NiTexture* outTexture) {
-
 }
 
 bool ExtraCameraManager::ProjectExtraCamera(const char camName[0x40], const char nodeName[0x40], float fov, std::uint32_t pixelSize) {
 	NiCamera* cam = (*s_extraCamerasMap.find(camName)).second;
-	if (cam && cam->m_parent) {
+	if (cam && cam->parent) {
 		NiTexture** pTex = NULL;
 		if (nodeName) {
 			BSFixedString sNodeName(nodeName);
-			NiAVObject* targetGeom = GetByNameHelper(sNodeName);
-			if (targetGeom && targetGeom->GetAsBSGeometry()) {
+			const BSGeometry* targetGeom = (BSGeometry*)GetByNameHelper(sNodeName);
+			if (targetGeom) {
 				NiPointer<BSShaderProperty> shaderProperty;
 
 				BSEffectShaderProperty* effectShaderProperty;
-				shaderProperty = ni_cast(targetGeom->GetAsBSGeometry()->shaderProperty, BSShaderProperty);
-				effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
+				shaderProperty.reset((BSShaderProperty*)(targetGeom->shaderProperty.get()));
+				effectShaderProperty = (BSEffectShaderProperty*)shaderProperty.get();
 				if (shaderProperty.get()) {
-					NiTexture* baseTex = effectShaderProperty->QBaseTexture();
+					NiTexture* baseTex = effectShaderProperty->GetBaseTexture();
 					pTex = &baseTex;
 				}
 			}
 		}
 		if (pTex) {
 			float w = tan(fov * FltPId180) * (1 / 1.5);
-			cam->viewFrustum.m_fLeft = -w;
-			cam->viewFrustum.m_fRight = w;
-			cam->viewFrustum.m_fTop = w;
-			cam->viewFrustum.m_fBottom = -w;
-
+			cam->viewFrustum.leftPlane = -w;
+			cam->viewFrustum.rightPlane = w;
+			cam->viewFrustum.topPlane = w;
+			cam->viewFrustum.bottomPlane = -w;
 		}
 	}
 	return true;
 }
+
+unordered_map<const char*, NiCamera*> ExtraCameraManager::s_extraCamerasMap;

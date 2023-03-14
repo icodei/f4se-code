@@ -1,143 +1,109 @@
 #pragma once
 
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/Bethesda/BSTHashMap.h"
 #include "RE/Bethesda/BSBound.h"
 #include "RE/Bethesda/BSFixedString.h"
 #include "RE/Bethesda/BSSkin.h"
+#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/NetImmerse/NiMain/BSGeometrySegmentData.h"
+#include "RE/NetImmerse/NiMain/NiAVObject.h"
+#include "RE/NetImmerse/NiMain/NiBound.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
 	class BSDynamicTriShape;
 	class NiProperty;
+	class NiUpdateData;
+	class BSCombinedTriShape;
+	class BSMergeInstancedTriShape;
+	class BSMultiIndexTriShape;
 
 	struct ID3D11Buffer;
 
-	// 38
-	struct BSGeometrySegmentFlagData
+	namespace BSGraphics
 	{
-		BSTHashMap<std::uint32_t, BSFixedString> SegmentDeltas;  // 00
-		BSFixedString BaseBoneName;                     // 30
-	};
-
-	// 68
-	class BSGeometrySegmentSharedData : public BSIntrusiveRefCounted
-	{
-	public:
-
-		// 28
-		struct PerSegmentSharedData
-		{
-			std::uint32_t uiUserIndex;  // 00
-			std::uint32_t uiBoneID;     // 04
-			float fValidCutOffsets[8];  // 08
-		};
-
-		//members
-		BSFixedString SSFFileName;                      // 08
-		std::uint32_t uiNumSegments;                    // 10
-		std::uint32_t uiTotalNumSegments;               // 14
-		std::uint32_t* pSegmentStarts;                  // 18
-		PerSegmentSharedData* pPerSegmentSharedData;    // 20
-		BSGeometrySegmentFlagData SegmentsEnabledData;  // 28
-		bool bProcessedCutOffsets;                      // 60
-	};
-
-	// 40
-	class BSGeometrySegmentData : public NiObject
-	{
-	public:
-
-		static constexpr auto RTTI{ RTTI::BSGeometrySegmentData };
-		static constexpr auto VTABLE{ VTABLE::BSGeometrySegmentData };
-		static constexpr auto Ni_RTTI{ Ni_RTTI::BSGeometrySegmentData };
-
-		// 18
-		struct Segment
-		{
-			std::uint32_t uiStartIndex;  // 00
-			std::uint32_t uiNumPrimitives;  // 04
-			std::uint32_t uiParentArrayIndex;  // 08
-			std::uint32_t uiChildCount;        // 0C
-			std::uint8_t ucDisabledCount;     // 10
-		};
-
-		// 8
-		struct DrawData
-		{
-			std::uint32_t uiStartIndex;  // 00
-			std::uint32_t uiNumPrimitives;  // 04
-		};
-
-		//members
-		BSGeometrySegmentSharedData* spSharedData;  // 10
-		Segment* pSegments;                         // 18
-		DrawData* pSegmentDrawData;                 // 20
-		std::uint32_t uiNumDraws;                   // 28
-		std::uint32_t uiNumSegments;                // 2C
-		std::uint32_t uiTotalNumSegments;           // 30
-		std::uint32_t uiTotalNumPrimitives;         // 34
-		std::uint32_t uiSegToZeroMap;               // 38
-		bool bSegmentsChanged;                      // 3C
-		bool bIgnoreSegments;                       // 3D
-	};
+		struct IndexBuffer;
+	}
 
 	class BSGeometryData
 	{
 	public:
-		
 		struct VertexData
 		{
-			ID3D11Buffer* d3d11Buffer;  // 00 - const CLayeredObjectWithCLS<class CBuffer>::CContainedObject::`vftable'{for `CPrivateDataImpl<struct ID3D11Buffer>'}
-			std::uint8_t* vertexBlock;  // 08
-			std::uint64_t unk10;        // 10
-			std::uint64_t unk18;        // 18
-			std::uint64_t unk20;        // 20
-			std::uint64_t unk28;        // 28
-			std::uint64_t unk30;        // 30
+			ID3D11Buffer* d3d11Buffer;       // 00 - const CLayeredObjectWithCLS<class CBuffer>::CContainedObject::`vftable'{for `CPrivateDataImpl<struct ID3D11Buffer>'}
+			std::uint8_t* vertexBlock;       // 08
+			std::uint64_t unk10;             // 10
+			std::uint64_t unk18;             // 18
+			std::uint64_t unk20;             // 20
+			std::uint64_t unk28;             // 28
+			std::uint64_t unk30;             // 30
 			volatile std::int32_t refCount;  // 38
 		};
 
 		struct TriangleData
 		{
-			ID3D11Buffer* d3d11Buffer;  // 00 - Same buffer as VertexData
-			std::uint16_t* triangles;   // 08
-			std::uint64_t unk10;        // 10
-			std::uint64_t unk18;        // 18
-			std::uint64_t unk20;        // 20
-			std::uint64_t unk28;        // 28
-			std::uint64_t unk30;        // 30
+			ID3D11Buffer* d3d11Buffer;       // 00 - Same buffer as VertexData
+			std::uint16_t* triangles;        // 08
+			std::uint64_t unk10;             // 10
+			std::uint64_t unk18;             // 18
+			std::uint64_t unk20;             // 20
+			std::uint64_t unk28;             // 28
+			std::uint64_t unk30;             // 30
 			volatile std::int32_t refCount;  // 38
 		};
 
 		//members
 		std::uint64_t vertexDesc;
-		VertexData* vertexData;      // 08
-		TriangleData* triangleData;  // 10
+		VertexData* vertexData;          // 08
+		TriangleData* triangleData;      // 10
 		volatile std::int32_t refCount;  // 18
 	};
 
-	// 160
+	struct GeometryType
+	{
+		enum : std::int32_t
+		{
+			GEOMETRY_TYPE_GEOMETRY = 0x0,
+			GEOMETRY_TYPE_PARTICLES = 0x1,
+			GEOMETRY_TYPE_STRIP_PARTICLES = 0x2,
+			GEOMETRY_TYPE_TRISHAPE = 0x3,
+			GEOMETRY_TYPE_DYNAMIC_TRISHAPE = 0x4,
+			GEOMETRY_TYPE_MESHLOD_TRISHAPE = 0x5,
+			GEOMETRY_TYPE_LOD_MULTIINDEX_TRISHAPE = 0x6,
+			GEOMETRY_TYPE_MULTIINDEX_TRISHAPE = 0x7,
+			GEOMETRY_TYPE_SUBINDEX_TRISHAPE = 0x8,
+			GEOMETRY_TYPE_SUBINDEX_LAND_TRISHAPE = 0x9,
+			GEOMETRY_TYPE_MULTISTREAMINSTANCE_TRISHAPE = 0xA,
+			GEOMETRY_TYPE_PARTICLE_SHADER_DYNAMIC_TRISHAPE = 0xB,
+			GEOMETRY_TYPE_LINES = 0xC,
+			GEOMETRY_TYPE_DYNAMIC_LINES = 0xD,
+			GEOMETRY_TYPE_INSTANCE_GROUP = 0xE,
+			GEOMETRY_TYPE_COMBINED_TRISHAPE = 0xF,
+		};
+	};
+
 	class BSGeometry : public NiAVObject
 	{
 	public:
-
 		static constexpr auto RTTI{ RTTI::BSGeometry };
 		static constexpr auto VTABLE{ VTABLE::BSGeometry };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::BSGeometry };
+		static constexpr auto TYPE{ GeometryType::GEOMETRY_TYPE_GEOMETRY };
 
-		virtual void Unk_39() { return; };
-		virtual void Unk_3A() { return; };
-		virtual void Unk_3B() { return; };
-		virtual void Unk_3C() { return; };
-		virtual void Unk_3D() { return; };
-		virtual void Unk_3E() { return; };
-		virtual void Unk_3F() { return; };
-		virtual void Unk_40() { return; };
+		//add
+		virtual void UpdatePropertyControllers(NiUpdateData& a_data) { return; };
+		virtual BSGeometrySegmentData* GetSegmentData() { return nullptr; };
+		virtual void SetSegmentData(BSGeometrySegmentData* a_data) { return; };
+		virtual BSGraphics::IndexBuffer* GetCustomIndexBuffer() { return nullptr; };
+		virtual BSCombinedTriShape* IsBSCombinedTriShape() { return nullptr; };
+		virtual BSMergeInstancedTriShape* IsBSMergeInstancedTriShape() { return nullptr; };
+		virtual BSMultiIndexTriShape* IsMultiIndexTriShape() { return nullptr; };
+		virtual std::uint32_t GetRenderableTris(std::uint32_t) { return 0; };
 
 		union VertexDesc
 		{
-			struct
+			struct Desc
 			{
 				std::uint8_t szVertexData: 4;
 				std::uint8_t szVertex: 4;  // 0 when not dynamic
@@ -180,84 +146,78 @@ namespace RE
 		NiPointer<NiProperty> effectState;         // 130
 		NiPointer<NiProperty> shaderProperty;      // 138
 		NiPointer<BSSkin::Instance> skinInstance;  // 140
-		BSGeometryData* geometryData;  // 148
-		std::uint64_t vertexDesc;      // 150
-		std::uint8_t ucType;  // 158
-		bool Registered;  // 159
-		std::uint16_t pad15A;  // 15A
-		std::uint32_t unk15C;  // 15C
-
+		void* geometryData;                        // 148
+		std::uint64_t vertexDesc;                  // 150
+		std::uint8_t ucType;                       // 158
+		bool Registered;                           // 159
+		std::uint16_t pad15A;                      // 15A
+		std::uint32_t unk15C;                      // 15C
 	};
 	static_assert(sizeof(BSGeometry) == 0x160);
 
-	// 170
 	class BSTriShape : public BSGeometry
 	{
 	public:
-
 		static constexpr auto RTTI{ RTTI::BSTriShape };
 		static constexpr auto VTABLE{ VTABLE::BSTriShape };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::BSTriShape };
+		static constexpr auto TYPE{ GeometryType::GEOMETRY_TYPE_TRISHAPE };
 
 		//members
 		std::uint32_t numTriangles;  // 160
 		std::uint16_t numVertices;   // 164
 		std::uint16_t unk166;        // 166
-		float unk168;         // 168
-		float unk16C;         // 16C
-
+		float unk168;                // 168
+		float unk16C;                // 16C
 	};
 	static_assert(sizeof(BSTriShape) == 0x170);
 
-	// 1A0
 	class BSDynamicTriShape : public BSTriShape
 	{
 	public:
-
 		static constexpr auto RTTI{ RTTI::BSDynamicTriShape };
 		static constexpr auto VTABLE{ VTABLE::BSDynamicTriShape };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::BSDynamicTriShape };
+		static constexpr auto TYPE{ GeometryType::GEOMETRY_TYPE_DYNAMIC_TRISHAPE };
 
 		//members
-		std::uint32_t uiDynamicDataSize;                     // 170
-		std::uint32_t uiFrameCount;                          // 174
+		std::uint32_t uiDynamicDataSize;              // 170
+		std::uint32_t uiFrameCount;                   // 174
 		BSSpinLock lock;                              // 178
-		std::uint8_t* dynamicVertices;                       // 180 - geometry pointer, must lock/unlock when altering
+		std::uint8_t* dynamicVertices;                // 180 - geometry pointer, must lock/unlock when altering
 		NiPointer<BSGeometrySegmentData> spSegments;  // 188
 		void* unk190;                                 // 190
 		void* unk198;                                 // 198
-
 	};
-	//static_assert(sizeof(BSDynamicTriShape) == 0x1A0);
+	static_assert(sizeof(BSDynamicTriShape) == 0x1A0);
 
-	// 190
 	class BSSubIndexTriShape : public BSTriShape
 	{
 	public:
-
 		static constexpr auto RTTI{ RTTI::BSSubIndexTriShape };
 		static constexpr auto VTABLE{ VTABLE::BSSubIndexTriShape };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::BSSubIndexTriShape };
+		static constexpr auto TYPE{ GeometryType::GEOMETRY_TYPE_SUBINDEX_TRISHAPE };
 
 		struct SegmentData
 		{
-			ID3D11Buffer* d3d11Buffer;  // 00 - const CLayeredObjectWithCLS<class CBuffer>::CContainedObject::vftable'{forCPrivateDataImpl<struct ID3D11Buffer>'}
-			std::uint8_t* segmentBlock;        // 08
-			std::uint64_t unk10;               // 10
-			std::uint64_t unk18;               // 18
-			std::uint64_t unk20;               // 20
-			void* unk28;                // 28
-			std::uint32_t unk30;               // 30
-			std::uint32_t unk34;               // 34
-			volatile std::int32_t refCount;   // 38
+			ID3D11Buffer* d3d11Buffer;       // 00 - const CLayeredObjectWithCLS<class CBuffer>::CContainedObject::vftable'{forCPrivateDataImpl<struct ID3D11Buffer>'}
+			std::uint8_t* segmentBlock;      // 08
+			std::uint64_t unk10;             // 10
+			std::uint64_t unk18;             // 18
+			std::uint64_t unk20;             // 20
+			void* unk28;                     // 28
+			std::uint32_t unk30;             // 30
+			std::uint32_t unk34;             // 34
+			volatile std::int32_t refCount;  // 38
 		};
 
 		//members
 		NiPointer<BSGeometrySegmentData> spSegments;  // 170
-		SegmentData* segmentData;  // 178
-		std::uint32_t numIndices;         // 180
-		std::uint32_t unk184;             // 184
-		void* unk188;              // 188
+		SegmentData* segmentData;                     // 178
+		std::uint32_t numIndices;                     // 180
+		std::uint32_t unk184;                         // 184
+		void* unk188;                                 // 188
 	};
 	static_assert(sizeof(BSSubIndexTriShape) == 0x190);
 }

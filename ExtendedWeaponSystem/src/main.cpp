@@ -1,17 +1,47 @@
 #include "Global.h"
 
 F4SE::PluginHandle g_pluginHandle = NULL;
-F4SE::MessagingInterface* g_messaging;
+const F4SE::MessagingInterface* g_messaging;
+const F4SE::TaskInterface* g_taskInterface;
 
 void init() {
 	pc = PlayerCharacter::GetSingleton();
 	pcam = PlayerCamera::GetSingleton();
-	logger::info(FMT_STRING("PlayerCharacter {}"), pc);
+
+	reloadStarted = false;
+	reloadEnd = true;
+	processCurrentWeap = false;
+	processCurrentScope = false;
+	ignore = false;
+	readyForRender = false;
 }
 
 void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
-	if (msg->type == F4SE::MessagingInterface::kGameLoaded) {
+	switch (msg->type) {
+	case F4SE::MessagingInterface::kPostLoad:
 
+	case F4SE::MessagingInterface::kPostPostLoad:
+
+	case F4SE::MessagingInterface::kPreLoadGame:
+
+	case F4SE::MessagingInterface::kPostLoadGame:
+		FillWeaponInfo();
+		break;
+	case F4SE::MessagingInterface::kPreSaveGame:
+
+	case F4SE::MessagingInterface::kPostSaveGame:
+
+	case F4SE::MessagingInterface::kDeleteGame:
+
+	case F4SE::MessagingInterface::kInputLoaded:
+
+	case F4SE::MessagingInterface::kNewGame:
+
+	case F4SE::MessagingInterface::kGameLoaded:
+
+	case F4SE::MessagingInterface::kGameDataReady:
+		init();
+		break;
 	}
 }
 
@@ -48,7 +78,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	a_info->version = Version::MAJOR;
 
 	if (a_f4se->IsEditor()) {
-		logger::critical("loaded in editor"sv);
+		logger::critical(FMT_STRING("loaded in editor"));
 		return false;
 	}
 
@@ -59,7 +89,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	}
 
 	g_pluginHandle = F4SE::GetPluginHandle();
-	g_messaging = const_cast<F4SE::MessagingInterface*>(F4SE::GetMessagingInterface());
+	g_messaging = F4SE::GetMessagingInterface();
 
 	F4SE::AllocTrampoline(8 * 8);
 
@@ -71,14 +101,15 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f
 	F4SE::Init(a_f4se);
 
 	F4SE::Trampoline& g_trampoline = F4SE::GetTrampoline();
+	g_taskInterface = F4SE::GetTaskInterface();
 
 	if (!g_messaging) {
-		logger::critical("Couldn't get messaging interface"sv);
+		logger::critical(FMT_STRING("Couldn't get messaging interface"));
 		return false;
 	}
 
 	if (g_messaging->RegisterListener(OnF4SEMessage)) {
-		logger::info("Registered listener"sv);
+		logger::info(FMT_STRING("Registered listener"));
 	}
 
 	return true;

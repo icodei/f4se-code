@@ -15,7 +15,7 @@
 #include "RE/Bethesda/BSTimer.h"
 #include "RE/Bethesda/MemoryManager.h"
 #include "RE/Bethesda/TESFile.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

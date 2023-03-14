@@ -5,21 +5,23 @@
 class ScopeRenderer {
 public:
 	ScopeRenderer();
-	ScopeRenderer(BSCullingProcess *cullingProcess, ScopeCamera *camera, BSShaderAccumulator* accumulator, ImageSpaceShaderParam* params);
+	ScopeRenderer(BSCullingProcess *cullingProcess, ScopeCamera *camera, BSShaderAccumulator* accumulator, ImageSpaceShaderParam* params, uint32_t target);
 	~ScopeRenderer();
 
 	//operators
 	ScopeRenderer& operator=(const ScopeRenderer& rhs);
 
 	//functions
-	NiTexture* Render(bool a1);
+	NiTexture* Render(bool saveTexture);
 
 	//members
 	BSCullingProcess* pScopeCullingProc{ nullptr };
-	ScopeCamera scopeCam{ ScopeCamera() };
+	ScopeCamera scopeCam;
 	BSShaderAccumulator* pScopeAccumulator{ nullptr };
 	ImageSpaceShaderParam shaderParams;
-	std::uint32_t renderTarget{ 19 };
+	uint32_t renderTarget{ 19 };
+
+	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
 };
 
 namespace nsScope {
@@ -43,7 +45,7 @@ public:
 		interior = isInterior;
 	}
 
-	std::uint32_t operator()(TESObjectCELL* a_cell) {
+	uint32_t operator()(TESObjectCELL* a_cell) {
 		//TODO
 	}
 
@@ -52,4 +54,4 @@ public:
 	bool interior{ 0 };
 };
 
-void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, std::uint32_t target, std::uint32_t depthTarget);
+void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, uint32_t target, uint32_t depthTarget);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Global.h"
+#include "Util.h"
 
 class BGSOnPlayerUseWorkBenchEventSink : public BSTEventSink<BGSOnPlayerUseWorkBenchEvent> {
 public:
@@ -19,7 +20,7 @@ public:
 	virtual BSEventNotifyControl ProcessEvent(const PlayerAmmoCountEvent& a_event, BSTEventSource<PlayerAmmoCountEvent>* a_source) override;
 
 	static BSTEventSource<PlayerAmmoCountEvent>* GetEventSource() {
-		return (BSTEventSource<PlayerAmmoCountEvent>*)GetGlobalEventSource(BSTGlobalEvent::GetSingleton(), "PlayerAmmoCountEvent");
+		return (BSTEventSource<PlayerAmmoCountEvent>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), "PlayerAmmoCountEvent");
 	}
 	F4_HEAP_REDEFINE_NEW(PlayerAmmoCountEventSink);
 };
@@ -66,7 +67,7 @@ public:
 	virtual BSEventNotifyControl ProcessEvent(const TESLoadGameEvent& a_event, BSTEventSource<TESLoadGameEvent>* a_source) override;
 };
 
-std::unordered_map<const char*, bool> hookedList;
+static std::unordered_map<const char*, bool> hookedList;
 
 bool Install();
 bool RegisterAfterLoadEvents();

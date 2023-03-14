@@ -1,13 +1,17 @@
 #pragma once
 #include "RE/Bethesda/BSPortalGraph.h"
-#include "RE/NetImmerse/NiCullingProcess.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiCullingProcess.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
-	class NiVisibleArray;
-	class NiAccumulator;
 	class BSCompoundFrustum;
+	class BSMultiBound;
+	class BSOcclusionPlane;
+	class NiAccumulator;
+	class NiAVObject;
+	class NiBound;
+	class NiVisibleArray;
 
 	class BSCullingProcess : public NiCullingProcess
 	{
@@ -30,40 +34,12 @@ namespace RE
 		{
 			ctor(a_array);
 		};
-		//virtual void GetRTTI();
-		//virtual void IsNode();
-		//virtual void IsNode2();
-		//virtual void IsSwitchNode();
-		//virtual void IsFadeNode();
-		//virtual void IsMultiBoundNode();
-		//virtual void IsGeometry();
-		//virtual void IsTriStrips();
-		//virtual void IsTriShape();
-		//virtual void IsDynamicTriShape();
-		//virtual void IsSegmentedTriShape();
-		//virtual void IsSubIndexTriShape();
-		//virtual void IsNiGeometry();
-		//virtual void IsNiTriBasedGeom();
-		//virtual void IsNiTriShape();
-		//virtual void IsParticlesGeom();
-		//virtual void IsParticleSystem();
-		//virtual void IsLinesGeom();
-		//virtual void IsLight();
-		//virtual void IsBhkNiCollisionObject();
-		//virtual void IsBhkBlendCollisionObject();
-		//virtual void IsBhkRigidBody();
-		//virtual void IsBhkLimitedHingeConstraint();
-		//virtual void IsbhkNPCollisionObject();
-		//virtual ~BSCullingProcess();
-		//virtual void Process();
-		//virtual void Process2();
-		//virtual void AppendVirtual();
 
 		//add
-		virtual void AppendNonAccum(){};
-		virtual void TestBaseVisibility_BSMultiBound(){};
-		virtual void TestBaseVisibility_BSOcclusionPlane(){};
-		virtual void TestBaseVisibility_NiBound(){};
+		virtual void AppendNonAccum(NiAVObject& a_object) { return; };
+		virtual bool TestBaseVisibility_BSMultiBound(BSMultiBound& a_bound) { return false; };
+		virtual bool TestBaseVisibility_BSOcclusionPlane(BSOcclusionPlane& a_plane) { return false; };
+		virtual bool TestBaseVisibility_NiBound(NiBound& a_bound) { return false; };
 
 		void SetAccumulator(NiAccumulator* accumulator) {
 			using func_t = decltype(&BSCullingProcess::SetAccumulator);

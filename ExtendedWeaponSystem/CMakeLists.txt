@@ -107,6 +107,7 @@ add_library(
 target_compile_definitions(
 	${PROJECT_NAME}
 	PRIVATE
+		_CRT_SECURE_NO_WARNINGS
 		_UNICODE
 )
 

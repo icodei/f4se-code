@@ -16,7 +16,6 @@ namespace RE
 		//members
 		float fTime;
 		std::uint32_t RenderUseDepth;
-		bool bParentsChecked;
 		NiCamera* pCamera;
 		std::uint32_t Flags;
 		std::uint32_t RenderObjects;

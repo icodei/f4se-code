@@ -4,8 +4,8 @@
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSTArray.h"
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
-#include "RE/NetImmerse/NiObject.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiObject.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

@@ -4,7 +4,7 @@
 #include "RE/Bethesda/BSTArray.h"
 #include "RE/Bethesda/BSTEvent.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
@@ -16,9 +16,9 @@ namespace RE
 	class VATSCameraContext;
 	class VATSCommand;
 
+	class TESHitEvent;
 	struct ProjectileBeginUpdateEvent;
 	struct TESDeathEvent;
-	class TESHitEvent;
 	struct WeaponFiredEvent;
 
 	class __declspec(novtable) VATS :

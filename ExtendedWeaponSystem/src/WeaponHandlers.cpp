@@ -27,7 +27,6 @@ void FillWeaponInfo() {
 		logIfNeeded(GetFullNameWEAP(weap) + " has the ThermalScopeKeyword.");
 	} else {
 		processCurrentScope = false;
-		ScopeTextureLoader = nullptr;
 		logIfNeeded(GetFullNameWEAP(weap) + " does not have the ThermalScopeKeyword.");
 	}
 	logIfNeeded(";======================================================================================;");
@@ -69,5 +68,5 @@ void HanldeWeaponEquipAfter3D() {
 	if (processCurrentScope == false || ignore == true) {
 		return;
 	}
-
+	nsScope::CreateRenderer();
 }

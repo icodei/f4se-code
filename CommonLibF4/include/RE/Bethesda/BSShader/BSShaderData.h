@@ -2,10 +2,10 @@
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
 #include "RE/Bethesda/BSTArray.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/NetImmerse/NiAlphaProperty.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiPoint2.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiAlphaProperty.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

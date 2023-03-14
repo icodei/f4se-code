@@ -3,7 +3,7 @@
 #include "RE/Bethesda/Atomic.h"
 #include "RE/Bethesda/BSFixedString.h"
 #include "RE/Bethesda/BSResource/BSResourceEnums.h"
-#include "RE/Bethesda/BSResource/StreamBase.h"
+#include "RE/Bethesda/BSResource/BSResourceStreamBase.h"
 #include "RE/Bethesda/BSTSmartPointer.h"
 
 namespace RE

@@ -15,5 +15,7 @@ public:
 	static BSCullingProcess* pScopeManagerCullingProc;
 	static BSShaderAccumulator* pScopeManagerAccumulator;
 	static ImageSpaceShaderParam* pScopeManagerShaderParam;
+	static NiCamera* pCamera;
+	static BSGeometry* pRenderPlane;
 };
 static_assert(std::is_empty_v<ScopeRendererManager>);

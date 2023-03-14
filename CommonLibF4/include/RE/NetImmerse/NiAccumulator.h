@@ -1,29 +1,29 @@
 #pragma once
-#include "RE/NetImmerse/NiObject.h"
-//#include "RE/NetImmerse/NiBound.h"
+#include "RE/NetImmerse/NiMain/NiObject.h"
 
 namespace RE
 {
 	class BSGeometry;
 	class NiCamera;
 	class NiBound;
+	class NiVisibleArray;
 
-	class NiAccumulator : public NiObject
+	class __declspec(novtable) NiAccumulator : public NiObject
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::NiAccumulator };
 		static constexpr auto VTABLE{ VTABLE::NiAccumulator };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::NiAccumulator };
 
-		virtual ~NiAccumulator();
+		virtual ~NiAccumulator() {}
 
 		//add
-		virtual void StartAccumulating(NiCamera* a_camera);
-		virtual void FinishAccumulating();
-		//_purecall_0 //virtual void RegisterObjectArray(NiVisibleArray &); //???
-		virtual void StartGroupingAlphas(NiBound& a_bound, bool a_unk);
-		virtual void StopGroupingAlphas();
-		virtual bool RegisterObject(BSGeometry* a_geometry);
+		virtual void StartAccumulating(NiCamera* a_camera) { return; }
+		virtual void FinishAccumulating() { return; }
+		virtual void RegisterObjectArray(NiVisibleArray& a_array) { return; }
+		virtual void StartGroupingAlphas(NiBound& a_bound, bool a_unk) { return; }
+		virtual void StopGroupingAlphas() { return; }
+		virtual bool RegisterObject(BSGeometry* a_geometry) { return false; }
 
 		//members
 		NiCamera* m_pkCamera;  //10
@@ -37,7 +37,7 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::NiBackToFrontAccumulator };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::NiBackToFrontAccumulator };
 
-		virtual ~NiBackToFrontAccumulator();
+		virtual ~NiBackToFrontAccumulator() {}
 
 		//members
 		std::uint64_t field_18;     //18
@@ -58,7 +58,7 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::NiAlphaAccumulator };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::NiAlphaAccumulator };
 
-		virtual ~NiAlphaAccumulator();
+		virtual ~NiAlphaAccumulator() {}
 
 		//members
 		bool m_bObserveNoSortHint;

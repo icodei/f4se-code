@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/NetImmerse/NiNode.h"
+#include "RE/NetImmerse/NiMain/NiNode.h"
 
 namespace RE
 {

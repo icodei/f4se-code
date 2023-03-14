@@ -7,7 +7,7 @@
 #include "RE/Bethesda/BSTSmartPointer.h"
 #include "RE/Bethesda/BSTTuple.h"
 #include "RE/Bethesda/MemoryManager.h"
-#include "RE/NetImmerse/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE
 {

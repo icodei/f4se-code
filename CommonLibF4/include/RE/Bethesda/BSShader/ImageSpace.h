@@ -2,9 +2,9 @@
 #include "RE/Bethesda/BSFixedString.h"
 #include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 #include "RE/Bethesda/BSTArray.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/NetImmerse/NiTArray.h"
-#include "RE/NetImmerse/NiTexture.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiTArray.h"
+#include "RE/NetImmerse/NiMain/NiTexture.h"
 
 namespace RE
 {

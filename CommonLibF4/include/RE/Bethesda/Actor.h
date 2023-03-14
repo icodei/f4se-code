@@ -12,10 +12,10 @@
 #include "RE/Bethesda/BSTTuple.h"
 #include "RE/Bethesda/IMovementInterface.h"
 #include "RE/Bethesda/TESObjectREFRs.h"
-#include "RE/NetImmerse/NiFlags.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/NetImmerse/NiRefObject.h"
+#include "RE/NetImmerse/NiMain/NiFlags.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiRefObject.h"
 
 namespace RE
 {
@@ -581,28 +581,28 @@ namespace RE
 			return func(this);
 		}
 
-		[[nodiscard]] bool GetEquippedWeaponByIndex(BGSEquipIndex a_equipIndex, EquippedWeapon& a_weapon) const
+		bool GetEquippedWeaponByIndex(BGSEquipIndex a_equipIndex, EquippedWeapon& a_weapon) const
 		{
 			using func_t = decltype(&AIProcess::GetEquippedWeaponByIndex);
 			REL::Relocation<func_t> func{ REL::ID(456256) };
 			return func(this, a_equipIndex, a_weapon);
 		}
 
-		[[nodiscard]] bool GetEquippedWeaponData(BGSEquipIndex a_equipIndex, NiPointer<EquippedWeaponData>& a_data) const
+		bool GetEquippedWeaponData(BGSEquipIndex a_equipIndex, NiPointer<EquippedWeaponData>& a_data) const
 		{
 			using func_t = decltype(&AIProcess::GetEquippedWeaponData);
 			REL::Relocation<func_t> func{ REL::ID(1416254) };
 			return func(this, a_equipIndex, a_data);
 		}
 
-		[[nodiscard]] std::uint32_t GetEquippedWeapons(BSTArray<EquippedWeapon>& a_weapons) const
+		std::uint32_t GetEquippedWeapons(BSTArray<EquippedWeapon>& a_weapons) const
 		{
 			using func_t = decltype(&AIProcess::GetEquippedWeapons);
 			REL::Relocation<func_t> func{ REL::ID(947344) };
 			return func(this, a_weapons);
 		}
 
-		[[nodiscard]] void GetItemsInSlot(BGSEquipSlot* a_slot, BSTArray<EquippedItem>& a_items) const
+		void GetItemsInSlot(BGSEquipSlot* a_slot, BSTArray<EquippedItem>& a_items) const
 		{
 			using func_t = decltype(&AIProcess::GetItemsInSlot);
 			REL::Relocation<func_t> func{ REL::ID(1573363) };

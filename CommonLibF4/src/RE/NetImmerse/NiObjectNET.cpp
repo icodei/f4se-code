@@ -1,6 +1,5 @@
 #include "RE/NetImmerse/NiObjectNET.h"
-
-#include "RE/NetImmerse/NiTimeController.h"
+#include "RE/NetImmerse/NiMain/NiTimeController.h"
 
 namespace RE
 {

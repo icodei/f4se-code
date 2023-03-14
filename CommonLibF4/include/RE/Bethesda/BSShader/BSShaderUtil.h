@@ -1,7 +1,7 @@
 #pragma once
 #include "RE/Bethesda/BSMain/BSCullingProcess.h"
 #include "RE/Bethesda/BSTArray.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

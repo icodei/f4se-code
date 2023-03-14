@@ -14,6 +14,13 @@ namespace RE
 		class RenderTargetManager
 		{
 		public:
+
+			[[nodiscard]] static RenderTargetManager& GetSingleton()
+			{
+				REL::Relocation<RenderTargetManager*> singleton{ REL::ID(1508457) };
+				return *singleton;
+			}
+
 			enum class TARGET_PERSISTENCY
 			{
 				TARGET_PERSISTENCY_SHARED,
@@ -324,5 +331,4 @@ namespace RE
 		};
 		static_assert(sizeof(RenderTargetManager) == 0xFC0);
 	}
-	REL::Relocation<BSGraphics::RenderTargetManager*> BSGraphics__gRenderTargetManager{ REL::ID(1508457) };
 }

@@ -116,11 +116,6 @@ namespace RE
 			}
 		}
 
-		BSTArray<BSTEventSink<event_type>*>* GetSinks()
-		{
-			return _sinks;
-		}
-
 	private:
 		// members
 		BSSpinLock _lock;                                         // 00
@@ -209,9 +204,9 @@ namespace RE
 
 		template <class Event>
 		class EventSource :
-			public BSTEventSink<KillSDMEvent>,			//00
-			public BSTSingletonSDM<EventSource<Event>>, //08
-			public BSTEventSource<Event>				//10
+			public BSTEventSink<KillSDMEvent>,           //00
+			public BSTSingletonSDM<EventSource<Event>>,  //08
+			public BSTEventSource<Event>                 //10
 		{
 		public:
 			EventSource(KillSDMEventSource* a_source)
@@ -244,4 +239,20 @@ namespace RE
 		KillSDMEventSource eventSourceSDMKiller;  // 10
 	};
 	static_assert(sizeof(BSTGlobalEvent) == 0x68);
+
+	class BSTGlobalEvent_OLD
+	{
+	public:
+		virtual ~BSTGlobalEvent_OLD();
+
+		[[nodiscard]] static BSTGlobalEvent_OLD* GetSingleton()
+		{
+			REL::Relocation<BSTGlobalEvent_OLD**> singleton{ REL::ID(1424022) };
+			return *singleton;
+		}
+
+		std::uint64_t unk08;                                         // 08
+		std::uint64_t unk10;                                         // 10
+		BSTArray<BSTGlobalEvent::EventSource<void*>*> eventSources;  // 18
+	};
 }

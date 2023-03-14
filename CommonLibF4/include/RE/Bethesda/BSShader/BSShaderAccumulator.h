@@ -3,8 +3,8 @@
 #include "RE/Bethesda/BSShader/BSBatchRenderer.h"
 #include "RE/Bethesda/BSShader/BSShaderManager.h"
 #include "RE/NetImmerse/NiAccumulator.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE
 {
@@ -23,11 +23,12 @@ namespace RE
 		};
 
 		BSShaderAccumulator() { ctor(); };
-		//virtual ~BSShaderAccumulator();
+
+		virtual ~BSShaderAccumulator() {}
 
 		//add
-		virtual void FinishAccumulatingPreResolveDepth();
-		virtual void FinishAccumulatingPostResolveDepth();
+		virtual void FinishAccumulatingPreResolveDepth() {}
+		virtual void FinishAccumulatingPostResolveDepth() {}
 
 		void ClearActivePasses(bool a1)
 		{
@@ -88,14 +89,14 @@ namespace RE
 		std::int32_t field_A8;
 		std::int32_t field_AC;
 		bool m_firstPerson;
-		bool QZPrePass;
+		bool ZPrePass;
 		NiColorA QSilhouetteColor;
 		std::int8_t QRenderDecals;
 		std::int8_t field_C5;
-		BSBatchRenderer BatchRenderer;
+		BSBatchRenderer batchRenders;
 		std::int64_t field_548;
 		std::int8_t field_550;
-		ShadowSceneNode* ShadowSceneNode;
+		ShadowSceneNode* activeShadowSceneNode;
 		BSShaderManager::etRenderMode renderMode;
 		BSLight* shadowLight;
 		NiPoint3 QEyePosition;

@@ -1,11 +1,11 @@
 #pragma once
 #include "RE/Bethesda/BSTArray.h"
 #include "RE/Bethesda/BSTHashMap.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiPoint2.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
-#include "RE/NetImmerse/NiTransform.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiTransform.h"
 
 #include <DirectXMath.h>
 
@@ -13,6 +13,8 @@ namespace RE
 {
 	class BSGeometry;
 	class BSInstanceGroup;
+	class BSPerformanceTimer;
+	class BSShader;
 	class BSShaderAccumulator;
 	class BSShaderTextureSet;
 	class NiAVObject;
@@ -23,6 +25,28 @@ namespace RE
 	class BSShaderManager
 	{
 	public:
+		//custom helper functions start
+
+		static NiCamera* GetCamera()
+		{
+			REL::Relocation<NiCamera**> singleton{ REL::ID(543218) };
+			return *singleton;
+		}
+
+		static NiCamera* GetMainCamera()
+		{
+			REL::Relocation<NiPointer<NiCamera>*> singleton{ REL::ID(175576) };
+			return singleton.get()->get();
+		}
+
+		static NiPointer<NiCamera>& GetMainCameraPtr()
+		{
+			REL::Relocation<NiPointer<NiCamera>*> singleton{ REL::ID(175576) };
+			return *singleton;
+		}
+
+		//custom helper functions end
+
 		enum ShaderEnum : std::int32_t
 		{
 			BSSM_SHADER_EFFECT = 0x0,
@@ -156,15 +180,21 @@ namespace RE
 			CAMERA_STATE_UNDER_WATER,
 		};
 
-		// NOTES ABOUT pShadowSceneNode				//											//											//
-		// pShadowSceneNode[0] <- BSSM_SSN_WORLD	// pShadowSceneNode[1] <- BSSM_SSN_UI_OLD	// pShadowSceneNode[2] <- BSSM_SSN_PREVIEW	// pShadowSceneNode[3] <- BSSM_SSN_UI_LOADING_MENU
-		//	Name									//	Name									//	Name									//	Name
+		//================================================= NOTES ABOUT pShadowSceneNode ===================================================//
+		// Found with REClass while character was in a mostly empty test world.																//
+		// Character was standing around and did not interact with any workshops or workbenches.											//
+		// Could be why UI_LOADING_MENU and PREVIEW were empty/nullptr.																		//
+		// Another potential for UI_LOADING_MENU being empty is my use of high fps fix mod and removing loading screen models.				//
+		//==================================================================================================================================//
+		//											//											//											//
+		// pShadowSceneNode[0] <- WORLD				// pShadowSceneNode[1] <- UI_OLD			// pShadowSceneNode[2] <- PREVIEW			//
+		//	Name									//	Name									//	Name									//
 		//	 shadow scene node						//	 shadow scene node						//											//
-		//	Parent									//	Parent									//	Parent									//	Parent
-		//	 WorldRootNode? (SceneGraph)			//	 NULL 									//		 									//	 0 -
-		//	Children								//	Children								//	Children								//	Children
-		//	 0 - Sky (BSMultiBoundNode)				//	 0 - NoName (NiNode)					//	 0 - 									//	 0 - 
-		//	 1 - Weather (NiNode)					//	 1 - NoName (NiNode)					//	 1 - 									//	 1 - 
+		//	Parent									//	Parent									//	Parent									//
+		//	 WorldRootNode? (SceneGraph)			//	 NULL 									//		 									//
+		//	Children								//	Children								//	Children								//
+		//	 0 - Sky (BSMultiBoundNode)				//	 0 - NoName (NiNode)					//	 0 - 									//
+		//	 1 - Weather (NiNode)					//	 1 - NoName (NiNode)					//	 1 - 									//
 		//	 2 - LODRoot (BSClearZNode)				//	 2 - NoName (NiNode)					//											//
 		//	 3 - ObjectLODRoot? (NiNode)			//	 3 - NoName (NiNode)					//											//
 		//	 4 - NULL								//	 4 - NoName (NiNode)					//											//
@@ -175,32 +205,38 @@ namespace RE
 		//	 9 - Portal-shared Node	(NiNode)		//											//											//
 		//	10 - NoName (NiNode)					//											//											//
 		//											//											//											//
+		//==================================================================================================================================//
 		//											//											//											//
-
-		// NOTES ABOUT pShadowSceneNode				//
-		// pShadowSceneNode[4] <- BSSM_SSN_UI		//
-		//  Name									//
-		//	 Interface3D Root						//
-		//	Parent									//
-		//	 NULL									//
-		//	Children								//
-		//	 0 -									//
-		//	 1 -									//
-		//	 2 -									//
-		//	 3 -									//
-		//	 4 -									//
-		//	 5 -									//
-		//	 6 -									//
-		//	 7 -									//
-		//	 8 -									//
-		//	 9 -									//
-		//	10 -									//
-		//	11 -									//
-		//											//
+		//	pShadowSceneNode[3] <- UI_LOADING_MENU	// pShadowSceneNode[4] <- UI				//											//
+		//	Name									//  Name									//											//
+		//											//	 Interface3D Root						//											//
+		//	Parent									//	Parent									//											//
+		//											//	 NULL									//											//
+		//	Children								//	Children								//											//
+		//											//	 0 -									//											//
+		//											//	 1 -									//											//
+		//											//	 2 -									//											//
+		//											//	 3 -									//											//
+		//											//	 4 -									//											//
+		//											//	 5 -									//											//
+		//											//	 6 -									//											//
+		//											//	 7 -									//											//
+		//											//	 8 -									//											//
+		//											//	 9 -									//											//
+		//											//	10 -									//											//
+		//											//	11 -									//											//
+		//											//											//											//
+		//==================================================================================================================================//
 
 		class State
 		{
 		public:
+			[[nodiscard]] static State& GetSingleton()
+			{
+				REL::Relocation<State*> singleton{ REL::ID(1327069) };
+				return *singleton;
+			}
+
 			//members
 			ShadowSceneNode* pShadowSceneNode[BSSM_SSN_COUNT];                          // 000
 			float fTimerValues[TIMER_MODE_COUNT];                                       //
@@ -232,42 +268,42 @@ namespace RE
 			float kfGriddArrayLerpStart;                                                //
 			bool bLODFadeInProgress;                                                    //
 			stl::enumeration<eSceneGraphEnum, std::uint8_t> cSceneGraph;                //
-			std::byte field_AA;
+			std::byte field_AA;                                                         //
 			stl::enumeration<etRenderMode, std::uint16_t> usDebugMode;                  //
-			std::byte gapAE[18];
-			NiTransform DirectionalAmbientTransform;
-			NiTransform LocalDirectionalAmbientTransform;
-			NiColorA AmbientSpecular;
-			bool bAmbientSpecularEnabled;
-			uint32_t uiTextureTransformCurrentBuffer;
-			uint32_t uiTextureTransformFlipMode;
+			std::byte gapAE[18];                                                        //
+			NiTransform DirectionalAmbientTransform;                                    //
+			NiTransform LocalDirectionalAmbientTransform;                               //
+			NiColorA AmbientSpecular;                                                   //
+			bool bAmbientSpecularEnabled;                                               //
+			std::uint32_t uiTextureTransformCurrentBuffer;                              //
+			std::uint32_t uiTextureTransformFlipMode;                                   //
 			stl::enumeration<eCameraInWaterState, std::uint32_t> uiCameraInWaterState;  //
-			float fCameraNear;
-			float fCameraFar;
-			float fWaterIntersect;
-			float field_16C;
-			std::byte gap170[12];
-			std::byte field_17C;
-			std::byte gap17D[7];
-			std::byte field_184;
-			std::byte gap185[7];
-			float fBoneTintingTiming;
-			NiPoint3 ForwardLightOffset;
-			NiPoint3 ClipVolume[2];
-			NiPointer<BSGeometry> spClipVolumeGeom;
-			NiColorA MaskRectParams;
-			NiColorA pUIMaskRectsA[16];
-			NiColorA pUIMaskRectColorsA[16];
-			NiColorA CharacterLightParams;
-			std::uint32_t uiForceDisableFrame;
-			bool bEffectShaderVATSHighlight;
-			bool ForceEffectShaderPremultAlpha;
-			bool ForceDisableSSR;
-			bool ForceDisableGodrays;
-			bool ForceDisableDirLights;
-			bool PendingForceDisableSSR;
-			bool PendingForceDisableGodrays;
-			bool PendingForceDisableDirLights;
+			float fCameraNear;                                                          //
+			float fCameraFar;                                                           //
+			float fWaterIntersect;                                                      //
+			float field_16C;                                                            //
+			std::byte gap170[12];                                                       //
+			std::byte field_17C;                                                        //
+			std::byte gap17D[7];                                                        //
+			std::byte field_184;                                                        //
+			std::byte gap185[7];                                                        //
+			float fBoneTintingTiming;                                                   //
+			NiPoint3 ForwardLightOffset;                                                //
+			NiPoint3 ClipVolume[2];                                                     //
+			NiPointer<BSGeometry> spClipVolumeGeom;                                     //
+			NiColorA MaskRectParams;                                                    //
+			NiColorA pUIMaskRectsA[16];                                                 //
+			NiColorA pUIMaskRectColorsA[16];                                            //
+			NiColorA CharacterLightParams;                                              //
+			std::uint32_t uiForceDisableFrame;                                          //
+			bool bEffectShaderVATSHighlight;                                            //
+			bool ForceEffectShaderPremultAlpha;                                         //
+			bool ForceDisableSSR;                                                       //
+			bool ForceDisableGodrays;                                                   //
+			bool ForceDisableDirLights;                                                 //
+			bool PendingForceDisableSSR;                                                //
+			bool PendingForceDisableGodrays;                                            //
+			bool PendingForceDisableDirLights;                                          //
 		};
 		static_assert(offsetof(State, cSceneGraph) == 0xA9);
 		static_assert(offsetof(State, usDebugMode) == 0xAC);
@@ -320,7 +356,14 @@ namespace RE
 		//static function GetFogProperty
 		//static function QLoadWarningFile
 		//static function SetLoadWarningFile
-		//static function GetTexture
+
+		static void GetTexture(const char* filepath, bool demandTex, NiPointer<NiTexture>& returnTex, bool environmentMap, bool normalMap, bool a6)
+		{
+			using func_t = decltype(&BSShaderManager::GetTexture);
+			REL::Relocation<func_t> func{ REL::ID(1375091) };
+			return func(filepath, demandTex, returnTex, environmentMap, normalMap, a6);
+		}
+
 		//static function ReloadTexture
 		//static function SetRenderMode
 		//static function IsDepthRenderMode
@@ -365,52 +408,46 @@ namespace RE
 		};
 
 		//static member eShadowMode
+		//static function GetRenderDebugTexture
+		//static function RenderDebugTexture
+		//static function SetDebugRenderTexture
+		//static function GetSelfIllumCount
+		//static function SetSelfIllumCount
+		//...
+
+		static BSShaderAccumulator* GetCurrentAccumulator()
+		{
+			using func_t = decltype(&BSShaderManager::GetCurrentAccumulator);
+			REL::Relocation<func_t> func{ REL::ID(1555929) };
+			return func();
+		}
+
+		static void SetCurrentAccumulator(BSShaderAccumulator* a_accumulator)
+		{
+			using func_t = decltype(&BSShaderManager::SetCurrentAccumulator);
+			REL::Relocation<func_t> func{ REL::ID(412086) };
+			return func(a_accumulator);
+		}
+		//...
+		//static function SetFOV
 		//...
 		using InstanceMap = BSTHashMap<std::uint64_t, BSTArray<BSGeometry*>>;
-		//...
+		//static function StartMapForInstancing
+		//static function AddToMapForInstancing
+		//static function FinishInstancing
+		//static member InstanceGroups
+		//static member IMap
+		//static member pTimerFunction
+		//static member iENabledPasses
+		//static member bInitialized
 		static constexpr auto NUM_RENDERFLAG_BITS{ 0x10 };
-
 		//static member usRenderFlags
 		//...
+		//static member St
+		//static member pCurrentShaderAccumulator
+		//static member usRenderMode
+		//static function BSShaderManager
+		//static member Instance
 	};
 	static_assert(std::is_empty_v<BSShaderManager>);
-
-	REL::Relocation<BSShaderManager::SHADERERRORFUNC*> BSShaderManager__pShaderErrorCallback{ REL::ID(197682) };               //146721A60
-	REL::Relocation<BSShaderManager::GARBAGECOLLECTORADDFUNC*> BSShaderManager__pGarbageCollectorCallback{ REL::ID(416649) };  //146721A68
-	/*
-	REL::Relocation<float[4][4]> BSShaderManager__actorVegetationCollisionsS{ REL::ID(636411) };                                  //146721A70
-	*/
-	REL::Relocation<BSShaderAccumulator*> BSShaderManager__pCurrentShaderAccumulator{ REL::ID(809145) };  //146721AB0
-	REL::Relocation<BSShaderManager::etRenderMode> BSShaderManager__usRenderMode{ REL::ID(1028217) };     //146721AB8
-	REL::Relocation<bool> BSShaderManager__bInitialized{ REL::ID(346773) };                               //146721ABC
-	REL::Relocation<bool> BSShaderManager__bImageSpaceEffects{ REL::ID(572286) };                         //146721ABD
-	REL::Relocation<bool> BSShaderManager__bTransparencyMultisampling{ (0x6721ABE) };                     //146721ABE
-	REL::Relocation<bool> BSShaderManager__bAnisoMinFiltering{ (0x6721ABF) };                             //146721ABF
-	REL::Relocation<BSShaderManager::FPTIMERFUNC> BSShaderManager__pTimerFunction{ REL::ID(1247963) };    //146721AC0
-	REL::Relocation<std::uint16_t> BSShaderManager__usRenderFlags{ (0x6721AC8) };                         //146721AC8
-	//...
-	REL::Relocation<std::uint32_t> BSShaderManager__uiStencilRenderTarget{ (0x6721AD0) };        //146721AD0
-	REL::Relocation<float> BSShaderManager__fWindAngle{ (0x6721AD4) };                           //146721AD4
-	REL::Relocation<float> BSShaderManager__fWindMinSpeed{ (0x6721AD8) };                        //146721AD8
-	REL::Relocation<BSShaderManager::etShadowMode> BSShaderManager__eShadowMode{ (0x6721ADC) };  //146721ADC
-	REL::Relocation<NiCamera*> BSShaderManager__spCamera{ REL::ID(543218) };                     //146721AE0
-	//...
-	//REL::Relocation<float[4]> BSShaderManager__CloudParameters{ (0x6721AF8) };                              //146721AF8
-	//...
-	REL::Relocation<BSShaderManager> BSShaderManager__Instance{ REL::ID(16321) };                             //146721B39
-	REL::Relocation<BSPerformanceTimer> TimerImageSpace{ (0x6721B3A) };                                       //146721B3A
-	REL::Relocation<BSTArray<NiPointer<BSInstanceGroup>>> BSShaderManager__InstanceGroups{ REL::ID(10442) };  //146721B40
-	REL::Relocation<BSTArray<BSShaderTextureSet*>> BSShaderManager__DismembermentTextureArray{ REL::ID() };   //146721B58
-	REL::Relocation<BSShaderManager::State> BSShaderManager__State{ REL::ID(1327069) };                       //146721B70
-	//REL::Relocation<NiPointer<BSShader>[12]> BSShaderManager__pspShader{ REL::ID(487858) };                       //146721F60
-	REL::Relocation<NiPointer<NiCamera>> BSShaderManager__spMainCamera{ REL::ID(175576) };     //146721FC8
-	REL::Relocation<DirectX::XMMATRIX> BSShaderManager__xmPipBoyWorldView{ REL::ID(394640) };  //146721FD0
-	REL::Relocation<NiColor> BSShaderManager__kBackgroundColor{ REL::ID(567603) };             //146722010
-	REL::Relocation<NiColorA> BSShaderManager__fpInterfaceTint{ REL::ID(1006044) };            //146722020
-	/*
-	REL::Relocation<NiColor[2][3]> BSShaderManager__DirectionalAmbientColorsA{ REL::ID(1444949) };            //146722030
-	REL::Relocation<NiColor[2][3]> BSShaderManager__LocalDirectionalAmbientColorsA{ REL::ID(474137) };        //146722080
-	*/
-	REL::Relocation<NiColorA> BSShaderManager__pHairTint{ (0x67220C8) };     //1467220C8
-	REL::Relocation<bool> BSShaderManager__binstancing{ REL::ID(1304977) };  //1467220D8
 }

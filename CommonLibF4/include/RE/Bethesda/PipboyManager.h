@@ -8,7 +8,7 @@
 #include "RE/Bethesda/BSTEvent.h"
 #include "RE/Bethesda/BSTPoint.h"
 #include "RE/Bethesda/BSTSingleton.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
@@ -87,9 +87,9 @@ namespace RE
 		// override
 		virtual BSEventNotifyControl ProcessEvent(const BSAnimationGraphEvent& a_event, BSTEventSource<BSAnimationGraphEvent>* a_source) override;  // 01
 		virtual bool ShouldHandleEvent(const InputEvent*) override;                                                                                 // 02
-		virtual void HandleEvent(const ButtonEvent*) override;                                                                                      // 09
-		virtual void HandleEvent(const MouseMoveEvent*) override;                                                                                   // 07
-		virtual void HandleEvent(const ThumbstickEvent*) override;                                                                                  // 05
+		virtual void HandleButtonEvent(const ButtonEvent*) override;                                                                                // 09
+		virtual void HandleMouseMoveEvent(const MouseMoveEvent*) override;                                                                          // 07
+		virtual void HandleThumbstickEvent(const ThumbstickEvent*) override;                                                                        // 05
 
 		[[nodiscard]] static PipboyManager* GetSingleton()
 		{

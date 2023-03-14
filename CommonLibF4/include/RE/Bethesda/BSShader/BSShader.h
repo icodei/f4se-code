@@ -1,10 +1,12 @@
 #pragma once
 
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiPoint2.h"
-#include "RE/NetImmerse/NiPoint3.h"
-#include "RE/NetImmerse/NiRefObject.h"
+#include "RE/Bethesda/BSShader/BSShaderTechniqueIDMap.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiPoint2.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiRefObject.h"
+#include "RE/NetImmerse/NiMain/IRendererResourceManager.h"
 
 namespace RE
 {
@@ -24,14 +26,6 @@ namespace RE
 	class NiShadeProperty;
 	class NiStream;
 	class NiTexture;
-
-	class IRendererResourceManager	// TODO - Move to different file
-	{
-	public:
-		class FadeNodeSettings
-		{
-		};
-	};
 
 	struct __declspec(novtable) BSReloadShaderI
 	{
@@ -76,7 +70,7 @@ namespace RE
 	};
 	static_assert(sizeof(BSShader) == 0x118);
 
-	class BSShaderResourceManager
+	class BSShaderResourceManager : public IRendererResourceManager
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::BSShaderResourceManager };
@@ -136,8 +130,12 @@ namespace RE
 		virtual float GetShaderTimerDelta();
 		virtual void GetFadeNodeSettings(IRendererResourceManager::FadeNodeSettings&);
 		virtual void GetCameraVectors(NiPoint3&, NiPoint3&, NiPoint3&);
+
+		static BSShaderResourceManager &GetInstance()
+		{
+			REL::Relocation<BSShaderResourceManager*> singleton{ REL::ID(1416967) };
+			return *singleton;
+		}
 	};
 	static_assert(sizeof(BSShaderResourceManager) == 0x8);
-
-	REL::Relocation<BSShaderResourceManager> gShaderResourceManagerInstance(1416967);
 }

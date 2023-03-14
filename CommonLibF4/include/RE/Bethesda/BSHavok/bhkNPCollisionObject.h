@@ -4,9 +4,9 @@
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
 #include "RE/Havok/Common/Base/Math/Vector/hkVector4.h"
 #include "RE/Havok/hknpBodyId.h"
-#include "RE/NetImmerse/NiCollisionObject.h"
-#include "RE/NetImmerse/NiFlags.h"
-#include "RE/NetImmerse/NiSmartPointer.h"
+#include "RE/NetImmerse/NiMain/NiCollisionObject.h"
+#include "RE/NetImmerse/NiMain/NiFlags.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {

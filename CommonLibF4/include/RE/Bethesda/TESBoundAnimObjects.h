@@ -8,8 +8,8 @@
 #include "RE/Bethesda/FormComponents.h"
 #include "RE/Bethesda/TESBoundObjects.h"
 #include "RE/Bethesda/TESCondition.h"
-#include "RE/NetImmerse/NiColor.h"
-#include "RE/NetImmerse/NiPoint3.h"
+#include "RE/NetImmerse/NiMain/NiColor.h"
+#include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE
 {

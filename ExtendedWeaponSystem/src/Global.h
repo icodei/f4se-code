@@ -1,13 +1,5 @@
 #pragma once
 
-#include "RE/Bethesda/BSGeometry.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/GameScript.h"
-#include "RE/Bethesda/TESForms.h"
-#include "RE/NetImmerse/NiCamera.h"
-#include "RE/NetImmerse/NiTexture.h"
-#include "RE/RTTI.h"
-
 #include "AnimationFunctions.h"
 #include "Custom Renderer/CustomRenderer.h"
 #include "Custom Renderer/ExtraCameraManager.h"
@@ -38,30 +30,25 @@
 static PlayerCharacter* pc;
 static PlayerCamera* pcam;
 
-extern bool ignore;
-extern bool isEmptyReload;
-extern bool logEnabled;
-extern bool oncePerSession;
-extern bool processCurrentScope;
-extern bool processCurrentWeap;
-extern bool readyForRender;
-extern bool reloadEnd;
-extern bool reloadStarted;
+static bool ignore;
+static bool isEmptyReload;
+static bool logEnabled;
+static bool oncePerSession;
+static bool processCurrentScope;
+static bool processCurrentWeap;
+static bool readyForRender;
+static bool reloadEnd;
+static bool reloadStarted;
 
-extern int ammoCapacity;
-extern int currentAmmoCount;
-extern int incrementor;
-extern int toAdd;
-extern int totalAmmoCount;
+static int ammoCapacity;
+static int currentAmmoCount;
+static int incrementor;
+static int toAdd;
+static int totalAmmoCount;
 
-extern BGSKeyword* reloadSequentialKeyword;
-extern BGSKeyword* ThermalScopeKeyword;
-extern TESObjectWEAP::InstanceData* currentWeapInstance;
-
-//This stuff is for the thermal scope shader and geom
-extern BSGeometry* ScopeTextureLoader;
-extern BSEffectShaderData* effectShaderData;
-extern TESEffectShader* ThermalFXS;
+static BGSKeyword* reloadSequentialKeyword;
+static BGSKeyword* ThermalScopeKeyword;
+static TESObjectWEAP::InstanceData* currentWeapInstance;
 
 static const BSFixedString WeaponFire("WeaponFire");
 static const BSFixedString ReloadEnd("ReloadEnd");
@@ -111,7 +98,6 @@ static const BSFixedString LoadingMenu("LoadingMenu");
 #define WORD7(x) WORDn(x, 7)
 
 #define FToRGB 0.0039215689
-#define NiPoint3_ZERO NiPoint3(0, 0, 0);
 
 #define FltPId2 1.570796371
 #define FltPI 3.141592741

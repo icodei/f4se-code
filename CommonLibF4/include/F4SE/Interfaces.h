@@ -164,17 +164,17 @@ namespace F4SE
 
 		enum : std::uint32_t
 		{
-			kPostLoad,
-			kPostPostLoad,
-			kPreLoadGame,
-			kPostLoadGame,
-			kPreSaveGame,
-			kPostSaveGame,
-			kDeleteGame,
-			kInputLoaded,
-			kNewGame,
-			kGameLoaded,
-			kGameDataReady
+			kPostLoad,		// sent to registered plugins once all plugins have been loaded (no data)
+			kPostPostLoad,	// sent right after kMessage_PostLoad to facilitate the correct dispatching/registering of messages/listeners
+			kPreLoadGame,	// dispatched immediately before savegame is read by Fallout
+			kPostLoadGame,	// dispatched after an attempt to load a saved game has finished (the game's LoadGame() routine has returned)
+			kPreSaveGame,	// right before the game is saved
+			kPostSaveGame,	// right after the game is saved
+			kDeleteGame,	// sent right before deleting the .f4se cosave and the .ess save.
+			kInputLoaded,	// sent right after game input is loaded, right before the main menu initializes
+			kNewGame,		// sent after a new game is created, before the game has loaded (Sends CharGen TESQuest pointer)
+			kGameLoaded,	// sent after the game has finished loading (only sent once)
+			kGameDataReady	// sent when the data handler is ready (data is false before loading, true when finished loading)
 		};
 
 		struct Message

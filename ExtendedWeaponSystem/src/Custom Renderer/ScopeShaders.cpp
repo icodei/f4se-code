@@ -1,87 +1,51 @@
 #include "Global.h"
 
-void SetupImageSpaceShader(BSGeometry* objGeom, bool active) {
-	BSImagespaceShader* BSImageShader = (BSImagespaceShader*)(*ImageSpaceManager_pInstance)->GetEffect(ImageSpaceManager::ImageSpaceEffectEnum::kBSHUDGlassCopy);
-	NiPointer<BSShaderProperty> shaderProperty;
-	BSEffectShaderProperty* effectShaderProperty;
-	BSEffectShaderMaterial* effectShaderMaterial;
-	shaderProperty = ni_cast(objGeom->shaderProperty, BSShaderProperty);
-	effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
-	if (shaderProperty.get()) {
-		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
-		BSImageShader->Render((BSTriShape*)objGeom, BSImagespaceShader_DefaultParam);
-		logIfNeeded("Scope materials setup complete.");
-	}
-}
-
-void SetupTextureLoaderWithEffectShader() {
-	NiPointer<BSShaderProperty> shaderProperty;
-	BSEffectShaderProperty* effectShaderProperty;
-	BSEffectShaderMaterial* effectShaderMaterial;
-	shaderProperty = ni_cast(ScopeTextureLoader->shaderProperty, BSShaderProperty);
-	effectShaderProperty = ni_cast(shaderProperty, BSEffectShaderProperty);
-	if (shaderProperty.get()) {
-		logIfNeeded("Got the EffectShaderProperty");
-		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->shaderMaterial);
-		//effectShaderData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
-		effectShaderData = CreateEffectShaderDataCustom(ThermalFXS, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
-		effectShaderProperty->SetEffectShaderData(effectShaderData);
-		if (effectShaderProperty->SetupGeometry(ScopeTextureLoader)) {
-			logIfNeeded("Geometry was setup with the shaders.");
-		} else {
-			logIfNeeded("Geometry was unable to be setup.");
-		}
-		logIfNeeded("Scope materials setup complete.");
-	}
-}
-
 //TESEffectShader::CreateEffectShaderData but without the reset part breaking it
 BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3) {
-	BSEffectShaderData* newEffectShaderData = (BSEffectShaderData*)Heap_Allocate(0x88);
+	BSEffectShaderData* newEffectShaderData = (BSEffectShaderData*)RE::malloc(0x88);
 	if (newEffectShaderData) {
-		newEffectShaderData->m_refCount = 0;
+		newEffectShaderData->refCount = 0;
 		newEffectShaderData->pNodeFilterFunction = 0i64;
-		newEffectShaderData->spBaseTexture.m_pObject = nullptr;
-		newEffectShaderData->spPaletteTexture.m_pObject = nullptr;
-		newEffectShaderData->spBlockOutTexture.m_pObject = nullptr;
-		newEffectShaderData->eTextureClampMode = 3;
-		newEffectShaderData->FillColor.g = 0.0;
-		newEffectShaderData->FillColor.a = 0.0;
-		newEffectShaderData->RimColor.g = 0.0;
-		newEffectShaderData->RimColor.a = 0.0;
-		newEffectShaderData->fBaseFillScale = 1.0;
-		newEffectShaderData->fBaseFillAlpha = 1.0;
-		newEffectShaderData->fBaseRimAlpha = 1.0;
-		newEffectShaderData->fVOffset = 0.0;
-		newEffectShaderData->fUScale = 1.0;
-		newEffectShaderData->fVScale = 1.0;
-		newEffectShaderData->fEdgeExponent = 1.0;
-		newEffectShaderData->eSrcBlend = NiAlphaProperty::AlphaFunction::kAlpha_SrcAlpha;
-		newEffectShaderData->eDestBlend = NiAlphaProperty::AlphaFunction::kAlpha_InvSrcAlpha;
-		newEffectShaderData->eZTestFunc = 1;
+		newEffectShaderData->spBaseTexture = nullptr;
+		newEffectShaderData->spPaletteTexture = nullptr;
+		newEffectShaderData->spBlockOutTexture = nullptr;
+		newEffectShaderData->eTextureClampMode = BSGraphics::TextureAddressMode::TEXTURE_ADDRESS_MODE_WRAP_S_WRAP_T;
+		newEffectShaderData->FillColor.g = 0.0F;
+		newEffectShaderData->FillColor.a = 0.0F;
+		newEffectShaderData->RimColor.g = 0.0F;
+		newEffectShaderData->RimColor.a = 0.0F;
+		newEffectShaderData->fBaseFillScale = 1.0F;
+		newEffectShaderData->fBaseFillAlpha = 1.0F;
+		newEffectShaderData->fBaseRimAlpha = 1.0F;
+		newEffectShaderData->fVOffset = 0.0F;
+		newEffectShaderData->fUScale = 1.0F;
+		newEffectShaderData->fVScale = 1.0F;
+		newEffectShaderData->fEdgeExponent = 1.0F;
+		newEffectShaderData->eSrcBlend = NiAlphaProperty::AlphaFunction::kSrcAlpha;
+		newEffectShaderData->eDestBlend = NiAlphaProperty::AlphaFunction::kInvSrcAlpha;
+		newEffectShaderData->eZTestFunc = BSGraphics::DepthStencilDepthMode::DEPTH_STENCIL_DEPTH_MODE_TEST;
 		newEffectShaderData->bBaseTextureProjectedUVs = 0;
 	} else {
 		newEffectShaderData = nullptr;
 	}
-	InterlockedIncrement(&newEffectShaderData->m_refCount);
+	InterlockedIncrement(&newEffectShaderData->refCount);
 
 	NiPointer<NiTexture> textureShaderTexture;
 	NiPointer<NiTexture> blockOutTexture;
 	NiPointer<NiTexture> paletteTexture;
 
-	gShaderManagerInstance->GetTexture(shader->textureShaderTexture.str.c_str(), false, textureShaderTexture, true, true, true);
-	gShaderManagerInstance->GetTexture(shader->blockOutTexture.str.c_str(), false, blockOutTexture, true, true, true);
-	gShaderManagerInstance->GetTexture(shader->paletteTexture.str.c_str(), false, paletteTexture, true, true, true);
+	BSShaderManager::GetTexture(shader->textureShaderTexture.textureName.c_str(), false, textureShaderTexture, true, true, true);
+	BSShaderManager::GetTexture(shader->blockOutTexture.textureName.c_str(), false, blockOutTexture, true, true, true);
+	BSShaderManager::GetTexture(shader->paletteTexture.textureName.c_str(), false, paletteTexture, true, true, true);
 
 	newEffectShaderData->spBaseTexture = textureShaderTexture;
 	newEffectShaderData->spBlockOutTexture = blockOutTexture;
 	newEffectShaderData->spPaletteTexture = paletteTexture;
 
-
 	newEffectShaderData->FillColor.r = (float)BYTE0(shader->data.fillColor1) * FToRGB;
 	newEffectShaderData->FillColor.g = (float)BYTE1(shader->data.fillColor1) * FToRGB;
 	newEffectShaderData->FillColor.b = (float)BYTE2(shader->data.fillColor1) * FToRGB;
-	newEffectShaderData->FillColor.a = 0.0 * FToRGB;
+	newEffectShaderData->FillColor.a = 0.0F * FToRGB;
 
 	float rimColorR = BYTE0(shader->data.edgeColor);
 	float rimColorG = BYTE1(shader->data.edgeColor);
@@ -93,14 +57,14 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 	newEffectShaderData->RimColor.a = 0.0 * FToRGB;
 
 	float fillAlpha;
-	if (shader->data.fillAlphaFadeInTime == 0.0 && shader->data.fillAlphaFullTime == 0.0) {
+	if (shader->data.fillAlphaFadeInTime == 0.0F && shader->data.fillAlphaFullTime == 0.0F) {
 		fillAlpha = shader->data.fillAlphaFullPercent;
 	} else {
-		fillAlpha = 0.0;
+		fillAlpha = 0.0F;
 	}
 	newEffectShaderData->fBaseFillAlpha = fillAlpha;
 	float edgeAlpha;
-	if (shader->data.edgeAlphaFadeInTime == 0.0 && shader->data.edgeAlphaFullTime == 0.0) {
+	if (shader->data.edgeAlphaFadeInTime == 0.0F && shader->data.edgeAlphaFullTime == 0.0F) {
 		edgeAlpha = shader->data.edgeAlphaFullPercent;
 	}
 	newEffectShaderData->fBaseRimAlpha = edgeAlpha;
@@ -109,9 +73,9 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 	newEffectShaderData->fVScale = shader->data.fillTextureVScale;
 	newEffectShaderData->fEdgeExponent = shader->data.edgeExponentValue;
 
-	newEffectShaderData->eSrcBlend = NiAlphaProperty::AlphaFunction::kAlpha_SrcAlpha;
-	newEffectShaderData->eDestBlend = NiAlphaProperty::AlphaFunction::kAlpha_InvSrcAlpha;
-	newEffectShaderData->eZTestFunc = 1;
+	newEffectShaderData->eSrcBlend = NiAlphaProperty::AlphaFunction::kSrcAlpha;
+	newEffectShaderData->eDestBlend = NiAlphaProperty::AlphaFunction::kInvSrcAlpha;
+	newEffectShaderData->eZTestFunc = BSGraphics::DepthStencilDepthMode::DEPTH_STENCIL_DEPTH_MODE_TEST;
 	newEffectShaderData->ucAlphaTestRef = shader->data.alphaTestStartValue;
 	newEffectShaderData->bGrayscaleToColor = (shader->data.flags & 2) != 0;
 	newEffectShaderData->bGrayscaleToAlpha = (shader->data.flags & 4) != 0;
@@ -122,22 +86,53 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 	newEffectShaderData->bAlpha = (shader->data.flags & 2048) != 0;
 
 	if ((shader->data.flags & 16) != 0) {
-		rimColorG = rimColorG - 255.0;
-		rimColorB = rimColorB - 255.0;
-		newEffectShaderData->RimColor.r = (float)(rimColorR - 255.0) * FToRGB;
+		rimColorG = rimColorG - 255.0F;
+		rimColorB = rimColorB - 255.0F;
+		newEffectShaderData->RimColor.r = (float)(rimColorR - 255.0F) * FToRGB;
 	} else {
 		newEffectShaderData->RimColor.r = rimColorR * FToRGB;
 	}
 	newEffectShaderData->RimColor.g = rimColorG * FToRGB;
 	newEffectShaderData->RimColor.b = rimColorB * FToRGB;
-	newEffectShaderData->RimColor.a = 0.0 * FToRGB;
+	newEffectShaderData->RimColor.a = 0.0F * FToRGB;
 
-	if (effectShaderData == newEffectShaderData) {
-		newEffectShaderData->~BSEffectShaderData();
-		logIfNeeded("The BSEffectShaderData has already been made. We can delete the one just now created");
-		return effectShaderData;
+	return newEffectShaderData;
+}
 
-	} else {
-		return newEffectShaderData;
+void SetupGeometryWithEffectShader(BSGeometry* geometryToSetup, TESEffectShader* shaderToUse, BSEffectShaderData& returnData) {
+	BSShaderProperty* shaderProperty;
+	BSEffectShaderProperty* effectShaderProperty;
+	BSEffectShaderMaterial* effectShaderMaterial;
+	shaderProperty = (BSShaderProperty*)geometryToSetup->shaderProperty.get();
+	effectShaderProperty = (BSEffectShaderProperty*)shaderProperty;
+	if (shaderProperty) {
+		logIfNeeded("Got the EffectShaderProperty");
+		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
+		//effectShaderData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
+		returnData = *CreateEffectShaderDataCustom(shaderToUse, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
+		effectShaderProperty->SetEffectShaderData(&returnData);
+		if (effectShaderProperty->SetupGeometry(geometryToSetup)) {
+			logIfNeeded("Geometry was setup with the shaders.");
+		} else {
+			logIfNeeded("Geometry was unable to be setup.");
+		}
+		logIfNeeded("Scope materials setup complete.");
+	}
+}
+
+void SetupImageSpaceShader(BSGeometry* objGeom, bool active) {
+	ImageSpaceShaderParam* defaultParams = &BSImagespaceShader::GetDefaultParam();
+	ImageSpaceManager* pImageSpaceManager = ImageSpaceManager::GetSingleton();
+
+	BSImagespaceShader* BSImageShader = (BSImagespaceShader*)pImageSpaceManager->GetEffect(ImageSpaceManager::kBSHUDGlassCopy);
+	BSShaderProperty* shaderProperty;
+	BSEffectShaderProperty* effectShaderProperty;
+	BSEffectShaderMaterial* effectShaderMaterial;
+	shaderProperty = (BSShaderProperty*)objGeom->shaderProperty.get();
+	effectShaderProperty = (BSEffectShaderProperty*)shaderProperty;
+	if (shaderProperty) {
+		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
+		BSImageShader->Render((BSTriShape*)objGeom, defaultParams);
+		logIfNeeded("Scope materials setup complete.");
 	}
 }
