@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/Bethesda/MemoryManager.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
 namespace RE
 {
 	namespace BSStorageDefs

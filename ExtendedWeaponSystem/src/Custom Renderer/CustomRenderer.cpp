@@ -1,5 +1,7 @@
 #include "Global.h"
 
+#pragma region ScopeRenderer
+
 ScopeRenderer::ScopeRenderer() {
 	logIfNeeded("ScopeRenderer ctor Starting...");
 
@@ -102,6 +104,7 @@ ScopeRenderer& ScopeRenderer::operator=(const ScopeRenderer& rhs) {
 	pScopeAccumulator = rhs.pScopeAccumulator;
 	shaderParams = rhs.shaderParams;
 	renderTarget = rhs.renderTarget;
+	return *this;
 }
 
 NiTexture* ScopeRenderer::Render(bool saveTexture) {
@@ -149,9 +152,9 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 
 	BSPortalGraphEntry* camPortalEntry = (Main::GetSingleton())->GetCameraPortalGraphEntry();
 	if (camPortalEntry) {
-		BSPortalGraph* camPortalGraph = camPortalEntry->QPortalGraph;
+		BSPortalGraph* camPortalGraph = camPortalEntry->PortalGraph;
 		if (camPortalGraph) {
-			BSShaderUtil::AccumulateSceneArray(pScopeCam->camera, &camPortalGraph->QAlwaysRenderArray, scopeCulling, false);
+			BSShaderUtil::AccumulateSceneArray(pScopeCam->camera, &camPortalGraph->AlwaysRenderArray, scopeCulling, false);
 		}
 	}
 
@@ -201,7 +204,7 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 	NiTexture* renderedTexture = nullptr;
 	BSGraphics::Texture* graphicsTex = nullptr;
 	if (saveTexture) {
-		BSFixedString strScope("ScopeTexture");
+		const BSFixedString strScope("ScopeTexture");
 		renderedTexture = renderedTexture->CreateEmpty(strScope, false, false);
 		graphicsTex = pTargetManager->SaveRenderTargetToTexture(19, false, false, BSGraphics::Usage::USAGE_DEFAULT);
 		renderedTexture->rendererTexture = graphicsTex;
@@ -220,6 +223,48 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 	}
 	return renderedTexture;
 }
+
+#pragma endregion
+
+void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, uint32_t target, uint32_t depthTarget) {
+	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
+	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
+	BSGraphics::Renderer* pRenderData = &BSGraphics::Renderer::GetSingleton();
+	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
+
+	pTargetManager->SetCurrentDepthStencilTarget(depthTarget, BSGraphics::SetRenderTargetMode::SRTM_FORCE_COPY_RESTORE, 0, false);
+	pTargetManager->SetCurrentRenderTarget(1, target, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	pTargetManager->SetCurrentRenderTarget(2, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	pTargetManager->SetCurrentRenderTarget(3, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	if (pShaderState->bDeferredRGBEmit) {
+		pTargetManager->SetCurrentRenderTarget(4, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	}
+	pTargetManager->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	pTargetManager->SetCurrentViewportForceToRenderTargetDimensions();
+	pRenderData->SetClearColor(0.0F, 0.0F, 0.0F, 0.0F);
+	pRenderData->ClearColor();
+	pRenderData->Flush();
+	//Threaded stuff happens here in RenderLocalMapScene
+	//stuff
+	//more stuff
+	pGraphicsState->SetCameraData(cam, false, 0.0F, 1.0F);
+	pRenderData->DoZPrePass(nullptr, nullptr, 0.0F, 1.0F, 0.0F, 1.0F);
+	shadeAccum->RenderOpaqueDecals();
+	shadeAccum->RenderBatches(4, false, -1);
+	shadeAccum->RenderBlendedDecals();
+	//BSGraphics::pDefaultContext stuff happens here in RenderLocalMapScene
+	//stuff
+	//more stuff
+	pRenderData->Flush();
+	pRenderData->SetClearColor(1.0F, 1.0F, 1.0F, 1.0F);
+	//more context stuff
+	//more things
+	shadeAccum->ClearEffectPasses();
+	shadeAccum->ClearActivePasses(false);
+}
+
+
+#pragma region nsScope
 
 void nsScope::CreateRenderer() {
 	logIfNeeded("ScopeRenderer Creation Starting...");
@@ -240,8 +285,8 @@ void nsScope::CreateRenderer() {
 		scopeRenderer = InitRenderer();
 		//in nsPipboy_LocalMap::CreateRenderer this is where the localMapCameraUpdateEvent stuff would also be created
 	}
-	(&scopeRendererLock)->unlock();
-
+	scopeRendererLock.unlock();
+	readyForRender = true;
 	logIfNeeded("ScopeRenderer Creation Complete.");
 }
 
@@ -255,6 +300,8 @@ void nsScope::DestroyRenderer() {
 		RE::free(pRenderer);
 	}
 	scopeRenderer = nullptr;
+	readyForRender = false;
+	logIfNeeded("ScopeRenderer Destroy Complete.");
 }
 
 ScopeRenderer* nsScope::InitRenderer() {
@@ -295,11 +342,11 @@ void nsScope::Render() {
 				//TODO: Add a creation of a shader property to the geometry for if the shaderProperty of the current geometry is nullptr or invalid
 
 			}
-			BSShaderProperty* shaderProperty = (BSShaderProperty*)(scopeRenderer->scopeCam.renderPlane->shaderProperty.get());
+			BSShaderProperty* shaderProperty = scopeRenderer->scopeCam.renderPlane->QShaderProperty();
 			if (shaderProperty->GetMaterialType() == BSShaderMaterial::BSMATERIAL_TYPE_EFFECT) {
 				BSEffectShaderProperty* effectShaderProperty;
 				BSEffectShaderMaterial* effectShaderMaterial;
-				effectShaderProperty = (BSEffectShaderProperty*)(shaderProperty);
+				effectShaderProperty = (BSEffectShaderProperty*)shaderProperty;
 				if (shaderProperty) {
 					effectShaderMaterial = effectShaderProperty->GetEffectShaderMaterial();
 					effectShaderMaterial->SetBaseTexture(renderedTexture);
@@ -321,39 +368,4 @@ void nsScope::Render() {
 	scopeRendererLock.unlock();
 }
 
-void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, uint32_t target, uint32_t depthTarget) {
-	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
-	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
-	BSGraphics::Renderer* pRenderData = &BSGraphics::Renderer::GetSingleton();
-	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
-
-	pTargetManager->SetCurrentDepthStencilTarget(depthTarget, BSGraphics::SetRenderTargetMode::SRTM_FORCE_COPY_RESTORE, 0, 0);
-	pTargetManager->SetCurrentRenderTarget(1, target, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	pTargetManager->SetCurrentRenderTarget(2, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	pTargetManager->SetCurrentRenderTarget(3, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	if (pShaderState->bDeferredRGBEmit) {
-		pTargetManager->SetCurrentRenderTarget(4, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	}
-	pTargetManager->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	pTargetManager->SetCurrentViewportForceToRenderTargetDimensions();
-	pRenderData->SetClearColor(0.0F, 0.0F, 0.0F, 0.0F);
-	pRenderData->ClearColor();
-	pRenderData->Flush();
-	//Threaded stuff happens here in RenderLocalMapScene
-	//stuff
-	//more stuff
-	pGraphicsState->SetCameraData(cam, 0, 0.0F, 1.0F);
-	pRenderData->DoZPrePass(0, 0, 0.0F, 1.0F, 0.0F, 1.0F);
-	shadeAccum->RenderOpaqueDecals();
-	shadeAccum->RenderBatches(4, 0, -1);
-	shadeAccum->RenderBlendedDecals();
-	//BSGraphics::pDefaultContext stuff happens here in RenderLocalMapScene
-	//stuff
-	//more stuff
-	pRenderData->Flush();
-	pRenderData->SetClearColor(1.0F, 1.0F, 1.0F, 1.0F);
-	//more context stuff
-	//more things
-	shadeAccum->ClearEffectPasses();
-	shadeAccum->ClearActivePasses(0);
-}
+#pragma endregion

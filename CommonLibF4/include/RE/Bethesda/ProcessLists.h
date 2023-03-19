@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RE/Bethesda/BSSemaphore.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 
 namespace RE
 {

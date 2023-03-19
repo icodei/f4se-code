@@ -85,8 +85,6 @@ namespace RE
 		bool bUpdateAccumulateFlag;
 		bool bIgnorePreprocess;
 		bool bCustomCullPlanes;
-		bool bUnknownBool1;
-		bool bUnknownBool2;
 
 	private:
 		NiCullingProcess* ctor(NiVisibleArray* a_array)

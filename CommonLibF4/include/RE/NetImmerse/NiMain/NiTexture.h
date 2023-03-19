@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/NetImmerse/NiMain/NiObject.h"
 
 namespace RE
@@ -31,14 +31,14 @@ namespace RE
 
 		[[nodiscard]] std::string_view GetName() const { return name; }
 
-		static NiTexture* Create(BSFixedString& name, [[maybe_unused]] bool a1, bool a2)
+		static NiTexture* Create(const BSFixedString& name, [[maybe_unused]] bool a1, bool a2)
 		{
 			using func_t = decltype(&NiTexture::Create);
 			REL::Relocation<func_t> func{ REL::ID(1071950) };
 			return func(name, a1, a2);
 		}
 
-		static NiTexture* CreateEmpty(BSFixedString& name, bool isDDX, [[maybe_unused]] bool a1)
+		static NiTexture* CreateEmpty(const BSFixedString& name, bool isDDX, [[maybe_unused]] bool a1)
 		{
 			using func_t = decltype(&NiTexture::CreateEmpty);
 			REL::Relocation<func_t> func{ REL::ID(1255534) };

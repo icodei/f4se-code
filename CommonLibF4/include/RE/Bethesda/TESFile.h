@@ -1,11 +1,11 @@
 #pragma once
 
 #include "RE/Bethesda/BSStringT.h"
-#include "RE/Bethesda/BSSystemFile.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTList.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSSystem/BSSystemFile.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/NetImmerse/NiSystem/NiFile.h"
 
 namespace RE

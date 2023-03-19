@@ -1,14 +1,14 @@
 #pragma once
 
 #include "RE/Bethesda/Atomic.h"
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTimer.h"
 #include "RE/Bethesda/BSInputEventReceiver.h"
 #include "RE/Bethesda/BSLock.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTSingleton.h"
-#include "RE/Bethesda/BSTimer.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/IMenu.h"
 #include "RE/Scaleform/GFx/GFx_Player.h"
 

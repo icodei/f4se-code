@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RE/Bethesda/BSLock.h"
-#include "RE/Bethesda/BSPointerHandle.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSSpinLock.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
 
 namespace RE
 {

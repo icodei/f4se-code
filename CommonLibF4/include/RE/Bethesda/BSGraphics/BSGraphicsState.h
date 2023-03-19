@@ -1,7 +1,7 @@
 #pragma once
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
 #include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"
 #include "RE/NetImmerse/NiMain/NiPoint4.h"
 #include "RE/NetImmerse/NiMain/NiRect.h"

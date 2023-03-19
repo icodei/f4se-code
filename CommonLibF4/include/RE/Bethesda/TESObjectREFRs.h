@@ -1,14 +1,15 @@
 #pragma once
 
 #include "RE/Bethesda/BGSInventoryItem.h"
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTSmallArray.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
 #include "RE/Bethesda/BSSoundHandle.h"
 #include "RE/Bethesda/BSStringT.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/Events.h"
-#include "RE/Bethesda/MemoryManager.h"
 #include "RE/Bethesda/TESForms.h"
 #include "RE/Havok/hknpBodyId.h"
 #include "RE/Havok/hknpClosestUniqueBodyIdHitCollector.h"
@@ -273,7 +274,6 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::WeaponAnimationGraphManagerHolder };
 		static constexpr auto VTABLE{ VTABLE::WeaponAnimationGraphManagerHolder };
-
 	};
 
 	class BGSEquipIndex

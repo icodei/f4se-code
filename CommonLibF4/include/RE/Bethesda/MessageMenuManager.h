@@ -2,9 +2,9 @@
 
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSStringT.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTSingleton.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/UIMessage.h"
 
 namespace RE

@@ -4,7 +4,7 @@
 #include "RE/Bethesda/BSResource/BSResourceStream.h"
 #include "RE/Bethesda/BSResource/BSResourceStreamBase.h"
 #include "RE/Bethesda/BSResource/LooseFileStreamBase.h"
-#include "RE/Bethesda/BSSystemFile.h"
+#include "RE/Bethesda/BSSystem/BSSystemFile.h"
 
 namespace RE
 {

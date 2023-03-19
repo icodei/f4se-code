@@ -1,13 +1,15 @@
 #pragma once
 
 #include "RE/Bethesda/BGSInventoryInterface.h"
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTPoint.h"
+#include "RE/Bethesda/BSCore/BSTPoint2.h"
+#include "RE/Bethesda/BSCore/BSTPoint3.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/BSInputEventUser.h"
-#include "RE/Bethesda/BSPointerHandle.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSSoundHandle.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTPoint.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RE/Bethesda/InputEvent.h"
-#include "RE/Bethesda/MemoryManager.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
 
 namespace RE
 {

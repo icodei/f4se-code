@@ -1,7 +1,7 @@
 #pragma once
 #include "RE/Bethesda/BSHavok/bhkIWorldstepListener.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Havok/Common/Base/Container/Array/hkArray.h"
 #include "RE/Havok/Common/Base/Math/Vector/hkVector4f.h"
 #include "RE/Havok/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"

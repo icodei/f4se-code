@@ -1,9 +1,9 @@
 #pragma once
 
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Bethesda/CRC.h"
-#include "RE/Bethesda/MemoryManager.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
 
 namespace RE
 {

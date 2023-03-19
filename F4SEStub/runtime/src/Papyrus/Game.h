@@ -28,7 +28,7 @@ namespace Papyrus
 		{
 			const auto camera = RE::PlayerCamera::GetSingleton();
 			return camera && camera->currentState ?
-                       *camera->currentState->id :
+                       static_cast<RE::CameraState>(camera->currentState->id) :
                        static_cast<RE::CameraState>(-1);
 		}
 

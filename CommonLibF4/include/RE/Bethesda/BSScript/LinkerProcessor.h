@@ -1,9 +1,10 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSScrapArray.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Bethesda/BSScript/IObjectProcessor.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 
 namespace RE
 {

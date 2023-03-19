@@ -1,8 +1,9 @@
 #include "Global.h"
 
+/*
 bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAttach, char nodeName) {
-	NiCamera* cam;
-	NiCamera** pCam;
+	NiCamera* cam = nullptr;
+	NiCamera** pCam = nullptr;
 
 	if (doAttach) {
 		BSFixedString sCamName(camName);
@@ -75,3 +76,4 @@ bool ExtraCameraManager::ProjectExtraCamera(const char camName[0x40], const char
 }
 
 unordered_map<const char*, NiCamera*> ExtraCameraManager::s_extraCamerasMap;
+*/

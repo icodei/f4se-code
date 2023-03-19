@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/BSLock.h"
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/Bethesda/UIShaderFXInfo.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"

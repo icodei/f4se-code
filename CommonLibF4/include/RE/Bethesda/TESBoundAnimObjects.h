@@ -1,10 +1,10 @@
 #pragma once
 
 #include "RE/Bethesda/BGSCharacterMorph.h"
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Bethesda/FormComponents.h"
 #include "RE/Bethesda/TESBoundObjects.h"
 #include "RE/Bethesda/TESCondition.h"

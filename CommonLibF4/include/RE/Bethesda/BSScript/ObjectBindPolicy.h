@@ -1,15 +1,16 @@
 #pragma once
 
 #include "RE/Bethesda/BSContainer.h"
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSLock.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTObjectArena.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/Bethesda/BSTTuple.h"
-#include "RE/Bethesda/MemoryManager.h"
+#include "RE/Bethesda/BSCore/BSSpinLock.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTObjectArena.h"
+#include "RE/Bethesda/BSCore/BSTScrapHashMap.h"
+#include "RE/Bethesda/BSCore/BSTSmallArray.h"
+#include "RE/Bethesda/BSCore/BSTTuple.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 
 namespace RE
 {

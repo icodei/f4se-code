@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/NetImmerse/NiMain/NiObject.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
@@ -16,6 +16,14 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::NiObjectNET };
 		static constexpr auto VTABLE{ VTABLE::NiObjectNET };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::NiObjectNET };
+
+		enum CopyType : std::int32_t
+		{
+			COPY_NONE = 0x0,
+			COPY_EXACT = 0x1,
+			COPY_UNIQUE = 0x2,
+		};
+
 
 		NiObjectNET();
 		virtual ~NiObjectNET();  // NOLINT(modernize-use-override) 00

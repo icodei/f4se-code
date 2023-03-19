@@ -11,4 +11,11 @@ namespace RE
 	{
 	public:
 	};
+
+	template <class T>
+	class NiTPointerList :
+		public NiTPointerListBase<NiTDefaultAllocator<T>, T>  // 00
+	{
+	public:
+	};
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
 #include "RE/Bethesda/Events.h"
 #include "RE/Bethesda/HUDModes.h"
 

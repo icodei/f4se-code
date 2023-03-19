@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RE/Bethesda/BSScript/Internal/IFuncCallQuery.h"
+#include "RE/Bethesda/BSCore/BSScrapArray.h"
 
 namespace RE
 {

@@ -35,17 +35,82 @@ set(SOURCES
 	include/RE/Bethesda/BSAnimation/AnimationStanceData.h
 	include/RE/Bethesda/BSAnimation/BSAnimationGraphManager.h
 	include/RE/Bethesda/BSAnimation/BSLinearInterpolator.h
-	include/RE/Bethesda/BSBound.h
 	include/RE/Bethesda/BSCompoundFrustum.h
 	include/RE/Bethesda/BSContainer.h
+	include/RE/Bethesda/BSCore/AllocatorStackCounter.h
+	include/RE/Bethesda/BSCore/BSAutoLock.h
+	include/RE/Bethesda/BSCore/BSCRC32.h
+	include/RE/Bethesda/BSCore/BSCore.h
+	include/RE/Bethesda/BSCore/BSCoreDefines.h
+	include/RE/Bethesda/BSCore/BSCoreHeaders.h
+	include/RE/Bethesda/BSCore/BSCoreLibType.h
+	include/RE/Bethesda/BSCore/BSCoreMath.h
+	include/RE/Bethesda/BSCore/BSCoreMemory.h
+	include/RE/Bethesda/BSCore/BSCoreMessage.h
+	include/RE/Bethesda/BSCore/BSCoreTypes.h
 	include/RE/Bethesda/BSCore/BSCoreUtils.h
+	include/RE/Bethesda/BSCore/BSCriticalSection.h
+	include/RE/Bethesda/BSCore/BSD3DX.h
+	include/RE/Bethesda/BSCore/BSEventFlag.h
+	include/RE/Bethesda/BSCore/BSIntrusiveRBTree.h
+	include/RE/Bethesda/BSCore/BSMemoryUtility.h
+	include/RE/Bethesda/BSCore/BSNonReEntrantSpinLock.h
+	include/RE/Bethesda/BSCore/BSPrecisionTimer.h
+	include/RE/Bethesda/BSCore/BSRandom.h
+	include/RE/Bethesda/BSCore/BSReadWriteLock.h
 	include/RE/Bethesda/BSCore/BSSafeSleep.h
+	include/RE/Bethesda/BSCore/BSScrapArray.h
+	include/RE/Bethesda/BSCore/BSSemaphore.h
+	include/RE/Bethesda/BSCore/BSSimpleList.h
+	include/RE/Bethesda/BSCore/BSSmallBlockAllocator.h
 	include/RE/Bethesda/BSCore/BSSpinLock.h
+	include/RE/Bethesda/BSCore/BSString.h
+	include/RE/Bethesda/BSCore/BSTArray.h
+	include/RE/Bethesda/BSCore/BSTArrayAlg.h
+	include/RE/Bethesda/BSCore/BSTBTree.h
+	include/RE/Bethesda/BSCore/BSTEvent.h
+	include/RE/Bethesda/BSCore/BSTHashMap.h
+	include/RE/Bethesda/BSCore/BSTList.h
+	include/RE/Bethesda/BSCore/BSTListAlg.h
 	include/RE/Bethesda/BSCore/BSTLocklessQueue.h
+	include/RE/Bethesda/BSCore/BSTObjectArena.h
+	include/RE/Bethesda/BSCore/BSTPoint.h
+	include/RE/Bethesda/BSCore/BSTPoint2.h
+	include/RE/Bethesda/BSCore/BSTPoint3.h
+	include/RE/Bethesda/BSCore/BSTPointBase.h
+	include/RE/Bethesda/BSCore/BSTRelocatableScatterTable.h
+	include/RE/Bethesda/BSCore/BSTScatterTable.h
+	include/RE/Bethesda/BSCore/BSTScrapHashMap.h
+	include/RE/Bethesda/BSCore/BSTScrapSet.h
+	include/RE/Bethesda/BSCore/BSTSet.h
+	include/RE/Bethesda/BSCore/BSTSingleton.h
+	include/RE/Bethesda/BSCore/BSTSmallArray.h
+	include/RE/Bethesda/BSCore/BSTSmallIndexScatterTable.h
+	include/RE/Bethesda/BSCore/BSTStaticHashMap.h
+	include/RE/Bethesda/BSCore/BSTStaticPrimitiveArray.h
+	include/RE/Bethesda/BSCore/BSTTuple.h
 	include/RE/Bethesda/BSCore/BSThread.h
+	include/RE/Bethesda/BSCore/BSTimer.h
+	include/RE/Bethesda/BSCore/CompactingStore.h
+	include/RE/Bethesda/BSCore/CompactingStoreCommon.h
+	include/RE/Bethesda/BSCore/HeapBlocks.h
+	include/RE/Bethesda/BSCore/IMemoryHeap.h
+	include/RE/Bethesda/BSCore/IMemoryStore.h
+	include/RE/Bethesda/BSCore/IMemoryTracker.h
+	include/RE/Bethesda/BSCore/MemoryContextTracker.h
+	include/RE/Bethesda/BSCore/MemoryDefs.h
+	include/RE/Bethesda/BSCore/MemoryManager.h
+	include/RE/Bethesda/BSCore/MemoryTrackSettings.h
+	include/RE/Bethesda/BSCore/NewOverloads.h
+	include/RE/Bethesda/BSCore/ScrapHeap.h
+	include/RE/Bethesda/BSCore/Unicode.h
+	include/RE/Bethesda/BSDevices/BSControllerDevice.h
+	include/RE/Bethesda/BSDevices/BSDevice.h
+	include/RE/Bethesda/BSDevices/BSGamepad.h
 	include/RE/Bethesda/BSDevices/BSInputEvent.h
+	include/RE/Bethesda/BSDevices/BSInterfaceDevice.h
+	include/RE/Bethesda/BSDevices/XPrefSettings.h
 	include/RE/Bethesda/BSExtraData.h
-	include/RE/Bethesda/BSFixedString.h
 	include/RE/Bethesda/BSGeometry.h
 	include/RE/Bethesda/BSGraphics/BSGraphics.h
 	include/RE/Bethesda/BSGraphics/BSGraphicsHandles.h
@@ -77,6 +142,7 @@ set(SOURCES
 	include/RE/Bethesda/BSHavok/bhkCharacterStateOnGround.h
 	include/RE/Bethesda/BSHavok/bhkCharacterStateSwimming.h
 	include/RE/Bethesda/BSHavok/bhkCollisionFilter.h
+	include/RE/Bethesda/BSHavok/bhkCollisionFilterDefs.h
 	include/RE/Bethesda/BSHavok/bhkCollisionQuery.h
 	include/RE/Bethesda/BSHavok/bhkConvert.h
 	include/RE/Bethesda/BSHavok/bhkIWorldstepListener.h
@@ -89,14 +155,48 @@ set(SOURCES
 	include/RE/Bethesda/BSInputEventSingleUser.h
 	include/RE/Bethesda/BSInputEventUser.h
 	include/RE/Bethesda/BSLock.h
+	include/RE/Bethesda/BSMain/BSBoneMap.h
+	include/RE/Bethesda/BSMain/BSBound.h
+	include/RE/Bethesda/BSMain/BSCloningProcess.h
 	include/RE/Bethesda/BSMain/BSCullingProcess.h
+	include/RE/Bethesda/BSMain/BSCurrent.h
+	include/RE/Bethesda/BSMain/BSGeometryConstructor.h
 	include/RE/Bethesda/BSMain/BSModelDB.h
+	include/RE/Bethesda/BSMain/BSMultiBound.h
+	include/RE/Bethesda/BSMain/BSMultiBoundNode.h
+	include/RE/Bethesda/BSMain/BSMultiBoundShape.h
+	include/RE/Bethesda/BSMain/BSNiLinesConstructor.h
 	include/RE/Bethesda/BSMain/BSNiNode.h
+	include/RE/Bethesda/BSMain/BSNiTriShapeConstructor.h
+	include/RE/Bethesda/BSMain/BSNodeVisitation.h
+	include/RE/Bethesda/BSMain/BSPointerHandle.h
+	include/RE/Bethesda/BSMain/BSPointerHandleManager.h
+	include/RE/Bethesda/BSMain/BSQueuedResourceCollection.h
+	include/RE/Bethesda/BSMain/BSReference.h
+	include/RE/Bethesda/BSMain/BSSpline.h
+	include/RE/Bethesda/BSMain/BSStream.h
+	include/RE/Bethesda/BSMain/BSTestObjects.h
 	include/RE/Bethesda/BSMain/BSTextureDB.h
+	include/RE/Bethesda/BSMain/BSTextureIndex.h
+	include/RE/Bethesda/BSMain/BSTextureStreamerTypes.h
 	include/RE/Bethesda/BSMain/BSUtilities.h
+	include/RE/Bethesda/BSMain/BSXFlags.h
+	include/RE/Bethesda/BSMain/IOManager.h
+	include/RE/Bethesda/BSMain/IOManagerDef.h
+	include/RE/Bethesda/BSMain/NiBSLODNodeEnums.h
 	include/RE/Bethesda/BSMain/QueuedFiles.h
+	include/RE/Bethesda/BSMain/Setting.h
+	include/RE/Bethesda/BSMain/XIniSetting.h
 	include/RE/Bethesda/BSMemStorage.h
-	include/RE/Bethesda/BSPointerHandle.h
+	include/RE/Bethesda/BSPathfinding/AStarNode.h
+	include/RE/Bethesda/BSPathfinding/BSNavMeshInfo.h
+	include/RE/Bethesda/BSPathfinding/BSNavmeshRaycast.h
+	include/RE/Bethesda/BSPathfinding/BSNavmeshTriangle.h
+	include/RE/Bethesda/BSPathfinding/BSPathSmootherRayCast.h
+	include/RE/Bethesda/BSPathfinding/BSPathingNode.h
+	include/RE/Bethesda/BSPathfinding/BSPathingSpline.h
+	include/RE/Bethesda/BSPathfinding/BSPathingStart.h
+	include/RE/Bethesda/BSPathfinding/MovementTypes.h
 	include/RE/Bethesda/BSPortalGraph.h
 	include/RE/Bethesda/BSPreCulledObjects.h
 	include/RE/Bethesda/BSResource/BSResource.h
@@ -239,29 +339,32 @@ set(SOURCES
 	include/RE/Bethesda/BSStorage.h
 	include/RE/Bethesda/BSStringPool.h
 	include/RE/Bethesda/BSStringT.h
+	include/RE/Bethesda/BSSystem/BSFile.h
+	include/RE/Bethesda/BSSystem/BSFixedString.h
+	include/RE/Bethesda/BSSystem/BSJobs.h
+	include/RE/Bethesda/BSSystem/BSSocket.h
+	include/RE/Bethesda/BSSystem/BSSocketDefines.h
+	include/RE/Bethesda/BSSystem/BSSocketError.h
+	include/RE/Bethesda/BSSystem/BSSocketServer.h
+	include/RE/Bethesda/BSSystem/BSSystemFile.h
+	include/RE/Bethesda/BSSystem/BSSystemFileStreamer.h
 	include/RE/Bethesda/BSSystem/BSSystemMonitorEvent.h
-	include/RE/Bethesda/BSSystemFile.h
-	include/RE/Bethesda/BSSystemFileStreamer.h
-	include/RE/Bethesda/BSSystemUtility.h
-	include/RE/Bethesda/BSTArray.h
-	include/RE/Bethesda/BSTBTree.h
-	include/RE/Bethesda/BSTEvent.h
+	include/RE/Bethesda/BSSystem/BSTBTreeFile.h
+	include/RE/Bethesda/BSSystem/BSTCreateFactory.h
+	include/RE/Bethesda/BSSystem/BSTFactory.h
+	include/RE/Bethesda/BSSystem/BSTPointerAndFlags.h
+	include/RE/Bethesda/BSSystem/BSTSmartPointer.h
+	include/RE/Bethesda/BSSystem/BSTaskletManager.h
+	include/RE/Bethesda/BSSystem/FilePathUtilities.h
+	include/RE/Bethesda/BSSystemMonitor/BSSystemMonitor.h
+	include/RE/Bethesda/BSSystemMonitor/BSSystemMonitorMessage.h
+	include/RE/Bethesda/BSSystemUtilities/BSSystemUtility.h
 	include/RE/Bethesda/BSTFreeList.h
-	include/RE/Bethesda/BSTHashMap.h
 	include/RE/Bethesda/BSTInterpolator.h
-	include/RE/Bethesda/BSTList.h
 	include/RE/Bethesda/BSTMessageQueue.h
-	include/RE/Bethesda/BSTObjectArena.h
 	include/RE/Bethesda/BSTOptional.h
-	include/RE/Bethesda/BSTPoint.h
-	include/RE/Bethesda/BSTPointerAndFlags.h
-	include/RE/Bethesda/BSTSingleton.h
-	include/RE/Bethesda/BSTSmallIndexScatterTable.h
-	include/RE/Bethesda/BSTSmartPointer.h
-	include/RE/Bethesda/BSTTuple.h
 	include/RE/Bethesda/BSTextureSet.h
 	include/RE/Bethesda/BSTextureStreamer.h
-	include/RE/Bethesda/BSTimer.h
 	include/RE/Bethesda/CELLJobs.h
 	include/RE/Bethesda/CRC.h
 	include/RE/Bethesda/Calendar.h
@@ -288,7 +391,6 @@ set(SOURCES
 	include/RE/Bethesda/LocalMap.h
 	include/RE/Bethesda/MagicItems.h
 	include/RE/Bethesda/Main.h
-	include/RE/Bethesda/MemoryManager.h
 	include/RE/Bethesda/MenuControls.h
 	include/RE/Bethesda/MenuCursor.h
 	include/RE/Bethesda/MessageMenuManager.h
@@ -311,7 +413,6 @@ set(SOURCES
 	include/RE/Bethesda/Settings.h
 	include/RE/Bethesda/ShadowSceneNode.h
 	include/RE/Bethesda/SplineUtils.h
-	include/RE/Bethesda/TES.h
 	include/RE/Bethesda/TESBoundAnimObjects.h
 	include/RE/Bethesda/TESBoundObjects.h
 	include/RE/Bethesda/TESCamera.h
@@ -516,6 +617,11 @@ set(SOURCES
 	include/RE/Scaleform/Render/Render_TreeNode.h
 	include/RE/Scaleform/Render/Render_Types2D.h
 	include/RE/Scaleform/Render/Render_Viewport.h
+	include/RE/Shared/FileIO/TES.h
+	include/RE/Shared/Misc/VatsEffectControl.h
+	include/RE/Shared/Sky/Moon.h
+	include/RE/Shared/Sky/Sky.h
+	include/RE/Shared/TESForms/Objects/TESEffectShader.h
 	include/RE/VTABLE_IDs.h
 	include/RE/msvc/functional.h
 	include/RE/msvc/memory.h
@@ -561,6 +667,7 @@ set(SOURCES
 	src/RE/Bethesda/BSShader/Shaders/BSImagespaceShader.cpp
 	src/RE/Bethesda/CRC.cpp
 	src/RE/Bethesda/Calendar.cpp
+	src/RE/Bethesda/DrawWorld.cpp
 	src/RE/Bethesda/FormComponents.cpp
 	src/RE/Bethesda/MenuCursor.cpp
 	src/RE/Bethesda/TESBoundAnimObjects.cpp

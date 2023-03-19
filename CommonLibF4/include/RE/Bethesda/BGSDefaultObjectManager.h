@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/TESForms.h"
 
 namespace RE

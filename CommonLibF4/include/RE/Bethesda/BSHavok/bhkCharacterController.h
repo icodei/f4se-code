@@ -1,11 +1,11 @@
 #pragma once
 
-#include "RE/Bethesda/BSBound.h"
-#include "RE/Bethesda/BSHavok/bhkNPCollisionObject.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Bethesda/BSHavok/bhkCollisionFilter.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSHavok/bhkNPCollisionObject.h"
+#include "RE/Bethesda/BSMain/BSBound.h"
 #include "RE/Havok/Common/Base/Math/Vector/hkVector4.h"
 #include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"

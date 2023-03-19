@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSPointerHandle.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/SCRIPT_OUTPUT.h"
 
 namespace RE

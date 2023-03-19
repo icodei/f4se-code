@@ -1,5 +1,5 @@
 #include "Global.h"
-
+/*
 void ScopeRendererManager::Setup() {
 	logIfNeeded("ScopeRendererManager Setup Starting...");
 
@@ -334,3 +334,4 @@ BSShaderAccumulator* ScopeRendererManager::pScopeManagerAccumulator;
 ImageSpaceShaderParam* ScopeRendererManager::pScopeManagerShaderParam;
 NiCamera* ScopeRendererManager::pCamera;
 BSGeometry* ScopeRendererManager::pRenderPlane;
+*/

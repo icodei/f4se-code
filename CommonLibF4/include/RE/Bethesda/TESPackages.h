@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RE/Bethesda/BSPointerHandle.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTList.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
 #include "RE/Bethesda/TESCondition.h"
 #include "RE/Bethesda/TESForms.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"

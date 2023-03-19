@@ -1,9 +1,10 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSPointerHandle.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTSmallArray.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/TESBoundObjects.h"
 #include "RE/Bethesda/UserEvents.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
@@ -309,6 +310,7 @@ namespace RE
 	{
 	private:
 		using EventSource_t = BSTGlobalEvent::EventSource<PlayerAmmoCountEvent>;
+		using ValueEventSource_t = BSTGlobalEvent::EventSource<BSTValueRequestEvent<PlayerAmmoCountEvent>>;
 
 	public:
 		[[nodiscard]] static EventSource_t* GetEventSource()
@@ -316,6 +318,14 @@ namespace RE
 			REL::Relocation<EventSource_t**> singleton{ REL::ID(353960) };
 			if (!*singleton) {
 				*singleton = new EventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
+			}
+			return *singleton;
+		}
+		[[nodiscard]] static ValueEventSource_t* GetValueEventSource()
+		{
+			REL::Relocation<ValueEventSource_t**> singleton{ REL::ID(573549) };
+			if (!*singleton) {
+				*singleton = new ValueEventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
 			}
 			return *singleton;
 		}
@@ -327,13 +337,23 @@ namespace RE
 	{
 	private:
 		using EventSource_t = BSTGlobalEvent::EventSource<PlayerWeaponReloadEvent>;
+		using ValueEventSource_t = BSTGlobalEvent::EventSource<BSTValueRequestEvent<PlayerWeaponReloadEvent>>;
 
 	public:
 		[[nodiscard]] static EventSource_t* GetEventSource()
 		{
-			REL::Relocation<EventSource_t**> singleton{ REL::ID(1012004) };
+			REL::Relocation<EventSource_t**> singleton{ REL::ID(793042) };
 			if (!*singleton) {
 				*singleton = new EventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
+			}
+			return *singleton;
+		}
+
+		[[nodiscard]] static ValueEventSource_t* GetValueEventSource()
+		{
+			REL::Relocation<ValueEventSource_t**> singleton{ REL::ID(1012004) };
+			if (!*singleton) {
+				*singleton = new ValueEventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
 			}
 			return *singleton;
 		}
@@ -345,13 +365,22 @@ namespace RE
 	{
 	private:
 		using EventSource_t = BSTGlobalEvent::EventSource<PlayerSetWeaponStateEvent>;
+		using ValueEventSource_t = BSTGlobalEvent::EventSource<BSTValueRequestEvent<PlayerSetWeaponStateEvent>>;
 
 	public:
 		[[nodiscard]] static EventSource_t* GetEventSource()
 		{
-			REL::Relocation<EventSource_t**> singleton{ REL::ID(307381) };
+			REL::Relocation<EventSource_t**> singleton{ REL::ID(88091) };
 			if (!*singleton) {
 				*singleton = new EventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
+			}
+			return *singleton;
+		}
+		[[nodiscard]] static ValueEventSource_t* GetValueEventSource()
+		{
+			REL::Relocation<ValueEventSource_t**> singleton{ REL::ID(307381) };
+			if (!*singleton) {
+				*singleton = new ValueEventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
 			}
 			return *singleton;
 		}

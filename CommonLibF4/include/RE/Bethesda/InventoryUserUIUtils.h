@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Scaleform/GFx/GFx_Player.h"
 
 namespace RE

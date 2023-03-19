@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 
 namespace RE
 {

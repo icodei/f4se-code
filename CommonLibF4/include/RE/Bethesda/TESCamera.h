@@ -1,13 +1,15 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTPoint.h"
+#include "RE/Bethesda/BSCore/BSTPoint2.h"
+#include "RE/Bethesda/BSCore/BSTPoint3.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/BSInputEventReceiver.h"
-#include "RE/Bethesda/BSPointerHandle.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTPoint.h"
-#include "RE/Bethesda/BSTSingleton.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
@@ -63,17 +65,17 @@ namespace RE
 		TESCameraState() = delete;
 		TESCameraState(TESCamera& cam, std::uint32_t ID) { ctor(cam, ID); }
 
-		virtual ~TESCameraState() { return; }  // 00
+		virtual ~TESCameraState() {}  // 00
 
 		// add
-		virtual void Begin() { return; }                                                         // 09
-		virtual void End() { return; }                                                           // 0A
-		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) { return; }            // 0B
-		virtual void GetRotation(NiQuaternion& a_rotation) const { return; }                     // 0C
-		virtual void GetTranslation(NiPoint3& a_translation) const { return; }                   // 0D
-		virtual void SaveGame([[maybe_unused]] BGSSaveFormBuffer* a_saveGameBuffer) { return; }  // 0E
-		virtual void LoadGame([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) { return; }  // 0F
-		virtual void Revert([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) { return; }    // 10
+		virtual void Begin() { return; }                                                                // 09
+		virtual void End() { return; }                                                                  // 0A
+		virtual void Update([[maybe_unused]] BSTSmartPointer<TESCameraState>& a_nextState) { return; }  // 0B
+		virtual void GetRotation([[maybe_unused]] NiQuaternion& a_rotation) const { return; }           // 0C
+		virtual void GetTranslation([[maybe_unused]] NiPoint3& a_translation) const { return; }         // 0D
+		virtual void SaveGame([[maybe_unused]] BGSSaveFormBuffer* a_saveGameBuffer) { return; }         // 0E
+		virtual void LoadGame([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) { return; }         // 0F
+		virtual void Revert([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) { return; }           // 10
 
 		// members
 		TESCamera* camera;  // 18
@@ -97,7 +99,7 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::TESCamera };
 		static constexpr auto VTABLE{ VTABLE::TESCamera };
 
-		virtual ~TESCamera() { return; }  // 00
+		virtual ~TESCamera() {}  // 00
 
 		// add
 		virtual void SetCameraRoot(NiNode* a_cameraRoot) { cameraRoot = a_cameraRoot; }  // 01

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSSystemFile.h"
+#include "RE/Bethesda/BSSystem/BSSystemFile.h"
 #include "RE/NetImmerse/NiSystem/NiBinaryStream.h"
 
 namespace RE

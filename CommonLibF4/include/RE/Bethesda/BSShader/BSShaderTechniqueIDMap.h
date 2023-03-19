@@ -1,6 +1,6 @@
 #pragma once
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 
 namespace RE
 {

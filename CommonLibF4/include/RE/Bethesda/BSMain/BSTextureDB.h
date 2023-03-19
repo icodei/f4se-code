@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 
 namespace RE
 {

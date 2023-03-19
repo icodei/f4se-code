@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
 #include "RE/Bethesda/BSShader/BSShaderMaterial.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"

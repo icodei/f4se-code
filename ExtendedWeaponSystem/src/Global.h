@@ -1,31 +1,16 @@
 #pragma once
+#include "Custom Renderer/ScopeCamera.h"
 
-#include "AnimationFunctions.h"
 #include "Custom Renderer/CustomRenderer.h"
 #include "Custom Renderer/ExtraCameraManager.h"
-#include "Custom Renderer/ScopeCamera.h"
 #include "Custom Renderer/ScopeRendererManager.h"
 #include "Custom Renderer/ScopeShaders.h"
+
+#include "AnimationFunctions.h"
 #include "Hooks.h"
 #include "ReloadHandlers.h"
 #include "Util.h"
 #include "WeaponHandlers.h"
-
-#include <Windows.h>
-#include <chrono>
-#include <ctime>
-#include <functional>
-#include <iostream>
-#include <sstream>
-#include <stdio.h>
-#include <string>
-#include <thread>
-#include <time.h>
-#include <type_traits>
-#include <unordered_map>
-
-#define PLUGIN_NAME "ExtendedWeaponSystem"
-#define PLUGIN_VERSION MAKE_EXE_VERSION(1, 0, 0)
 
 static PlayerCharacter* pc;
 static PlayerCamera* pcam;
@@ -50,17 +35,22 @@ static BGSKeyword* reloadSequentialKeyword;
 static BGSKeyword* ThermalScopeKeyword;
 static TESObjectWEAP::InstanceData* currentWeapInstance;
 
-static const BSFixedString WeaponFire("WeaponFire");
-static const BSFixedString ReloadEnd("ReloadEnd");
-static const BSFixedString ReloadComplete("ReloadComplete");
 static const BSFixedString Event00("Event00");
-static const BSFixedString reloadSequentialStart("reloadSequentialStart");
+static const BSFixedString LoadingMenu("LoadingMenu");
+static const BSFixedString pipboyClosed("pipboyClosed");
+static const BSFixedString pipboyOpened("pipboyOpened");
+static const BSFixedString ReloadComplete("ReloadComplete");
+static const BSFixedString ReloadEnd("ReloadEnd");
 static const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
+static const BSFixedString reloadSequentialStart("reloadSequentialStart");
 static const BSFixedString sightedStateEnter("sightedStateEnter");
 static const BSFixedString sightedStateExit("sightedStateExit");
+static const BSFixedString weapEquip("weapEquip");
+static const BSFixedString weapForceEquip("weapForceEquip");
 static const BSFixedString weaponDraw("weaponDraw");
+static const BSFixedString WeaponFire("WeaponFire");
 static const BSFixedString weaponInstantDown("weaponInstantDown");
-static const BSFixedString LoadingMenu("LoadingMenu");
+static const BSFixedString weapUnequip("weapUnequip");
 
 #define _BYTE std::uint8_t
 #define _WORD std::uint16_t
@@ -97,17 +87,17 @@ static const BSFixedString LoadingMenu("LoadingMenu");
 #define WORD6(x) WORDn(x, 6)
 #define WORD7(x) WORDn(x, 7)
 
-#define FToRGB 0.0039215689
+#define FToRGB 0.0039215689F
 
-#define FltPId2 1.570796371
-#define FltPI 3.141592741
-#define FltPIx2 6.283185482
-#define Flt2dPI 0.6366197467
-#define FltPId180 0.01745329238
-#define Flt180dPI 57.29578018
-#define DblPId180 0.017453292519943295
-#define Dbl180dPI 57.29577951308232
+#define FltPId2 1.570796371F
+#define FltPI 3.141592741F
+#define FltPIx2 6.283185482F
+#define Flt2dPI 0.6366197467F
+#define FltPId180 0.01745329238F
+#define Flt180dPI 57.29578018F
+#define DblPId180 0.017453292519943295F
+#define Dbl180dPI 57.29577951308232F
 
-#define BUTTON_UP 0.0f
-#define BUTTON_DOWN 1.0f
-#define BUTTON_HOLD_TIMER 0.4f
+#define BUTTON_UP 0.0F
+#define BUTTON_DOWN 1.0F
+#define BUTTON_HOLD_TIMER 0.4F

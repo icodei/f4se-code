@@ -1,10 +1,10 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/BSStringT.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Scaleform/GFx/GFx_Player.h"
 #include "RE/Scaleform/Kernel/SF_RefCount.h"
 

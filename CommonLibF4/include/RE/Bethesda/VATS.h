@@ -1,9 +1,9 @@
 #pragma once
 
 #include "RE/Bethesda/BSLock.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE

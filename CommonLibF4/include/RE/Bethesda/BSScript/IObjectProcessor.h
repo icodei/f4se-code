@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/BSScript/ILoader.h"
 
 namespace RE

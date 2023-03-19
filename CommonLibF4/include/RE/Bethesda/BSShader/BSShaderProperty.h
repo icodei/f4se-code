@@ -2,7 +2,7 @@
 
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSShader/BSShaderMaterial.h"
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"
 #include "RE/NetImmerse/NiMain/NiPlane.h"
 #include "RE/NetImmerse/NiMain/NiShadeProperty.h"
@@ -174,27 +174,27 @@ namespace RE
 		static_assert(sizeof(RenderPassArray) == 0x8);
 
 		// add
-		virtual RenderPassArray* GetRenderPasses(BSGeometry* a_geom, std::uint32_t a_renderMode, BSShaderAccumulator* a_accumulator) = 0;  // 2B
-		virtual RenderPassArray* GetRenderPasses_ShadowMapOrMask(BSGeometry*, std::uint32_t, BSShaderAccumulator*) { return nullptr; }     // 2C
-		virtual RenderPassArray* GetRenderPasses_LocalMap(BSGeometry*, std::uint32_t, BSShaderAccumulator*) { return nullptr; }            // 2D
-		virtual BSRenderPass* CreateVatsMaskRenderPass(BSGeometry*) { return nullptr; }                                                    // 2E
-		virtual std::uint16_t GetNumberofPasses([[maybe_unused]] BSGeometry* a_geom) { return 1; }                                         // 2F
-		virtual BSRenderPass* GetRenderDepthPass(BSGeometry*) { return nullptr; }                                                          // 30
-		virtual bool CanMerge(const BSShaderProperty* a_prop) { return false; }                                                            // 31
-		virtual void SetMaterialAlpha(float) { return; }                                                                                   // 32
-		virtual float QMaterialAlpha() const { return 1.0F; }                                                                              // 33
-		virtual const BSFixedString& GetRootName() const { return name; }                                                                  // 34
-		virtual std::int32_t ForEachTexture(ForEachVisitor&) { return 1; }                                                                 // 35
-		virtual std::int32_t QShader() const { return 0; }                                                                                 // 36
-		virtual void ClearUnusedMaterialValues() { return; }                                                                               // 37
-		virtual BSShaderProperty* ClarifyShader(BSGeometry*, bool, bool) { return nullptr; }                                               // 38
-		virtual NiTexture* GetBaseTexture() const { return nullptr; }                                                                      // 39
-		virtual RenderPassArray* GetWaterFogPassList(BSGeometry*) { return nullptr; }                                                      // 3A
-		virtual bool AcceptsEffectData() const { return false; }                                                                           // 3B
-		virtual void PrecacheTextures() { return; }                                                                                        // 3C
-		virtual std::uint32_t DetermineUtilityShaderDecl() const { return 0; }                                                             // 3D
-		virtual std::uint32_t GetMaterialType() const { return 0; }                                                                        // 3E
-		virtual void DoClearRenderPasses() { return; }                                                                                     // 3F
+		virtual RenderPassArray* GetRenderPasses([[maybe_unused]] BSGeometry* a_geom, [[maybe_unused]] std::uint32_t a_renderMode, [[maybe_unused]] BSShaderAccumulator* a_accumulator) { return nullptr; }                  // 2B
+		virtual RenderPassArray* GetRenderPasses_ShadowMapOrMask([[maybe_unused]] BSGeometry* a_geom, [[maybe_unused]] std::uint32_t a_renderMode, [[maybe_unused]] BSShaderAccumulator* a_accumulator) { return nullptr; }  // 2C
+		virtual RenderPassArray* GetRenderPasses_LocalMap([[maybe_unused]] BSGeometry* a_geom, [[maybe_unused]] std::uint32_t a_renderMode, [[maybe_unused]] BSShaderAccumulator* a_accumulator) { return nullptr; }         // 2D
+		virtual BSRenderPass* CreateVatsMaskRenderPass([[maybe_unused]] BSGeometry* a_geom) { return nullptr; }                                                                                                              // 2E
+		virtual std::uint16_t GetNumberofPasses([[maybe_unused]] BSGeometry* a_geom) { return 1; }                                                                                                                           // 2F
+		virtual BSRenderPass* GetRenderDepthPass([[maybe_unused]] BSGeometry* a_geom) { return nullptr; }                                                                                                                    // 30
+		virtual bool CanMerge([[maybe_unused]] const BSShaderProperty* a_prop) { return false; }                                                                                                                             // 31
+		virtual void SetMaterialAlpha([[maybe_unused]] float a_alpha) { return; }                                                                                                                                            // 32
+		virtual float QMaterialAlpha() const { return 1.0F; }                                                                                                                                                                // 33
+		virtual const BSFixedString& GetRootName() const { return name; }                                                                                                                                                    // 34
+		virtual std::int32_t ForEachTexture([[maybe_unused]] ForEachVisitor& a_visitor) { return 1; }                                                                                                                        // 35
+		virtual std::int32_t QShader() const { return 0; }                                                                                                                                                                   // 36
+		virtual void ClearUnusedMaterialValues() { return; }                                                                                                                                                                 // 37
+		virtual BSShaderProperty* ClarifyShader([[maybe_unused]] BSGeometry* a_geom, [[maybe_unused]] bool, [[maybe_unused]] bool) { return nullptr; }                                                                       // 38
+		virtual NiTexture* GetBaseTexture() const { return nullptr; }                                                                                                                                                        // 39
+		virtual RenderPassArray* GetWaterFogPassList([[maybe_unused]] BSGeometry* a_geom) { return nullptr; }                                                                                                                // 3A
+		virtual bool AcceptsEffectData() const { return false; }                                                                                                                                                             // 3B
+		virtual void PrecacheTextures() { return; }                                                                                                                                                                          // 3C
+		virtual std::uint32_t DetermineUtilityShaderDecl() const { return 0; }                                                                                                                                               // 3D
+		virtual std::uint32_t GetMaterialType() const { return 0; }                                                                                                                                                          // 3E
+		virtual void DoClearRenderPasses() { return; }                                                                                                                                                                       // 3F
 
 		void SetEffectShaderData(BSEffectShaderData* shaderData)
 		{

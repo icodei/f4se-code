@@ -3,7 +3,7 @@
 #include "RE/Bethesda/BSShader/BSShaderData.h"
 #include "RE/Bethesda/BSTextureSet.h"
 #include "RE/Bethesda/FormComponents.h"
-#include "RE/Bethesda/MemoryManager.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
 #include "RE/Bethesda/TESBoundObjects.h"
 
 namespace RE

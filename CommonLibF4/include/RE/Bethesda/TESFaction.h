@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RE/Bethesda/AITimeStamp.h"
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Bethesda/FormComponents.h"
 #include "RE/Bethesda/TESForms.h"
 

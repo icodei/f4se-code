@@ -7,11 +7,11 @@ BSEventNotifyControl BGSOnPlayerUseWorkBenchEventSink::ProcessEvent(const BGSOnP
 
 BSEventNotifyControl MenuOpenCloseEventSink::ProcessEvent(const MenuOpenCloseEvent& a_event, BSTEventSource<MenuOpenCloseEvent>* a_source) {
 	if (a_event.menuName == LoadingMenu && a_event.opening) {
-		isEmptyReload = false;
 		ignore = true;
-
-		//static auto pLoadGameHandler = new TESLoadGameHandler();
-		//TESLoadGameEvent::GetEventSource()->RegisterSink(pLoadGameHandler);
+		RegisterAfterLoadEvents();
+	}
+	if (a_event.menuName == LoadingMenu && !a_event.opening) {
+		ignore = false;
 	}
 	return BSEventNotifyControl::kContinue;
 }
@@ -73,8 +73,8 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 				}
 			}
 		}
-		//Manually handle relaod end for various situations
-		if (reloadStarted && !reloadEnd && !_strcmpi("pipboyOpened", a_event.name.c_str())) {
+		//Manually handle reload end for various situations
+		if (reloadStarted && !reloadEnd && a_event.name == pipboyOpened) {
 			reloadStop();
 			logIfNeeded("pipboy opened");
 		}
@@ -90,17 +90,16 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 	if (a_event.name == weaponDraw) {
 		HanldeWeaponEquipAfter3D();
 	}
-	if (a_event.name == weaponInstantDown) {
-		ignore = true;
-		if (processCurrentScope) {
-			nsScope::DestroyRenderer();
-		}
-	}
+	
 	if (processCurrentScope) {
 		if (a_event.name == sightedStateEnter) {
 			ignore = false;
 		} else if (a_event.name == sightedStateExit) {
 			ignore = true;
+		}
+		if (a_event.name == weaponInstantDown) {
+			ignore = true;
+			nsScope::DestroyRenderer();
 		}
 	}
 	return fn ? (this->*fn)(const_cast<BSAnimationGraphEvent&>(a_event), a_source) : BSEventNotifyControl::kContinue;
@@ -204,7 +203,7 @@ void PlayerUpdate_Hook(void* player, float a1) {
 }
 
 void TryHookBGSOnPlayerUseWorkBenchEvent() {
-	if (hookedList.at("BGSOnPlayerUseWorkBenchEvent") == false) {
+	if (hookedList.at("BGSOnPlayerUseWorkBenchEvent") == true) {
 		return;
 	}
 
@@ -217,7 +216,7 @@ void TryHookBGSOnPlayerUseWorkBenchEvent() {
 }
 
 void TryHookMenuOpenCloseEvent() {
-	if (hookedList.at("MenuOpenCloseEvent") == false) {
+	if (hookedList.at("MenuOpenCloseEvent") == true) {
 		return;
 	}
 	BSTEventSource<MenuOpenCloseEvent>* eventSource = UI::GetSingleton()->GetEventSource<MenuOpenCloseEvent>();
@@ -229,7 +228,7 @@ void TryHookMenuOpenCloseEvent() {
 }
 
 void TryHookPlayerAmmoCountEvent() {
-	if (hookedList.at("PlayerAmmoCountEvent") == false) {
+	if (hookedList.at("PlayerAmmoCountEvent") == true) {
 		return;
 	}
 	//BSTEventSource<PlayerAmmoCountEvent>* eventSource = PlayerAmmoCountEventSink::GetEventSource();
@@ -242,7 +241,7 @@ void TryHookPlayerAmmoCountEvent() {
 }
 
 void TryHookPlayerAnimGraphEvent() {
-	if (hookedList.at("PlayerAnimGraphEvent") == false) {
+	if (hookedList.at("PlayerAnimGraphEvent") == true) {
 		return;
 	}
 	if (pc) {
@@ -253,7 +252,7 @@ void TryHookPlayerAnimGraphEvent() {
 }
 
 void TryHookPlayerSetWeaponStateEvent() {
-	if (hookedList.at("PlayerSetWeaponStateEvent") == false) {
+	if (hookedList.at("PlayerSetWeaponStateEvent") == true) {
 		return;
 	}
 	BSTEventSource<PlayerSetWeaponStateEvent>* eventSource = PlayerSetWeaponStateEvent::GetEventSource();
@@ -265,7 +264,7 @@ void TryHookPlayerSetWeaponStateEvent() {
 }
 
 void TryHookPlayerWeaponReloadEvent() {
-	if (hookedList.at("PlayerWeaponReloadEvent") == false) {
+	if (hookedList.at("PlayerWeaponReloadEvent") == true) {
 		return;
 	}
 	BSTEventSource<PlayerWeaponReloadEvent>* eventSource = PlayerWeaponReloadEvent::GetEventSource();
@@ -277,7 +276,7 @@ void TryHookPlayerWeaponReloadEvent() {
 }
 
 void TryHookTESEquipEvent() {
-	if (hookedList.at("TESEquipEvent") == false) {
+	if (hookedList.at("TESEquipEvent") == true) {
 		return;
 	}
 	BSTEventSource<TESEquipEvent>* eventSource = TESEquipEvent::GetEventSource();
@@ -289,7 +288,7 @@ void TryHookTESEquipEvent() {
 }
 
 void TryHookTESFurnitureEvent() {
-	if (hookedList.at("TESFurnitureEvent") == false) {
+	if (hookedList.at("TESFurnitureEvent") == true) {
 		return;
 	}
 	BSTEventSource<TESFurnitureEvent>* eventSource = TESFurnitureEvent::GetEventSource();
@@ -301,7 +300,7 @@ void TryHookTESFurnitureEvent() {
 }
 
 void TryHookTESLoadGameEvent() {
-	if (hookedList.at("TESLoadGameEvent") == false) {
+	if (hookedList.at("TESLoadGameEvent") == true) {
 		return;
 	}
 	BSTEventSource<TESLoadGameEvent>* eventSource = TESLoadGameEvent::GetEventSource();
@@ -313,6 +312,7 @@ void TryHookTESLoadGameEvent() {
 }
 
 void TryHooks() {
+	log("Trying for hooks...");
 	TryHookBGSOnPlayerUseWorkBenchEvent();
 	TryHookMenuOpenCloseEvent();
 	TryHookPlayerAmmoCountEvent();
@@ -347,10 +347,6 @@ bool Install() {
 //Called at LoadingMenu, mostly for global events
 bool RegisterAfterLoadEvents()  // TODO - This function might be called more than once? should we keep track of created things?
 {
-
-	//if (!scopePOV || !scopePOVRoot || !pScopeManagerCullingProc || !pScopeManagerAccumulator || !pScopeManagerShaderParam) {
-	//	ScopeRendererManager::Setup();
-	//}
-
+	TryHooks();
 	return true;
 }

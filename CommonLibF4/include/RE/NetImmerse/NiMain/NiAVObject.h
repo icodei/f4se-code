@@ -23,28 +23,35 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::NiAVObject };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::NiAVObject };
 
+		enum : std::int32_t
+		{
+			UPDATE_FLAG_NONE = 0x0,
+			UPDATE_FLAG_PARENT_IS_CULLED = 0x1,
+		};
+
+
 		NiAVObject();
 		virtual ~NiAVObject();  // NOLINT(modernize-use-override) 00
 
 		// add
-		virtual void UpdateControllers(NiUpdateData& a_data) { return; }                                                            // 28
-		virtual void PerformOp(PerformOpFunc& a_operation) { return; }                                                              // 29
-		virtual void AttachProperty([[maybe_unused]] NiAlphaProperty* a_prop) { return; }                                           // 2A
-		virtual void SetMaterialNeedsUpdate(bool) { return; }                                                                       // 2B
-		virtual void SetDefaultMaterialNeedsUpdateFlag(bool) { return; }                                                            // 2C
-		virtual void SetAppCulled(bool a_appCulled) { return; }                                                                     // 2D
-		virtual NiAVObject* GetObjectByName(const BSFixedString& a_name) { return name == a_name ? this : nullptr; }                // 2E
-		virtual void SetSelectiveUpdateFlags(bool& a_selectiveUpdate, bool a_selectiveUpdateTransforms, bool& a_rigid) { return; }  // 2F
-		virtual void UpdateDownwardPass(NiUpdateData& a_data, std::uint32_t a_flags) { return; }                                    // 30
-		virtual void UpdateSelectedDownwardPass(NiUpdateData& a_data, std::uint32_t a_flags) { return; }                            // 31
-		virtual void UpdateRigidDownwardPass(NiUpdateData& a_data, std::uint32_t a_flags) { return; }                               // 32
-		virtual void UpdateWorldBound() { return; }                                                                                 // 33
-		virtual void UpdateWorldData(NiUpdateData* a_data) { return; }                                                              // 34
-		virtual void UpdateTransformAndBounds(NiUpdateData& a_data) { return; }                                                     // 35
-		virtual void UpdateTransforms(NiUpdateData& a_data) { UpdateWorldData(std::addressof(a_data)); }                            // 36
-		virtual void PreAttachUpdate(NiNode* a_eventualParent, NiUpdateData& a_data) { return; }                                    // 37
-		virtual void PostAttachUpdate() { return; }                                                                                 // 38
-		virtual void OnVisible([[maybe_unused]] NiCullingProcess& a_culler) { return; }                                             // 39
+		virtual void UpdateControllers([[maybe_unused]] NiUpdateData& a_data) { return; }                                                                                              // 28
+		virtual void PerformOp([[maybe_unused]] PerformOpFunc& a_operation) { return; }                                                                                                // 29
+		virtual void AttachProperty([[maybe_unused]] NiAlphaProperty* a_prop) { return; }                                                                                              // 2A
+		virtual void SetMaterialNeedsUpdate(bool) { return; }                                                                                                                          // 2B
+		virtual void SetDefaultMaterialNeedsUpdateFlag(bool) { return; }                                                                                                               // 2C
+		virtual void SetAppCulled([[maybe_unused]] bool a_appCulled) { return; }                                                                                                       // 2D
+		virtual NiAVObject* GetObjectByName(const BSFixedString& a_name) { return name == a_name ? this : nullptr; }                                                                   // 2E
+		virtual void SetSelectiveUpdateFlags([[maybe_unused]] bool& a_selectiveUpdate, [[maybe_unused]] bool a_selectiveUpdateTransforms, [[maybe_unused]] bool& a_rigid) { return; }  // 2F
+		virtual void UpdateDownwardPass([[maybe_unused]] NiUpdateData& a_data, [[maybe_unused]] std::uint32_t a_flags) { return; }                                                     // 30
+		virtual void UpdateSelectedDownwardPass([[maybe_unused]] NiUpdateData& a_data, [[maybe_unused]] std::uint32_t a_flags) { return; }                                             // 31
+		virtual void UpdateRigidDownwardPass([[maybe_unused]] NiUpdateData& a_data, [[maybe_unused]] std::uint32_t a_flags) { return; }                                                // 32
+		virtual void UpdateWorldBound() { return; }                                                                                                                                    // 33
+		virtual void UpdateWorldData([[maybe_unused]] NiUpdateData* a_data) { return; }                                                                                                // 34
+		virtual void UpdateTransformAndBounds([[maybe_unused]] NiUpdateData& a_data) { return; }                                                                                       // 35
+		virtual void UpdateTransforms(NiUpdateData& a_data) { UpdateWorldData(std::addressof(a_data)); }                                                                               // 36
+		virtual void PreAttachUpdate([[maybe_unused]] NiNode* a_eventualParent, [[maybe_unused]] NiUpdateData& a_data) { return; }                                                     // 37
+		virtual void PostAttachUpdate() { return; }                                                                                                                                    // 38
+		virtual void OnVisible([[maybe_unused]] NiCullingProcess& a_culler) { return; }                                                                                                // 39
 
 		F4_HEAP_REDEFINE_ALIGNED_NEW(NiAVObject);
 

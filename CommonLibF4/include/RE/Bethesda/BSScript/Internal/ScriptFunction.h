@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/BSScript/IFunction.h"
 #include "RE/Bethesda/BSScript/Internal/VDescTable.h"
 #include "RE/Bethesda/BSScript/PackedInstructionStream.h"

@@ -1,6 +1,6 @@
 #include "RE/Bethesda/FormComponents.h"
 
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Bethesda/FormUtil.h"
 #include "RE/Bethesda/TESBoundAnimObjects.h"
 #include "RE/Bethesda/TESForms.h"

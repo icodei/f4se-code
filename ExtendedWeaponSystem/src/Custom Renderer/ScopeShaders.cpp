@@ -63,7 +63,7 @@ BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiText
 		fillAlpha = 0.0F;
 	}
 	newEffectShaderData->fBaseFillAlpha = fillAlpha;
-	float edgeAlpha;
+	float edgeAlpha = 1.0F;
 	if (shader->data.edgeAlphaFadeInTime == 0.0F && shader->data.edgeAlphaFullTime == 0.0F) {
 		edgeAlpha = shader->data.edgeAlphaFullPercent;
 	}

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
 
 namespace RE
 {

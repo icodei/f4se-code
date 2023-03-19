@@ -1,8 +1,8 @@
 #pragma once
 
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
 #include "RE/Bethesda/BSExtraData.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/MemoryManager.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE

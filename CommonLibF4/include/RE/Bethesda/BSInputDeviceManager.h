@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/InputDevice.h"
 
 namespace RE

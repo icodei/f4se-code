@@ -1,7 +1,6 @@
 #pragma once
 #include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTList.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"

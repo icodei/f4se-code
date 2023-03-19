@@ -2,7 +2,7 @@
 #include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
 #include "RE/Bethesda/Atomic.h"
-#include "RE/Bethesda/BSTList.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
 
 #include <DirectXMath.h>
 #include <d3d11.h>

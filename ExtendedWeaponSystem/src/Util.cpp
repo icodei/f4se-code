@@ -289,7 +289,7 @@ const EquippedWeapon* GetPlayerEquippedWeaponByEquipIndex(EquipIndex equipIndex)
 		return &weapon;
 	}
 
-	BSTArray<EquippedWeapon>* equipDataArray;
+	BSTArray<EquippedWeapon>* equipDataArray = nullptr;
 	(pc)->currentProcess->GetEquippedWeapons(*equipDataArray);
 	if (!equipDataArray) {
 		return nullptr;
@@ -349,8 +349,8 @@ const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedWeapon& a
 	if (a_weapon.weapon.object->formType != ENUM_FORM_ID::kWEAP) {
 		return nullptr;
 	}
-	TESObjectWEAP::InstanceData* weapInstData = reinterpret_cast<TESObjectWEAP::InstanceData*>(a_weapon.weapon.instanceData.get());
-	//TESObjectWEAP::InstanceData* weapInstData = fallout_cast<TESObjectWEAP::InstanceData, TBO_InstanceData>(a_weapon.weapon.instanceData.get());
+	//TESObjectWEAP::InstanceData* weapInstData = reinterpret_cast<TESObjectWEAP::InstanceData*>(a_weapon.weapon.instanceData.get());
+	TESObjectWEAP::InstanceData* weapInstData = fallout_cast<TESObjectWEAP::InstanceData*, TBO_InstanceData>(a_weapon.weapon.instanceData.get());
 	if (!weapInstData) {
 		return nullptr;
 	}
@@ -438,7 +438,7 @@ const string currentDateTime() {
 	time_t now = time(0);
 	struct tm tstruct;
 	char buf[80];
-	tstruct = *localtime(&now);
+	localtime_s(&tstruct, &now);
 	// Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
 	// for more information about date/time format
 	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
@@ -455,11 +455,13 @@ const string prefixLog() {
 //Write message log only if logEnabled == True
 void logIfNeeded(string text) {
 	if (logEnabled) {
-		_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
+		logger::info(FMT_STRING("{}"), text);
+		//_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
 	}
 }
 
 //Write message log always
 void log(string text) {
-	_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
+	logger::info(FMT_STRING("{}"), text);
+	//_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
 }

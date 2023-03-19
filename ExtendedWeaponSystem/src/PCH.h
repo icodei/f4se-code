@@ -4,6 +4,15 @@
 #include "F4SE/F4SE.h"
 #include "RE/Fallout.h"
 
+#include <Windows.h>
+#include <chrono>
+#include <ctime>
+#include <iostream>
+#include <stdio.h>
+#include <thread>
+#include <time.h>
+#include <unordered_map>
+
 #ifdef NDEBUG
 #	include <spdlog/sinks/basic_file_sink.h>
 #else

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "RE/Bethesda/BSHavok/bhkCollisionFilter.h"
-#include "RE/Bethesda/BSPointerHandle.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSSoundHandle.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
 #include "RE/Bethesda/CELLJobs.h"
 #include "RE/Bethesda/TESObjectREFRs.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"

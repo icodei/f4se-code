@@ -1,6 +1,6 @@
 #include "RE/Bethesda/BSScaleformManager.h"
 
-#include "RE/Bethesda/BSSystemFileStreamer.h"
+#include "RE/Bethesda/BSSystem/BSSystemFileStreamer.h"
 #include "RE/Bethesda/IMenu.h"
 #include "RE/Bethesda/Settings.h"
 #include "RE/Scaleform/GFx/GFx_Loader.h"

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RE/Bethesda/BSStringT.h"
-#include "RE/Bethesda/BSTList.h"
-#include "RE/Bethesda/MemoryManager.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
 #include "RE/Bethesda/TESForms.h"
 
 namespace RE

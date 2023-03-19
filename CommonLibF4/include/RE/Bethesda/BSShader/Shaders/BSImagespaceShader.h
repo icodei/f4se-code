@@ -1,7 +1,7 @@
 #pragma once
 #include "RE/Bethesda/BSShader/BSShader.h"
 #include "RE/Bethesda/BSShader/ImageSpace.h"
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 
 namespace RE
 {

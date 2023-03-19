@@ -1,7 +1,10 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSLock.h"
+#include "RE/Bethesda/BSCore/BSScrapArray.h"
+#include "RE/Bethesda/BSCore/BSSpinLock.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTScrapHashMap.h"
+#include "RE/Bethesda/BSCore/BSTSet.h"
 #include "RE/Bethesda/BSScript/IClientVM.h"
 #include "RE/Bethesda/BSScript/IVMDebugInterface.h"
 #include "RE/Bethesda/BSScript/IVMObjectBindInterface.h"
@@ -16,11 +19,10 @@
 #include "RE/Bethesda/BSScript/Internal/WritableStringTable.h"
 #include "RE/Bethesda/BSScript/Internal/WritableTypeTable.h"
 #include "RE/Bethesda/BSScript/LinkerProcessor.h"
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/BSTFreeList.h"
-#include "RE/Bethesda/BSTHashMap.h"
 #include "RE/Bethesda/BSTMessageQueue.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
 
 namespace RE
 {

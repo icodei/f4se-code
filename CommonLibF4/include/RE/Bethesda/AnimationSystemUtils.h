@@ -1,9 +1,9 @@
 #pragma once
 
 #include "RE/Bethesda/BSContainer.h"
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 
 namespace RE
 {

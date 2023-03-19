@@ -1,6 +1,5 @@
 #pragma once
 #include "Global.h"
-#include "ScopeCamera.h"
 
 class ScopeRenderer {
 public:
@@ -24,6 +23,24 @@ public:
 	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
 };
 
+void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, uint32_t target, uint32_t depthTarget);
+
+class AccumulateSceneFunctor {
+public:
+	AccumulateSceneFunctor() :
+		renderer(nullptr), interior(0) {}
+	AccumulateSceneFunctor(ScopeRenderer* pRenderer, bool isInterior) {
+		renderer = pRenderer;
+		interior = isInterior;
+	}
+
+	uint32_t operator()(TESObjectCELL* a_cell);
+
+	//members
+	ScopeRenderer* renderer{ nullptr };
+	bool interior{ 0 };
+};
+
 namespace nsScope {
 
 	//functions
@@ -36,22 +53,3 @@ namespace nsScope {
 	static ScopeRenderer* scopeRenderer;
 	static BSSpinLock scopeRendererLock;
 }
-
-class AccumulateSceneFunctor {
-public:
-	AccumulateSceneFunctor() : renderer(nullptr), interior(0){}
-	AccumulateSceneFunctor(ScopeRenderer* pRenderer, bool isInterior) {
-		renderer = pRenderer;
-		interior = isInterior;
-	}
-
-	uint32_t operator()(TESObjectCELL* a_cell) {
-		//TODO
-	}
-
-	//members
-	ScopeRenderer* renderer{ nullptr };
-	bool interior{ 0 };
-};
-
-void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, uint32_t target, uint32_t depthTarget);

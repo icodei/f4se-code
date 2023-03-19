@@ -108,6 +108,7 @@ namespace RE
 				TryAttach();
 				return *this;
 			}
+			return *this;
 		}
 
 		[[nodiscard]] element_type& operator*() const noexcept

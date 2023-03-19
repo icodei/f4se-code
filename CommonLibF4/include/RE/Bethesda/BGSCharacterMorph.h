@@ -2,9 +2,9 @@
 
 #include "RE/Bethesda/BGSCharacterTint.h"
 #include "RE/Bethesda/BGSHeadPart.h"
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
 
 namespace RE

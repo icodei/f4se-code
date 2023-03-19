@@ -2,8 +2,8 @@
 
 #include "RE/Bethesda/Atomic.h"
 #include "RE/Bethesda/BSShader/BSBatchRenderer.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTSmallIndexScatterTable.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTSmallIndexScatterTable.h"
 
 namespace RE
 {

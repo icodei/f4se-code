@@ -1,6 +1,5 @@
 #pragma once
 
-#include "RE/Bethesda/BSTHashMap.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 #include "RE/NetImmerse/NiMain/NiTArray.h"
 #include "RE/NetImmerse/NiMain/NiTimeController.h"

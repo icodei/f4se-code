@@ -340,7 +340,7 @@ void ScopeCamera::DefaultState::GetTranslation(NiPoint3& a_translation) const { 
 }
 
 NiQuaternion& ScopeCamera::DefaultState::QInitialRotation() {
-	// TODO: insert return statement here
+	return initialRotation;
 }
 
 NiPoint3& ScopeCamera::DefaultState::QInitialPosition() {
@@ -348,11 +348,11 @@ NiPoint3& ScopeCamera::DefaultState::QInitialPosition() {
 }
 
 NiQuaternion& ScopeCamera::DefaultState::QRotation() {
-	// TODO: insert return statement here
+	return rotation;
 }
 
 NiPoint3& ScopeCamera::DefaultState::QTranslation() {
-	// TODO: insert return statement here
+	return translation;
 }
 
 void ScopeCamera::DefaultState::SetInitialPosition(NiPoint3& newPos) {

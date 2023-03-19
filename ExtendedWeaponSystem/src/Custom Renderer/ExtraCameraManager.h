@@ -1,6 +1,7 @@
 #pragma once
 #include "Global.h"
 
+/*
 //uses stuff from JiP for reference
 class ExtraCameraManager {
 public:
@@ -14,3 +15,4 @@ public:
 
 };
 static_assert(is_empty_v<ExtraCameraManager>);
+*/

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RE/Bethesda/BSScript/Object.h"
-#include "RE/Bethesda/BSTPointerAndFlags.h"
+#include "RE/Bethesda/BSSystem/BSTPointerAndFlags.h"
 
 namespace RE
 {

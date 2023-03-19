@@ -18,12 +18,12 @@ namespace RE
 		virtual ~NiAccumulator() {}
 
 		//add
-		virtual void StartAccumulating(NiCamera* a_camera) { return; }
+		virtual void StartAccumulating([[maybe_unused]] NiCamera* a_camera) { return; }
 		virtual void FinishAccumulating() { return; }
-		virtual void RegisterObjectArray(NiVisibleArray& a_array) { return; }
-		virtual void StartGroupingAlphas(NiBound& a_bound, bool a_unk) { return; }
+		virtual void RegisterObjectArray([[maybe_unused]] NiVisibleArray& a_array) { return; }
+		virtual void StartGroupingAlphas([[maybe_unused]] NiBound& a_bound, [[maybe_unused]] bool a_unk) { return; }
 		virtual void StopGroupingAlphas() { return; }
-		virtual bool RegisterObject(BSGeometry* a_geometry) { return false; }
+		virtual bool RegisterObject([[maybe_unused]] BSGeometry* a_geometry) { return false; }
 
 		//members
 		NiCamera* m_pkCamera;  //10

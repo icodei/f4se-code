@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSTSmartPointer.h"  // BSTSmartPointer
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"  // BSTSmartPointer
 
 namespace RE
 {

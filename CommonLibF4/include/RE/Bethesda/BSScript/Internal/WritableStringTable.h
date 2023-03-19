@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTHashMap.h"
-#include "RE/Bethesda/BSTObjectArena.h"
+#include "RE/Bethesda/BSCore/BSTObjectArena.h"
+#include "RE/Bethesda/BSCore/BSTScrapHashMap.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 
 namespace RE
 {

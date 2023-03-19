@@ -5,39 +5,35 @@ namespace RE
 	class NiFrustumPlanes
 	{
 	public:
-		struct Planes
+		enum
 		{
-			enum Plane
-			{
-				kNear,
-				kFar,
-				kLeft,
-				kRight,
-				kTop,
-				kBottom,
-
-				kTotal
-			};
+			NEAR_PLANE = 0x0,
+			FAR_PLANE = 0x1,
+			LEFT_PLANE = 0x2,
+			RIGHT_PLANE = 0x3,
+			TOP_PLANE = 0x4,
+			BOTTOM_PLANE = 0x5,
+			MAX_PLANES = 0x6,
 		};
 
 		enum class ActivePlane
 		{
-			kNear = 1 << 0,
-			kFar = 1 << 1,
-			kLeft = 1 << 2,
-			kRight = 1 << 3,
-			kTop = 1 << 4,
-			kBottom = 1 << 5
+			NEAR_PLANE_SET = 1 << 0,
+			FAR_PLANE_SET = 1 << 1,
+			LEFT_PLANE_SET = 1 << 2,
+			RIGHT_PLANE_SET = 1 << 3,
+			TOP_PLANE_SET = 1 << 4,
+			BOTTOM_PLANE_SET = 1 << 5,
+			ALL_PLANES_SET = 1 << 6
 		};
 
 		NiFrustumPlanes() { ctor(); }
 
 		// members
-		NiPlane cullingPlanes[6];       // 00
-		ActivePlane activePlanes;       // 60
-		std::uint32_t basePlaneStates;  // 64
-		std::uint32_t unk68;            // 68
-		std::uint32_t unk6C;            // 6C
+		NiPlane m_akCullingPlanes[MAX_PLANES];  // 00
+		ActivePlane m_uiActivePlanes;           // 60
+		std::uint32_t m_uiBasePlaneStates;      // 64
+		std::uint32_t m_Pad[2];                 // 68
 	private:
 		NiFrustumPlanes* ctor()
 		{

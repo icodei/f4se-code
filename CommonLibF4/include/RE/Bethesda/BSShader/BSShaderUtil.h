@@ -1,6 +1,6 @@
 #pragma once
 #include "RE/Bethesda/BSMain/BSCullingProcess.h"
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE

@@ -22,6 +22,7 @@
 #include <memory>
 #include <new>
 #include <optional>
+#include <random>
 #include <source_location>
 #include <span>
 #include <sstream>
@@ -45,8 +46,6 @@ static_assert(
 #include <mmio/mmio.hpp>
 #include <spdlog/spdlog.h>
 #pragma warning(pop)
-
-#pragma warning(disable: 4100);
 
 #include "F4SE/Impl/WinAPI.h"
 
@@ -595,7 +594,7 @@ namespace F4SE
 						WinAPI::GetCurrentModule(),
 						buf.data(),
 						static_cast<std::uint32_t>(buf.size()));
-				} while (result && result == buf.size() && buf.size() <= std::numeric_limits<std::uint32_t>::max());
+				} while (result && result == buf.size() && buf.size() <= (std::numeric_limits<std::uint32_t>::max)());
 
 				if (result && result != buf.size()) {
 					std::filesystem::path p(buf.begin(), buf.begin() + result);

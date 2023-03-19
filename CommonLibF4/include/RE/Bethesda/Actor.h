@@ -1,21 +1,23 @@
 #pragma once
 
 #include "RE/Bethesda/AITimeStamp.h"
-#include "RE/Bethesda/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTSmallArray.h"
+#include "RE/Bethesda/BSCore/BSTTuple.h"
 #include "RE/Bethesda/BSLock.h"
-#include "RE/Bethesda/BSPointerHandle.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSSoundHandle.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTSingleton.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
-#include "RE/Bethesda/BSTTuple.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/IMovementInterface.h"
 #include "RE/Bethesda/TESObjectREFRs.h"
 #include "RE/NetImmerse/NiMain/NiFlags.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
-#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 #include "RE/NetImmerse/NiMain/NiRefObject.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
@@ -559,7 +561,6 @@ namespace RE
 			return func(this, a_actor, a_array);
 		}
 
-
 		[[nodiscard]] bool GetEquippedItemByIndex(BGSEquipIndex a_equipIndex, EquippedItem& a_item) const
 		{
 			using func_t = decltype(&AIProcess::GetEquippedItemByIndex);
@@ -608,7 +609,6 @@ namespace RE
 			REL::Relocation<func_t> func{ REL::ID(1573363) };
 			return func(this, a_slot, a_items);
 		}
-
 
 		void KnockExplosion(Actor* a_actor, const NiPoint3& a_location, float a_magnitude)
 		{

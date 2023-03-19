@@ -3,6 +3,7 @@
 F4SE::PluginHandle g_pluginHandle = NULL;
 const F4SE::MessagingInterface* g_messaging;
 const F4SE::TaskInterface* g_taskInterface;
+const F4SE::Trampoline* g_trampoline;
 
 void init() {
 	pc = PlayerCharacter::GetSingleton();
@@ -38,7 +39,13 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	case F4SE::MessagingInterface::kNewGame:
 
 	case F4SE::MessagingInterface::kGameLoaded:
-
+		if (!GetForms()) {
+			logger::critical(FMT_STRING("ERROR: You are missing some forms"));
+		}
+		if (!Install()) {
+			logger::critical(FMT_STRING("ERROR:: Could not install all hooks"));
+		}
+		break;
 	case F4SE::MessagingInterface::kGameDataReady:
 		init();
 		break;
@@ -88,10 +95,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 		return false;
 	}
 
-	g_pluginHandle = F4SE::GetPluginHandle();
-	g_messaging = F4SE::GetMessagingInterface();
-
-	F4SE::AllocTrampoline(8 * 8);
+	//F4SE::AllocTrampoline(1024 * 64);
 
 	return true;
 }
@@ -99,18 +103,35 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f4se)
 {
 	F4SE::Init(a_f4se);
-
-	F4SE::Trampoline& g_trampoline = F4SE::GetTrampoline();
+	logger::info(FMT_STRING("Plugin Load"));
+	g_trampoline = &F4SE::GetTrampoline();
 	g_taskInterface = F4SE::GetTaskInterface();
+	g_pluginHandle = F4SE::GetPluginHandle();
+	g_messaging = F4SE::GetMessagingInterface();
 
-	if (!g_messaging) {
-		logger::critical(FMT_STRING("Couldn't get messaging interface"));
-		return false;
-	}
+	//if (!g_messaging) {
+	//	logger::critical(FMT_STRING("Couldn't get messaging interface"));
+	//	return false;
+	//}
 
-	if (g_messaging->RegisterListener(OnF4SEMessage)) {
-		logger::info(FMT_STRING("Registered listener"));
-	}
+	//if (g_messaging->RegisterListener(OnF4SEMessage)) {
+	//	logger::info(FMT_STRING("Registered listener"));
+	//}
 
+	g_messaging->RegisterListener([](F4SE::MessagingInterface::Message* msg) -> void {
+		if (msg->type == F4SE::MessagingInterface::kGameLoaded) {
+			init();
+			if (!GetForms()) {
+				logger::critical(FMT_STRING("ERROR: You are missing some forms"));
+			}
+			if (!Install()) {
+				logger::critical(FMT_STRING("ERROR:: Could not install all hooks"));
+			}
+		}
+		if (msg->type == F4SE::MessagingInterface::kPostLoadGame) {
+			FillWeaponInfo();
+		}
+	});
+	
 	return true;
 }

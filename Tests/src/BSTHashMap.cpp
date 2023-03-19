@@ -108,7 +108,7 @@ namespace RE
 	using BSTTuple = std::pair<T1, T2>;
 }
 
-#include "RE/Bethesda/BSTHashMap.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 
 #include <catch2/catch_all.hpp>
 

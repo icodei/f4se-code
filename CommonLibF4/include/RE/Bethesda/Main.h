@@ -1,9 +1,9 @@
 #pragma once
 
-#include "RE/Bethesda/BSPointerHandle.h"
-#include "RE/Bethesda/BSTEvent.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
 #include "RE/Bethesda/BSTMessageQueue.h"
-#include "RE/Bethesda/BSTTuple.h"
+#include "RE/Bethesda/BSCore/BSTTuple.h"
 
 namespace RE
 {

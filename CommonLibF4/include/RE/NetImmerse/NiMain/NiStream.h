@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 #include "RE/NetImmerse/NiMain/NiTArray.h"
 #include "RE/NetImmerse/NiMain/NiTLargeArray.h"

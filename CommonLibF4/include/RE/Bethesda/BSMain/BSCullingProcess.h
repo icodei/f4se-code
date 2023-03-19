@@ -2,6 +2,7 @@
 #include "RE/Bethesda/BSPortalGraph.h"
 #include "RE/NetImmerse/NiMain/NiCullingProcess.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 
 namespace RE
 {
@@ -36,10 +37,10 @@ namespace RE
 		};
 
 		//add
-		virtual void AppendNonAccum(NiAVObject& a_object) { return; };
-		virtual bool TestBaseVisibility_BSMultiBound(BSMultiBound& a_bound) { return false; };
-		virtual bool TestBaseVisibility_BSOcclusionPlane(BSOcclusionPlane& a_plane) { return false; };
-		virtual bool TestBaseVisibility_NiBound(NiBound& a_bound) { return false; };
+		virtual void AppendNonAccum([[maybe_unused]] NiAVObject& a_object) { return; }
+		virtual bool TestBaseVisibility_BSMultiBound([[maybe_unused]] BSMultiBound& a_bound) { return false; }
+		virtual bool TestBaseVisibility_BSOcclusionPlane([[maybe_unused]] BSOcclusionPlane& a_plane) { return false; }
+		virtual bool TestBaseVisibility_NiBound([[maybe_unused]] NiBound& a_bound) { return false; }
 
 		void SetAccumulator(NiAccumulator* accumulator) {
 			using func_t = decltype(&BSCullingProcess::SetAccumulator);
@@ -48,17 +49,11 @@ namespace RE
 		}
 
 		//members
-		std::uint32_t field_128;
-		std::uint32_t field_12C;
-		std::uint32_t field_130;
-		std::uint32_t field_134;
-		void* field_138;
-		std::uint64_t gap140;
-		std::uint64_t field_148;
-		BSPortalGraphEntry* QPortalGraphEntry;
-		BSCPCullingType CullingType;
-		std::uint8_t gap15C[40];
-		std::uint32_t field_184;
+		BSTHashMap<NiAVObject *,bool> kRoomSharedMap;
+		BSPortalGraphEntry* pPortalGraphEntry;
+		BSCPCullingType kCullMode;
+		BSCPCullingType eTypeStackA[10];
+		std::uint32_t iCTStackIndex;
 		BSCompoundFrustum* pCompoundFrustum;
 		NiPointer<NiAccumulator> spAccumulator;
 		bool bRecurseToGeometry;

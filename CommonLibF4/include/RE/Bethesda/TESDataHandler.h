@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RE/Bethesda/BSTEvent.h"
-#include "RE/Bethesda/BSTList.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/TESFile.h"
 #include "RE/Bethesda/TESForms.h"
 #include "RE/NetImmerse/NiMain/NiTArray.h"

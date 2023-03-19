@@ -2,7 +2,7 @@
 
 #include "RE/Bethesda/BSResource/BSResourceEnums.h"
 #include "RE/Bethesda/BSResource/BSResourceStream.h"
-#include "RE/Bethesda/BSTSmartPointer.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/NetImmerse/NiSystem/NiBinaryStream.h"
 
 namespace RE

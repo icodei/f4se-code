@@ -2,7 +2,7 @@
 
 #include <xmmintrin.h>
 
-#include "RE/Bethesda/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
 #include "RE/NetImmerse/NiMain/NiTransform.h"
 #include "RE/Netimmerse/NiMain/NiObject.h"

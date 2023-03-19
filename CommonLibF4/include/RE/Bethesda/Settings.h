@@ -1,9 +1,9 @@
 #pragma once
 
-#include "RE/Bethesda/BSFixedString.h"
-#include "RE/Bethesda/BSTBTree.h"
-#include "RE/Bethesda/BSTList.h"
-#include "RE/Bethesda/MemoryManager.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
+#include "RE/Bethesda/BSCore/BSTBTree.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 
 namespace RE
 {

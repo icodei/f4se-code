@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RE/Bethesda/BSInputEventReceiver.h"
-#include "RE/Bethesda/BSTArray.h"
-#include "RE/Bethesda/BSTSingleton.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 
 namespace RE
 {
