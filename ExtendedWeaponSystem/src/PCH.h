@@ -12,6 +12,7 @@
 #include <thread>
 #include <time.h>
 #include <unordered_map>
+#include <xbyak/xbyak.h>
 
 #ifdef NDEBUG
 #	include <spdlog/sinks/basic_file_sink.h>
@@ -28,12 +29,12 @@
 
 #define DLLEXPORT __declspec(dllexport)
 
-namespace logger = F4SE::log;
-
 using namespace std::literals;
 using namespace RE;
 using std::unordered_map;
 using std::is_empty_v;
 using std::string;
+
+namespace logger = F4SE::log;
 
 #include "Version.h"

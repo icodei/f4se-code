@@ -1,4 +1,4 @@
-#include "Global.h"
+#include "Hooks.h"
 
 BSEventNotifyControl BGSOnPlayerUseWorkBenchEventSink::ProcessEvent(const BGSOnPlayerUseWorkBenchEvent& a_event, BSTEventSource<BGSOnPlayerUseWorkBenchEvent>* a_source) {
 	ignore = true;
@@ -6,9 +6,11 @@ BSEventNotifyControl BGSOnPlayerUseWorkBenchEventSink::ProcessEvent(const BGSOnP
 }
 
 BSEventNotifyControl MenuOpenCloseEventSink::ProcessEvent(const MenuOpenCloseEvent& a_event, BSTEventSource<MenuOpenCloseEvent>* a_source) {
+	const BSFixedString LoadingMenu("LoadingMenu");
+
 	if (a_event.menuName == LoadingMenu && a_event.opening) {
 		ignore = true;
-		RegisterAfterLoadEvents();
+		//initSpecialHooks();
 	}
 	if (a_event.menuName == LoadingMenu && !a_event.opening) {
 		ignore = false;
@@ -20,32 +22,55 @@ BSEventNotifyControl PlayerAmmoCountEventSink::ProcessEvent(const PlayerAmmoCoun
 	if (processCurrentWeap == false) {
 		return BSEventNotifyControl::kContinue;
 	}
-	if (!a_event.optionalValue.value().weapon) {
+	if (!a_event.weapon) {
 		return BSEventNotifyControl::kContinue;
 	}
-	if (!a_event.optionalValue.value().weaponInstance) {
+	if (!a_event.weaponInstance) {
 		return BSEventNotifyControl::kContinue;
 	}
-	if (a_event.optionalValue.value().unk08 != 1) {
+	if (a_event.unk08 != 1) {
 		return BSEventNotifyControl::kContinue;
 	}
-	if (a_event.optionalValue.value().weaponInstance != currentWeapInstance) {
-		currentWeapInstance = a_event.optionalValue.value().weaponInstance;
+	if (a_event.weaponInstance != currentWeapInstance) {
+		currentWeapInstance = a_event.weaponInstance;
 		ammoCapacity = currentWeapInstance->ammoCapacity;
 	}
 	currentAmmoCount = a_event.optionalValue.value().clipAmmo;
 	totalAmmoCount = a_event.optionalValue.value().reserveAmmo;
-	logIfNeeded("ammo count: " + std::to_string(currentAmmoCount));
+	logInfoConditional("ammo count: " + std::to_string(currentAmmoCount));
 	return BSEventNotifyControl::kContinue;
+}
+
+BSTEventSource<PlayerAmmoCountEvent>* PlayerAmmoCountEventSink::GetEventSource() {
+	return GET_EVENT_SOURCE(PlayerAmmoCountEvent);
 }
 
 #pragma region PlayerAnimGraphEventSink
 BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimationGraphEvent& a_event, BSTEventSource<BSAnimationGraphEvent>* a_source) {
 	FnProcessEvent fn = fnHash.at(*(uintptr_t*)this);
+
+	const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
+	const BSFixedString reloadSequentialStart("reloadSequentialStart");
+	const BSFixedString Event00("Event00");
+	const BSFixedString pipboyClosed("pipboyClosed");
+	const BSFixedString pipboyOpened("pipboyOpened");
+	const BSFixedString ReloadComplete("ReloadComplete");
+	const BSFixedString ReloadEnd("ReloadEnd");
+	const BSFixedString sightedStateEnter("sightedStateEnter");
+	const BSFixedString sightedStateExit("sightedStateExit");
+	const BSFixedString throwEnd("throwEnd");
+	const BSFixedString weapEquip("weapEquip");
+	const BSFixedString weapForceEquip("weapForceEquip");
+	const BSFixedString weaponDraw("weaponDraw");
+	const BSFixedString WeaponFire("WeaponFire");
+	const BSFixedString weaponInstantDown("weaponInstantDown");
+	const BSFixedString weaponSwing("weaponSwing");
+	const BSFixedString weapUnequip("weapUnequip");
+
 	if (!currentWeapInstance) {
 		return BSEventNotifyControl::kContinue;
 	}
-
+	
 	if (processCurrentWeap) {
 		if (!reloadStarted && reloadEnd) {
 			if (a_event.name == Event00) {
@@ -56,11 +81,11 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 		}
 		if (reloadStarted && !reloadEnd) {
 			if (a_event.name == ReloadEnd) {
-				logIfNeeded("ReloadEnd");
+				logInfoConditional("Event Recieved: ReloadEnd");
 				reloadStop();
 			}
 			if (a_event.name == ReloadComplete) {
-				logIfNeeded("reloadComplete");
+				logInfoConditional("Event Recieved: reloadComplete");
 				if ((ammoCapacity - 1) == currentAmmoCount) {
 					reloadStop();
 				} else {
@@ -72,25 +97,25 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 					}
 				}
 			}
-		}
-		//Manually handle reload end for various situations
-		if (reloadStarted && !reloadEnd && a_event.name == pipboyOpened) {
-			reloadStop();
-			logIfNeeded("pipboy opened");
-		}
-		if (reloadStarted && !reloadEnd && !_strcmpi("weaponSwing", a_event.name.c_str())) {
-			reloadStop();
-			logIfNeeded("weapon swing");
-		}
-		if (reloadStarted && !reloadEnd && !_strcmpi("throwEnd", a_event.name.c_str())) {
-			reloadStop();
-			logIfNeeded("throw end");
+			//Manually handle reload end for various situations
+			if (a_event.name == pipboyOpened) {
+				reloadStop();
+				logInfoConditional("Event Recieved: pipboy opened");
+			}
+			if (a_event.name == weaponSwing) {
+				reloadStop();
+				logInfoConditional("Event Recieved: weapon swing");
+			}
+			if (a_event.name == throwEnd) {
+				reloadStop();
+				logInfoConditional("Event Recieved: throw end");
+			}
 		}
 	}
 	if (a_event.name == weaponDraw) {
 		HanldeWeaponEquipAfter3D();
 	}
-	
+
 	if (processCurrentScope) {
 		if (a_event.name == sightedStateEnter) {
 			ignore = false;
@@ -99,7 +124,8 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 		}
 		if (a_event.name == weaponInstantDown) {
 			ignore = true;
-			nsScope::DestroyRenderer();
+			//Destroy turned off for testing
+			//nsScope::DestroyRenderer();
 		}
 	}
 	return fn ? (this->*fn)(const_cast<BSAnimationGraphEvent&>(a_event), a_source) : BSEventNotifyControl::kContinue;
@@ -121,13 +147,13 @@ std::unordered_map<uintptr_t, PlayerAnimGraphEventSink::FnProcessEvent> PlayerAn
 BSEventNotifyControl PlayerSetWeaponStateEventSink::ProcessEvent(const PlayerSetWeaponStateEvent& a_event, BSTEventSource<PlayerSetWeaponStateEvent>* a_source) {
 	bool isDrawing = false;
 	if (a_event.optionalValue.value() == WEAPON_STATE::kDrawing) {
-		logIfNeeded("Weapon is being equiped.");
+		logInfoConditional("Weapon is being equiped.");
 		isDrawing = true;
 	}
 	if (a_event.optionalValue.value() == WEAPON_STATE::kDrawn && isDrawing) {
 		//HanldeWeaponEquipAfter3D();
 		ignore = false;
-		logIfNeeded("Weapon has finished being equiped.");
+		logInfoConditional("Weapon has finished being equiped.");
 		isDrawing = false;
 	}
 	if (a_event.optionalValue.value() == WEAPON_STATE::kSheathing || a_event.optionalValue.value() == WEAPON_STATE::kSheathed) {
@@ -140,7 +166,7 @@ BSEventNotifyControl PlayerSetWeaponStateEventSink::ProcessEvent(const PlayerSet
 
 #pragma region PlayerWeaponReloadEventSink
 BSEventNotifyControl PlayerWeaponReloadEventSink::ProcessEvent(const PlayerWeaponReloadEvent& a_event, BSTEventSource<PlayerWeaponReloadEvent>* a_source) {
-	//logIfNeeded("PlayerWeaponReloadEvent");
+	//logInfoConditional("PlayerWeaponReloadEvent");
 	return BSEventNotifyControl::kContinue;
 }
 #pragma endregion
@@ -168,8 +194,8 @@ BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_even
 	}
 	TESObjectWEAP* weap = static_cast<TESObjectWEAP*>(equipData->item.object);
 	TESObjectWEAP::InstanceData* weapInst = const_cast<TESObjectWEAP::InstanceData*>(GetPlayerWeaponInstanceData(equipData->item.object, equipData->item.instanceData.get()));
-	logIfNeeded(";======================================================================================;");
-	logIfNeeded("Player TESEquipEvent: " + GetFullNameWEAP(weap));
+	logInfoConditional(";======================================================================================;");
+	logInfoConditional("Player TESEquipEvent: " + GetFullNameWEAP(weap));
 	std::thread([weapInst]() { HanldeWeaponEquip(weapInst); }).detach();
 
 	return BSEventNotifyControl::kContinue;
@@ -180,10 +206,10 @@ BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_even
 BSEventNotifyControl TESFurnitureEventSink::ProcessEvent(const TESFurnitureEvent& a_event, BSTEventSource<TESFurnitureEvent>* a_source) {
 	if (a_event.actor.get() == (pc)) {
 		if (a_event.type.get() == TESFurnitureEvent::FurnitureEventType::kExit) {
-			logIfNeeded("Player is leaving the workbench. We may resume our work.");
+			logInfoConditional("Player is leaving the workbench. We may resume our work.");
 			ignore = false;
 		} else {
-			logIfNeeded("Player is entering a workbench. We need to ignore certain events during this time.");
+			logInfoConditional("Player is entering a workbench. We need to ignore certain events during this time.");
 			ignore = true;
 		}
 	}
@@ -191,7 +217,7 @@ BSEventNotifyControl TESFurnitureEventSink::ProcessEvent(const TESFurnitureEvent
 }
 
 BSEventNotifyControl TESLoadGameEventSink::ProcessEvent(const TESLoadGameEvent& a_event, BSTEventSource<TESLoadGameEvent>* a_source) {
-	RegisterAfterLoadEvents();
+	//initSpecialHooks();
 	return BSEventNotifyControl::kContinue;
 }
 
@@ -279,7 +305,7 @@ void TryHookTESEquipEvent() {
 	if (hookedList.at("TESEquipEvent") == true) {
 		return;
 	}
-	BSTEventSource<TESEquipEvent>* eventSource = TESEquipEvent::GetEventSource();
+	BSTEventSource<TESEquipEvent>* eventSource = &TESEquipEvent::GetSingleton();
 	if (eventSource) {
 		TESEquipEventSink* OnTESEquipEvent = new TESEquipEventSink();
 		eventSource->RegisterSink(OnTESEquipEvent);
@@ -312,20 +338,24 @@ void TryHookTESLoadGameEvent() {
 }
 
 void TryHooks() {
-	log("Trying for hooks...");
+	logInfo("Trying for hooks...");
 	TryHookBGSOnPlayerUseWorkBenchEvent();
 	TryHookMenuOpenCloseEvent();
-	TryHookPlayerAmmoCountEvent();
 	TryHookPlayerAnimGraphEvent();
-	TryHookPlayerSetWeaponStateEvent();
-	TryHookPlayerWeaponReloadEvent();
 	TryHookTESEquipEvent();
 	TryHookTESFurnitureEvent();
 	TryHookTESLoadGameEvent();
 }
 
-//Called at GameLoaded
-bool Install() {
+//Used to hook certain things that CTD if hooked at the wrong time
+void TrySpecialHooks() {
+	logInfo("Trying for special hooks...");
+	TryHookPlayerAmmoCountEvent();
+	TryHookPlayerSetWeaponStateEvent();
+	TryHookPlayerWeaponReloadEvent();
+}
+
+void initHooks() {
 	if (hookedList.empty()) {
 		hookedList = {
 			{ "BGSOnPlayerUseWorkBenchEvent", false },
@@ -340,13 +370,16 @@ bool Install() {
 		};
 	}
 	TryHooks();
-	log("Hooks Install Complete");
-	return true;
+	logInfo(";=============================== Hooks Install Complete ===============================;");
+	print_map(std::as_const(hookedList));
+	logInfo(";======================================================================================;");
 }
 
-//Called at LoadingMenu, mostly for global events
-bool RegisterAfterLoadEvents()  // TODO - This function might be called more than once? should we keep track of created things?
+//Mostly for global events
+void initSpecialHooks()  // TODO - This function might be called more than once? should we keep track of created things?
 {
-	TryHooks();
-	return true;
+	TrySpecialHooks();
+	logInfo(";=========================== Special Hooks Install Complete ===========================;");
+	print_map(std::as_const(hookedList));
+	logInfo(";======================================================================================;");
 }

@@ -36,6 +36,7 @@
 #include "RE/Bethesda/BSAnimation/AnimationStanceData.h"
 #include "RE/Bethesda/BSAnimation/BSAnimationGraphManager.h"
 #include "RE/Bethesda/BSAnimation/BSLinearInterpolator.h"
+#include "RE/Bethesda/BSAnimation/FirstPersonRootEvents.h"
 #include "RE/Bethesda/BSCompoundFrustum.h"
 #include "RE/Bethesda/BSContainer.h"
 #include "RE/Bethesda/BSCore/AllocatorStackCounter.h"

@@ -23,7 +23,7 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::NiAVObject };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::NiAVObject };
 
-		enum : std::int32_t
+		enum UpdateFlags : std::int32_t
 		{
 			UPDATE_FLAG_NONE = 0x0,
 			UPDATE_FLAG_PARENT_IS_CULLED = 0x1,

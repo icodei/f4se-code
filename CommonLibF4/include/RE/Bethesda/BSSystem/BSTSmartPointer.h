@@ -157,7 +157,7 @@ namespace RE
 		}
 
 		// 2a
-		BSTSmartPointer& operator=(BSTSmartPointer&& a_rhs)
+		BSTSmartPointer& operator=(BSTSmartPointer&& a_rhs) noexcept
 		{
 			if (this != std::addressof(a_rhs)) {
 				TryDetach();

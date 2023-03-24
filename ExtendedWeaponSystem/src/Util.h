@@ -29,6 +29,7 @@ T SafeWrite64Function(uintptr_t addr, T data) {
 }
 
 BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName);
+const char* GetObjectClassNameImpl(const char* result, void* objBase);
 const char* GetObjectClassName(void* objBase);
 
 enum AmmoType {
@@ -44,25 +45,24 @@ enum EquipIndex {
 	kEquipIndex_Throwable = 2
 };
 
-struct IsReloadableData {
-	uint64_t unk00;
-	Actor* actor;
-};
-
 struct IsReloadableDataWrapper {
 	void* arg1;
 	void* arg2;
 };
 
-bool IsReloading();
-bool IsSprinting();
-bool IsFirstPerson();
-bool IsThirdPerson();
-bool IsWeaponDrawn();
-bool IsWeaponReloadable();
-bool IsThrowableWeapon(uint32_t equipIndex);
+bool IsPlayerActive();
+
 bool IsButtonPressed(ButtonEvent* btnEvent);
 bool IsHoldingButton(ButtonEvent* btnEvent);
+bool IsPlayerInFirstPerson();
+bool IsPlayerInThirdPerson();
+bool IsPlayerSprinting();
+bool IsPlayerWeaponDrawn();
+bool IsPlayerWeaponReloadable();
+bool IsPlayerWeaponReloading();
+bool IsPlayerWeaponThrowable();
+bool IsWeaponReloadable(IsReloadableDataWrapper* data, const EquippedItem* item);
+bool IsWeaponThrowable(uint32_t equipIndex);
 
 bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword);
 bool HasKeyword(TESForm* form, BGSKeyword* keyword);
@@ -81,11 +81,25 @@ const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedItem& a_i
 const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedWeapon& a_weapon);
 const uint32_t GetInventoryItemCount(Actor* actor, TESForm* item);
 
-const NiAVObject* GetByNameHelper(const BSFixedString& name);
+const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name);
 
-char* _MESSAGE(const char* fmt, ...);
+template <typename K, typename V>
+void print_map(unordered_map<K, V> const& map) {
+	auto print_key_value = [](const auto& key, const auto& value) {
+		logger::info(FMT_STRING("Hook: {:s} IsHooked: {:s}"), key, value);
+	};
+	for (const std::pair<K, V>& n : map) {
+		print_key_value(n.first, n.second);
+	}
+	
+	//std::for_each(map.begin(), map.end(), [](std::pair<K, V> p) {
+	//	logger::info(FMT_STRING("Hook: {:s} IsHooked: {%t}"), p.first, p.second);
+	//});
+}
 
-const string currentDateTime();
-const string prefixLog();
-void logIfNeeded(string text);
-void log(string text);
+//Functions to write a simple line of text to logs
+void logInfoConditional(string text);
+void logInfo(string text);
+void logWarn(string text);
+void logError(string text);
+void logCritical(string text);

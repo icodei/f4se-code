@@ -1,4 +1,4 @@
-#include "Global.h"
+#include "Util.h"
 
 BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName) {
 	auto sources = (globalEvents->eventSources);
@@ -44,39 +44,17 @@ const char* GetObjectClassName(void* objBase) {
 	return result;
 }
 
-bool IsReloading() {
+bool IsPlayerActive() {
 	if (!pc) {
-		return false;
+		pc = PlayerCharacter::GetSingleton();
 	}
-	return ((pc)->ActorState::gunState) == GUN_STATE::kReloading;
-}
 
-bool IsSprinting() {
-	if (!pc) {
+	if (!pc || !(pc)->currentProcess || !(pc)->currentProcess->middleHigh) {
+		logger::warn("A function tried to interact with the player character but there is no player active");
 		return false;
 	}
-	return (pc)->ActorState::moveMode & 0x0100;
-}
 
-bool IsFirstPerson() {
-	if (!pcam) {
-		return false;
-	}
-	return (pcam)->currentState == (pcam)->cameraStates[CameraState::kFirstPerson];
-}
-
-bool IsThirdPerson() {
-	if (!pcam) {
-		return false;
-	}
-	return (pcam)->currentState == (pcam)->cameraStates[CameraState::k3rdPerson];
-}
-
-bool IsWeaponDrawn() {
-	if (!pc) {
-		return false;
-	}
-	return (pc)->GetWeaponMagicDrawn();
+	return true;
 }
 
 bool IsButtonPressed(ButtonEvent* btnEvent) {
@@ -93,13 +71,36 @@ bool IsHoldingButton(ButtonEvent* btnEvent) {
 	return false;
 }
 
-bool IsThrowableWeapon(uint32_t equipIndex) {
-	return equipIndex == EquipIndex::kEquipIndex_Throwable;
+bool IsPlayerInFirstPerson() {
+	if (!pcam) {
+		return false;
+	}
+	return (pcam)->currentState == (pcam)->cameraStates[CameraState::kFirstPerson];
 }
 
-typedef bool (*_IsReloadable)(IsReloadableDataWrapper*, EquippedItem*);
-bool IsWeaponReloadable() {
-	if (!pc || !(pc)->currentProcess || !(pc)->currentProcess->middleHigh) {
+bool IsPlayerInThirdPerson() {
+	if (!pcam) {
+		return false;
+	}
+	return (pcam)->currentState == (pcam)->cameraStates[CameraState::k3rdPerson];
+}
+
+bool IsPlayerSprinting() {
+	if (!IsPlayerActive()) {
+		return false;
+	}
+	return (pc)->ActorState::moveMode & 0x0100;
+}
+
+bool IsPlayerWeaponDrawn() {
+	if (!IsPlayerActive()) {
+		return false;
+	}
+	return (pc)->GetWeaponMagicDrawn();
+}
+
+bool IsPlayerWeaponReloadable() {
+	if (!IsPlayerActive()) {
 		return false;
 	}
 
@@ -108,11 +109,11 @@ bool IsWeaponReloadable() {
 		return false;
 	}
 
-	EquippedItem* equipData = nullptr;
+	const EquippedItem* equipData = nullptr;
 	for (auto& elem : equipDataArr) {
 		uint32_t equipIndex = elem.equipIndex.index;
 		if (equipIndex == 0) {
-			equipData = const_cast<EquippedItem*>(&elem);
+			equipData = &elem;
 			break;
 		}
 	}
@@ -120,14 +121,31 @@ bool IsWeaponReloadable() {
 		return false;
 	}
 
-	IsReloadableData data = { 0 };
-	data.actor = pc;
+	IsReloadableDataWrapper wrapper = { 0i64, pc };
 
-	IsReloadableDataWrapper wrapper = { &data.unk00, &data.actor };
-	using func_t = _IsReloadable;
+	return IsWeaponReloadable(&wrapper, equipData);
+}
+
+bool IsPlayerWeaponReloading() {
+	if (!IsPlayerActive()) {
+		return false;
+	}
+	return ((pc)->ActorState::gunState) == GUN_STATE::kReloading;
+}
+
+bool IsPlayerWeaponThrowable() {
+	return false;  //TODO
+}
+
+bool IsWeaponReloadable(IsReloadableDataWrapper* data, const EquippedItem* item) {
+	using func_t = bool (*)(IsReloadableDataWrapper*, const EquippedItem*);
 	REL::Relocation<func_t> func{ REL::ID(1089596) };
 
-	return !func(&wrapper, equipData);
+	return !func(data, item);
+}
+
+bool IsWeaponThrowable(uint32_t equipIndex) {
+	return equipIndex == EquipIndex::kEquipIndex_Throwable;
 }
 
 typedef bool (*_WornHasKeywordActor)(BSScript::IVirtualMachine* vm, uint32_t stackId, Actor* akTarget, BGSKeyword* akKeyword);
@@ -145,12 +163,12 @@ typedef bool (*_IKeywordFormBase_HasKeyword)(IKeywordFormBase* keywordFormBase, 
 bool HasKeyword(TESForm* form, BGSKeyword* keyword) {
 	IKeywordFormBase* keywordFormBase = form->As<IKeywordFormBase>();
 	if (!keywordFormBase) {
-		logIfNeeded("HasKeyword:: Failed to cast keyword to base type.");
+		logger::warn("HasKeyword:: Failed to cast keyword to base type.");
 		return false;
 	}
 	auto HasKeyword_Internal = GetVirtualFunction<_IKeywordFormBase_HasKeyword>(keywordFormBase, 1);
 	if (!HasKeyword_Internal) {
-		logIfNeeded("HasKeyword:: Failed to get virtual function.");
+		logger::warn("HasKeyword:: Failed to get virtual function.");
 		return false;
 	}
 	if (HasKeyword_Internal(keywordFormBase, keyword, 0)) {
@@ -163,7 +181,7 @@ bool HasKeywordInstWEAP(TESObjectWEAP::InstanceData* thisInstance, BGSKeyword* k
 	BGSKeywordForm* keywordForm = nullptr;
 	keywordForm = thisInstance->keywords;
 	if (!keywordForm) {
-		logIfNeeded("This weapInstance has no keywords");
+		logger::warn("This weapInstance has no keywords");
 		return false;
 	}
 
@@ -209,19 +227,23 @@ TESForm* GetFormFromIdentifier(const string& identifier) {
 
 //Gather the forms we need
 bool GetForms() {
-	reloadSequentialKeyword = reinterpret_cast<BGSKeyword*>(GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED4"));
+	bool toReturn = true;
+	reloadSequentialKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED4")->As<BGSKeyword>();
 	if (!reloadSequentialKeyword) {
-		log("Unable to get reloadSequentialKeyword, you are lacking some file/files");
+		logError("Unable to get reloadSequentialKeyword, you are lacking some file/files");
 	}
-	ThermalScopeKeyword = reinterpret_cast<BGSKeyword*>(GetFormFromIdentifier("Code_SharedAttachments.esm|6436"));
+	ThermalScopeKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|6436")->As<BGSKeyword>();
 	if (!ThermalScopeKeyword) {
-		log("Unable to get ThermalScopeKeyword, you are lacking some file/files");
+		logError("Unable to get ThermalScopeKeyword, you are lacking some file/files");
 	}
-	//ThermalFXS = reinterpret_cast<TESEffectShader*>(GetFormFromIdentifier("Code_SharedAttachments.esm|5BCB"));
+	//ThermalFXS = GetFormFromIdentifier("Code_SharedAttachments.esm|5BCB")->As<BGSKeyword>();
 	//if (!ThermalFXS) {
-	//	log("Unable to get ThermalFXS, you are lacking some file/files");
+	//	logError("Unable to get ThermalFXS, you are lacking some file/files");
 	//}
-	return true;
+	if (!reloadSequentialKeyword || !ThermalScopeKeyword) {
+		toReturn = false;
+	}
+	return toReturn;
 }
 
 std::string GetFullNameWEAP(TESObjectWEAP* weap) {
@@ -231,7 +253,7 @@ std::string GetFullNameWEAP(TESObjectWEAP* weap) {
 }
 
 const BSTArray<EquippedItem>* GetPlayerEquippedItemArray() {
-	if (!pc || !(pc)->currentProcess || !(pc)->currentProcess->middleHigh) {
+	if (!IsPlayerActive()) {
 		return nullptr;
 	}
 
@@ -243,6 +265,10 @@ const BSTArray<EquippedItem>* GetPlayerEquippedItemArray() {
 }
 
 const EquippedItem* GetPlayerEquippedItemByFormID(uint32_t formId) {
+	if (!IsPlayerActive()) {
+		return nullptr;
+	}
+
 	const BSTArray<EquippedItem>* equipDataArray = GetPlayerEquippedItemArray();
 	if (!equipDataArray) {
 		return nullptr;
@@ -257,6 +283,10 @@ const EquippedItem* GetPlayerEquippedItemByFormID(uint32_t formId) {
 }
 
 const EquippedItem* GetPlayerEquippedItemByEquipIndex(EquipIndex equipIndex) {
+	if (!IsPlayerActive()) {
+		return nullptr;
+	}
+
 	EquippedItem item;
 	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
 
@@ -278,12 +308,17 @@ const EquippedItem* GetPlayerEquippedItemByEquipIndex(EquipIndex equipIndex) {
 }
 
 const EquippedWeapon* GetPlayerEquippedWeaponByEquipIndex(EquipIndex equipIndex) {
-	EquippedWeapon weapon;
-	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
-
-	if (!(pc)->currentProcess) {
+	if (!IsPlayerActive()) {
 		return nullptr;
 	}
+
+	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
+
+	EquippedWeapon weapon;
+	weapon.weapon = *new BGSObjectInstanceT<TESObjectWEAP>();
+	weapon.equipSlot = nullptr;
+	weapon.equipIndex = BGSEquipIndex(-1);
+	weapon.weaponData = nullptr;
 
 	if ((pc)->currentProcess->GetEquippedWeaponByIndex(bgsindex, weapon)) {
 		return &weapon;
@@ -304,12 +339,12 @@ const EquippedWeapon* GetPlayerEquippedWeaponByEquipIndex(EquipIndex equipIndex)
 }
 
 const EquippedWeaponData* GetPlayerEquippedWeaponDataByEquipIndex(EquipIndex equipIndex) {
-	NiPointer<EquippedWeaponData> spWeaponData;
-	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
-
-	if (!(pc)->currentProcess) {
+	if (!IsPlayerActive()) {
 		return nullptr;
 	}
+
+	NiPointer<EquippedWeaponData> spWeaponData;
+	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
 
 	if ((pc)->currentProcess->GetEquippedWeaponData(bgsindex, spWeaponData)) {
 		return spWeaponData.get();
@@ -318,6 +353,10 @@ const EquippedWeaponData* GetPlayerEquippedWeaponDataByEquipIndex(EquipIndex equ
 }
 
 const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(TESForm* weapForm, TBO_InstanceData* weapInst) {
+	if (!IsPlayerActive()) {
+		return nullptr;
+	}
+
 	if (!weapForm || !weapInst) {
 		return nullptr;
 	}
@@ -335,6 +374,10 @@ const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(TESForm* weapForm
 }
 
 const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedItem& a_item) {
+	if (!IsPlayerActive()) {
+		return nullptr;
+	}
+
 	if (a_item.item.object->formType != ENUM_FORM_ID::kWEAP) {
 		return nullptr;
 	}
@@ -346,10 +389,13 @@ const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedItem& a_i
 }
 
 const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedWeapon& a_weapon) {
+	if (!IsPlayerActive()) {
+		return nullptr;
+	}
+
 	if (a_weapon.weapon.object->formType != ENUM_FORM_ID::kWEAP) {
 		return nullptr;
 	}
-	//TESObjectWEAP::InstanceData* weapInstData = reinterpret_cast<TESObjectWEAP::InstanceData*>(a_weapon.weapon.instanceData.get());
 	TESObjectWEAP::InstanceData* weapInstData = fallout_cast<TESObjectWEAP::InstanceData*, TBO_InstanceData>(a_weapon.weapon.instanceData.get());
 	if (!weapInstData) {
 		return nullptr;
@@ -384,8 +430,12 @@ const uint32_t GetInventoryItemCount(Actor* actor, TESForm* item) {
 	return totalItemCount;
 }
 
-const NiAVObject* GetByNameHelper(const BSFixedString& name) {
-	BSFadeNode* player3D = (pc) ? (BSFadeNode*)(pc)->Get3D() : nullptr;
+const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name) {
+	if (!IsPlayerActive()) {
+		return nullptr;
+	}
+
+	BSFadeNode* player3D = (pc) ? (pc)->Get3D()->IsFadeNode() : nullptr;
 	if (!player3D) {
 		return nullptr;
 	}
@@ -397,7 +447,7 @@ const NiAVObject* GetByNameHelper(const BSFixedString& name) {
 	return obj;
 	/*
 	if (!obj) {
-		logIfNeeded("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
+		logInfoConditional("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
 		for (std::uint32_t i = 0; i < player3D->kGeomArray.count; i++) {
 			BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
 			if (object->m_name == name) {
@@ -407,7 +457,7 @@ const NiAVObject* GetByNameHelper(const BSFixedString& name) {
 		}
 	}
 	if (!obj) {
-		logIfNeeded("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
+		logInfoConditional("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
 		for (std::uint32_t i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
 			NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
 			if (object) {
@@ -421,47 +471,29 @@ const NiAVObject* GetByNameHelper(const BSFixedString& name) {
 	*/
 }
 
-char tempbuf[8192] = { 0 };
-char* _MESSAGE(const char* fmt, ...) {
-	va_list args;
-
-	va_start(args, fmt);
-	vsnprintf(tempbuf, sizeof(tempbuf), fmt, args);
-	va_end(args);
-	spdlog::log(spdlog::level::warn, tempbuf);
-
-	return tempbuf;
-}
-
-// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-const string currentDateTime() {
-	time_t now = time(0);
-	struct tm tstruct;
-	char buf[80];
-	localtime_s(&tstruct, &now);
-	// Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
-	// for more information about date/time format
-	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-
-	return buf;
-}
-
-const string prefixLog() {
-	std::stringstream buffer;
-	buffer << "[" << currentDateTime() << "] [EWS] ";
-	return (buffer.str());
-}
-
-//Write message log only if logEnabled == True
-void logIfNeeded(string text) {
+//Functions to write a simple line of text to logs
+//Write message logInfo only if logEnabled == True
+void logInfoConditional(string text) {
 	if (logEnabled) {
-		logger::info(FMT_STRING("{}"), text);
-		//_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
+		logger::info(FMT_STRING("{:s}"), text);
 	}
 }
 
-//Write message log always
-void log(string text) {
-	logger::info(FMT_STRING("{}"), text);
-	//_MESSAGE("%s %s", prefixLog().c_str(), text.c_str());
+//Write info to log
+void logInfo(string text) {
+	logger::info(FMT_STRING("{:s}"), text);
+}
+
+void logWarn(string text) {
+	logger::warn(FMT_STRING("{:s}"), text);
+}
+
+//Write error to log. Error is unexpected result but not a crash
+void logError(string text) {
+	logger::error(FMT_STRING("{:s}"), text);
+}
+
+//Write critical to log. Critical is something that will crash
+void logCritical(string text) {
+	logger::critical(FMT_STRING("{:s}"), text);
 }

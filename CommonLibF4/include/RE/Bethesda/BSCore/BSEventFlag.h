@@ -8,5 +8,5 @@ namespace RE
 		//members
 		void* hEvent;
 	};
-
+	static_assert(sizeof(BSEventFlag) == 0x8);
 }

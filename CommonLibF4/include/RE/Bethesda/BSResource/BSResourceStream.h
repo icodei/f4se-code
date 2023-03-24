@@ -1,9 +1,9 @@
 #pragma once
 
-#include "RE/Bethesda/Atomic.h"
-#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSEventFlag.h"
 #include "RE/Bethesda/BSResource/BSResourceEnums.h"
 #include "RE/Bethesda/BSResource/BSResourceStreamBase.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 
 namespace RE

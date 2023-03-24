@@ -1,4 +1,4 @@
-#include "Global.h"
+#include "Custom Renderer/ExtraCameraManager.h"
 
 /*
 bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAttach, char nodeName) {
@@ -8,7 +8,7 @@ bool ExtraCameraManager::AttachExtraCamera(const char camName[0x40], bool doAtta
 	if (doAttach) {
 		BSFixedString sCamName(camName);
 		BSFixedString sNodeName(&nodeName);
-		NiNode* targetNode = (NiNode*)GetByNameHelper(sNodeName);
+		NiNode* targetNode = (NiNode*)GetByNameFromPlayer3D(sNodeName);
 		if (targetNode) {
 			if (std::get<bool>(s_extraCamerasMap.insert(std::pair<const char*, NiCamera*>(camName, *pCam)))) {
 				*pCam = cam = NiCamera::Create();
@@ -51,7 +51,7 @@ bool ExtraCameraManager::ProjectExtraCamera(const char camName[0x40], const char
 		NiTexture** pTex = NULL;
 		if (nodeName) {
 			BSFixedString sNodeName(nodeName);
-			const BSGeometry* targetGeom = (BSGeometry*)GetByNameHelper(sNodeName);
+			const BSGeometry* targetGeom = (BSGeometry*)GetByNameFromPlayer3D(sNodeName);
 			if (targetGeom) {
 				NiPointer<BSShaderProperty> shaderProperty;
 

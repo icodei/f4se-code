@@ -35,6 +35,7 @@ set(SOURCES
 	include/RE/Bethesda/BSAnimation/AnimationStanceData.h
 	include/RE/Bethesda/BSAnimation/BSAnimationGraphManager.h
 	include/RE/Bethesda/BSAnimation/BSLinearInterpolator.h
+	include/RE/Bethesda/BSAnimation/FirstPersonRootEvents.h
 	include/RE/Bethesda/BSCompoundFrustum.h
 	include/RE/Bethesda/BSContainer.h
 	include/RE/Bethesda/BSCore/AllocatorStackCounter.h
@@ -635,6 +636,7 @@ set(SOURCES
 	src/F4SE/Trampoline.cpp
 	src/RE/Bethesda/Actor.cpp
 	src/RE/Bethesda/BGSInventoryItem.cpp
+	src/RE/Bethesda/BSAnimation/FirstPersonRootEvents.cpp
 	src/RE/Bethesda/BSExtraData.cpp
 	src/RE/Bethesda/BSGraphics/BSGraphics.cpp
 	src/RE/Bethesda/BSGraphics/BSGraphicsHandles.cpp
@@ -646,8 +648,8 @@ set(SOURCES
 	src/RE/Bethesda/BSGraphics/BSGraphicsTypes.cpp
 	src/RE/Bethesda/BSGraphics/BSGraphicsUtility.cpp
 	src/RE/Bethesda/BSResource.cpp
-	src/RE/Bethesda/BSResource/Stream.cpp
-	src/RE/Bethesda/BSResource/StreamBase.cpp
+	src/RE/Bethesda/BSResource/BSResourceStream.cpp
+	src/RE/Bethesda/BSResource/BSResourceStreamBase.cpp
 	src/RE/Bethesda/BSResourceNiBinaryStream.cpp
 	src/RE/Bethesda/BSScaleformManager.cpp
 	src/RE/Bethesda/BSScript.cpp

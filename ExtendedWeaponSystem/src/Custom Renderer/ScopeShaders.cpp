@@ -1,4 +1,4 @@
-#include "Global.h"
+#include "Custom Renderer/ScopeShaders.h"
 
 //TESEffectShader::CreateEffectShaderData but without the reset part breaking it
 BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3) {
@@ -106,17 +106,17 @@ void SetupGeometryWithEffectShader(BSGeometry* geometryToSetup, TESEffectShader*
 	shaderProperty = (BSShaderProperty*)geometryToSetup->shaderProperty.get();
 	effectShaderProperty = (BSEffectShaderProperty*)shaderProperty;
 	if (shaderProperty) {
-		logIfNeeded("Got the EffectShaderProperty");
+		logInfoConditional("Got the EffectShaderProperty");
 		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
 		//effectShaderData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
 		returnData = *CreateEffectShaderDataCustom(shaderToUse, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
 		effectShaderProperty->SetEffectShaderData(&returnData);
 		if (effectShaderProperty->SetupGeometry(geometryToSetup)) {
-			logIfNeeded("Geometry was setup with the shaders.");
+			logInfoConditional("Geometry was setup with the shaders.");
 		} else {
-			logIfNeeded("Geometry was unable to be setup.");
+			logInfoConditional("Geometry was unable to be setup.");
 		}
-		logIfNeeded("Scope materials setup complete.");
+		logInfoConditional("Scope materials setup complete.");
 	}
 }
 
@@ -133,6 +133,6 @@ void SetupImageSpaceShader(BSGeometry* objGeom, bool active) {
 	if (shaderProperty) {
 		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
 		BSImageShader->Render((BSTriShape*)objGeom, defaultParams);
-		logIfNeeded("Scope materials setup complete.");
+		logInfoConditional("Scope materials setup complete.");
 	}
 }

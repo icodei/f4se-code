@@ -1,4 +1,4 @@
-#include "Global.h"
+#include "AnimationFunctions.h"
 
 void SetPlayerAnimationVariableBool(BSFixedString& asVariableName, bool newVal) {
 	(pc)->SetGraphVariableBool(asVariableName, newVal);

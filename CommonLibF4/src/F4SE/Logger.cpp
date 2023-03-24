@@ -4,7 +4,6 @@
 
 #define NOGDICAPMASKS
 #define NOVIRTUALKEYCODES
-//#define NOWINMESSAGES
 #define NOWINSTYLES
 #define NOSYSMETRICS
 #define NOMENUS
@@ -17,17 +16,14 @@
 #define NOATOM
 #define NOCLIPBOARD
 #define NOCOLOR
-//#define NOCTLMGR
 #define NODRAWTEXT
 #define NOGDI
 #define NOKERNEL
-//#define NOUSER
 #define NONLS
 #define NOMB
 #define NOMEMMGR
 #define NOMETAFILE
 #define NOMINMAX
-//#define NOMSG
 #define NOOPENFILE
 #define NOSCROLL
 #define NOSERVICE
@@ -41,6 +37,11 @@
 #define NOPROFILER
 #define NODEFERWINDOWPOS
 #define NOMCX
+
+//#define NOWINMESSAGES
+//#define NOCTLMGR
+//#define NOUSER
+//#define NOMSG
 
 #include <ShlObj.h>
 

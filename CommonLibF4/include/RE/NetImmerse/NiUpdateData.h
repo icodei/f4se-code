@@ -17,7 +17,7 @@ namespace RE
 		float fTime;
 		std::uint32_t RenderUseDepth;
 		NiCamera* pCamera;
-		std::uint32_t Flags;
+		std::uint32_t Flags;			//NiAVObject::UpdateFlags
 		std::uint32_t RenderObjects;
 		std::uint32_t FadeNodeDepth;
 	};

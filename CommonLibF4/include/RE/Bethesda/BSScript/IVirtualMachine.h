@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Bethesda/BSContainer.h"
+#include "RE/Bethesda/BSCore/BSCoreTypes.h"
 #include "RE/Bethesda/BSCore/BSScrapArray.h"
 #include "RE/Bethesda/BSCore/BSSpinLock.h"
 #include "RE/Bethesda/BSCore/BSTArray.h"

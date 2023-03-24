@@ -1,6 +1,4 @@
 #pragma once
-#include "Custom Renderer/ScopeCamera.h"
-
 #include "Custom Renderer/CustomRenderer.h"
 #include "Custom Renderer/ExtraCameraManager.h"
 #include "Custom Renderer/ScopeRendererManager.h"
@@ -15,42 +13,27 @@
 static PlayerCharacter* pc;
 static PlayerCamera* pcam;
 
-static bool ignore;
-static bool isEmptyReload;
-static bool logEnabled;
-static bool oncePerSession;
-static bool processCurrentScope;
-static bool processCurrentWeap;
-static bool readyForRender;
-static bool reloadEnd;
-static bool reloadStarted;
+extern bool ignore;
+extern bool isEmptyReload;
+extern bool logEnabled;
+extern bool oncePerSession;
+extern bool processCurrentScope;
+extern bool processCurrentWeap;
+extern bool readyForRender;
+extern bool reloadEnd;
+extern bool reloadStarted;
 
-static int ammoCapacity;
-static int currentAmmoCount;
-static int incrementor;
-static int toAdd;
-static int totalAmmoCount;
+extern int ammoCapacity;
+extern int currentAmmoCount;
+extern int incrementor;
+extern int toAdd;
+extern int totalAmmoCount;
 
-static BGSKeyword* reloadSequentialKeyword;
-static BGSKeyword* ThermalScopeKeyword;
-static TESObjectWEAP::InstanceData* currentWeapInstance;
+extern BGSKeyword* reloadSequentialKeyword;
+extern BGSKeyword* ThermalScopeKeyword;
+extern TESObjectWEAP::InstanceData* currentWeapInstance;
 
-static const BSFixedString Event00("Event00");
-static const BSFixedString LoadingMenu("LoadingMenu");
-static const BSFixedString pipboyClosed("pipboyClosed");
-static const BSFixedString pipboyOpened("pipboyOpened");
-static const BSFixedString ReloadComplete("ReloadComplete");
-static const BSFixedString ReloadEnd("ReloadEnd");
-static const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
-static const BSFixedString reloadSequentialStart("reloadSequentialStart");
-static const BSFixedString sightedStateEnter("sightedStateEnter");
-static const BSFixedString sightedStateExit("sightedStateExit");
-static const BSFixedString weapEquip("weapEquip");
-static const BSFixedString weapForceEquip("weapForceEquip");
-static const BSFixedString weaponDraw("weaponDraw");
-static const BSFixedString WeaponFire("WeaponFire");
-static const BSFixedString weaponInstantDown("weaponInstantDown");
-static const BSFixedString weapUnequip("weapUnequip");
+#define GET_EVENT_SOURCE(EventName) (BSTEventSource<EventName>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), #EventName);
 
 #define _BYTE std::uint8_t
 #define _WORD std::uint16_t

@@ -1,9 +1,9 @@
-#include "Global.h"
+#include "Custom Renderer/ScopeRendererManager.h"
 /*
 void ScopeRendererManager::Setup() {
-	logIfNeeded("ScopeRendererManager Setup Starting...");
+	logInfoConditional("ScopeRendererManager Setup Starting...");
 
-	logIfNeeded("ScopeRendererManager - Creating BSCullingProcess...");
+	logInfoConditional("ScopeRendererManager - Creating BSCullingProcess...");
 	BSCullingProcess* currentCullingProcess;
 	BSCullingProcess* cullingProcess;
 	BSCullingProcess* newCullingProcess;
@@ -12,11 +12,11 @@ void ScopeRendererManager::Setup() {
 	if (cullingProcess) {
 		new(cullingProcess) BSCullingProcess(0);
 		newCullingProcess = cullingProcess;
-		logIfNeeded("ScopeRendererManager - Created BSCullingProcess");
+		logInfoConditional("ScopeRendererManager - Created BSCullingProcess");
 	}
 	else {
 		newCullingProcess = nullptr;
-		logIfNeeded("ScopeRendererManager - BSCullingProcess Creation FAILED");
+		logInfoConditional("ScopeRendererManager - BSCullingProcess Creation FAILED");
 	}
 	currentCullingProcess = pScopeManagerCullingProc;
 	if (currentCullingProcess != newCullingProcess) {
@@ -26,9 +26,9 @@ void ScopeRendererManager::Setup() {
 		}
 	}
 
-	logIfNeeded("ScopeRendererManager - Creating Cameras...");
+	logInfoConditional("ScopeRendererManager - Creating Cameras...");
 
-	logIfNeeded("ScopeRendererManager - Creating NiCamera...");
+	logInfoConditional("ScopeRendererManager - Creating NiCamera...");
 	NiCamera* cam;
 	NiCamera* oldCam;
 	NiCamera* newCam;
@@ -37,10 +37,10 @@ void ScopeRendererManager::Setup() {
 	cam = NiCamera::Create();
 	if (cam) {
 		newCam = cam;
-		logIfNeeded("ScopeRendererManager - Created NiCamera");
+		logInfoConditional("ScopeRendererManager - Created NiCamera");
 	} else {
 		newCam = nullptr;
-		logIfNeeded("ScopeRendererManager - NiCamera Creation FAILED");
+		logInfoConditional("ScopeRendererManager - NiCamera Creation FAILED");
 	}
 	currentCam = pCamera;
 	if (pCamera != newCam) {
@@ -58,7 +58,7 @@ void ScopeRendererManager::Setup() {
 		}
 	}
 
-	logIfNeeded("ScopeRendererManager - Creating NiCameraRootNode...");
+	logInfoConditional("ScopeRendererManager - Creating NiCameraRootNode...");
 	NiNode* currentNode;
 	NiNode* newNode;
 	NiNode* node;
@@ -66,10 +66,10 @@ void ScopeRendererManager::Setup() {
 	node = new NiNode(1);
 	if (node) {
 		newNode = node;
-		logIfNeeded("ScopeRendererManager - Created NiNode");
+		logInfoConditional("ScopeRendererManager - Created NiNode");
 	} else {
 		newNode = nullptr;
-		logIfNeeded("ScopeRendererManager - NiNode Creation FAILED");
+		logInfoConditional("ScopeRendererManager - NiNode Creation FAILED");
 	}
 	currentNode = pCamera->parent;
 	if (currentNode != newNode) {
@@ -82,9 +82,9 @@ void ScopeRendererManager::Setup() {
 		}
 	}
 	pCamera->parent->AttachChild(pCamera, true);
-	logIfNeeded("ScopeRendererManager Cameras Completed.");
+	logInfoConditional("ScopeRendererManager Cameras Completed.");
 
-	logIfNeeded("ScopeRendererManager - Creating ImageSpaceShaderParam...");
+	logInfoConditional("ScopeRendererManager - Creating ImageSpaceShaderParam...");
 	ImageSpaceShaderParam* currentShaderParam;
 	ImageSpaceShaderParam* shaderParam;
 	ImageSpaceShaderParam* newShaderParam;
@@ -93,11 +93,11 @@ void ScopeRendererManager::Setup() {
 	if (shaderParam) {
 		new(shaderParam) ImageSpaceShaderParam();
 		newShaderParam = shaderParam;
-		logIfNeeded("ScopeRendererManager - Created ImageSpaceShaderParam");
+		logInfoConditional("ScopeRendererManager - Created ImageSpaceShaderParam");
 	}
 	else {
 		newShaderParam = nullptr;
-		logIfNeeded("ScopeRendererManager - ImageSpaceShaderParam Creation FAILED");
+		logInfoConditional("ScopeRendererManager - ImageSpaceShaderParam Creation FAILED");
 	}
 	currentShaderParam = pScopeManagerShaderParam;
 	if (currentShaderParam != newShaderParam) {
@@ -107,7 +107,7 @@ void ScopeRendererManager::Setup() {
 		}
 	}
 
-	logIfNeeded("ScopeRendererManager - Creating BSShaderAccumulator...");
+	logInfoConditional("ScopeRendererManager - Creating BSShaderAccumulator...");
 	BSShaderAccumulator* currentShaderAccumulator;
 	BSShaderAccumulator* shaderAccumulator;
 	BSShaderAccumulator* newShaderAccumulator;
@@ -116,11 +116,11 @@ void ScopeRendererManager::Setup() {
 	if (shaderAccumulator) {
 		new(shaderAccumulator) BSShaderAccumulator();
 		newShaderAccumulator = shaderAccumulator;
-		logIfNeeded("ScopeRendererManager - Created BSShaderAccumulator");
+		logInfoConditional("ScopeRendererManager - Created BSShaderAccumulator");
 	}
 	else {
 		newShaderAccumulator = nullptr;
-		logIfNeeded("ScopeRendererManager - BSShaderAccumulator Creation FAILED");
+		logInfoConditional("ScopeRendererManager - BSShaderAccumulator Creation FAILED");
 	}
 	currentShaderAccumulator = pScopeManagerAccumulator;
 	if (currentShaderAccumulator != newShaderAccumulator) {
@@ -143,7 +143,7 @@ void ScopeRendererManager::Setup() {
 	pScopeManagerCullingProc->m_bCameraRelatedUpdates = 0;
 	pScopeManagerShaderParam->ResizeConstantGroup(0, 1);
 	readyForRender = 1;
-	logIfNeeded("ScopeRendererManager Setup Completed.");
+	logInfoConditional("ScopeRendererManager Setup Completed.");
 }
 
 //Delete the current stored values and objects we have created so far. I don't think DestroyRenderTarget is needed but idk. I'm still not sure how rendertargets work
@@ -157,7 +157,7 @@ void ScopeRendererManager::Pause() {
 }
 
 void ScopeRendererManager::RenderHelper(bool save) {
-	//logIfNeeded("ScopeRendererManager Rendering...");
+	//logInfoConditional("ScopeRendererManager Rendering...");
 	NiTexture* renderedTexture;
 	renderedTexture = ScopeRendererManager::Render(save);
 	if (renderedTexture) {
@@ -210,7 +210,7 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	scopeCulling->m_bCameraRelatedUpdates = 0;
 	scopeCulling->m_pkCamera = pCamera;
 
-	//scopeCam->Update();
+	//rendererCamera->Update();
 
 	pRenderData->SetClearColor(1.0F, 1.0F, 1.0F, 1.0F);
 

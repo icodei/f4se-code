@@ -1,8 +1,8 @@
 #pragma once
+#include "RE/Bethesda/BSHavok/bhkCollisionFilterDefs.h"
 
 namespace RE
 {
-
 	enum class COL_LAYER : std::uint32_t
 	{
 		L_UNIDENTIFIED = 0x0,
@@ -77,6 +77,16 @@ namespace RE
 	{
 	public:
 		~CFilter() noexcept {}  // intentional
+
+		operator COL_LAYER()
+		{
+			return (COL_LAYER)(this->filter & 0x7F);
+		}
+
+		operator BIPED_PART()
+		{
+			return (BIPED_PART)((this->filter >> 8) & 0x1F);
+		}
 
 		// members
 		std::uint32_t filter;  // 0

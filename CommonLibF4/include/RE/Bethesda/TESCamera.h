@@ -99,6 +99,8 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::TESCamera };
 		static constexpr auto VTABLE{ VTABLE::TESCamera };
 
+		TESCamera() { ctor(); }
+
 		virtual ~TESCamera() {}  // 00
 
 		// add
@@ -113,6 +115,13 @@ namespace RE
 		NiPointer<NiNode> cameraRoot;                  // 20
 		BSTSmartPointer<TESCameraState> currentState;  // 28
 		bool enabled;                                  // 30
+
+	private:
+		TESCamera* ctor() {
+			using func_t = decltype(&TESCamera::ctor);
+			REL::Relocation<func_t> func{ REL::ID(807071) };
+			return func(this);
+		}
 	};
 	static_assert(sizeof(TESCamera) == 0x38);
 

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "RE/Bethesda/Atomic.h"
 #include "RE/Bethesda/BSResource/BSResourceEnums.h"
 #include "RE/Bethesda/BSResource/BSResourceStream.h"
 #include "RE/Bethesda/BSResource/BSResourceStreamBase.h"

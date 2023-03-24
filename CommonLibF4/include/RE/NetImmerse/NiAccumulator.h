@@ -26,7 +26,7 @@ namespace RE
 		virtual bool RegisterObject([[maybe_unused]] BSGeometry* a_geometry) { return false; }
 
 		//members
-		NiCamera* m_pkCamera;  //10
+		NiCamera* m_pkCamera{ nullptr };  //10
 	};
 	static_assert(sizeof(NiAccumulator) == 0x18);
 

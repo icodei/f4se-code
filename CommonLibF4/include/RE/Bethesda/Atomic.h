@@ -52,12 +52,4 @@ namespace RE
 	extern template class BSTAtomicValue<std::uint32_t>;
 	extern template class BSTAtomicValue<std::int64_t>;
 	extern template class BSTAtomicValue<std::uint64_t>;
-
-	class BSEventFlag
-	{
-	public:
-		// members
-		void* event{ nullptr };  // 0
-	};
-	static_assert(sizeof(BSEventFlag) == 0x8);
 }

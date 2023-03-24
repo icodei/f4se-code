@@ -297,13 +297,8 @@ namespace RE
 		// members
 		std::uint32_t clipAmmo;     // 00
 		std::uint32_t reserveAmmo;  // 04
-		//I got this below part from bcr and still have no idea where they got it but it seems to work
-		std::uint64_t unk08;                          // 08
-		TESObjectWEAP* weapon;                        // 10
-		TESObjectWEAP::InstanceData* weaponInstance;  //
-													  //...
 	};
-	//static_assert(sizeof(PlayerAmmoCounts) == 0x08);
+	static_assert(sizeof(PlayerAmmoCounts) == 0x08);
 
 	class PlayerAmmoCountEvent :
 		public BSTValueEvent<PlayerAmmoCounts>
@@ -329,6 +324,11 @@ namespace RE
 			}
 			return *singleton;
 		}
+		//I got this below part from bcr and still have no idea where they got it but it seems to work
+		std::uint64_t unk08;                          // 08
+		TESObjectWEAP* weapon;                        // 10
+		TESObjectWEAP::InstanceData* weaponInstance;  //
+													  //...
 	};
 	//static_assert(sizeof(PlayerAmmoCountEvent) == 0x0C);
 
@@ -482,10 +482,15 @@ namespace RE
 	};
 	static_assert(sizeof(TESDeathEvent) == 0x18);
 
-	//Code edit start
 	struct TESEquipEvent
 	{
 	public:
+		[[nodiscard]] static BSTEventSource<TESEquipEvent>& GetSingleton()
+		{
+			REL::Relocation<BSTEventSource<TESEquipEvent>*> singleton{ REL::ID(485633) };
+			return *singleton;
+		}
+
 		[[nodiscard]] static BSTEventSource<TESEquipEvent>* GetEventSource()
 		{
 			using func_t = decltype(&TESEquipEvent::GetEventSource);
@@ -494,21 +499,20 @@ namespace RE
 		}
 
 		//members
-		TESObjectREFR* owner;        // 00
-		std::uint32_t FormID;        // 08	base FormID
-		std::uint32_t unkC;          // 0C	Refr FormID?
-		std::uint16_t unk10;         // 10	ID?
-		bool unk12;                  // 12
-		bool isEquipping;            // 15
-		std::uint8_t padding1[111];  // 16
-		//16-87 UNK
-		BGSInventoryItem::Stack* invItem;  // 88
-		std::uint8_t padding2[15];         // 90
-		//90-9F UNK
+		TESObjectREFR* owner;                       // 00
+		std::uint32_t FormID;                       // 08	base FormID
+		std::uint32_t unkC;                         // 0C	Refr FormID?
+		std::uint16_t unk10;                        // 10	ID?
+		bool unk12;                                 // 12
+		bool isEquipping;                           // 15
+		std::uint8_t padding1[111];                 // 16
+													// 16-87 UNK
+		BGSInventoryItem::Stack* invItem;           // 88
+		std::uint8_t padding2[15];                  // 90
+													// 90-9F UNK
 		TESObject* item;                            // A0
 		TESObjectWEAP::InstanceData* instanceData;  // A8
 	};
-	//code edit end
 
 	struct TESFurnitureEvent
 	{
@@ -536,10 +540,16 @@ namespace RE
 	struct TESLoadGameEvent
 	{
 	public:
+		[[nodiscard]] static BSTEventSource<TESLoadGameEvent>& GetSingleton()
+		{
+			REL::Relocation<BSTEventSource<TESLoadGameEvent>*> singleton{ REL::ID(430381) };
+			return *singleton;
+		}
+
 		[[nodiscard]] static BSTEventSource<TESLoadGameEvent>* GetEventSource()
 		{
 			using func_t = decltype(&TESLoadGameEvent::GetEventSource);
-			REL::Relocation<func_t> func{ REL::ID(430381) };
+			REL::Relocation<func_t> func{ REL::ID(823570) };
 			return func();
 		}
 	};

@@ -59,6 +59,10 @@ endif ()
 
 # ---- Globals ----
 
+add_compile_definitions(
+	F4SE_SUPPORT_XBYAK
+)
+
 if (MSVC)
 	if (NOT ${CMAKE_GENERATOR} STREQUAL "Ninja")
 		add_compile_options(
@@ -100,6 +104,7 @@ add_library(
 	${PROJECT_NAME}
 	SHARED
 	${SOURCES}
+	${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc
 	.clang-format
 )
@@ -127,7 +132,6 @@ target_link_libraries(
 	${PROJECT_NAME}
 	PRIVATE
 		CommonLibF4::CommonLibF4
-		spdlog::spdlog
 )
 
 target_precompile_headers(
