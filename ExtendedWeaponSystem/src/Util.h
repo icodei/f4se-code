@@ -1,6 +1,10 @@
 #pragma once
 #include "Global.h"
 
+
+char* _MESSAGE(const char* fmt, ...);
+void Dump(void* mem, unsigned int size);
+
 template <typename T>
 T GetVirtualFunction(void* baseObject, int vtblIndex) {
 	uintptr_t* vtbl = reinterpret_cast<uintptr_t**>(baseObject)[0];
@@ -40,17 +44,15 @@ enum AmmoType {
 };
 
 enum EquipIndex {
-	kEquipIndex_Invalid = -1,
-	kEquipIndex_Default = 0,
-	kEquipIndex_Throwable = 2
+	kInvalid = -1,
+	kDefault = 0,
+	kThrowable = 2
 };
 
 struct IsReloadableDataWrapper {
 	void* arg1;
 	void* arg2;
 };
-
-bool IsPlayerActive();
 
 bool IsButtonPressed(ButtonEvent* btnEvent);
 bool IsHoldingButton(ButtonEvent* btnEvent);
@@ -64,29 +66,23 @@ bool IsPlayerWeaponThrowable();
 bool IsWeaponReloadable(IsReloadableDataWrapper* data, const EquippedItem* item);
 bool IsWeaponThrowable(uint32_t equipIndex);
 
-bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword);
-bool HasKeyword(TESForm* form, BGSKeyword* keyword);
-bool HasKeywordInstWEAP(TESObjectWEAP::InstanceData* thisInstance, BGSKeyword* kwdToCheck);
 TESForm* GetFormFromIdentifier(const string& identifier);
 bool GetForms();
-string GetFullNameWEAP(TESObjectWEAP* weap);
 
-const BSTArray<EquippedItem>* GetPlayerEquippedItemArray();
-const EquippedItem* GetPlayerEquippedItemByFormID(uint32_t formId);
-const EquippedItem* GetPlayerEquippedItemByEquipIndex(EquipIndex equipIndex);
-const EquippedWeapon* GetPlayerEquippedWeaponByEquipIndex(EquipIndex equipIndex);
-const EquippedWeaponData* GetPlayerEquippedWeaponDataByEquipIndex(EquipIndex equipIndex);
-const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(TESForm* weapForm, TBO_InstanceData* weapInst);
-const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedItem& a_item);
-const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedWeapon& a_weapon);
-const uint32_t GetInventoryItemCount(Actor* actor, TESForm* item);
+EquippedItem& GetPlayerEquippedItemDefault();
+EquippedWeapon& GetPlayerEquippedWeaponDefault();
+const uint32_t GetPlayerInventoryObjectCount(const TESBoundObject* item);
 
 const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name);
 
 template <typename K, typename V>
 void print_map(unordered_map<K, V> const& map) {
 	auto print_key_value = [](const auto& key, const auto& value) {
-		logger::info(FMT_STRING("Hook: {:s} IsHooked: {:s}"), key, value);
+		if (!value) {
+			logger::warn(FMT_STRING("Hook: {:s} IsHooked: {:s}"), key, value);
+		} else {
+			logger::info(FMT_STRING("Hook: {:s} IsHooked: {:s}"), key, value);
+		}
 	};
 	for (const std::pair<K, V>& n : map) {
 		print_key_value(n.first, n.second);
@@ -98,7 +94,7 @@ void print_map(unordered_map<K, V> const& map) {
 }
 
 //Functions to write a simple line of text to logs
-void logInfoConditional(string text);
+void logInfo(string text);
 void logInfo(string text);
 void logWarn(string text);
 void logError(string text);

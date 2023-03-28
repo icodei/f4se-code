@@ -1,62 +1,71 @@
 #include "ReloadHandlers.h"
 
 void reloadStop() {
-	logInfoConditional("Stopping reload loop");
+	const BSFixedString bReloadLoop("bReloadLoop");
+
+	logInfo("Stopping reload loop");
 	reloadEndHandle();
-	(pc)->SetGraphVariableBool(BSFixedString("bReloadLoop"), false);
+	PlayerCharacter::GetSingleton()->SetGraphVariableBool(bReloadLoop, false);
 }
 
 void reloadContinue() {
-	logInfoConditional("Continuing reload loop");
-	(pc)->SetGraphVariableBool(BSFixedString("bReloadLoop"), true);
-	(pc)->NotifyAnimationGraphImpl(BSFixedString("reloadSequentialReserveStart"));
+	const BSFixedString bReloadLoop("bReloadLoop");
+	const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
+
+	logInfo("Continuing reload loop");
+	PlayerCharacter::GetSingleton()->SetGraphVariableBool(bReloadLoop, true);
+	PlayerCharacter::GetSingleton()->NotifyAnimationGraphImpl(reloadSequentialReserveStart);
 }
 
 void reloadContinueFromEmpty() {
-	logInfoConditional("Continuing reload loop");
-	(pc)->SetGraphVariableBool(BSFixedString("bReloadLoop"), true);
-	(pc)->NotifyAnimationGraphImpl(BSFixedString("reloadSequentialStart"));
+	const BSFixedString bReloadLoop("bReloadLoop");
+	const BSFixedString reloadSequentialStart("reloadSequentialStart");
+
+	logInfo("Continuing reload loop");
+	PlayerCharacter::GetSingleton()->SetGraphVariableBool(bReloadLoop, true);
+	PlayerCharacter::GetSingleton()->NotifyAnimationGraphImpl(reloadSequentialStart);
 }
 
 //ready needed stuff when reload is started
 void reloadStartHandle() {
-	logInfoConditional("reloadStartHandle");
-	incrementor = 0;
-	toAdd = ammoCapacity - currentAmmoCount;
-	reloadStarted = true;
-	reloadEnd = false;
-	SetWeapAmmoCapacity(currentAmmoCount);
+	logInfo("reloadStartHandle");
+	WeaponInfo::weapInfo.weapAmmoIncrementor = 0;
+	WeaponInfo::weapInfo.weapAmmoToAdd = WeaponInfo::weapInfo.weapAmmoCapacity - WeaponInfo::weapInfo.weapAmmoCurrentCount;
+	reloadHasStarted = true;
+	reloadHasEnded = false;
+	SetWeapAmmoCapacity(WeaponInfo::weapInfo.weapAmmoCurrentCount);
 }
 
 //clear needed stuff when reload ends
 void reloadEndHandle() {
-	logInfoConditional("reloadEndHandle");
-	reloadEnd = true;
-	reloadStarted = false;
-	incrementor = 0;
-	toAdd = 0;
-	SetWeapAmmoCapacity(ammoCapacity);
+	logInfo("reloadEndHandle");
+	reloadHasEnded = true;
+	reloadHasStarted = false;
+	WeaponInfo::weapInfo.weapAmmoIncrementor = 0;
+	WeaponInfo::weapInfo.weapAmmoToAdd = 0;
+	SetWeapAmmoCapacity(WeaponInfo::weapInfo.weapAmmoCapacity);
 }
 
 //Stops the reload early if there is not enough ammo in the inventory
 void StopLesserAmmo() {
-	if ((totalAmmoCount + currentAmmoCount) - ammoCapacity < 0) {
-		toAdd = totalAmmoCount;
+	if ((WeaponInfo::weapInfo.weapAmmoTotalCount + WeaponInfo::weapInfo.weapAmmoCurrentCount) - WeaponInfo::weapInfo.weapAmmoCapacity < 0) {
+		WeaponInfo::weapInfo.weapAmmoToAdd = WeaponInfo::weapInfo.weapAmmoTotalCount;
 	}
 }
 
 //Set weapon capacity to needed amount to be sure reloadComplete fills needed amount of ammo
 void SetWeapAmmoCapacity(int amount) {
-	if (!currentWeapInstance) {
+	if (!WeaponInfo::weapCurrentInstanceData) {
 		logInfo("Weapon instance is nullptr. Could not set ammo.");
 		return;
 	}
 
-	if (amount > ammoCapacity) { //This if statement is for when ammo complete of the animation goes over the original max ammo count. Will be edited later for +1 and +2 loading
-		currentWeapInstance->ammoCapacity = ammoCapacity;
-		logInfoConditional("Ammo count set to: " + std::to_string(ammoCapacity));
+	//This if statement is for when ammo complete of the animation goes over the original max ammo count. Will be edited later for +1 and +2 loading
+	if (amount > WeaponInfo::weapInfo.weapAmmoCapacity) {
+		WeaponInfo::weapCurrentInstanceData->ammoCapacity = WeaponInfo::weapInfo.weapAmmoCapacity;
+		logInfo("Ammo count set to: " + std::to_string(WeaponInfo::weapInfo.weapAmmoCapacity));
 	} else {
-		currentWeapInstance->ammoCapacity = amount;
-		logInfoConditional("Ammo count set to: " + std::to_string(amount));
+		WeaponInfo::weapCurrentInstanceData->ammoCapacity = amount;
+		logInfo("Ammo count set to: " + std::to_string(amount));
 	}
 }

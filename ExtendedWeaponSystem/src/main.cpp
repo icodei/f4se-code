@@ -1,24 +1,22 @@
 #include "Global.h"
 
-F4SE::PluginHandle g_pluginHandle = NULL;
-const F4SE::MessagingInterface* g_messaging;
-const F4SE::TaskInterface* g_taskInterface;
-const F4SE::Trampoline* g_trampoline;
-
 void initPlugin() {
 	pc = PlayerCharacter::GetSingleton();
+	logger::info(FMT_STRING("Player: {:p}"), fmt::ptr(pc));
 	pcam = PlayerCamera::GetSingleton();
+	logger::info(FMT_STRING("Player Camera: {:p}"), fmt::ptr(pcam));
 
 	if (!GetForms()) {
 		logError("You are missing some forms");
 	}
 
-	reloadStarted = false;
-	reloadEnd = true;
-	processCurrentWeap = false;
-	processCurrentScope = false;
-	ignore = false;
+	ignoreEquip = false;
+	ignoreScope = false;
 	readyForRender = false;
+	reloadHasEnded = true;
+	reloadHasStarted = false;
+	weaponHasSequentialReload = false;
+	weaponHasThermalScope = false;
 }
 
 void initLog() {
@@ -59,8 +57,10 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	case F4SE::MessagingInterface::kPreLoadGame:
 
 	case F4SE::MessagingInterface::kPostLoadGame:
-		initSpecialHooks();
-		FillWeaponInfo();
+		if (reinterpret_cast<bool>(msg->data)) {
+			initSpecialHooks();
+			gameLoadingSave = true;
+		}
 		break;
 	case F4SE::MessagingInterface::kPreSaveGame:
 
@@ -72,13 +72,16 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 
 	case F4SE::MessagingInterface::kNewGame:
 		initSpecialHooks();
-		FillWeaponInfo();
+		gameLoadingSave = true;
 		break;
 	case F4SE::MessagingInterface::kGameLoaded:
 		
 	case F4SE::MessagingInterface::kGameDataReady:
-		initPlugin();
-		initHooks();
+		if (reinterpret_cast<bool>(msg->data)) {
+			initPlugin();
+			initHooks();
+			WeaponInfo::InitSDM();
+		}
 		break;
 	}
 }
@@ -120,25 +123,8 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f
 		logCritical("Couldn't get messaging interface");
 		return false;
 	}
-
 	if (g_messaging->RegisterListener(OnF4SEMessage)) {
 		logInfo("Registered listener");
 	}
-
-	/*g_messaging->RegisterListener([](F4SE::MessagingInterface::Message* msg) -> void {
-		if (msg->type == F4SE::MessagingInterface::kGameLoaded) {
-			initPlugin();
-			if (!GetForms()) {
-				logger::critical(FMT_STRING("ERROR: You are missing some forms"));
-			}
-			if (!initHooks()) {
-				logger::critical(FMT_STRING("ERROR:: Could not install all hooks"));
-			}
-		}
-		if (msg->type == F4SE::MessagingInterface::kPostLoadGame) {
-			FillWeaponInfo();
-		}
-	});*/
-	
 	return true;
 }

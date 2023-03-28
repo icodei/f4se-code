@@ -298,7 +298,7 @@ namespace RE
 		std::uint32_t clipAmmo;     // 00
 		std::uint32_t reserveAmmo;  // 04
 	};
-	static_assert(sizeof(PlayerAmmoCounts) == 0x08);
+	static_assert(sizeof(PlayerAmmoCounts) == 0x8);
 
 	class PlayerAmmoCountEvent :
 		public BSTValueEvent<PlayerAmmoCounts>
@@ -324,13 +324,13 @@ namespace RE
 			}
 			return *singleton;
 		}
-		//I got this below part from bcr and still have no idea where they got it but it seems to work
-		std::uint64_t unk08;                          // 08
 		TESObjectWEAP* weapon;                        // 10
-		TESObjectWEAP::InstanceData* weaponInstance;  //
+		TESObjectWEAP::InstanceData* weaponInstance;  // 18
 													  //...
 	};
-	//static_assert(sizeof(PlayerAmmoCountEvent) == 0x0C);
+	static_assert(sizeof(BSTValueEvent<PlayerAmmoCounts>) == 0xC);
+	static_assert(sizeof(PlayerAmmoCountEvent) == 0x20);
+	static_assert(offsetof(PlayerAmmoCountEvent, weapon) == 0x10);
 
 	class PlayerWeaponReloadEvent :
 		public BSTValueEvent<bool>
@@ -358,7 +358,7 @@ namespace RE
 			return *singleton;
 		}
 	};
-	static_assert(sizeof(PlayerWeaponReloadEvent) == 0x02);
+	static_assert(sizeof(PlayerWeaponReloadEvent) == 0x2);
 
 	class PlayerSetWeaponStateEvent :
 		public BSTValueEvent<WEAPON_STATE>

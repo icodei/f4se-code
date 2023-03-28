@@ -106,17 +106,17 @@ void SetupGeometryWithEffectShader(BSGeometry* geometryToSetup, TESEffectShader*
 	shaderProperty = (BSShaderProperty*)geometryToSetup->shaderProperty.get();
 	effectShaderProperty = (BSEffectShaderProperty*)shaderProperty;
 	if (shaderProperty) {
-		logInfoConditional("Got the EffectShaderProperty");
+		logInfo("Got the EffectShaderProperty");
 		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
 		//effectShaderData = ThermalFXS->CreateEffectShaderData(ScopeTextureLoader, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
 		returnData = *CreateEffectShaderDataCustom(shaderToUse, effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get(), effectShaderMaterial->spBaseTexture.get());
 		effectShaderProperty->SetEffectShaderData(&returnData);
 		if (effectShaderProperty->SetupGeometry(geometryToSetup)) {
-			logInfoConditional("Geometry was setup with the shaders.");
+			logInfo("Geometry was setup with the shaders.");
 		} else {
-			logInfoConditional("Geometry was unable to be setup.");
+			logInfo("Geometry was unable to be setup.");
 		}
-		logInfoConditional("Scope materials setup complete.");
+		logInfo("Scope materials setup complete.");
 	}
 }
 
@@ -133,6 +133,6 @@ void SetupImageSpaceShader(BSGeometry* objGeom, bool active) {
 	if (shaderProperty) {
 		effectShaderMaterial = static_cast<BSEffectShaderMaterial*>(shaderProperty->material);
 		BSImageShader->Render((BSTriShape*)objGeom, defaultParams);
-		logInfoConditional("Scope materials setup complete.");
+		logInfo("Scope materials setup complete.");
 	}
 }

@@ -2,16 +2,16 @@
 
 #include "RE/Bethesda/AITimeStamp.h"
 #include "RE/Bethesda/Actor.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
 #include "RE/Bethesda/BSCore/BSSpinLock.h"
-#include "RE/Bethesda/BSMain/BSPointerHandle.h"
-#include "RE/Bethesda/BSSoundHandle.h"
 #include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/Bethesda/BSCore/BSTEvent.h"
 #include "RE/Bethesda/BSCore/BSTHashMap.h"
-#include "RE/Bethesda/BSCore/BSSimpleList.h"
-#include "RE/Bethesda/BSTOptional.h"
-#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/BSCore/BSTTuple.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
+#include "RE/Bethesda/BSSoundHandle.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
+#include "RE/Bethesda/BSTOptional.h"
 #include "RE/Bethesda/IMovementInterface.h"
 #include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
@@ -254,6 +254,33 @@ namespace RE
 		{
 			REL::Relocation<NiPointer<PlayerCharacter>*> singleton{ REL::ID(303410) };
 			return singleton->get();
+		}
+
+		[[nodiscard]] static PlayerCharacter* GetSingletonPtr()
+		{
+			REL::Relocation<PlayerCharacter**> singleton{ REL::ID(303410) };
+			return *singleton;
+		}
+
+		TESAmmo* GetCurrentAmmo()
+		{
+			using func_t = decltype(&PlayerCharacter::GetCurrentAmmo);
+			REL::Relocation<func_t> func{ REL::ID(660416), 0x10 };
+			return func(this);
+		}
+
+		std::uint32_t GetCurrentAmmoCount()
+		{
+			using func_t = decltype(&PlayerCharacter::GetCurrentAmmoCount);
+			REL::Relocation<func_t> func{ REL::ID(293822), 0x23 };
+			return func(this);
+		}
+
+		BGSObjectInstanceT<TESObjectWEAP> GetCurrentWeapon()
+		{
+			using func_t = decltype(&PlayerCharacter::GetCurrentWeapon);
+			REL::Relocation<func_t> func{ REL::ID(832872) };
+			return func(this);
 		}
 
 		void RemoveLastUsedPowerArmor()

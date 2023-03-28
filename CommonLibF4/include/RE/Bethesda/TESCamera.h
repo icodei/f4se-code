@@ -81,6 +81,8 @@ namespace RE
 		TESCamera* camera;  // 18
 		std::uint32_t id;   // 20
 
+		F4_HEAP_REDEFINE_NEW(TESCameraState);
+
 	private:
 		TESCameraState* ctor(TESCamera& cam, std::uint32_t ID)
 		{
@@ -115,6 +117,8 @@ namespace RE
 		NiPointer<NiNode> cameraRoot;                  // 20
 		BSTSmartPointer<TESCameraState> currentState;  // 28
 		bool enabled;                                  // 30
+
+		F4_HEAP_REDEFINE_NEW(TESCamera);
 
 	private:
 		TESCamera* ctor() {

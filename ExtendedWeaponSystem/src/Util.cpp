@@ -1,5 +1,42 @@
 #include "Util.h"
 
+char tempbuf[8192] = { 0 };
+char* _MESSAGE(const char* fmt, ...) {
+	va_list args;
+
+	va_start(args, fmt);
+	vsnprintf(tempbuf, sizeof(tempbuf), fmt, args);
+	va_end(args);
+	spdlog::log(spdlog::level::info, tempbuf);
+
+	return tempbuf;
+}
+
+void Dump(void* mem, unsigned int size) {
+	char* p = static_cast<char*>(mem);
+	unsigned char* up = (unsigned char*)p;
+	std::stringstream stream;
+	int row = 0;
+	for (unsigned int i = 0; i < size; i++) {
+		stream << std::setfill('0') << std::setw(2) << std::hex << (int)up[i] << " ";
+		if (i % 8 == 7) {
+			stream << "\t0x"
+				   << std::setw(2) << std::hex << (int)up[i]
+				   << std::setw(2) << (int)up[i - 1]
+				   << std::setw(2) << (int)up[i - 2]
+				   << std::setw(2) << (int)up[i - 3]
+				   << std::setw(2) << (int)up[i - 4]
+				   << std::setw(2) << (int)up[i - 5]
+				   << std::setw(2) << (int)up[i - 6]
+				   << std::setw(2) << (int)up[i - 7] << std::setfill('0');
+			stream << "\t0x" << std::setw(2) << std::hex << row * 8 << std::setfill('0');
+			_MESSAGE("%s", stream.str().c_str());
+			stream.str(std::string());
+			row++;
+		}
+	}
+}
+
 BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName) {
 	auto sources = (globalEvents->eventSources);
 	for (auto elem = sources.begin(); elem != sources.end(); ++elem) {
@@ -44,19 +81,6 @@ const char* GetObjectClassName(void* objBase) {
 	return result;
 }
 
-bool IsPlayerActive() {
-	if (!pc) {
-		pc = PlayerCharacter::GetSingleton();
-	}
-
-	if (!pc || !(pc)->currentProcess || !(pc)->currentProcess->middleHigh) {
-		logger::warn("A function tried to interact with the player character but there is no player active");
-		return false;
-	}
-
-	return true;
-}
-
 bool IsButtonPressed(ButtonEvent* btnEvent) {
 	if (btnEvent->value == BUTTON_UP && (btnEvent->heldDownSecs > 0 && btnEvent->heldDownSecs < BUTTON_HOLD_TIMER)) {
 		return true;
@@ -72,39 +96,30 @@ bool IsHoldingButton(ButtonEvent* btnEvent) {
 }
 
 bool IsPlayerInFirstPerson() {
-	if (!pcam) {
+	if (!PlayerCamera::GetSingleton()) {
 		return false;
 	}
-	return (pcam)->currentState == (pcam)->cameraStates[CameraState::kFirstPerson];
+	return PlayerCamera::GetSingleton()->currentState == PlayerCamera::GetSingleton()->cameraStates[CameraState::kFirstPerson];
 }
 
 bool IsPlayerInThirdPerson() {
-	if (!pcam) {
+	if (!PlayerCamera::GetSingleton()) {
 		return false;
 	}
-	return (pcam)->currentState == (pcam)->cameraStates[CameraState::k3rdPerson];
+	return PlayerCamera::GetSingleton()->currentState == PlayerCamera::GetSingleton()->cameraStates[CameraState::k3rdPerson];
 }
 
 bool IsPlayerSprinting() {
-	if (!IsPlayerActive()) {
-		return false;
-	}
-	return (pc)->ActorState::moveMode & 0x0100;
+	return PlayerCharacter::GetSingleton()->ActorState::moveMode & 0x0100;
 }
 
 bool IsPlayerWeaponDrawn() {
-	if (!IsPlayerActive()) {
-		return false;
-	}
-	return (pc)->GetWeaponMagicDrawn();
+	return PlayerCharacter::GetSingleton()->GetWeaponMagicDrawn();
 }
 
 bool IsPlayerWeaponReloadable() {
-	if (!IsPlayerActive()) {
-		return false;
-	}
-
-	const BSTArray<EquippedItem> equipDataArr = *GetPlayerEquippedItemArray();
+	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->lock();
+	const BSTArray<EquippedItem> equipDataArr = *PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArray();
 	if (equipDataArr.empty()) {
 		return false;
 	}
@@ -112,25 +127,23 @@ bool IsPlayerWeaponReloadable() {
 	const EquippedItem* equipData = nullptr;
 	for (auto& elem : equipDataArr) {
 		uint32_t equipIndex = elem.equipIndex.index;
-		if (equipIndex == 0) {
+		if (equipIndex == EquipIndex::kDefault) {
 			equipData = &elem;
 			break;
 		}
 	}
+	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
 	if (!equipData) {
 		return false;
 	}
 
-	IsReloadableDataWrapper wrapper = { 0i64, pc };
+	IsReloadableDataWrapper wrapper = { 0i64, PlayerCharacter::GetSingleton() };
 
 	return IsWeaponReloadable(&wrapper, equipData);
 }
 
 bool IsPlayerWeaponReloading() {
-	if (!IsPlayerActive()) {
-		return false;
-	}
-	return ((pc)->ActorState::gunState) == GUN_STATE::kReloading;
+	return PlayerCharacter::GetSingleton()->ActorState::gunState == GUN_STATE::kReloading;
 }
 
 bool IsPlayerWeaponThrowable() {
@@ -145,57 +158,7 @@ bool IsWeaponReloadable(IsReloadableDataWrapper* data, const EquippedItem* item)
 }
 
 bool IsWeaponThrowable(uint32_t equipIndex) {
-	return equipIndex == EquipIndex::kEquipIndex_Throwable;
-}
-
-typedef bool (*_WornHasKeywordActor)(BSScript::IVirtualMachine* vm, uint32_t stackId, Actor* akTarget, BGSKeyword* akKeyword);
-bool WornHasKeywordActor(Actor* akTarget, BGSKeyword* akKeyword) {
-	GameVM* g_gameVM = GameVM::GetSingleton();
-	using func_t = _WornHasKeywordActor;
-	REL::Relocation<func_t> func{ REL::ID(295765) };
-	if (func((g_gameVM)->impl.get(), 1, akTarget, akKeyword)) {
-		return true;
-	}
-	return false;
-}
-
-typedef bool (*_IKeywordFormBase_HasKeyword)(IKeywordFormBase* keywordFormBase, BGSKeyword* keyword, uint32_t unk3);
-bool HasKeyword(TESForm* form, BGSKeyword* keyword) {
-	IKeywordFormBase* keywordFormBase = form->As<IKeywordFormBase>();
-	if (!keywordFormBase) {
-		logger::warn("HasKeyword:: Failed to cast keyword to base type.");
-		return false;
-	}
-	auto HasKeyword_Internal = GetVirtualFunction<_IKeywordFormBase_HasKeyword>(keywordFormBase, 1);
-	if (!HasKeyword_Internal) {
-		logger::warn("HasKeyword:: Failed to get virtual function.");
-		return false;
-	}
-	if (HasKeyword_Internal(keywordFormBase, keyword, 0)) {
-		return true;
-	}
-	return false;
-}
-
-bool HasKeywordInstWEAP(TESObjectWEAP::InstanceData* thisInstance, BGSKeyword* kwdToCheck) {
-	BGSKeywordForm* keywordForm = nullptr;
-	keywordForm = thisInstance->keywords;
-	if (!keywordForm) {
-		logger::warn("This weapInstance has no keywords");
-		return false;
-	}
-
-	if (keywordForm->HasKeyword(kwdToCheck)) {
-		return true;
-	}
-
-	for (uint32_t i = 0; i < keywordForm->numKeywords; i++) {
-		BGSKeyword* curr = keywordForm->keywords[i];
-		if (curr == kwdToCheck) {
-			return true;
-		}
-	}
-	return false;
+	return equipIndex == EquipIndex::kThrowable;
 }
 
 TESForm* GetFormFromIdentifier(const string& identifier) {
@@ -228,214 +191,61 @@ TESForm* GetFormFromIdentifier(const string& identifier) {
 //Gather the forms we need
 bool GetForms() {
 	bool toReturn = true;
-	reloadSequentialKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED4")->As<BGSKeyword>();
-	if (!reloadSequentialKeyword) {
-		logError("Unable to get reloadSequentialKeyword, you are lacking some file/files");
+	weaponHasSequentialReloadKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED4")->As<BGSKeyword>();
+	if (!weaponHasSequentialReloadKeyword) {
+		logError("Unable to get weaponHasSequentialReloadKeyword, you are lacking some file/files");
 	}
-	ThermalScopeKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|6436")->As<BGSKeyword>();
-	if (!ThermalScopeKeyword) {
-		logError("Unable to get ThermalScopeKeyword, you are lacking some file/files");
+	weaponHasSpeedReloadKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|ECBD")->As<BGSKeyword>();
+	if (!weaponHasSpeedReloadKeyword) {
+		logError("Unable to get weaponHasSpeedReloadKeyword, you are lacking some file/files");
+	}
+	weaponHasThermalScopeKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|6436")->As<BGSKeyword>();
+	if (!weaponHasThermalScopeKeyword) {
+		logError("Unable to get weaponHasThermalScopeKeyword, you are lacking some file/files");
+	}
+	weaponIsClosedBoltKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED8")->As<BGSKeyword>();
+	if (!weaponIsClosedBoltKeyword) {
+		logError("Unable to get weaponIsClosedBoltKeyword, you are lacking some file/files");
+	}
+	weaponIsOpenBoltKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED9")->As<BGSKeyword>();
+	if (!weaponIsOpenBoltKeyword) {
+		logError("Unable to get weaponIsOpenBoltKeyword, you are lacking some file/files");
 	}
 	//ThermalFXS = GetFormFromIdentifier("Code_SharedAttachments.esm|5BCB")->As<BGSKeyword>();
 	//if (!ThermalFXS) {
 	//	logError("Unable to get ThermalFXS, you are lacking some file/files");
 	//}
-	if (!reloadSequentialKeyword || !ThermalScopeKeyword) {
+	if (!weaponHasSequentialReloadKeyword || !weaponHasThermalScopeKeyword || !weaponIsClosedBoltKeyword || !weaponIsOpenBoltKeyword || !weaponHasSpeedReloadKeyword) {
 		toReturn = false;
 	}
 	return toReturn;
 }
 
-std::string GetFullNameWEAP(TESObjectWEAP* weap) {
-	TESFullName* pFullName = (TESFullName*)weap;
-	std::string sName = (pFullName->fullName).c_str();
-	return sName;
+EquippedItem& GetPlayerEquippedItemDefault() {
+	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->lock();
+	EquippedItem& a_item = PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
+	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
+	return a_item;
 }
 
-const BSTArray<EquippedItem>* GetPlayerEquippedItemArray() {
-	if (!IsPlayerActive()) {
-		return nullptr;
+EquippedWeapon& GetPlayerEquippedWeaponDefault() {
+	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->lock();
+	EquippedItem& a_item = PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
+	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
+	EquippedWeapon& a_weapon = reinterpret_cast<EquippedWeapon&>(a_item);
+	if (a_weapon.IsValid() && a_weapon.weaponData.get()) {
+		return a_weapon;
 	}
-
-	BSTArray<EquippedItem>* equipDataArray = (pc)->currentProcess->GetEquippedItemArray();
-	if (equipDataArray->empty()) {
-		return nullptr;
-	}
-	return equipDataArray;
+	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedWeaponByIndex(BGSEquipIndex(EquipIndex::kDefault), a_weapon);
+	return a_weapon;
 }
 
-const EquippedItem* GetPlayerEquippedItemByFormID(uint32_t formId) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	const BSTArray<EquippedItem>* equipDataArray = GetPlayerEquippedItemArray();
-	if (!equipDataArray) {
-		return nullptr;
-	}
-
-	for (auto elem = equipDataArray->begin(); elem != equipDataArray->end(); ++elem) {
-		if (elem->item.object->formID == formId) {
-			return elem;
-		}
-	}
-	return nullptr;
-}
-
-const EquippedItem* GetPlayerEquippedItemByEquipIndex(EquipIndex equipIndex) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	EquippedItem item;
-	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
-
-	if ((pc)->currentProcess->GetEquippedItemByIndex(bgsindex, item)) {
-		return &item;
-	}
-
-	const BSTArray<EquippedItem>* equipDataArray = GetPlayerEquippedItemArray();
-	if (!equipDataArray) {
-		return nullptr;
-	}
-	for (auto elem = equipDataArray->begin(); elem != equipDataArray->end(); ++elem) {
-		uint32_t eIdx = elem->equipIndex.index;
-		if (eIdx == (uint32_t)equipIndex) {
-			return elem;
-		}
-	}
-	return nullptr;
-}
-
-const EquippedWeapon* GetPlayerEquippedWeaponByEquipIndex(EquipIndex equipIndex) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
-
-	EquippedWeapon weapon;
-	weapon.weapon = *new BGSObjectInstanceT<TESObjectWEAP>();
-	weapon.equipSlot = nullptr;
-	weapon.equipIndex = BGSEquipIndex(-1);
-	weapon.weaponData = nullptr;
-
-	if ((pc)->currentProcess->GetEquippedWeaponByIndex(bgsindex, weapon)) {
-		return &weapon;
-	}
-
-	BSTArray<EquippedWeapon>* equipDataArray = nullptr;
-	(pc)->currentProcess->GetEquippedWeapons(*equipDataArray);
-	if (!equipDataArray) {
-		return nullptr;
-	}
-	for (auto elem = equipDataArray->begin(); elem != equipDataArray->end(); ++elem) {
-		uint32_t eIdx = elem->equipIndex.index;
-		if (eIdx == (uint32_t)equipIndex) {
-			return elem;
-		}
-	}
-	return nullptr;
-}
-
-const EquippedWeaponData* GetPlayerEquippedWeaponDataByEquipIndex(EquipIndex equipIndex) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	NiPointer<EquippedWeaponData> spWeaponData;
-	BGSEquipIndex bgsindex = BGSEquipIndex(equipIndex);
-
-	if ((pc)->currentProcess->GetEquippedWeaponData(bgsindex, spWeaponData)) {
-		return spWeaponData.get();
-	}
-	return nullptr;
-}
-
-const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(TESForm* weapForm, TBO_InstanceData* weapInst) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	if (!weapForm || !weapInst) {
-		return nullptr;
-	}
-
-	TESObjectWEAP::InstanceData* weapInstData = reinterpret_cast<TESObjectWEAP::InstanceData*>(weapInst);
-	if (weapInstData) {
-		return weapInstData;
-	}
-
-	TESObjectWEAP* objWeap = weapForm->As<TESObjectWEAP>();
-	if (!objWeap) {
-		return nullptr;
-	}
-	return &objWeap->weaponData;
-}
-
-const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedItem& a_item) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	if (a_item.item.object->formType != ENUM_FORM_ID::kWEAP) {
-		return nullptr;
-	}
-	TESObjectWEAP::InstanceData* weapInstData = static_cast<TESObjectWEAP::InstanceData*>(a_item.item.instanceData.get());
-	if (!weapInstData) {
-		return nullptr;
-	}
-	return weapInstData;
-}
-
-const TESObjectWEAP::InstanceData* GetPlayerWeaponInstanceData(EquippedWeapon& a_weapon) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	if (a_weapon.weapon.object->formType != ENUM_FORM_ID::kWEAP) {
-		return nullptr;
-	}
-	TESObjectWEAP::InstanceData* weapInstData = fallout_cast<TESObjectWEAP::InstanceData*, TBO_InstanceData>(a_weapon.weapon.instanceData.get());
-	if (!weapInstData) {
-		return nullptr;
-	}
-	return weapInstData;
-}
-
-const uint32_t GetInventoryItemCount(Actor* actor, TESForm* item) {
-	if (!actor || !item) {
-		return NULL;
-	}
-
-	BGSInventoryList* inventory = actor->inventoryList;
-	if (!inventory) {
-		return NULL;
-	}
-
-	uint32_t totalItemCount = 0;
-	inventory->rwLock.lock_read();
-	for (auto& elem : inventory->data) {
-		if (elem.object == item) {
-			BGSInventoryItem::Stack* sp = elem.stackData.get();
-			while (sp) {
-				totalItemCount += sp->count;
-				sp = sp->nextStack.get();
-			}
-			break;
-		}
-	}
-	inventory->rwLock.unlock_read();
-
-	return totalItemCount;
+const uint32_t GetPlayerInventoryObjectCount(const TESBoundObject* item) {
+	return PlayerCharacter::GetSingleton()->GetInventoryObjectCount(item);
 }
 
 const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name) {
-	if (!IsPlayerActive()) {
-		return nullptr;
-	}
-
-	BSFadeNode* player3D = (pc) ? (pc)->Get3D()->IsFadeNode() : nullptr;
+	BSFadeNode* player3D = PlayerCharacter::GetSingleton() ? PlayerCharacter::GetSingleton()->Get3D()->IsFadeNode() : nullptr;
 	if (!player3D) {
 		return nullptr;
 	}
@@ -445,39 +255,9 @@ const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name) {
 		return nullptr;
 	}
 	return obj;
-	/*
-	if (!obj) {
-		logInfoConditional("Unable to find scope geometry with BSUtilities. Now attempting to find it in the FlattenedGeometryData...");
-		for (std::uint32_t i = 0; i < player3D->kGeomArray.count; i++) {
-			BSGeometry* object = player3D->kGeomArray.entries[i] ? player3D->kGeomArray.entries[i]->spGeometry.get() : nullptr;
-			if (object->m_name == name) {
-				obj = (NiAVObject*)object;
-				return obj;
-			}
-		}
-	}
-	if (!obj) {
-		logInfoConditional("Unable to find scope geometry in FlattenedGeometryData. Now attempting to find it in the ninode children...");
-		for (std::uint32_t i = 0; i < player3D->m_children.m_emptyRunStart; i++) {
-			NiPointer<NiAVObject> object(player3D->m_children.m_data[i]);
-			if (object) {
-				if (object->m_name == name) {
-					obj = object.get();
-					return obj;
-				}
-			}
-		}
-	}
-	*/
 }
 
 //Functions to write a simple line of text to logs
-//Write message logInfo only if logEnabled == True
-void logInfoConditional(string text) {
-	if (logEnabled) {
-		logger::info(FMT_STRING("{:s}"), text);
-	}
-}
 
 //Write info to log
 void logInfo(string text) {

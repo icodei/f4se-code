@@ -1,15 +1,15 @@
 #include "AnimationFunctions.h"
 
 void SetPlayerAnimationVariableBool(BSFixedString& asVariableName, bool newVal) {
-	(pc)->SetGraphVariableBool(asVariableName, newVal);
+	PlayerCharacter::GetSingleton()->SetGraphVariableBool(asVariableName, newVal);
 }
 
 void SetPlayerAnimationVariableInt(BSFixedString& asVariableName, int newVal) {
-	(pc)->SetGraphVariableInt(asVariableName, newVal);
+	PlayerCharacter::GetSingleton()->SetGraphVariableInt(asVariableName, newVal);
 }
 
 void SetPlayerAnimationVariableFloat(BSFixedString& asVariableName, float newVal) {
-	(pc)->SetGraphVariableFloat(asVariableName, newVal);
+	PlayerCharacter::GetSingleton()->SetGraphVariableFloat(asVariableName, newVal);
 }
 
 void ReloadSubgraph() {

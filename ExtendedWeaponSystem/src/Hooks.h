@@ -5,12 +5,16 @@ class BGSOnPlayerUseWorkBenchEventSink : public BSTEventSink<BGSOnPlayerUseWorkB
 public:
 	virtual ~BGSOnPlayerUseWorkBenchEventSink(){};
 	virtual BSEventNotifyControl ProcessEvent(const BGSOnPlayerUseWorkBenchEvent& a_event, BSTEventSource<BGSOnPlayerUseWorkBenchEvent>* a_source) override;
+
+	F4_HEAP_REDEFINE_NEW(BGSOnPlayerUseWorkBenchEventSink);
 };
 
 class MenuOpenCloseEventSink : public BSTEventSink<MenuOpenCloseEvent> {
 public:
 	virtual ~MenuOpenCloseEventSink(){};
 	virtual BSEventNotifyControl ProcessEvent(const MenuOpenCloseEvent& a_event, BSTEventSource<MenuOpenCloseEvent>* a_source) override;
+
+	F4_HEAP_REDEFINE_NEW(MenuOpenCloseEventSink);
 };
 
 class PlayerAmmoCountEventSink : public BSTEventSink<PlayerAmmoCountEvent> {
@@ -19,6 +23,7 @@ public:
 	virtual BSEventNotifyControl ProcessEvent(const PlayerAmmoCountEvent& a_event, BSTEventSource<PlayerAmmoCountEvent>* a_source) override;
 
 	static BSTEventSource<PlayerAmmoCountEvent>* GetEventSource();
+
 	F4_HEAP_REDEFINE_NEW(PlayerAmmoCountEventSink);
 };
 
@@ -36,12 +41,16 @@ class PlayerSetWeaponStateEventSink : public BSTEventSink<PlayerSetWeaponStateEv
 public:
 	virtual ~PlayerSetWeaponStateEventSink(){};
 	virtual BSEventNotifyControl ProcessEvent(const PlayerSetWeaponStateEvent& a_event, BSTEventSource<PlayerSetWeaponStateEvent>* a_source) override;
+
+	F4_HEAP_REDEFINE_NEW(PlayerSetWeaponStateEventSink);
 };
 
 class PlayerWeaponReloadEventSink : public BSTEventSink<PlayerWeaponReloadEvent> {
 public:
 	virtual ~PlayerWeaponReloadEventSink(){};
 	virtual BSEventNotifyControl ProcessEvent(const PlayerWeaponReloadEvent& a_event, BSTEventSource<PlayerWeaponReloadEvent>* a_source) override;
+
+	F4_HEAP_REDEFINE_NEW(PlayerWeaponReloadEventSink);
 };
 
 class TESEquipEventSink : public BSTEventSink<TESEquipEvent> {
@@ -56,12 +65,16 @@ class TESFurnitureEventSink : public BSTEventSink<TESFurnitureEvent> {
 public:
 	virtual ~TESFurnitureEventSink(){};
 	virtual BSEventNotifyControl ProcessEvent(const TESFurnitureEvent& a_event, BSTEventSource<TESFurnitureEvent>* a_source) override;
+
+	F4_HEAP_REDEFINE_NEW(TESFurnitureEventSink);
 };
 
 class TESLoadGameEventSink : public BSTEventSink<TESLoadGameEvent> {
 public:
 	virtual ~TESLoadGameEventSink(){};
 	virtual BSEventNotifyControl ProcessEvent(const TESLoadGameEvent& a_event, BSTEventSource<TESLoadGameEvent>* a_source) override;
+
+	F4_HEAP_REDEFINE_NEW(TESLoadGameEventSink);
 };
 
 static std::unordered_map<const char*, bool> hookedList;

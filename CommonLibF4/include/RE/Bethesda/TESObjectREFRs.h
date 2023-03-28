@@ -308,19 +308,11 @@ namespace RE
 	class BGSObjectInstance
 	{
 	public:
-		BGSObjectInstance()
-		{
-			BGSObjectInstance(nullptr, nullptr);
-		}
-		BGSObjectInstance(TESForm* a_object, TBO_InstanceData* a_instanceData)
-		{
-			ctor(a_object, a_instanceData);
-		}
+		BGSObjectInstance() { BGSObjectInstance(nullptr, nullptr); }
+		BGSObjectInstance(TESForm* a_object, TBO_InstanceData* a_instanceData) { ctor(a_object, a_instanceData); }
 
-		bool IsValid()
-		{
-			return object != nullptr;
-		}
+		bool IsValid() { return object != nullptr; }
+		bool IsValid() const { return object != nullptr; }
 
 		// members
 		TESForm* object{ nullptr };                      // 00
@@ -858,6 +850,12 @@ namespace RE
 			using func_t = decltype(&TESObjectREFR::SetWantsDelete);
 			REL::Relocation<func_t> func{ REL::ID(761346) };
 			return func(this, a_delete);
+		}
+
+		bool WornHasKeyword(BGSKeyword* a_keyword) {
+			using func_t = decltype(&TESObjectREFR::WornHasKeyword);
+			REL::Relocation<func_t> func{ REL::ID(900857) };
+			return func(this, a_keyword);
 		}
 
 		// members

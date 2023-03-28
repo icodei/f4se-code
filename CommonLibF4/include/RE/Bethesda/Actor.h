@@ -302,19 +302,11 @@ namespace RE
 	class EquippedWeapon
 	{
 	public:
-		EquippedWeapon()
-		{
-			ctor();
-		}
-		EquippedWeapon(EquippedWeapon& a_copy)
-		{
-			ctorCopy(a_copy);
-		}
+		EquippedWeapon() { ctor(); }
+		EquippedWeapon(EquippedWeapon& a_copy) { ctorCopy(a_copy); }
 
-		bool IsValid()
-		{
-			return weapon.IsValid();
-		}
+		bool IsValid() { return weapon.IsValid(); }
+		bool IsValid() const { return weapon.IsValid(); }
 
 		//members
 		BGSObjectInstanceT<TESObjectWEAP> weapon;  // 00
@@ -573,6 +565,13 @@ namespace RE
 			using func_t = decltype(&AIProcess::GetEquippedItemBySlot);
 			REL::Relocation<func_t> func{ REL::ID(111648) };
 			return func(this, a_slot);
+		}
+
+		[[nodiscard]] BSSpinLock* GetEquippedItemArrayLock() const
+		{
+			using func_t = decltype(&AIProcess::GetEquippedItemArrayLock);
+			REL::Relocation<func_t> func{ REL::ID(1126369) };
+			return func(this);
 		}
 
 		[[nodiscard]] BSTArray<EquippedItem>* GetEquippedItemArray() const

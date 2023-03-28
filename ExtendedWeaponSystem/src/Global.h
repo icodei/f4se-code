@@ -10,28 +10,44 @@
 #include "Util.h"
 #include "WeaponHandlers.h"
 
-static PlayerCharacter* pc;
-static PlayerCamera* pcam;
+extern F4SE::PluginHandle g_pluginHandle;
+extern const F4SE::MessagingInterface* g_messaging;
+extern const F4SE::TaskInterface* g_taskInterface;
+extern const F4SE::Trampoline* g_trampoline;
 
-extern bool ignore;
+extern PlayerCharacter* pc;
+extern PlayerCamera* pcam;
+
+extern bool gameLoading;
+extern bool gameLoadingSave;
+extern bool ignoreEquip;
+extern bool ignoreScope;
 extern bool isEmptyReload;
-extern bool logEnabled;
-extern bool oncePerSession;
-extern bool processCurrentScope;
-extern bool processCurrentWeap;
 extern bool readyForRender;
-extern bool reloadEnd;
-extern bool reloadStarted;
+extern bool reloadHasEnded;
+extern bool reloadHasStarted;
+extern bool weaponHasSequentialReload;
+extern bool weaponHasSpeedReload;
+extern bool weaponHasThermalScope;
+extern bool weaponIsClosedBolt;
+extern bool weaponIsOpenBolt;
+extern bool weaponIsQueued;
 
-extern int ammoCapacity;
-extern int currentAmmoCount;
-extern int incrementor;
-extern int toAdd;
-extern int totalAmmoCount;
+//extern int weapAmmoCapacity;
+//extern int weapAmmoCurrentCount;
+//extern int weapAmmoIncrementor;
+//extern int weapAmmoToAdd;
+//extern int weapAmmoTotalCount;
 
-extern BGSKeyword* reloadSequentialKeyword;
-extern BGSKeyword* ThermalScopeKeyword;
-extern TESObjectWEAP::InstanceData* currentWeapInstance;
+extern struct WeaponInfo weapInfo;
+
+extern BGSKeyword* weaponHasSequentialReloadKeyword;
+extern BGSKeyword* weaponHasSpeedReloadKeyword;
+extern BGSKeyword* weaponHasThermalScopeKeyword;
+extern BGSKeyword* weaponIsClosedBoltKeyword;
+extern BGSKeyword* weaponIsOpenBoltKeyword;
+
+//extern TESObjectWEAP::InstanceData* currentWeapInstance;
 
 #define GET_EVENT_SOURCE(EventName) (BSTEventSource<EventName>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), #EventName);
 

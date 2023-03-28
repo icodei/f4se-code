@@ -2,10 +2,10 @@
 
 #pragma region ScopeCamera
 
-
+//This gets called twice. Needs fix
 ScopeCamera::ScopeCamera() :
 	TESCamera() {
-	logInfoConditional("ScopeCamera ctor Starting...");
+	logInfo("ScopeCamera ctor Starting...");
 
 	DefaultState* camDefaultState;
 	ThermalState* camThermalState;
@@ -16,28 +16,28 @@ ScopeCamera::ScopeCamera() :
 	camDefaultState = new DefaultState(*this, ScopeCameraStates::kDefault);
 	if (camDefaultState) {
 		cameraStates[ScopeCameraStates::kDefault].reset(camDefaultState);
-		logInfoConditional("ScopeCamera - Created ScopeCamera::DefaultState");
+		logInfo("ScopeCamera - Created ScopeCamera::DefaultState");
 	} else {
 		camDefaultState = nullptr;
-		logInfoConditional("ScopeCamera - ScopeCamera::DefaultState Creation FAILED");
+		logInfo("ScopeCamera - ScopeCamera::DefaultState Creation FAILED");
 	}
 	//thermalState init
 	camThermalState = new ThermalState(*this, ScopeCameraStates::kThermal);
 	if (camThermalState) {
 		cameraStates[ScopeCameraStates::kThermal].reset(camThermalState);
-		logInfoConditional("ScopeCamera - Created ScopeCamera::ThermalState");
+		logInfo("ScopeCamera - Created ScopeCamera::ThermalState");
 	} else {
 		camThermalState = nullptr;
-		logInfoConditional("ScopeCamera - ScopeCamera::ThermalState Creation FAILED");
+		logInfo("ScopeCamera - ScopeCamera::ThermalState Creation FAILED");
 	}
 	//nightVisionState init
-	camNightVisionState = new NightVisionState(*this, ScopeCameraStates::kNightVision);
+	camNightVisionState = new NightVisionState(*this, ScopeCameraStates::kNightVision); //Error here
 	if (camNightVisionState) {
 		cameraStates[ScopeCameraStates::kNightVision].reset(camNightVisionState);
-		logInfoConditional("ScopeCamera - Created ScopeCamera::NightVisionState");
+		logInfo("ScopeCamera - Created ScopeCamera::NightVisionState");
 	} else {
 		camNightVisionState = nullptr;
-		logInfoConditional("ScopeCamera - ScopeCamera::NightVisionState Creation FAILED");
+		logInfo("ScopeCamera - ScopeCamera::NightVisionState Creation FAILED");
 	}
 
 	//oldState
@@ -54,7 +54,7 @@ ScopeCamera::ScopeCamera() :
 
 	//set state to default
 	this->SetState(cameraStates[ScopeCameraStates::kDefault].get());
-	logInfoConditional("ScopeCamera ctor Completed.");
+	logInfo("ScopeCamera ctor Completed.");
 }
 
 ScopeCamera::~ScopeCamera() {  //TODO
@@ -105,10 +105,10 @@ void ScopeCamera::CreateDefault3D() {
 	cam = NiCamera::Create();
 	if (cam) {
 		newCam = cam;
-		logInfoConditional("ScopeCamera - Created NiCamera");
+		logInfo("ScopeCamera - Created NiCamera");
 	} else {
 		newCam = nullptr;
-		logInfoConditional("ScopeCamera - NiCamera Creation FAILED");
+		logInfo("ScopeCamera - NiCamera Creation FAILED");
 	}
 	currentCam = camera;
 	if (camera != newCam) {
@@ -146,10 +146,10 @@ void ScopeCamera::CreateDefault3D() {
 	node = new NiNode(1);
 	if (node) {
 		newNode = node;
-		logInfoConditional("ScopeCamera - Created NiNode");
+		logInfo("ScopeCamera - Created NiNode");
 	} else {
 		newNode = nullptr;
-		logInfoConditional("ScopeCamera - NiNode Creation FAILED");
+		logInfo("ScopeCamera - NiNode Creation FAILED");
 	}
 	currentNode = cameraRoot.get();
 	if (currentNode != newNode) {
@@ -170,10 +170,10 @@ void ScopeCamera::CreateDefault3D() {
 	geo = new BSTriShape();
 	if (geo) {
 		newGeo = geo;
-		logInfoConditional("ScopeCamera - Created BSTriShape");
+		logInfo("ScopeCamera - Created BSTriShape");
 	} else {
 		newGeo = nullptr;
-		logInfoConditional("ScopeCamera - BSTriShape Creation FAILED");
+		logInfo("ScopeCamera - BSTriShape Creation FAILED");
 	}
 	currentGeo = renderPlane;
 	if (currentGeo != newGeo) {
@@ -229,7 +229,7 @@ void ScopeCamera::Update3D() {
 
 	const BSFixedString geomName = "TextureLoader:0";
 
-	logInfoConditional("Looking for new camera and geometry...");
+	logInfo("Looking for new camera and geometry...");
 
 	geom = (BSGeometry*)GetByNameFromPlayer3D(geomName);
 	if (geom) {
@@ -242,7 +242,7 @@ void ScopeCamera::Update3D() {
 		oldGeom = renderPlane;
 		if (newGeom) {
 			//Do we need to increment the refCount?
-			logInfoConditional("Found the geometry of the scope.");
+			logInfo("Found the geometry of the scope.");
 		}
 		currentGeom = newGeom;
 		renderPlane = newGeom;
@@ -270,7 +270,7 @@ void ScopeCamera::Update3D() {
 		oldCam = camera;
 		if (newCam) {
 			//Do we need to increment the refCount?
-			logInfoConditional("Found the scope camera.");
+			logInfo("Found the scope camera.");
 		}
 		currentCam = newCam;
 		camera = newCam;
@@ -284,14 +284,14 @@ void ScopeCamera::Update3D() {
 	BSShaderUtil::SetSceneGraphCameraFOV(Main::GetWorldSceneGraph(), (90.0 / 4.0), 0, camera, 1);  //TEMP. Right now I just have it as 4x zoom
 
 	if (!geom) {
-		logInfoConditional("Could not find the geometry of the scope.");
-		processCurrentScope = false;
+		logInfo("Could not find the geometry of the scope.");
+		weaponHasThermalScope = false;
 	}
 }
 
 ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) :
 	TESCameraState(cam, ID) {  //TODO: Add new members and add each new state
-	logInfoConditional("ScopeCamera::DefaultState ctor Starting...");
+	logInfo("ScopeCamera::DefaultState ctor Starting...");
 	refCount = 0;
 	camera = &cam;
 	id = ID;
@@ -301,13 +301,13 @@ ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) :
 	zoom = 1.0F;
 	minFrustumHalfWidth = 0.0F;
 	minFrustumHalfHeight = 0.0F;
-	logInfoConditional("ScopeCamera::DefaultState ctor Completed.");
+	logInfo("ScopeCamera::DefaultState ctor Completed.");
 }
 
 ScopeCamera::DefaultState::~DefaultState() {
-	logInfoConditional("ScopeCamera::DefaultState dtor Starting...");
+	logInfo("ScopeCamera::DefaultState dtor Starting...");
 	RE::free(this);
-	logInfoConditional("ScopeCamera::DefaultState dtor Completed.");
+	logInfo("ScopeCamera::DefaultState dtor Completed.");
 }
 
 bool ScopeCamera::DefaultState::ShouldHandleEvent(const InputEvent* inputEvent) {  //TODO
@@ -458,36 +458,36 @@ void ScopeCamera::NightVisionState::GetTranslation(NiPoint3& a_translation) cons
 #pragma region ScopeRenderer
 
 ScopeRenderer::ScopeRenderer() {
-	logInfoConditional("ScopeRenderer ctor Starting...");
+	logInfo("ScopeRenderer ctor Starting...");
 
 	BSShaderAccumulator* shaderAccum;
 	BSShaderAccumulator* newShaderAccum;
 	BSShaderAccumulator* oldShaderAccum;
 	BSShaderAccumulator* pShaderAccum;
 
-	logInfoConditional("ScopeRenderer - Creating BSCullingProcess...");
+	logInfo("ScopeRenderer - Creating BSCullingProcess...");
 	pScopeCullingProc = (BSCullingProcess*)RE::malloc(0x1A0);
 	if (&pScopeCullingProc) {
 		new (pScopeCullingProc) BSCullingProcess(0);
 	} else {
 		pScopeCullingProc = nullptr;
-		logInfoConditional("ScopeRenderer - BSCullingProcess Creation FAILED");
+		logInfo("ScopeRenderer - BSCullingProcess Creation FAILED");
 	}
 
-	logInfoConditional("ScopeRenderer - Creating ScopeCamera...");
+	logInfo("ScopeRenderer - Creating ScopeCamera...");
 	rendererCamera = *new ScopeCamera();
 	if (&rendererCamera) {
 		new (&rendererCamera) ScopeCamera();
 	} else {
-		logInfoConditional("ScopeRenderer - ScopeCamera Creation FAILED");
+		logInfo("ScopeRenderer - ScopeCamera Creation FAILED");
 	}
 
-	logInfoConditional("ScopeRenderer - Creating ImageSpaceShaderParam...");
+	logInfo("ScopeRenderer - Creating ImageSpaceShaderParam...");
 	shaderParams = *(ImageSpaceShaderParam*)RE::malloc(0x90);
 	if (&shaderParams) {
 		new (&shaderParams) ImageSpaceShaderParam();
 	} else {
-		logInfoConditional("ScopeRenderer - ImageSpaceShaderParam Creation FAILED");
+		logInfo("ScopeRenderer - ImageSpaceShaderParam Creation FAILED");
 		shaderParams = BSImagespaceShader::GetDefaultParam();
 	}
 
@@ -495,10 +495,10 @@ ScopeRenderer::ScopeRenderer() {
 	if (shaderAccum) {
 		new (shaderAccum) BSShaderAccumulator();
 		newShaderAccum = shaderAccum;
-		logInfoConditional("ScopeRenderer - Created BSShaderAccumulator");
+		logInfo("ScopeRenderer - Created BSShaderAccumulator");
 	} else {
 		newShaderAccum = nullptr;
-		logInfoConditional("ScopeRenderer - BSShaderAccumulator Creation FAILED");
+		logInfo("ScopeRenderer - BSShaderAccumulator Creation FAILED");
 	}
 	oldShaderAccum = pScopeAccumulator;
 	if ((oldShaderAccum != newShaderAccum) || (pScopeAccumulator == nullptr)) {
@@ -520,7 +520,7 @@ ScopeRenderer::ScopeRenderer() {
 	(&shaderParams)->ResizeConstantGroup(0, 1);
 	renderTarget = 19;
 
-	logInfoConditional("ScopeRenderer ctor Completed.");
+	logInfo("ScopeRenderer ctor Completed.");
 }
 
 ScopeRenderer::~ScopeRenderer() {
@@ -714,16 +714,16 @@ void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, uint32_t t
 #pragma region nsScope
 
 void nsScope::CreateRenderer() {
-	logInfoConditional("ScopeRenderer Creation Starting...");
+	logInfo("ScopeRenderer Creation Starting...");
 
 	//create a spinlock
 	scopeRendererLock = *(new BSSpinLock());
-	logInfoConditional("ScopeRendererLock Allocated...");
+	logInfo("ScopeRendererLock Allocated...");
 	new (&scopeRendererLock) BSSpinLock();
 
 	//there is already an exsisting renderer
 	if (scopeRenderer != nullptr) {
-		logInfoConditional("nsScope::CreateRenderer() was called but there was already a renderer in place");
+		logInfo("nsScope::CreateRenderer() was called but there was already a renderer in place");
 		return;
 	}
 
@@ -734,12 +734,12 @@ void nsScope::CreateRenderer() {
 	}
 	scopeRendererLock.unlock();
 	readyForRender = true;
-	logInfoConditional("ScopeRenderer Creation Complete.");
+	logInfo("ScopeRenderer Creation Complete.");
 	logger::info(FMT_STRING("ScopeRenderer created at {:p}"), fmt::ptr(scopeRenderer));
 }
 
 void nsScope::DestroyRenderer() {
-	logInfoConditional("ScopeRenderer Destroy Starting...");
+	logInfo("ScopeRenderer Destroy Starting...");
 	scopeRendererLock.lock();
 
 	ScopeRenderer* pRenderer = scopeRenderer;
@@ -749,18 +749,18 @@ void nsScope::DestroyRenderer() {
 	}
 	scopeRenderer = nullptr;
 	readyForRender = false;
-	logInfoConditional("ScopeRenderer Destroy Complete.");
+	logInfo("ScopeRenderer Destroy Complete.");
 }
 
 ScopeRenderer* nsScope::InitRenderer() {
-	logInfoConditional("ScopeRenderer Init Starting...");
+	logInfo("ScopeRenderer Init Starting...");
 
 	ScopeRenderer* renderer;
 	ScopeRenderer* newRenderer;
 
 	//allocate our renderer
 	renderer = new ScopeRenderer();
-	logInfoConditional("ScopeRenderer Allocated...");
+	logInfo("ScopeRenderer Allocated...");
 	//if allocated succesful
 	if (renderer) {
 		newRenderer = renderer;
@@ -768,7 +768,7 @@ ScopeRenderer* nsScope::InitRenderer() {
 		newRenderer = nullptr;
 	}
 
-	logInfoConditional("ScopeRenderer Init Complete.");
+	logInfo("ScopeRenderer Init Complete.");
 	return newRenderer;
 }
 
