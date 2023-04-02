@@ -41,3 +41,7 @@ void HanldeWeaponEquip(WeaponInfo& initInfo);
 void HanldeWeaponEquipAfter3D(WeaponInfo& initInfo);
 void HandleWeaponOnLoadGame(WeaponInfo& initInfo);
 void QueueHandlingOfWeapon(WeaponInfo& initInfo);
+
+void HandleWeaponInstantDown();
+void HandleWeaponSightsEnter();
+void HandleWeaponSightsExit();

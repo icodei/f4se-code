@@ -39,12 +39,24 @@ namespace RE
 		virtual void SetAt(std::uint32_t a_idx, NiAVObject* a_child, NiPointer<NiAVObject>& a_avObject);  // 40
 		virtual void UpdateUpwardPass(NiUpdateData& a_data);                                              // 42
 
-		F4_HEAP_REDEFINE_ALIGNED_NEW(NiNode);
+		static NiObject* CreateObject()
+		{
+			using func_t = decltype(&NiNode::CreateObject);
+			REL::Relocation<func_t> func{ REL::ID(695914), 0x6 };
+			return func();
+		}
+
+		static NiNode* Create()
+		{
+			return (NiNode*)CreateObject();
+		}
 
 		// members
 		NiTObjectArray<NiPointer<NiAVObject>> children;  // 120
 		BSTAtomicValue<std::uint32_t> dirtyState;        // 138
 		float meshLODFadeAmount{ 0.0F };                 // 13C
+
+		F4_HEAP_REDEFINE_ALIGNED_NEW(NiNode);
 	};
 	static_assert(sizeof(NiNode) == 0x140);
 }

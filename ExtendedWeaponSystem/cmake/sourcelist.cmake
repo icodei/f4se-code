@@ -5,6 +5,8 @@ set(SOURCES
 	"src/Custom Renderer/CustomRenderer.h"
 	"src/Custom Renderer/ExtraCameraManager.cpp"
 	"src/Custom Renderer/ExtraCameraManager.h"
+	"src/Custom Renderer/ScopeGeometry.cpp"
+	"src/Custom Renderer/ScopeGeometry.h"
 	"src/Custom Renderer/ScopeRendererManager.cpp"
 	"src/Custom Renderer/ScopeRendererManager.h"
 	"src/Custom Renderer/ScopeShaders.cpp"

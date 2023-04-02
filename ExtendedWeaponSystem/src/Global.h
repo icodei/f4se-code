@@ -3,6 +3,7 @@
 #include "Custom Renderer/ExtraCameraManager.h"
 #include "Custom Renderer/ScopeRendererManager.h"
 #include "Custom Renderer/ScopeShaders.h"
+#include "Custom Renderer/ScopeGeometry.h"
 
 #include "AnimationFunctions.h"
 #include "Hooks.h"
@@ -26,18 +27,14 @@ extern bool isEmptyReload;
 extern bool readyForRender;
 extern bool reloadHasEnded;
 extern bool reloadHasStarted;
+extern bool weaponHasScopeNV;
+extern bool weaponHasScopePIP;
+extern bool weaponHasScopeThermal;
 extern bool weaponHasSequentialReload;
 extern bool weaponHasSpeedReload;
-extern bool weaponHasThermalScope;
 extern bool weaponIsClosedBolt;
 extern bool weaponIsOpenBolt;
 extern bool weaponIsQueued;
-
-//extern int weapAmmoCapacity;
-//extern int weapAmmoCurrentCount;
-//extern int weapAmmoIncrementor;
-//extern int weapAmmoToAdd;
-//extern int weapAmmoTotalCount;
 
 extern struct WeaponInfo weapInfo;
 
@@ -46,8 +43,6 @@ extern BGSKeyword* weaponHasSpeedReloadKeyword;
 extern BGSKeyword* weaponHasThermalScopeKeyword;
 extern BGSKeyword* weaponIsClosedBoltKeyword;
 extern BGSKeyword* weaponIsOpenBoltKeyword;
-
-//extern TESObjectWEAP::InstanceData* currentWeapInstance;
 
 #define GET_EVENT_SOURCE(EventName) (BSTEventSource<EventName>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), #EventName);
 

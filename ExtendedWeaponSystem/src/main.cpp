@@ -16,7 +16,7 @@ void initPlugin() {
 	reloadHasEnded = true;
 	reloadHasStarted = false;
 	weaponHasSequentialReload = false;
-	weaponHasThermalScope = false;
+	weaponHasScopeThermal = false;
 }
 
 void initLog() {

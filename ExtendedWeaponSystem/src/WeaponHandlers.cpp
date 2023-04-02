@@ -118,8 +118,8 @@ WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo) {
 	initInfo.weapInstance = &initInfo.weapEquip->weapon;
 	initInfo.weapInstanceData = (TESObjectWEAP::InstanceData*)a_item.item.instanceData.get();
 	initInfo.weapForm = a_item.item.object->As<TESObjectWEAP>();
-	initInfo.weapAmmo = initInfo.weapInstanceData->ammo; //weapInstanceData is nullptr needs fix
-	initInfo.weapAmmoCapacity = initInfo.weapInstanceData->ammoCapacity; //weapInstanceData is nullptr needs fix
+	initInfo.weapAmmo = PlayerCharacter::GetSingleton()->GetCurrentAmmo();
+	initInfo.weapAmmoCapacity = a_item.item.object->As<TESObjectWEAP>()->weaponData.ammoCapacity;
 	initInfo.weapAmmoCurrentCount = PlayerCharacter::GetSingleton()->GetCurrentAmmoCount();
 	initInfo.weapAmmoTotalCount = GetPlayerInventoryObjectCount(initInfo.weapAmmo);
 	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
@@ -168,11 +168,13 @@ void HanldeWeaponEquip(WeaponInfo& initInfo) {
 		weaponHasSequentialReload = false;
 	}
 	if (WeaponHasThermalScope()) {
-		weaponHasThermalScope = true;
+		weaponHasScopeThermal = true;
 		logInfo("Thermal scope found");
-		nsScope::CreateRenderer();
+		if (!readyForRender) {
+			nsScope::CreateRenderer();
+		}
 	} else {
-		weaponHasThermalScope = false;
+		weaponHasScopeThermal = false;
 		logInfo("No thermal scope found");
 	}
 	logInfo(";======================================================================================;");
@@ -180,9 +182,8 @@ void HanldeWeaponEquip(WeaponInfo& initInfo) {
 
 //Called from anim event of weapon equip. This should happen after the 3d is loaded hopefully
 void HanldeWeaponEquipAfter3D(WeaponInfo& initInfo) {
-	if (weaponHasThermalScope) {
-		//Create turned off here for testing
-		//nsScope::CreateRenderer();
+	if (weaponHasScopeThermal) {
+		nsScope::scopeRenderer->rendererCamera->Update3D();
 	}
 }
 
@@ -205,10 +206,13 @@ void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
 		logInfo(weaponName + " does not reload sequnetially");
 	}
 	if (WeaponHasThermalScope()) {
-		weaponHasThermalScope = true;
+		weaponHasScopeThermal = true;
 		logInfo(weaponName + " has a thermal scope");
+		if (!readyForRender) {
+			nsScope::CreateRenderer();
+		}
 	} else {
-		weaponHasThermalScope = false;
+		weaponHasScopeThermal = false;
 		logInfo(weaponName + " does not have a thermal scope");
 	}
 	logInfo(";======================================================================================;");
@@ -244,4 +248,23 @@ void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
 			});
 		}
 	}).detach();
+}
+
+void HandleWeaponInstantDown() {
+	if (readyForRender) {
+		nsScope::DestroyRenderer();
+	}
+	ignoreEquip = true;
+	ignoreScope = true;
+}
+
+void HandleWeaponSightsEnter() {
+	ignoreScope = false;
+	if (nsScope::scopeRenderer->rendererCamera->QCameraHasRenderPlane()) {
+		nsScope::Render();
+	}
+}
+
+void HandleWeaponSightsExit() {
+	ignoreScope = true;
 }

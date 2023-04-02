@@ -38,7 +38,6 @@ public:
 
 		//functions
 		void SetInitialPosition(NiPoint3& newPos);
-		void SetMinFrustum(float width, float height);
 		void SetTranslation(NiPoint3& newPos);
 		void SetZoom(float newZoom);
 
@@ -54,8 +53,6 @@ public:
 		NiQuaternion rotation;
 		NiPoint3 translation;
 		float zoom;
-		float minFrustumHalfWidth;
-		float minFrustumHalfHeight;
 
 		F4_HEAP_REDEFINE_NEW(ScopeCamera::DefaultState);
 	};
@@ -77,8 +74,6 @@ public:
 		virtual void Begin() override;
 		virtual void End() override;
 		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) override;
-		virtual void GetRotation(NiQuaternion& a_rotation) const override;
-		virtual void GetTranslation(NiPoint3& a_translation) const override;
 
 		//functions
 
@@ -106,8 +101,6 @@ public:
 		virtual void Begin() override;
 		virtual void End() override;
 		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) override;
-		virtual void GetRotation(NiQuaternion& a_rotation) const override;
-		virtual void GetTranslation(NiPoint3& a_translation) const override;
 
 		//functions
 
@@ -119,33 +112,39 @@ public:
 	};
 
 	ScopeCamera();
+	ScopeCamera(bool createDefault);
 
 	virtual ~ScopeCamera();
 
 	virtual void SetCameraRoot(NiNode* node) override;
 	virtual void SetEnabled(bool bEnabled) override;
-	virtual void Update() override;
 
 	//functions
 	void CreateDefault3D();
+	bool IsInDefaultMode();
+	bool IsInThermalMode();
+	bool IsInNightVisionMode();
 	void Reset();
-	void SetExtents(NiPoint3& min, NiPoint3& max);
 	void SetState(TESCameraState* newCameraState);
+	void StartDefaultState();
+	void StartThermalState();
+	void StartNightVisionState();
 	void Update3D();
+	void UpdateCamera();
+	void UpdateCameraState();
 
 	//member access
+	bool QCameraHasRenderPlane();
 	bool QCameraEquals(uint32_t cameraIndex);
 	TESCameraState* QCameraState(uint32_t index);
 	NiCamera* QRenderCamera();
-	NiPoint3& QMaxExtent();
-	NiPoint3& QMinExtent();
 
 	//members
 	BSTSmartPointer<TESCameraState> cameraStates[ScopeCameraStates::kTotal];
 	NiCamera* camera;
 	BSGeometry* renderPlane;
-	NiPoint3 maxExtent;
-	NiPoint3 minExtent;
+	bool geometryDefault;
+	bool geometryFound;
 
 	F4_HEAP_REDEFINE_NEW(ScopeCamera);
 };
@@ -164,9 +163,9 @@ public:
 
 	//members
 	BSCullingProcess* pScopeCullingProc{ nullptr };
-	ScopeCamera rendererCamera;
+	ScopeCamera* rendererCamera{ nullptr };
 	BSShaderAccumulator* pScopeAccumulator{ nullptr };
-	ImageSpaceShaderParam shaderParams;
+	ImageSpaceShaderParam* shaderParams;
 	uint32_t renderTarget{ 19 };
 
 	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
@@ -201,6 +200,6 @@ namespace nsScope {
 	void Render();
 
 	//members
-	static ScopeRenderer* scopeRenderer;
-	static BSSpinLock scopeRendererLock;
+	extern ScopeRenderer* scopeRenderer;
+	extern BSSpinLock* scopeRendererLock;
 }

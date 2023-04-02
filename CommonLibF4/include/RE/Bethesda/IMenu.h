@@ -161,8 +161,9 @@ namespace RE
 	};
 
 	class __declspec(novtable) FlatScreenModel :
-		public BSTSingletonSDM<FlatScreenModel>,                  // 08
-		public BSTEventSink<UIAdvanceMenusFunctionCompleteEvent>  // 00
+		public BSTEventSink<UIAdvanceMenusFunctionCompleteEvent>,  // 00
+		public BSTSingletonSDM<FlatScreenModel>                    // 08
+		
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::FlatScreenModel };
@@ -178,7 +179,7 @@ namespace RE
 		BSFixedString customRendererName;  // 10
 		void* model;                       // 18 - TODO
 	};
-	//static_assert(sizeof(FlatScreenModel) == 0x20);
+	static_assert(sizeof(FlatScreenModel) == 0x20);
 
 	class IMenu :
 		public SWFToCodeFunctionHandler,  // 00

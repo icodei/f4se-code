@@ -110,6 +110,12 @@ namespace RE
 		virtual void SetEnabled(bool a_enabled) { enabled = a_enabled; }                 // 02
 		virtual void Update() { return; }                                                // 03
 
+		bool GetCameraRoot(NiPointer<NiNode>& a_node) {
+			using func_t = decltype(&TESCamera::GetCameraRoot);
+			REL::Relocation<func_t> func{ REL::ID(261092) };
+			return func(this, a_node);
+		}
+
 		// members
 		BSTPoint2<float> rotationInput;                // 08
 		BSTPoint3<float> translationInput;             // 10

@@ -27,7 +27,6 @@ namespace RE
 		virtual void UpdateWorldBound() override;                               // 33
 		virtual void UpdateWorldData(NiUpdateData* a_data) override;            // 34
 
-		//Returned object is constructed
 		static NiObject* CreateObject()
 		{
 			using func_t = decltype(&NiCamera::CreateObject);

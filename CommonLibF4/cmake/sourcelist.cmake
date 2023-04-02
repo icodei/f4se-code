@@ -469,6 +469,8 @@ set(SOURCES
 	include/RE/Havok/Common/Base/Types/Physics/hkHandle.h
 	include/RE/Havok/Common/Base/Types/Physics/hkRefPtr.h
 	include/RE/Havok/Common/Base/Types/Physics/hkStepInfo.h
+	include/RE/Havok/Physics/ConstraintSolver/VehicleFriction/hkpVehicleFriction.h
+	include/RE/Havok/Physics/ConstraintSolver/VehicleFriction/hkpVehicleFrictionSolver.h
 	include/RE/Havok/Physics/Physics/Dynamics/World/hknpWorld.h
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/Proxy/hknpCharacterProxy.h
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/RigidBody/hknpCharacterRigidbody.h
@@ -478,6 +480,28 @@ set(SOURCES
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterStateManager.h
 	include/RE/Havok/Physics/Physics/Extensions/CharacterControl/hknpCharacterSurfaceInfo.h
 	include/RE/Havok/Physics/Physics/Extensions/PhysicsSystem/hknpPhysicsSystem.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Aerodynamics/Default/hknpVehicleDefaultAerodynamics.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Aerodynamics/hknpVehicleAerodynamics.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Brake/Default/hknpVehicleDefaultBrake.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Brake/hknpVehicleBrake.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/DriverInput/Default/hknpVehicleDefaultAnalogDriverInput.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/DriverInput/hknpVehicleDriverInput.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Engine/Default/hknpVehicleDefaultEngine.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Engine/hknpVehicleEngine.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Steering/Default/hknpVehicleDefaultSteering.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Steering/hknpVehicleSteering.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Suspension/Default/hknpVehicleDefaultSuspension.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Suspension/hknpVehicleSuspension.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Transmission/Default/hknpVehicleDefaultTransmission.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/Transmission/hknpVehicleTransmission.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/TyreMarks/hknpTyreMarksInfo.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/VelocityDamper/Default/hknpVehicleDefaultVelocityDamper.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/VelocityDamper/hknpVehicleVelocityDamper.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/WheelCollide/LinerCast/hknpVehicleLinearCastWheelCollide.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/WheelCollide/RayCast/hknpVehicleRayCastWheelCollide.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/WheelCollide/hknpVehicleWheelCollide.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/hknpVehicleData.h
+	include/RE/Havok/Physics/Physics/Extensions/Vehicle/hknpVehicleInstance.h
 	include/RE/Havok/hknpAllHitsCollector.h
 	include/RE/Havok/hknpBodyId.h
 	include/RE/Havok/hknpClosestUniqueBodyIdHitCollector.h

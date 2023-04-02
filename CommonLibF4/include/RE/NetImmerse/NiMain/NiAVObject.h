@@ -59,6 +59,13 @@ namespace RE
 		[[nodiscard]] std::uint64_t GetFlags() const noexcept { return flags.flags; }
 		[[nodiscard]] bool ShadowCaster() const noexcept { return ~(flags.flags >> 40) & 1; }
 
+		void Update(NiUpdateData& a_data)
+		{
+			using func_t = decltype(&NiAVObject::Update);
+			REL::Relocation<func_t> func{ REL::ID(121052) };
+			return func(this, a_data);
+		}
+
 		// members
 		NiNode* parent{ nullptr };                     // 027
 		NiTransform local;                             // 030

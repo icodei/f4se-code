@@ -82,7 +82,7 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 			}
 		}
 		if (reloadHasStarted && !reloadHasEnded) {
-			if (a_event.name == ReloadEnd) {
+			if (a_event.name == ReloadEnd) { //Better way to do this? Bolt action stuff calls reloadend event during bolt charge and reload
 				logInfo("Event Recieved: ReloadEnd");
 				reloadStop();
 			}
@@ -118,17 +118,14 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 		HanldeWeaponEquipAfter3D(WeaponInfo::weapInfo);
 	}
 
-	if (weaponHasThermalScope) {
+	if (weaponHasScopeThermal) {
 		if (a_event.name == sightedStateEnter) {
-			ignoreScope = false;
+			HandleWeaponSightsEnter();
 		} else if (a_event.name == sightedStateExit) {
-			ignoreScope = true;
+			HandleWeaponSightsExit();
 		}
 		if (a_event.name == weaponInstantDown) {
-			ignoreEquip = true;
-			ignoreScope = true;
-			//Destroy turned off for testing
-			//nsScope::DestroyRenderer();
+			HandleWeaponInstantDown();
 		}
 	}
 	FnProcessEvent fn = fnHash.at(*(uintptr_t*)this);
