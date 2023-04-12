@@ -4,7 +4,7 @@
 #include "RE/Havok/Common/Base/Math/Vector/hkVector4f.h"
 #include "RE/Havok/Common/Base/Object/hkReferencedObject.h"
 #include "RE/Havok/Common/Base/Types/Geometry/Aabb/hkAabb.h"
-#include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
+#include "RE/Havok/Common/Base/Types/hkBaseTypes.h"
 #include "RE/Havok/hknpBodyId.h"
 
 namespace RE

@@ -10,10 +10,7 @@ PlayerCamera* pcam = nullptr;
 
 bool gameLoading = false;
 bool gameLoadingSave = false;
-bool ignoreEquip = false;
-bool ignoreScope = false;
 bool isEmptyReload = false;
-bool readyForRender = false;
 bool reloadHasEnded = true;
 bool reloadHasStarted = false;
 bool weaponHasScopeNV = false;
@@ -25,8 +22,10 @@ bool weaponIsClosedBolt = false;
 bool weaponIsOpenBolt = false;
 bool weaponIsQueued = false;
 
+BGSKeyword* weaponHasScopeNVKeyword = nullptr;
+BGSKeyword* weaponHasScopePIPKeyword = nullptr;
+BGSKeyword* weaponHasScopeThermalKeyword = nullptr;
 BGSKeyword* weaponHasSequentialReloadKeyword = nullptr;
 BGSKeyword* weaponHasSpeedReloadKeyword = nullptr;
-BGSKeyword* weaponHasThermalScopeKeyword = nullptr;
 BGSKeyword* weaponIsClosedBoltKeyword = nullptr;
 BGSKeyword* weaponIsOpenBoltKeyword = nullptr;

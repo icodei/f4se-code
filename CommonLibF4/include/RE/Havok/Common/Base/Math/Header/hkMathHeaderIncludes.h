@@ -1,0 +1,12 @@
+#pragma once
+#include "RE/Havok/Common/Base/Math/Vector/hkVector4Comparison.h"
+#include "RE/Havok/Common/Base/Math/Vector/hkVector4.h"
+#include "RE/Havok/Common/Base/Math/Vector/hkSimdReal.h"
+#include "RE/Havok/Common/Base/Math/Quaternion/hkQuaternion.h"
+#include "RE/Havok/Common/Base/Math/Matrix/hkMatrix3.h"
+#include "RE/Havok/Common/Base/Math/Matrix/hkRotation.h"
+#include "RE/Havok/Common/Base/Math/Matrix/hkTransform.h"
+#include "RE/Havok/Common/Base/Math/QsTransform/hkQsTransform.h"
+//#include "RE/Havok/Common/Base/Math/QTransform/hkQTransform.h"
+#include "RE/Havok/Common/Base/Math/Matrix/hkMatrix4.h"
+#include "RE/Havok/Common/Base/Math/SymmetricMatrix/hkSymmetricMatrix3.h"

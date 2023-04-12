@@ -199,8 +199,8 @@ bool GetForms() {
 	if (!weaponHasSpeedReloadKeyword) {
 		logError("Unable to get weaponHasSpeedReloadKeyword, you are lacking some file/files");
 	}
-	weaponHasThermalScopeKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|6436")->As<BGSKeyword>();
-	if (!weaponHasThermalScopeKeyword) {
+	weaponHasScopeThermalKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|6436")->As<BGSKeyword>();
+	if (!weaponHasScopeThermalKeyword) {
 		logError("Unable to get weaponHasThermalScopeKeyword, you are lacking some file/files");
 	}
 	weaponIsClosedBoltKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED8")->As<BGSKeyword>();
@@ -215,7 +215,7 @@ bool GetForms() {
 	//if (!ThermalFXS) {
 	//	logError("Unable to get ThermalFXS, you are lacking some file/files");
 	//}
-	if (!weaponHasSequentialReloadKeyword || !weaponHasThermalScopeKeyword || !weaponIsClosedBoltKeyword || !weaponIsOpenBoltKeyword || !weaponHasSpeedReloadKeyword) {
+	if (!weaponHasSequentialReloadKeyword || !weaponHasScopeThermalKeyword || !weaponIsClosedBoltKeyword || !weaponIsOpenBoltKeyword || !weaponHasSpeedReloadKeyword) {
 		toReturn = false;
 	}
 	return toReturn;

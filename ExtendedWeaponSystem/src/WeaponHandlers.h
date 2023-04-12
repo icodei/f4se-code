@@ -40,8 +40,19 @@ WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo);
 void HanldeWeaponEquip(WeaponInfo& initInfo);
 void HanldeWeaponEquipAfter3D(WeaponInfo& initInfo);
 void HandleWeaponOnLoadGame(WeaponInfo& initInfo);
-void QueueHandlingOfWeapon(WeaponInfo& initInfo);
 
+void HandleWeaponChange();
 void HandleWeaponInstantDown();
 void HandleWeaponSightsEnter();
 void HandleWeaponSightsExit();
+
+void QueryReload();
+void QueryScope();
+void QueueHandlingOfWeapon(WeaponInfo& initInfo);
+
+bool WeaponHasSequentialReload();
+bool WeaponHasNightVisionScope();
+bool WeaponHasPIPScope();
+bool WeaponHasThermalScope();
+bool WeaponHasSpecialScope();
+bool WeaponHasNoSpecialScopes();

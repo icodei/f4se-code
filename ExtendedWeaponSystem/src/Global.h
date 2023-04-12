@@ -21,10 +21,7 @@ extern PlayerCamera* pcam;
 
 extern bool gameLoading;
 extern bool gameLoadingSave;
-extern bool ignoreEquip;
-extern bool ignoreScope;
 extern bool isEmptyReload;
-extern bool readyForRender;
 extern bool reloadHasEnded;
 extern bool reloadHasStarted;
 extern bool weaponHasScopeNV;
@@ -36,11 +33,11 @@ extern bool weaponIsClosedBolt;
 extern bool weaponIsOpenBolt;
 extern bool weaponIsQueued;
 
-extern struct WeaponInfo weapInfo;
-
+extern BGSKeyword* weaponHasScopeNVKeyword;
+extern BGSKeyword* weaponHasScopePIPKeyword;
+extern BGSKeyword* weaponHasScopeThermalKeyword;
 extern BGSKeyword* weaponHasSequentialReloadKeyword;
 extern BGSKeyword* weaponHasSpeedReloadKeyword;
-extern BGSKeyword* weaponHasThermalScopeKeyword;
 extern BGSKeyword* weaponIsClosedBoltKeyword;
 extern BGSKeyword* weaponIsOpenBoltKeyword;
 

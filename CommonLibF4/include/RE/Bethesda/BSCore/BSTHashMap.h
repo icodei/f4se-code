@@ -1,11 +1,9 @@
 #pragma once
 
-#ifndef F4SE_TEST_SUITE
-#	include "RE/Bethesda/BSCore/BSTScatterTable.h"
-#	include "RE/Bethesda/BSCore/BSTTuple.h"
-#	include "RE/Bethesda/BSCore/MemoryManager.h"
-#	include "RE/Bethesda/CRC.h"
-#endif
+#include "RE/Bethesda/BSCore/BSTScatterTable.h"
+#include "RE/Bethesda/BSCore/BSTTuple.h"
+#include "RE/Bethesda/BSCore/MemoryManager.h"
+#include "RE/Bethesda/CRC.h"
 
 namespace RE
 {

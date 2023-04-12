@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
+#include "RE/Havok/Common/Base/Types/hkBaseTypes.h"
 
 namespace RE
 {

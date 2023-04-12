@@ -3,7 +3,7 @@
 #include "RE/Bethesda/BSHavok/bhkCharRigidBodyManager.h"
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSCore/BSTArray.h"
-#include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
+#include "RE/Havok/Common/Base/Types/hkRefPtr.h"
 #include "RE/NetImmerse/NiMain/NiObject.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 

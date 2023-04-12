@@ -1,7 +1,7 @@
 #pragma once
 #include "RE/Bethesda/BSHavok/bhkCollisionFilter.h"
-#include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
-#include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
+#include "RE/Havok/Common/Base/Types/hkBaseTypes.h"
+#include "RE/Havok/Common/Base/Types/hkRefPtr.h"
 #include "RE/Havok/Common/Base/Math/Vector/hkVector4.h"
 #include "RE/Havok/hknpBodyId.h"
 #include "RE/NetImmerse/NiMain/NiCollisionObject.h"

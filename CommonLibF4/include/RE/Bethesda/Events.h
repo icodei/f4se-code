@@ -385,7 +385,7 @@ namespace RE
 			return *singleton;
 		}
 	};
-	static_assert(sizeof(PlayerSetWeaponStateEvent) == 0x08);
+	static_assert(sizeof(PlayerSetWeaponStateEvent) == 0x8);
 
 	enum class QuickContainerMode : std::int32_t
 	{
@@ -503,13 +503,26 @@ namespace RE
 		std::uint32_t FormID;                       // 08	base FormID
 		std::uint32_t unkC;                         // 0C	Refr FormID?
 		std::uint16_t unk10;                        // 10	ID?
-		bool unk12;                                 // 12
-		bool isEquipping;                           // 15
-		std::uint8_t padding1[111];                 // 16
-													// 16-87 UNK
+		bool isEquipping;                           // 12
+		std::uint8_t unk13;                         // 13	InventoryStackIndex
+		std::uint32_t unk14;                        // 14
+		std::uint64_t unk18;                        // 18
+		std::uint64_t unk20;                        // 20
+		std::uint64_t unk28;                        // 28
+		std::uint64_t unk30;                        // 30
+		std::uint64_t unk38;                        // 38
+		std::uint64_t unk40;                        // 40
+		std::uint64_t unk48;                        // 48
+		std::uint64_t unk50;                        // 50
+		std::uint64_t unk58;                        // 58
+		std::uint64_t unk60;                        // 60
+		std::uint64_t unk68;                        // 68
+		std::uint64_t unk70;                        // 70
+		std::uint64_t unk78;                        // 78
+		std::uint64_t unk80;                        // 80
 		BGSInventoryItem::Stack* invItem;           // 88
-		std::uint8_t padding2[15];                  // 90
-													// 90-9F UNK
+		std::uint64_t unk90;                        // 90
+		std::uint64_t unk98;                        // 98
 		TESObject* item;                            // A0
 		TESObjectWEAP::InstanceData* instanceData;  // A8
 	};

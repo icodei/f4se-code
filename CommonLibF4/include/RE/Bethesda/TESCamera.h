@@ -10,7 +10,7 @@
 #include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
-#include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
+#include "RE/Havok/Common/Base/Types/hkRefPtr.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
 #include "RE/NetImmerse/NiMain/NiQuaternion.h"
@@ -53,7 +53,7 @@ namespace RE
 	};
 	using CameraState = CameraStates::CameraState;
 
-	class TESCameraState :
+	class __declspec(novtable) TESCameraState :
 		public BSInputEventUser,      // 00
 		public BSIntrusiveRefCounted  // 10
 
@@ -106,11 +106,33 @@ namespace RE
 		virtual ~TESCamera() {}  // 00
 
 		// add
-		virtual void SetCameraRoot(NiNode* a_cameraRoot) { cameraRoot = a_cameraRoot; }  // 01
-		virtual void SetEnabled(bool a_enabled) { enabled = a_enabled; }                 // 02
-		virtual void Update() { return; }                                                // 03
+		virtual void SetCameraRoot([[maybe_unused]] NiNode* a_cameraRoot) { return; }  // 01
+		virtual void SetEnabled(bool a_enabled) { enabled = a_enabled; }               // 02
+		virtual void Update() { return; }                                              // 03
 
-		bool GetCameraRoot(NiPointer<NiNode>& a_node) {
+		void AddRotationInput(float y, float x)
+		{
+			using func_t = decltype(&TESCamera::AddRotationInput);
+			REL::Relocation<func_t> func{ REL::ID(1324925), 0x10 };
+			return func(this, y, x);
+		}
+
+		void AddTranslationInput(float x, float y, float z)
+		{
+			using func_t = decltype(&TESCamera::AddTranslationInput);
+			REL::Relocation<func_t> func{ REL::ID(1324925), 0x30 };
+			return func(this, x, y, z);
+		}
+
+		void AddZoomInput(float newZoom)
+		{
+			using func_t = decltype(&TESCamera::AddZoomInput);
+			REL::Relocation<func_t> func{ REL::ID(1324925), 0x60 };
+			return func(this, newZoom);
+		}
+
+		bool GetCameraRoot(NiPointer<NiNode>& a_node)
+		{
 			using func_t = decltype(&TESCamera::GetCameraRoot);
 			REL::Relocation<func_t> func{ REL::ID(261092) };
 			return func(this, a_node);
@@ -127,13 +149,45 @@ namespace RE
 		F4_HEAP_REDEFINE_NEW(TESCamera);
 
 	private:
-		TESCamera* ctor() {
+		TESCamera* ctor()
+		{
 			using func_t = decltype(&TESCamera::ctor);
 			REL::Relocation<func_t> func{ REL::ID(807071) };
 			return func(this);
 		}
 	};
 	static_assert(sizeof(TESCamera) == 0x38);
+
+	class __declspec(novtable) FirstPersonState :
+		public TESCameraState  // 000
+	{
+	public:
+		static constexpr auto RTTI{ RTTI::FirstPersonState };
+		static constexpr auto VTABLE{ VTABLE::FirstPersonState };
+		static constexpr auto STATE{ CameraStates::kFirstPerson };
+
+		//members
+		NiPoint3 lastPosition;
+		NiPoint3 lastFrameSpringVelocity;
+		NiPoint3 dampeningOffset;
+		float field_4C;
+		NiAVObject* cameraObj;
+		NiNode* cameraControlNode;
+		float sittingRotation;
+		float sittingPitch;
+		float field_68;
+		float field_6C;
+		float field_70;
+		float field_74;
+		float field_78;
+		float field_7C;
+		bool cameraOverride;
+		bool cameraPitchOverride;
+		bool field_82;
+		bool field_83;
+		bool field_84;
+	};
+	static_assert(sizeof(FirstPersonState) == 0x88);
 
 	class __declspec(novtable) ThirdPersonState :
 		public TESCameraState  // 000

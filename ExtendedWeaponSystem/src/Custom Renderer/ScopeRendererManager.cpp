@@ -140,7 +140,7 @@ void ScopeRendererManager::Setup() {
 	pScopeManagerAccumulator->QSilhouetteColor.a = 1.0F;
 	pScopeManagerCullingProc->SetAccumulator(pScopeManagerAccumulator);
 	pScopeManagerCullingProc->CullingType = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
-	pScopeManagerCullingProc->m_bCameraRelatedUpdates = 0;
+	pScopeManagerCullingProc->bCameraRelatedUpdates = 0;
 	pScopeManagerShaderParam->ResizeConstantGroup(0, 1);
 	readyForRender = 1;
 	logInfo("ScopeRendererManager Setup Completed.");
@@ -207,10 +207,10 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	pGraphicsState->SetCameraData(pCamera, 0, 0.0F, 1.0F);
 	scopeCulling->SetAccumulator(pScopeManagerAccumulator);
 	scopeCulling->CullingType = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
-	scopeCulling->m_bCameraRelatedUpdates = 0;
-	scopeCulling->m_pkCamera = pCamera;
+	scopeCulling->bCameraRelatedUpdates = 0;
+	scopeCulling->pkCamera = pCamera;
 
-	//rendererCamera->Update();
+	//pRendererCamera->Update();
 
 	pRenderData->SetClearColor(1.0F, 1.0F, 1.0F, 1.0F);
 

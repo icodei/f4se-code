@@ -94,18 +94,18 @@ namespace RE
 			void QCurrentCubeMapRenderTarget();          //TODO
 			void QCurrentPlatformCubeMapRenderTarget();  //TODO
 
-			void SetCurrentRenderTarget(std::int32_t target, std::int32_t renderTargetID, SetRenderTargetMode targetMode)
+			void SetCurrentRenderTarget(std::int32_t shadowRenderTarget, std::int32_t renderTarget, SetRenderTargetMode targetMode)
 			{
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetCurrentRenderTarget);
 				REL::Relocation<func_t> func{ REL::ID(1502425) };
-				return func(this, target, renderTargetID, targetMode);
+				return func(this, shadowRenderTarget, renderTarget, targetMode);
 			}
 
-			void SetCurrentDepthStencilTarget(std::int32_t depthStencilTargetID, SetRenderTargetMode targetMode, std::int32_t a2, [[maybe_unused]] bool a3)
+			void SetCurrentDepthStencilTarget(std::int32_t depthStencilTarget, SetRenderTargetMode targetMode, std::int32_t depthStencilSliceIndex, [[maybe_unused]] bool a3)
 			{
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetCurrentDepthStencilTarget);
 				REL::Relocation<func_t> func{ REL::ID(704517) };
-				return func(this, depthStencilTargetID, targetMode, a2, a3);
+				return func(this, depthStencilTarget, targetMode, depthStencilSliceIndex, a3);
 			}
 
 			void SetCurrentCubeMapRenderTarget();       //TODO

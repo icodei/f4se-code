@@ -539,7 +539,7 @@ namespace F4SE
 		}
 
 		template <class T>
-		void emplace_vtable(T* a_ptr)
+		constexpr void emplace_vtable(T* a_ptr)
 		{
 			reinterpret_cast<std::uintptr_t*>(a_ptr)[0] = T::VTABLE[0].address();
 		}

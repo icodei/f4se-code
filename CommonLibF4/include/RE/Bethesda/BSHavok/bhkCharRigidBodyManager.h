@@ -5,7 +5,7 @@
 #include "RE/Havok/Common/Base/Container/Array/hkArray.h"
 #include "RE/Havok/Common/Base/Math/Vector/hkVector4f.h"
 #include "RE/Havok/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
-#include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
+#include "RE/Havok/Common/Base/Types/hkBaseTypes.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE

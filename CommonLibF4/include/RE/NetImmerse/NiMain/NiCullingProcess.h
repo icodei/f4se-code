@@ -77,11 +77,11 @@ namespace RE
 		//members
 		const bool m_bUseVirtualAppend{ 0 };
 		NiVisibleArray* m_pkVisibleSet{ nullptr };
-		NiCamera* m_pkCamera{ nullptr };
+		NiCamera* pkCamera{ nullptr };
 		NiFrustum m_kFrustum;
 		NiFrustumPlanes m_kPlanes;
 		NiFrustumPlanes kCustomCullPlanes;
-		bool m_bCameraRelatedUpdates;
+		bool bCameraRelatedUpdates;
 		bool bUpdateAccumulateFlag;
 		bool bIgnorePreprocess;
 		bool bCustomCullPlanes;

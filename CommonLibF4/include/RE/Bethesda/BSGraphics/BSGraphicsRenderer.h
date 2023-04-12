@@ -72,6 +72,18 @@ namespace RE
 				return func(this, vertexBuffer);
 			}
 
+			void Lock() {
+				using func_t = decltype(&BSGraphics::Renderer::Lock);
+				REL::Relocation<func_t> func{ REL::ID(1087134) };
+				return func(this);
+			}
+
+			void Unlock() {
+				using func_t = decltype(&BSGraphics::Renderer::Unlock);
+				REL::Relocation<func_t> func{ REL::ID(382332) };
+				return func(this);
+			}
+
 			void ClearColor()
 			{
 				using func_t = decltype(&BSGraphics::Renderer::ClearColor);

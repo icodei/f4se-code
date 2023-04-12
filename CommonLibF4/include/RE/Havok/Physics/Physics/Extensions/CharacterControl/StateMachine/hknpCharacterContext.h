@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RE/Havok/Common/Base/Types/Physics/hkBaseTypes.h"
+#include "RE/Havok/Common/Base/Types/hkBaseTypes.h"
 #include "RE/Havok/Common/Base/Object/hkReferencedObject.h"
 #include "RE/Havok/Common/Base/Math/Vector/hkVector4.h"
 #include "RE/Havok/Physics/Physics/Extensions/CharacterControl/StateMachine/hknpCharacterState.h"

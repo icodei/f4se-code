@@ -13,7 +13,7 @@
 #include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/BSTOptional.h"
 #include "RE/Bethesda/IMovementInterface.h"
-#include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
+#include "RE/Havok/Common/Base/Types/hkRefPtr.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 #include "RE/NetImmerse/NiMain/NiTMap.h"

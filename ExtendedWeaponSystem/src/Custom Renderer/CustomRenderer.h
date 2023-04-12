@@ -18,7 +18,7 @@ class ScopeCamera : public TESCamera {
 public:
 	class DefaultState : public TESCameraState {
 	public:
-		static constexpr auto STATE{ ScopeCameraStates::kDefault };
+		static constexpr auto STATE{ ScopeCameraState::kDefault };
 
 		DefaultState() = delete;
 		DefaultState(TESCamera& cam, uint32_t ID);
@@ -35,9 +35,14 @@ public:
 		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) override;
 		virtual void GetRotation(NiQuaternion& a_rotation) const override;
 		virtual void GetTranslation(NiPoint3& a_translation) const override;
+		virtual void SaveGame([[maybe_unused]] BGSSaveFormBuffer* a_saveGameBuffer) override;
+		virtual void LoadGame([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
+		virtual void Revert([[maybe_unused]] BGSLoadFormBuffer* a_loadGameBuffer) override;
 
 		//functions
+		void SetInitialRotation(NiQuaternion& newRotation);
 		void SetInitialPosition(NiPoint3& newPos);
+		void SetRotation(NiQuaternion& newRotation);
 		void SetTranslation(NiPoint3& newPos);
 		void SetZoom(float newZoom);
 
@@ -59,7 +64,7 @@ public:
 
 	class ThermalState : public DefaultState {
 	public:
-		static constexpr auto STATE{ ScopeCameraStates::kThermal };
+		static constexpr auto STATE{ ScopeCameraState::kThermal };
 
 		ThermalState() = delete;
 		ThermalState(TESCamera& cam, uint32_t ID);
@@ -86,7 +91,7 @@ public:
 
 	class NightVisionState : public DefaultState {
 	public:
-		static constexpr auto STATE{ ScopeCameraStates::kNightVision };
+		static constexpr auto STATE{ ScopeCameraState::kNightVision };
 
 		NightVisionState() = delete;
 		NightVisionState(TESCamera& cam, uint32_t ID);
@@ -126,12 +131,13 @@ public:
 	bool IsInNightVisionMode();
 	void Reset();
 	void SetState(TESCameraState* newCameraState);
+	void StartCorrectState();
 	void StartDefaultState();
 	void StartThermalState();
 	void StartNightVisionState();
 	void Update3D();
 	void UpdateCamera();
-	void UpdateCameraState();
+	
 
 	//member access
 	bool QCameraHasRenderPlane();
@@ -140,7 +146,7 @@ public:
 	NiCamera* QRenderCamera();
 
 	//members
-	BSTSmartPointer<TESCameraState> cameraStates[ScopeCameraStates::kTotal];
+	BSTSmartPointer<TESCameraState> cameraStates[ScopeCameraState::kTotal];
 	NiCamera* camera;
 	BSGeometry* renderPlane;
 	bool geometryDefault;
@@ -155,23 +161,21 @@ public:
 	ScopeRenderer();
 	~ScopeRenderer();
 
-	//operators
-	ScopeRenderer& operator=(const ScopeRenderer& rhs);
-
 	//functions
 	NiTexture* Render(bool saveTexture);
+	void UpdateCamera(bool updateState, bool update3D, bool updateGeneral);
 
 	//members
 	BSCullingProcess* pScopeCullingProc{ nullptr };
-	ScopeCamera* rendererCamera{ nullptr };
+	ScopeCamera* pRendererCamera{ nullptr };
 	BSShaderAccumulator* pScopeAccumulator{ nullptr };
-	ImageSpaceShaderParam* shaderParams;
+	ImageSpaceShaderParam* pShaderParams;
 	uint32_t renderTarget{ 19 };
 
 	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
 };
 
-void RenderScopeScene(NiCamera* cam, BSShaderAccumulator* shadeAccum, uint32_t target, uint32_t depthTarget);
+void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulator, uint32_t a_renderTarget, uint32_t a_depthTarget);
 
 class AccumulateSceneFunctor {
 public:
@@ -198,8 +202,14 @@ namespace nsScope {
 	void DestroyRenderer();
 	ScopeRenderer* InitRenderer();
 	void Render();
+	void RevaluateRendererState();
+	void UpdateCamera(bool updateState, bool update3D, bool updateGeneral);
 
 	//members
 	extern ScopeRenderer* scopeRenderer;
 	extern BSSpinLock* scopeRendererLock;
+	extern bool initialized;
+	extern bool currentlyActive;
+	extern bool queueCreation;
+	extern bool queueDestruction;
 }

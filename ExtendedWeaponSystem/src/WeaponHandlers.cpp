@@ -1,13 +1,6 @@
 #include "WeaponHandlers.h"
 
-bool WeaponHasSequentialReload() {
-	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasSequentialReloadKeyword);
-}
-
-bool WeaponHasThermalScope() {
-	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasThermalScopeKeyword);
-}
-
+#pragma region WeaponInfo
 WeaponInfo& WeaponInfo::operator=(const WeaponInfo& rhs) {
 	weapEquip = rhs.weapEquip;
 	weapEquipData = rhs.weapEquipData;
@@ -77,11 +70,11 @@ WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo) {
 	//If weaponInstanceData is nullptr or weaponEquip is nullptr
 	if (initInfo.IsCriticalFilled()) {
 		//If weaponInstanceData is nullptr
-		if ((weaponInstanceData == nullptr) && weaponEquip && weaponEquip->IsValid()) {
+		if (!weaponInstanceData && weaponEquip && weaponEquip->IsValid()) {
 			weaponInstanceData = (TESObjectWEAP::InstanceData*)weaponEquip->weapon.instanceData.get();
 		}
 		//If weaponEquip is nullptr
-		if (weaponEquip == nullptr) {
+		if (!weaponEquip) {
 			weaponEquip = &GetPlayerEquippedWeaponDefault();
 		}
 	}
@@ -144,6 +137,7 @@ WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo) {
 	WeaponInfo::weapInfo.weapAmmoTotalCount = weaponAmmoTotalCount;
 	return WeaponInfo::weapInfo;
 }
+#pragma endregion
 
 void HanldeWeaponEquip(WeaponInfo& initInfo) {
 	TESObjectWEAP::InstanceData* currentWeapon = const_cast<TESObjectWEAP::InstanceData*>(initInfo.weapInstanceData);
@@ -159,31 +153,17 @@ void HanldeWeaponEquip(WeaponInfo& initInfo) {
 	logInfo("CurrentAmmoCount: " + std::to_string(initInfo.weapAmmoCurrentCount));
 	logInfo("AmmoCapacity: " + std::to_string(initInfo.weapAmmoCapacity));
 	logInfo("TotalAmmoCount: " + std::to_string(initInfo.weapAmmoTotalCount));
-	if (WeaponHasSequentialReload()) {
-		weaponHasSequentialReload = true;
-		logInfo("Weapon has sequential reloads");
-		logInfo("Weapon instance equipped with ammo capacity of:" + std::to_string(WeaponInfo::weapCurrentInstanceData->ammoCapacity));
-	} else {
-		logInfo("Weapon does not have sequential reloads");
-		weaponHasSequentialReload = false;
-	}
-	if (WeaponHasThermalScope()) {
-		weaponHasScopeThermal = true;
-		logInfo("Thermal scope found");
-		if (!readyForRender) {
-			nsScope::CreateRenderer();
-		}
-	} else {
-		weaponHasScopeThermal = false;
-		logInfo("No thermal scope found");
-	}
+	QueryReload();
+	QueryScope();
 	logInfo(";======================================================================================;");
+	HandleWeaponChange();
 }
 
 //Called from anim event of weapon equip. This should happen after the 3d is loaded hopefully
 void HanldeWeaponEquipAfter3D(WeaponInfo& initInfo) {
-	if (weaponHasScopeThermal) {
-		nsScope::scopeRenderer->rendererCamera->Update3D();
+	if (nsScope::currentlyActive && !nsScope::queueDestruction) {
+		logInfo("HanldeWeaponEquipAfter3D() Decided to update the renderer camera for state and 3D");
+		nsScope::UpdateCamera(true, true, false);
 	}
 }
 
@@ -198,24 +178,108 @@ void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
 	logInfo("CurrentAmmoCount: " + std::to_string(initInfo.weapAmmoCurrentCount));
 	logInfo("AmmoCapacity: " + std::to_string(initInfo.weapAmmoCapacity));
 	logInfo("TotalAmmoCount: " + std::to_string(initInfo.weapAmmoTotalCount));
+	QueryReload();
+	QueryScope();
+	logInfo(";======================================================================================;");
+	HandleWeaponChange();
+}
+
+void HandleWeaponChange() {
+	//nsScope::RevaluateRendererState();
+	if (WeaponHasSpecialScope()) {
+		if (!nsScope::initialized) {
+			logInfo("Weapon needs custom renderer");
+			nsScope::CreateRenderer();
+			nsScope::queueCreation = false;
+		}
+		/*if (nsScope::queueCreation && !nsScope::queueDestruction) {
+			logInfo("Weapon needs custom renderer");
+			nsScope::CreateRenderer();
+			nsScope::queueCreation = false;
+		}
+		if (nsScope::queueDestruction) {
+			logError("HandleWeaponChange() Found a special scope but renderer destruction is still queued. This should not happen");
+			logError("Reseting queue destruction of renderer");
+			nsScope::queueDestruction = false;
+		}
+	} else {
+		if (nsScope::queueDestruction && !nsScope::queueCreation) {
+			logInfo("Custom renderer no longer needed");
+			nsScope::DestroyRenderer();
+			nsScope::queueDestruction = false;
+		}
+		if (nsScope::queueCreation) {
+			logError("HandleWeaponChange() Found no special scope but renderer creation is still queued. This should not happen");
+			logError("Reseting queue creation of renderer");
+			nsScope::queueCreation = false;
+		}*/
+	}
+}
+
+void HandleWeaponInstantDown() {
+
+}
+
+void HandleWeaponSightsEnter() {
+	if (!nsScope::initialized) {
+
+	}
+	if (nsScope::currentlyActive) {
+		if (!nsScope::scopeRenderer->pRendererCamera->QCameraHasRenderPlane()) {
+			logInfo("HandleWeaponSightsEnter() Decided to update the renderer camera");
+			nsScope::UpdateCamera(false, true, false);
+		}
+		if (nsScope::scopeRenderer->pRendererCamera->QCameraHasRenderPlane()) {
+			nsScope::Render();
+		}
+	}
+}
+
+void HandleWeaponSightsExit() {
+
+}
+
+void QueryReload() {
 	if (WeaponHasSequentialReload()) {
 		weaponHasSequentialReload = true;
-		logInfo(weaponName + " reloads sequentially");
+		logInfo("Weapon has sequential reloads");
 	} else {
 		weaponHasSequentialReload = false;
-		logInfo(weaponName + " does not reload sequnetially");
+		logInfo("Weapon does not have sequential reloads");
+	}
+}
+
+void QueryScope() {
+	int i = 0;
+	if (WeaponHasNightVisionScope()) {
+		weaponHasScopeNV = true;
+		i++;
+		logInfo("NightVision scope found");
+	} else {
+		weaponHasScopeNV = false;
+	}
+	if (WeaponHasPIPScope()) {
+		weaponHasScopePIP = true;
+		i++;
+		logInfo("PIP scope found");
+	} else {
+		weaponHasScopePIP = false;
 	}
 	if (WeaponHasThermalScope()) {
 		weaponHasScopeThermal = true;
-		logInfo(weaponName + " has a thermal scope");
-		if (!readyForRender) {
-			nsScope::CreateRenderer();
-		}
+		i++;
+		logInfo("Thermal scope found");
 	} else {
 		weaponHasScopeThermal = false;
-		logInfo(weaponName + " does not have a thermal scope");
 	}
-	logInfo(";======================================================================================;");
+
+	if (WeaponHasNoSpecialScopes()) {
+		logInfo("No special scopes were found");
+	}
+
+	if (i > 1) {
+		logError("QueryScope() Found more than one scope type. Unexpected results may happen");
+	}
 }
 
 void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
@@ -250,21 +314,34 @@ void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
 	}).detach();
 }
 
-void HandleWeaponInstantDown() {
-	if (readyForRender) {
-		nsScope::DestroyRenderer();
-	}
-	ignoreEquip = true;
-	ignoreScope = true;
+bool WeaponHasSequentialReload() {
+	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasSequentialReloadKeyword);
 }
 
-void HandleWeaponSightsEnter() {
-	ignoreScope = false;
-	if (nsScope::scopeRenderer->rendererCamera->QCameraHasRenderPlane()) {
-		nsScope::Render();
+bool WeaponHasNightVisionScope() {
+	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasScopeNVKeyword);
+}
+
+bool WeaponHasPIPScope() {
+	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasScopePIPKeyword);
+}
+
+bool WeaponHasThermalScope() {
+	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasScopeThermalKeyword);
+}
+
+bool WeaponHasSpecialScope() {
+	if (weaponHasScopeNV || weaponHasScopePIP || weaponHasScopeThermal) {
+		return true;
+	} else {
+		return false;
 	}
 }
 
-void HandleWeaponSightsExit() {
-	ignoreScope = true;
+bool WeaponHasNoSpecialScopes() {
+	if (!weaponHasScopeNV && !weaponHasScopePIP && !weaponHasScopeThermal) {
+		return true;
+	} else {
+		return false;
+	}
 }

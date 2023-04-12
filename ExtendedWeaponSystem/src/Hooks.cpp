@@ -1,7 +1,6 @@
 #include "Hooks.h"
 
 BSEventNotifyControl BGSOnPlayerUseWorkBenchEventSink::ProcessEvent(const BGSOnPlayerUseWorkBenchEvent& a_event, BSTEventSource<BGSOnPlayerUseWorkBenchEvent>* a_source) {
-	ignoreEquip = true;
 	return BSEventNotifyControl::kContinue;
 }
 
@@ -11,12 +10,9 @@ BSEventNotifyControl MenuOpenCloseEventSink::ProcessEvent(const MenuOpenCloseEve
 	if (a_event.menuName == LoadingMenu && a_event.opening) {
 		logInfo("Loading...");
 		gameLoading = true;
-		ignoreEquip = true;
-		ignoreScope = true;
 	}
 	if (a_event.menuName == LoadingMenu && !a_event.opening) {
 		logInfo("Loading Complete");
-		ignoreEquip = false;
 		if (gameLoadingSave) {
 			HandleWeaponOnLoadGame(FillWeaponInfo(WeaponInfo::weapInfo));
 			gameLoadingSave = false;
@@ -26,7 +22,7 @@ BSEventNotifyControl MenuOpenCloseEventSink::ProcessEvent(const MenuOpenCloseEve
 }
 
 BSEventNotifyControl PlayerAmmoCountEventSink::ProcessEvent(const PlayerAmmoCountEvent& a_event, BSTEventSource<PlayerAmmoCountEvent>* a_source) {
-	if (weaponHasSequentialReload == false) {
+	if (!weaponHasSequentialReload) {
 		return BSEventNotifyControl::kContinue;
 	}
 	if (!a_event.weapon) {
@@ -37,7 +33,8 @@ BSEventNotifyControl PlayerAmmoCountEventSink::ProcessEvent(const PlayerAmmoCoun
 	}
 	if (a_event.weaponInstance != WeaponInfo::weapCurrentInstanceData) {
 		WeaponInfo::weapCurrentInstanceData = a_event.weaponInstance;
-		WeaponInfo::weapInfo.weapAmmoCapacity = WeaponInfo::weapCurrentInstanceData->ammoCapacity;
+		WeaponInfo::weapInfo.weapAmmoCapacity = a_event.weapon->weaponData.ammoCapacity;
+		;
 	}
 
 	//logInfo("PlayerAmmoCountEvent Dump");
@@ -117,16 +114,14 @@ BSEventNotifyControl PlayerAnimGraphEventSink::HookedProcessEvent(const BSAnimat
 	if (a_event.name == weaponDraw) {
 		HanldeWeaponEquipAfter3D(WeaponInfo::weapInfo);
 	}
-
-	if (weaponHasScopeThermal) {
-		if (a_event.name == sightedStateEnter) {
-			HandleWeaponSightsEnter();
-		} else if (a_event.name == sightedStateExit) {
-			HandleWeaponSightsExit();
-		}
-		if (a_event.name == weaponInstantDown) {
-			HandleWeaponInstantDown();
-		}
+	if (a_event.name == sightedStateEnter) {
+		HandleWeaponSightsEnter();
+	}
+	if (a_event.name == sightedStateExit) {
+		HandleWeaponSightsExit();
+	}
+	if (a_event.name == weaponInstantDown) {
+		HandleWeaponInstantDown();
 	}
 	FnProcessEvent fn = fnHash.at(*(uintptr_t*)this);
 	return fn ? (this->*fn)(a_event, a_source) : BSEventNotifyControl::kContinue;
@@ -146,20 +141,27 @@ std::unordered_map<uintptr_t, PlayerAnimGraphEventSink::FnProcessEvent> PlayerAn
 
 #pragma region PlayerSetWeaponStateEventSink
 BSEventNotifyControl PlayerSetWeaponStateEventSink::ProcessEvent(const PlayerSetWeaponStateEvent& a_event, BSTEventSource<PlayerSetWeaponStateEvent>* a_source) {
-	bool isDrawing = false;
+	//logger::info(FMT_STRING("PlayerSetWeaponStateEvent at {:p}"), fmt::ptr(std::addressof(a_event)));
+	//logInfo("PlayerSetWeaponStateEvent Dump");
+	//Dump(const_cast<PlayerSetWeaponStateEvent*>(&a_event), 0x16);
+
 	WEAPON_STATE state = a_event.optionalValue.value();
-	if (state == WEAPON_STATE::kDrawing) {
-		logInfo("Weapon is being equiped.");
-		isDrawing = true;
+	switch (state) {
+	case WEAPON_STATE::kSheathed:
+
+	case WEAPON_STATE::kWantToDraw:
+
+	case WEAPON_STATE::kDrawing:
+
+	case WEAPON_STATE::kDrawn:
+
+	case WEAPON_STATE::kWantToSheathe:
+
+	case WEAPON_STATE::kSheathing:
+
+	default:
+		return BSEventNotifyControl::kContinue;
 	}
-	if (state == WEAPON_STATE::kDrawn && isDrawing) {
-		logInfo("Weapon has finished being equiped.");
-		isDrawing = false;
-	}
-	if (state == WEAPON_STATE::kSheathing || state == WEAPON_STATE::kSheathed) {
-		isDrawing = false;
-	}
-	return BSEventNotifyControl::kContinue;
 }
 #pragma endregion
 
@@ -180,14 +182,15 @@ BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_even
 	if (a_event.owner != PlayerCharacter::GetSingleton()) {
 		return BSEventNotifyControl::kContinue;
 	}
-
-	logInfo("TESEquipEvent Dump");
-	Dump(const_cast<TESEquipEvent*>(&a_event), 0xB0);
-
 	TESForm* form = TESForm::GetFormByID(a_event.FormID);
 	if (!form || form->formType != ENUM_FORM_ID::kWEAP) {
 		return BSEventNotifyControl::kContinue;
 	}
+
+	//logger::info(FMT_STRING("TESEquipEvent at {:p}"), fmt::ptr(std::addressof(a_event)));
+	//logInfo("TESEquipEvent Dump");
+	//Dump(const_cast<TESEquipEvent*>(&a_event), 0xB0);
+
 	if (WeaponInfo::weapCurrentInstanceData != a_event.instanceData) {
 		WeaponInfo::weapCurrentInstanceData = a_event.instanceData;
 	}
@@ -202,14 +205,13 @@ BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_even
 #pragma region TESFurnitureEventSink
 //TODO: check what furniture the player is getting into. Might be able to ignore power armor frame
 BSEventNotifyControl TESFurnitureEventSink::ProcessEvent(const TESFurnitureEvent& a_event, BSTEventSource<TESFurnitureEvent>* a_source) {
-	if (a_event.actor.get() == PlayerCharacter::GetSingleton()) {
-		if (a_event.type.get() == TESFurnitureEvent::FurnitureEventType::kExit) {
-			logInfo("Player is leaving the workbench. We may resume our work.");
-			ignoreEquip = false;
-		} else {
-			logInfo("Player is entering a workbench. We need to ignore certain events during this time.");
-			ignoreEquip = true;
-		}
+	if (a_event.actor.get() != PlayerCharacter::GetSingleton()) {
+		return BSEventNotifyControl::kContinue;
+	}
+	if (a_event.type.get() == TESFurnitureEvent::FurnitureEventType::kExit) {
+
+	} else {
+
 	}
 	return BSEventNotifyControl::kContinue;
 }

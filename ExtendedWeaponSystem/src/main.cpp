@@ -10,9 +10,6 @@ void initPlugin() {
 		logError("You are missing some forms");
 	}
 
-	ignoreEquip = false;
-	ignoreScope = false;
-	readyForRender = false;
 	reloadHasEnded = true;
 	reloadHasStarted = false;
 	weaponHasSequentialReload = false;
@@ -71,6 +68,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	case F4SE::MessagingInterface::kInputLoaded:
 
 	case F4SE::MessagingInterface::kNewGame:
+		logInfo("New Game");
 		initSpecialHooks();
 		gameLoadingSave = true;
 		break;

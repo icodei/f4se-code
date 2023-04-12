@@ -1,7 +1,8 @@
 #pragma once
-#include "RE/Havok/Common/Base/Types/Physics/hkRefPtr.h"
+#include "RE/Havok/Common/Base/Types/hkRefPtr.h"
 #include "RE/Havok/Common/Base/Object/hkReferencedObject.h"
 #include "RE/NetImmerse/NiMain/NiObject.h"
+#include "RE/Bethesda/BSHavok/bhkCharacterPointCollector.h"
 
 namespace RE
 {
@@ -14,6 +15,6 @@ namespace RE
 
 		//members
 		hkRefPtr<hkReferencedObject> spProxyNP;
-		//bhkCharacterPointCollector m_ignoredCollisionStartCollector;
+		bhkCharacterPointCollector m_ignoredCollisionStartCollector;
 	};
 }

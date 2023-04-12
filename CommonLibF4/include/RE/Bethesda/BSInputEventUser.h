@@ -1,15 +1,17 @@
 #pragma once
 
-#include "RE/Bethesda/InputEvent.h"
 #include "RE/Bethesda/BSCore/MemoryManager.h"
+#include "RE/Bethesda/InputEvent.h"
 
 namespace RE
 {
-	class alignas(0x08) BSInputEventUser
+	class alignas(0x08) __declspec(novtable) BSInputEventUser
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::BSInputEventUser };
 		static constexpr auto VTABLE{ VTABLE::BSInputEventUser };
+
+		explicit constexpr BSInputEventUser() noexcept { stl::emplace_vtable(this); }
 
 		virtual ~BSInputEventUser() = default;  // 00
 
