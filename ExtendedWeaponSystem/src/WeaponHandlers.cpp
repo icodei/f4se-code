@@ -12,47 +12,30 @@ WeaponInfo& WeaponInfo::operator=(const WeaponInfo& rhs) {
 }
 
 void WeaponInfo::ClearWeaponInfo() {
-	weapInfo.weapEquip = nullptr;
-	weapInfo.weapEquipData = nullptr;
-	weapInfo.weapAmmo = nullptr;
-	weapInfo.weapForm = nullptr;
-	weapInfo.weapInstance = nullptr;
-	weapInfo.weapInstanceData = nullptr;
+	Info::weapInfo.weapEquip = nullptr;
+	Info::weapInfo.weapEquipData = nullptr;
+	Info::weapInfo.weapAmmo = nullptr;
+	Info::weapInfo.weapForm = nullptr;
+	Info::weapInfo.weapInstance = nullptr;
+	Info::weapInfo.weapInstanceData = nullptr;
 
-	weapInfo.weapAmmoCapacity = 0;
-	weapInfo.weapAmmoCurrentCount = 0;
-	weapInfo.weapAmmoIncrementor = 0;
-	weapInfo.weapAmmoToAdd = 0;
-	weapInfo.weapAmmoTotalCount = 0;
+	Info::weapInfo.weapAmmoCapacity = 0;
+	Info::weapInfo.weapAmmoCurrentCount = 0;
+	Info::weapInfo.weapAmmoIncrementor = 0;
+	Info::weapInfo.weapAmmoToAdd = 0;
+	Info::weapInfo.weapAmmoTotalCount = 0;
 
-	weapCurrentInstanceData = nullptr;
+	Info::weapCurrentInstanceData = nullptr;
 }
 
-void WeaponInfo::InitSDM() {
-	logInfo("Weapon Info Static Data Init");
-	logger::info(FMT_STRING("WeapInfo: {:p}"), fmt::ptr(&weapInfo));
-	weapInfo.weapEquip = nullptr;
-	weapInfo.weapEquipData = nullptr;
-	weapInfo.weapAmmo = nullptr;
-	weapInfo.weapForm = nullptr;
-	weapInfo.weapInstance = nullptr;
-	weapInfo.weapInstanceData = nullptr;
-
-	weapInfo.weapAmmoCapacity = 0;
-	weapInfo.weapAmmoCurrentCount = 0;
-	weapInfo.weapAmmoIncrementor = 0;
-	weapInfo.weapAmmoToAdd = 0;
-	weapInfo.weapAmmoTotalCount = 0;
-
-	weapCurrentInstanceData = nullptr;
+namespace Info {
+	WeaponInfo weapInfo = WeaponInfo();
+	TESObjectWEAP::InstanceData* weapCurrentInstanceData = nullptr;
 }
-
-WeaponInfo WeaponInfo::weapInfo;
-TESObjectWEAP::InstanceData* WeaponInfo::weapCurrentInstanceData;
 
 WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo) {
 	logInfo("Filling Weapon Info...");
-	
+
 	/*
 	const EquippedWeapon* weaponEquip = initInfo.weapEquip;
 	const EquippedWeaponData* weaponEquipData = initInfo.weapEquipData;
@@ -104,18 +87,18 @@ WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo) {
 	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
 	*/
 
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->lock();
-	EquippedItem& a_item = PlayerCharacter::GetSingleton()->currentProcess->middleHigh->equippedItems[EquipIndex::kDefault];
+	pc->currentProcess->GetEquippedItemArrayLock()->lock();
+	EquippedItem& a_item = pc->currentProcess->middleHigh->equippedItems[EquipIndex::kDefault];
 	initInfo.weapEquip = const_cast<EquippedWeapon*>(reinterpret_cast<EquippedWeapon*>(&a_item));
 	initInfo.weapEquipData = (EquippedWeaponData*)a_item.data.get();
 	initInfo.weapInstance = &initInfo.weapEquip->weapon;
 	initInfo.weapInstanceData = (TESObjectWEAP::InstanceData*)a_item.item.instanceData.get();
 	initInfo.weapForm = a_item.item.object->As<TESObjectWEAP>();
-	initInfo.weapAmmo = PlayerCharacter::GetSingleton()->GetCurrentAmmo();
+	initInfo.weapAmmo = pc->GetCurrentAmmo();
 	initInfo.weapAmmoCapacity = a_item.item.object->As<TESObjectWEAP>()->weaponData.ammoCapacity;
-	initInfo.weapAmmoCurrentCount = PlayerCharacter::GetSingleton()->GetCurrentAmmoCount();
+	initInfo.weapAmmoCurrentCount = pc->GetCurrentAmmoCount();
 	initInfo.weapAmmoTotalCount = GetPlayerInventoryObjectCount(initInfo.weapAmmo);
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
+	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
 
 	const EquippedWeapon* weaponEquip = initInfo.weapEquip;
 	const EquippedWeaponData* weaponEquipData = initInfo.weapEquipData;
@@ -127,25 +110,25 @@ WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo) {
 	const int weaponAmmoCurrentCount = initInfo.weapAmmoCurrentCount;
 	const int weaponAmmoTotalCount = initInfo.weapAmmoTotalCount;
 
-	WeaponInfo::weapInfo.weapAmmo = weaponAmmo;
-	WeaponInfo::weapInfo.weapForm = weaponForm;
-	WeaponInfo::weapInfo.weapEquip = weaponEquip;
-	WeaponInfo::weapInfo.weapInstance = weaponInstance;
-	WeaponInfo::weapInfo.weapInstanceData = weaponInstanceData;
-	WeaponInfo::weapInfo.weapAmmoCapacity = weaponAmmoCapacity;
-	WeaponInfo::weapInfo.weapAmmoCurrentCount = weaponAmmoCurrentCount;
-	WeaponInfo::weapInfo.weapAmmoTotalCount = weaponAmmoTotalCount;
-	return WeaponInfo::weapInfo;
+	Info::weapInfo.weapAmmo = weaponAmmo;
+	Info::weapInfo.weapForm = weaponForm;
+	Info::weapInfo.weapEquip = weaponEquip;
+	Info::weapInfo.weapInstance = weaponInstance;
+	Info::weapInfo.weapInstanceData = weaponInstanceData;
+	Info::weapInfo.weapAmmoCapacity = weaponAmmoCapacity;
+	Info::weapInfo.weapAmmoCurrentCount = weaponAmmoCurrentCount;
+	Info::weapInfo.weapAmmoTotalCount = weaponAmmoTotalCount;
+	return Info::weapInfo;
 }
 #pragma endregion
 
 void HanldeWeaponEquip(WeaponInfo& initInfo) {
 	TESObjectWEAP::InstanceData* currentWeapon = const_cast<TESObjectWEAP::InstanceData*>(initInfo.weapInstanceData);
-	if (WeaponInfo::weapCurrentInstanceData != initInfo.weapInstanceData) {
-		WeaponInfo::weapCurrentInstanceData = currentWeapon;
-	}
 	string weaponName = initInfo.weapForm->GetFullName();
-	if (!WeaponInfo::weapCurrentInstanceData) {
+	if (Info::weapCurrentInstanceData != initInfo.weapInstanceData) {
+		Info::weapCurrentInstanceData = currentWeapon;
+	}
+	if (!Info::weapCurrentInstanceData) {
 		return;
 	}
 	logInfo(";================================ Player TESEquipEvent ================================;");
@@ -159,18 +142,23 @@ void HanldeWeaponEquip(WeaponInfo& initInfo) {
 	HandleWeaponChange();
 }
 
-//Called from anim event of weapon equip. This should happen after the 3d is loaded hopefully
 void HanldeWeaponEquipAfter3D(WeaponInfo& initInfo) {
-	if (nsScope::currentlyActive && !nsScope::queueDestruction) {
-		logInfo("HanldeWeaponEquipAfter3D() Decided to update the renderer camera for state and 3D");
-		nsScope::UpdateCamera(true, true, false);
+	if (!nsScope::initialized || !nsScope::scopeRenderer) {
+		goto skipRender;
+	}
+
+	nsScope::scopeRenderer->pRendererCamera->Update3D();
+
+skipRender:
+	{
+
 	}
 }
 
 void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
 	TESObjectWEAP::InstanceData* currentWeapon = const_cast<TESObjectWEAP::InstanceData*>(initInfo.weapInstanceData);
-	if (WeaponInfo::weapCurrentInstanceData != initInfo.weapInstanceData) {
-		WeaponInfo::weapCurrentInstanceData = currentWeapon;
+	if (Info::weapCurrentInstanceData != initInfo.weapInstanceData) {
+		Info::weapCurrentInstanceData = currentWeapon;
 	}
 	string weaponName = initInfo.weapForm->GetFullName();
 	logInfo(";====================== Game Loaded. Getting Initial Weapon Stats =====================;");
@@ -185,58 +173,34 @@ void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
 }
 
 void HandleWeaponChange() {
-	//nsScope::RevaluateRendererState();
-	if (WeaponHasSpecialScope()) {
-		if (!nsScope::initialized) {
-			logInfo("Weapon needs custom renderer");
-			nsScope::CreateRenderer();
-			nsScope::queueCreation = false;
-		}
-		/*if (nsScope::queueCreation && !nsScope::queueDestruction) {
-			logInfo("Weapon needs custom renderer");
-			nsScope::CreateRenderer();
-			nsScope::queueCreation = false;
-		}
-		if (nsScope::queueDestruction) {
-			logError("HandleWeaponChange() Found a special scope but renderer destruction is still queued. This should not happen");
-			logError("Reseting queue destruction of renderer");
-			nsScope::queueDestruction = false;
-		}
+	if (!nsScope::scopeRenderer && WeaponHasSpecialScope()) {
+		logInfo("Weapon needs custom renderer");
+		nsScope::CreateRenderer();
+		nsScope::scopeRenderer->pRendererCamera->StartCorrectState();
 	} else {
-		if (nsScope::queueDestruction && !nsScope::queueCreation) {
-			logInfo("Custom renderer no longer needed");
+		if (nsScope::scopeRenderer) {
 			nsScope::DestroyRenderer();
-			nsScope::queueDestruction = false;
 		}
-		if (nsScope::queueCreation) {
-			logError("HandleWeaponChange() Found no special scope but renderer creation is still queued. This should not happen");
-			logError("Reseting queue creation of renderer");
-			nsScope::queueCreation = false;
-		}*/
 	}
 }
 
 void HandleWeaponInstantDown() {
-
 }
 
 void HandleWeaponSightsEnter() {
-	if (!nsScope::initialized) {
-
+	if (!nsScope::initialized || !nsScope::scopeRenderer) {
+		goto skipRender;
 	}
-	if (nsScope::currentlyActive) {
-		if (!nsScope::scopeRenderer->pRendererCamera->QCameraHasRenderPlane()) {
-			logInfo("HandleWeaponSightsEnter() Decided to update the renderer camera");
-			nsScope::UpdateCamera(false, true, false);
-		}
-		if (nsScope::scopeRenderer->pRendererCamera->QCameraHasRenderPlane()) {
-			nsScope::Render();
-		}
+	nsScope::scopeRenderer->pRendererCamera->UpdateCamera();
+	nsScope::Render();
+
+skipRender:
+	{
+		//In the future anything further added that does not involve the scope renderer should go here
 	}
 }
 
 void HandleWeaponSightsExit() {
-
 }
 
 void QueryReload() {
@@ -294,20 +258,20 @@ void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
 		//Is weapon still in queue
 		if (weaponIsQueued) {
 			g_taskInterface->AddTask([]() {
-				if (*(bool*)((uintptr_t)PlayerCharacter::GetSingleton()->currentProcess->high + 0x594)) {
+				if (*(bool*)((uintptr_t)pc->currentProcess->high + 0x594)) {
 					weaponIsQueued = false;
-					QueueHandlingOfWeapon(WeaponInfo::weapInfo);
+					QueueHandlingOfWeapon(Info::weapInfo);
 					return;
 				}
 
 				//Reset variables here?
 
-				if (PlayerCharacter::GetSingleton()->currentProcess->middleHigh->equippedItems.size() == 0) {
+				if (pc->currentProcess->middleHigh->equippedItems.size() == 0) {
 					weaponIsQueued = false;
 					return;
 				}
 
-				HanldeWeaponEquip(FillWeaponInfo(WeaponInfo::weapInfo));
+				HanldeWeaponEquip(FillWeaponInfo(Info::weapInfo));
 				weaponIsQueued = false;
 			});
 		}
@@ -315,33 +279,25 @@ void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
 }
 
 bool WeaponHasSequentialReload() {
-	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasSequentialReloadKeyword);
+	return pc->WornHasKeyword(weaponHasSequentialReloadKeyword);
 }
 
 bool WeaponHasNightVisionScope() {
-	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasScopeNVKeyword);
+	return pc->WornHasKeyword(weaponHasScopeNVKeyword);
 }
 
 bool WeaponHasPIPScope() {
-	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasScopePIPKeyword);
+	return pc->WornHasKeyword(weaponHasScopePIPKeyword);
 }
 
 bool WeaponHasThermalScope() {
-	return PlayerCharacter::GetSingleton()->WornHasKeyword(weaponHasScopeThermalKeyword);
+	return pc->WornHasKeyword(weaponHasScopeThermalKeyword);
 }
 
 bool WeaponHasSpecialScope() {
-	if (weaponHasScopeNV || weaponHasScopePIP || weaponHasScopeThermal) {
-		return true;
-	} else {
-		return false;
-	}
+	return (weaponHasScopeNV || weaponHasScopePIP || weaponHasScopeThermal);
 }
 
 bool WeaponHasNoSpecialScopes() {
-	if (!weaponHasScopeNV && !weaponHasScopePIP && !weaponHasScopeThermal) {
-		return true;
-	} else {
-		return false;
-	}
+	return (!weaponHasScopeNV && !weaponHasScopePIP && !weaponHasScopeThermal);
 }

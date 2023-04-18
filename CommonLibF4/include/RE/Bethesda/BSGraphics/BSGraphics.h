@@ -27,6 +27,7 @@ struct IDXGISwapChain;
 
 enum DXGI_FORMAT;
 
+
 namespace RE
 {
 	enum class DXGI_MODE_SCALING;
@@ -48,6 +49,9 @@ namespace RE
 
 	namespace BSGraphics
 	{
+
+		enum class DepthStencilExtraMode;
+
 		struct AutoDebugMarker
 		{
 		public:
@@ -119,6 +123,19 @@ namespace RE
 		{
 		public:
 			//members
+			ID3D11Texture2D* m_Texture;
+			ID3D11Texture2D* tex2D;
+			ID3D11ShaderResourceView* m_ResourceView;
+			std::uint64_t field_18;
+			HANDLE* handle;
+			TextureHeader header;
+			std::uint32_t field_30;
+			std::uint32_t field_34;
+			std::uint32_t currentAllocFrame;
+			std::uint8_t minLOD;
+			std::uint8_t field_3D;
+			std::byte field_3E;
+			std::byte field_3F;
 		};
 
 		class ConstantGroup
@@ -235,11 +252,104 @@ namespace RE
 		{
 		public:
 			//members
-			std::int32_t CurrentRenderTargetIndex;         // 000
-			std::int32_t CurrentDepthStencilTargetIndex;   //
-			std::int32_t CurrentCubeMapRenderTargetIndex;  //
-			D3D11_VIEWPORT ViewPort;                       //
-														   // ...
+			std::uint32_t m_StateUpdateFlags;
+			std::uint32_t m_ModifiedBits0x4;
+			std::uint32_t m_ModifiedBits0x8;
+			std::uint32_t m_ModifiedBits0xC;
+			std::uint32_t m_ModifiedBits0x10;
+			std::uint32_t m_ModifiedBits0x14;
+			std::uint32_t m_ModifiedBits0x18;
+			std::uint32_t m_ModifiedBits0x1C;
+			std::uint32_t m_ModifiedBits0x20;
+			std::uint32_t m_CSUAVModifiedBits;
+			bool m_TextureDepthSomethingBool;
+			bool m_TextureSomethingBool;
+			bool field_2A;
+			bool field_2B;
+			std::uint32_t m_RenderTargets[8];
+			std::uint32_t m_CurrentDepthStencilIndex;
+			std::uint32_t m_CurrentDepthStencilSliceIndex;
+			std::uint32_t m_CurrentCubeMapRenderTargetIndex;
+			std::uint32_t m_CurrentCubeMapRenderTargetViewIndex;
+			SetRenderTargetMode m_SetRenderTargetMode[8];
+			SetRenderTargetMode m_SetDepthStencilMode;
+			SetRenderTargetMode m_SetCubeMapRenderTargetMode;
+			std::uint32_t rendertarget;
+			std::uint32_t depthstenciltargetindex;
+			std::uint32_t cubemaprendertargetindex;
+			D3D11_VIEWPORT m_ViewPort;
+			DepthStencilDepthMode m_DepthStencilDepthMode;
+			DepthStencilStencilMode m_DepthStencilStencilMode;
+			DepthStencilExtraMode m_DepthStencilExtraMode;
+			std::uint32_t m_StencilRef;
+			RasterStateCullMode m_RasterStateFillMode;
+			RasterStateCullMode m_RasterStateCullMode;
+			RasterStateDepthBiasMode m_RasterStateDepthBiasMode;
+			RasterStateScissorMode m_RasterStateScissorMode;
+			AlphaBlendMode m_AlphaBlendMode;
+			AlphaBlendAlphaToCoverage m_AlphaBlendAlphaToCoverage;
+			AlphaBlendWriteMode m_AlphaBlendWriteMode;
+			bool m_AlphaTestEnabled;
+			float m_AlphaTestRef;
+			TextureAddressMode m_VSTextureAddressMode[16];
+			TextureFilterMode m_VSTextureFilterMode[16];
+			ID3D11ShaderResourceView* m_VSTexture[16];
+			std::uint32_t m_VSTextureSomething[16];
+			std::uint32_t m_DSTextureAddressMode[16];
+			std::uint32_t m_DSTextureFilterMode[16];
+			ID3D11ShaderResourceView* m_DSTexture[16];
+			std::uint32_t m_DSTextureFilter[16];
+			TextureAddressMode textureAddressMode[16];
+			std::uint32_t field_3A0;
+			std::uint32_t field_3A4;
+			std::byte gap3A8[56];
+			ID3D11ShaderResourceView* m_Texture[16];
+			std::uint32_t m_TextureSomething[16];
+			std::uint32_t m_CSTextureAddressMode[16];
+			std::uint32_t m_CSTextureFilterMode[16];
+			ID3D11ShaderResourceView* SRViewArray[16];
+			std::uint32_t m_CSTextureSomething[8];
+			void* field_5C0;
+			std::uint64_t field_5C8;
+			std::uint64_t field_5D0;
+			std::uint64_t field_5D8;
+			ID3D11UnorderedAccessView* field_5E0;
+			std::uint64_t field_5E8;
+			std::uint64_t field_5F0;
+			std::uint64_t field_5F8;
+			std::uint64_t field_600;
+			std::uint64_t field_608;
+			std::uint64_t field_610;
+			std::uint64_t field_618;
+			std::uint64_t field_620;
+			std::uint64_t field_628;
+			ID3D11Buffer* m_ZPrePassConstantBuffer;
+			std::uint64_t field_638;
+			std::uint64_t field_640;
+			ID3D11Buffer* m_AlphaTestZPrePassConstantBufferPS;
+			std::uint64_t field_650;
+			std::uint64_t field_658;
+			std::uint64_t field_660;
+			std::uint64_t field_668;
+			std::uint64_t field_670;
+			std::uint64_t field_678;
+			std::uint64_t field_680;
+			VertexShader* m_CurrentVertexShader;
+			DomainShader* m_CurrentDomainShader;
+			HullShader* m_CurrentHullShader;
+			PixelShader* m_CurrentPixelShader;
+			std::uint32_t field_6A8;
+			std::uint32_t field_6AC;
+			NiPoint3 actorCollision;
+			std::uint32_t field_6BC;
+			NiPoint3 field_6C0;
+			std::uint32_t field_6CC;
+			ViewData m_ViewData;
+			float m_PreviousClearColor[4];
+			float field_8F0;
+			float clearcolor6;
+			float clearcolor7;
+			float clearcolor8;
 		};
 
 		class RendererWindow
@@ -263,7 +373,7 @@ namespace RE
 		};
 		//static_assert(sizeof(Context) == 0x2FF0);
 
-		enum DepthStencilExtraMode : std::int32_t
+		enum class DepthStencilExtraMode : std::int32_t
 		{
 			DEPTH_STENCIL_EX_DISABLED = 0x0,
 			DEPTH_STENCIL_EX_DFLIGHT_STEP0 = 0x1,

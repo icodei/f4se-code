@@ -5,6 +5,8 @@ void initPlugin() {
 	logger::info(FMT_STRING("Player: {:p}"), fmt::ptr(pc));
 	pcam = PlayerCamera::GetSingleton();
 	logger::info(FMT_STRING("Player Camera: {:p}"), fmt::ptr(pcam));
+	pcon = PlayerControls::GetSingleton();
+	logger::info(FMT_STRING("Player Controls: {:p}"), fmt::ptr(pcon));
 
 	if (!GetForms()) {
 		logError("You are missing some forms");
@@ -78,7 +80,6 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 		if (reinterpret_cast<bool>(msg->data)) {
 			initPlugin();
 			initHooks();
-			WeaponInfo::InitSDM();
 		}
 		break;
 	}
@@ -101,8 +102,6 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 		return false;
 	}
 
-	F4SE::AllocTrampoline(8 * 8);
-
 	return true;
 }
 
@@ -112,6 +111,8 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f
 	logger::info(FMT_STRING("{:s} Loaded"), Version::PROJECT);
 	F4SE::Init(a_f4se);
 	
+	F4SE::AllocTrampoline(1024 * 64);
+
 	g_trampoline = &F4SE::GetTrampoline();
 	g_taskInterface = F4SE::GetTaskInterface();
 	g_pluginHandle = F4SE::GetPluginHandle();

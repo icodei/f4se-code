@@ -32,15 +32,32 @@ T SafeWrite64Function(uintptr_t addr, T data) {
 	return olddata;
 }
 
+template <class Ty>
+static inline Ty SafeWrite_Impl(uintptr_t addr, Ty data) {
+	DWORD oldProtect = 0;
+	Ty oldVal = 0;
+
+	if (VirtualProtect((void*)addr, sizeof(Ty), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+		Ty* p = (Ty*)addr;
+		oldVal = *p;
+		*p = data;
+		VirtualProtect((void*)addr, sizeof(Ty), oldProtect, &oldProtect);
+	}
+
+	return oldVal;
+}
+
+uintptr_t SafeWrite64(uintptr_t addr, uintptr_t data);
+
 BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName);
 const char* GetObjectClassNameImpl(const char* result, void* objBase);
 const char* GetObjectClassName(void* objBase);
 
 enum AmmoType {
-	kAmmoType_Default = 0x00,
-	kAmmoType_Charging = 0x01,
-	kAmmoType_FusionCore = 0x02,
-	kAmmoType_NeverEnding = 0x04
+	kAmmoType_Default = 0x0,
+	kAmmoType_Charging = 0x1,
+	kAmmoType_FusionCore = 0x2,
+	kAmmoType_NeverEnding = 0x4
 };
 
 enum EquipIndex {

@@ -45,6 +45,13 @@ namespace RE
 			return func(name, isDDX, a1);
 		}
 
+		void SetRendererTexture(BSGraphics::Texture* texture)
+		{
+			using func_t = decltype(&NiTexture::SetRendererTexture);
+			REL::Relocation<func_t> func{ REL::ID(320514), 0x10 };
+			return func(this, texture);
+		}
+
 		// members
 		BSFixedString name;                          // 10
 		std::uint32_t flags;                         // 18

@@ -4,6 +4,7 @@
 struct WeaponInfo {
 public:
 	WeaponInfo() = default;
+	~WeaponInfo() = default;
 
 	WeaponInfo& operator=(const WeaponInfo& rhs);
 
@@ -14,11 +15,6 @@ public:
 
 	//static functions
 	static void ClearWeaponInfo();
-	static void InitSDM();
-	
-	//static members
-	static WeaponInfo weapInfo;
-	static TESObjectWEAP::InstanceData* weapCurrentInstanceData;
 
 	//members
 	const EquippedWeapon* weapEquip{ nullptr };
@@ -34,6 +30,11 @@ public:
 	int weapAmmoToAdd{ 0 };
 	int weapAmmoTotalCount{ 0 };
 };
+
+namespace Info {
+	extern WeaponInfo weapInfo;
+	extern TESObjectWEAP::InstanceData* weapCurrentInstanceData;
+}
 
 
 WeaponInfo& FillWeaponInfo(WeaponInfo& initInfo);

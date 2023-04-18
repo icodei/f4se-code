@@ -73,6 +73,7 @@ set(SOURCES
 	include/RE/Bethesda/BSCore/BSTListAlg.h
 	include/RE/Bethesda/BSCore/BSTLocklessQueue.h
 	include/RE/Bethesda/BSCore/BSTObjectArena.h
+	include/RE/Bethesda/BSCore/BSTObjectDictonary.h
 	include/RE/Bethesda/BSCore/BSTPoint.h
 	include/RE/Bethesda/BSCore/BSTPoint2.h
 	include/RE/Bethesda/BSCore/BSTPoint3.h
@@ -236,6 +237,7 @@ set(SOURCES
 	include/RE/Bethesda/BSResource/BSResourceUtil.h
 	include/RE/Bethesda/BSResource/LooseFileStreamBase.h
 	include/RE/Bethesda/BSResourceNiBinaryStream.h
+	include/RE/Bethesda/BSResponse.h
 	include/RE/Bethesda/BSScaleformManager.h
 	include/RE/Bethesda/BSSceneGraph.h
 	include/RE/Bethesda/BSScript.h
@@ -403,6 +405,8 @@ set(SOURCES
 	include/RE/Bethesda/GamePlayFormulas.h
 	include/RE/Bethesda/GameScript.h
 	include/RE/Bethesda/HUDModes.h
+	include/RE/Bethesda/Handlers.h
+	include/RE/Bethesda/IHandlerFunctor.h
 	include/RE/Bethesda/IMenu.h
 	include/RE/Bethesda/IMovementInterface.h
 	include/RE/Bethesda/InputDevice.h
@@ -1299,6 +1303,7 @@ set(SOURCES
 	include/RE/Shared/TESForms/World/TESWorldSpace.h
 	include/RE/Shared/TempEffects/BSDismember.h
 	include/RE/Shared/TempEffects/BSDismemberUtils.h
+	include/RE/Shared/TempEffects/BSTempEffect.h
 	include/RE/Shared/TempEffects/BSTempEffectGeometryDecal.h
 	include/RE/Shared/TempEffects/BSTempEffectParticle.h
 	include/RE/Shared/TempEffects/BSTempEffectWeaponBlood.h

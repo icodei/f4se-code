@@ -18,6 +18,7 @@ extern const F4SE::Trampoline* g_trampoline;
 
 extern PlayerCharacter* pc;
 extern PlayerCamera* pcam;
+extern PlayerControls* pcon;
 
 extern bool gameLoading;
 extern bool gameLoadingSave;

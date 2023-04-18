@@ -25,10 +25,69 @@ namespace RE
 
 		enum UpdateFlags : std::int32_t
 		{
-			UPDATE_FLAG_NONE = 0x0,
-			UPDATE_FLAG_PARENT_IS_CULLED = 0x1,
+			UPDATE_FLAG_NONE,
+			UPDATE_FLAG_PARENT_IS_CULLED,
 		};
 
+		enum : std::uint64_t
+		{
+			NONE = 0,
+			APP_CULLED_MASK = 1 << 0,                 //Hidden
+			SELECTIVE_UPDATE_MASK = 1 << 1,           //SelectiveUpdate
+			SELECTIVE_XFORMS_MASK = 1 << 2,           //SelectiveUpdateTransforms
+			SELECTIVE_CONTROLLER_MASK = 1 << 3,       //SelectiveUpdateController
+			SELECTIVE_RIGID_MASK = 1 << 4,            //SelectiveUpdateRigid
+			DISPLAY_OBJECT_MASK = 1 << 5,             //DisplayObject
+			DISABLE_SORTING = 1 << 6,                 //DisableSorting
+			SELECTIVE_XFORMS_OVERRIDE_MASK = 1 << 7,  //SelectiveUpdateTransformsOverride
+			kUNK = 1 << 8,                            //
+			SAVE_EXTERNAL_GEOMDATA = 1 << 9,          //SaveExternalGeometryData
+			NO_DECALS = 1 << 10,                      //NoDecals
+			ALWAYS_DRAW = 1 << 11,                    //AlwaysDraw
+			MESH_LOD = 1 << 12,                       //MeshLOD
+			FIXED_BOUND = 1 << 13,                    //FixedBound
+			TOP_FADENODE = 1 << 14,                   //TopFadeNode
+			IGNORE_FADE = 1 << 15,                    //IgnoreFade
+			NO_ANIMSYNC_X = 1 << 16,                  //NoAnimSyncX
+			NO_ANIMSYNC_Y = 1 << 17,                  //NoAnimSyncY
+			NO_ANIMSYNC_Z = 1 << 18,                  //NoAnimSyncZ
+			NO_ANIMSYNC_S = 1 << 19,                  //NoAnimSyncS
+			NO_DISMEMBER = 1 << 20,                   //NoDismember
+			NO_DISMEMBER_VALIDITY = 1 << 21,          //NoDismemberValidity
+			kRenderUse = 1 << 22,                     //RenderUse
+			MATERIALS_APPLIED = 1 << 23,              //MaterialsApplied
+			SAVE_FLAG_MASK = 16777215,                //
+			HIGH_DETAIL = 1 << 24,                    //HighDetail
+			FORCE_UPDATE = 1 << 25,                   //ForceUpdate
+			PREPROCESSED_NODE = 1 << 26,              //PreProcessedNode
+			OBJECT_PREPARED_MASK = 1 << 27,
+			MANDATORY_UPDATE = 1 << 28,
+			SCENEGRAPH_CHANGE = 1 << 29,
+			WORLD_BOUND_CHANGE = 1 << 30,
+			MESHLOD_LEVEL_CHANGE = 1 << 31,
+
+			MESHLOD_USE_BOUND_SCALE = 4294967296,         //1 << 32
+			NEEDS_LIGHTING_UPDATE = 8589934592,           //1 << 33
+			NEEDS_CUSTOM_RENDER = 17179869184,            //1 << 34
+			INSTANCED = 34359738368,                      //1 << 35
+			LOD_FADING_OUT = 68719476736,                 //1 << 36
+			FADED_IN = 137438953472,                      //1 << 37
+			FORCE_FADEOUT = 274877906944,                 //1 << 38
+			NOT_VISIBLE = 549755813888,                   //1 << 39
+			NOT_SHADOW_CASTER = 1099511627776,            //1 << 40
+			NEEDS_RENDERER_DATA = 2199023255552,          //1 << 41
+			ACCUMULATED = 4398046511104,                  //1 << 42
+			ALREADY_TRAVERSED = 8796093022208,            //1 << 43
+			PICK_OFF = 17592186044416,                    //1 << 44
+			TRANS_IS_IDENTITY = 35184372088832,           //1 << 45
+			HAS_PROPERTY_CONTROLLER = 70368744177664,     //1 << 46
+			LOCKED_CHILDREN = 140737488355328,            //1 << 47
+			NO_OCCLUSION = 281474976710656,               //1 << 48
+			HAS_MOVING_SOUND = 562949953421312,           //1 << 49
+			FIRST_PERSON_HIRES = 1125899906842624,        //1 << 50
+			DEFERRED_ATTACHES = 1125899906842624,         //1 << 50
+			FORCE_NO_LIGHTING_UPDATE = 2251799813685248,  //1 << 51
+		};
 
 		NiAVObject();
 		virtual ~NiAVObject();  // NOLINT(modernize-use-override) 00
@@ -55,9 +114,9 @@ namespace RE
 
 		F4_HEAP_REDEFINE_ALIGNED_NEW(NiAVObject);
 
-		[[nodiscard]] bool GetAppCulled() const noexcept { return flags.flags & 1; }
+		[[nodiscard]] bool GetAppCulled() const noexcept { return flags.GetBit(APP_CULLED_MASK); }
 		[[nodiscard]] std::uint64_t GetFlags() const noexcept { return flags.flags; }
-		[[nodiscard]] bool ShadowCaster() const noexcept { return ~(flags.flags >> 40) & 1; }
+		[[nodiscard]] bool ShadowCaster() const noexcept { return !flags.GetBit(NOT_SHADOW_CASTER); }
 
 		void Update(NiUpdateData& a_data)
 		{

@@ -17,6 +17,8 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::NiTimeController };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::NiTimeController };
 
+
+
 		// add
 		virtual void Start(float a_time);                             // 28
 		virtual void Stop();                                          // 28
@@ -28,6 +30,39 @@ namespace RE
 		virtual void OnPreDisplay() { return; }                       // 2E
 		virtual bool IsStreamable() const { return true; }            // 2F
 		virtual void Start() = 0;                                     // 30
+
+		enum AnimType : std::int32_t
+		{
+			APP_TIME,
+			APP_INIT,
+		};
+
+		enum CycleType : std::int32_t
+		{
+			LOOP = 0x0,
+			REVERSE = 0x1,
+			CLAMP = 0x2,
+			MAX_CYCLE_TYPES = 0x3,
+		};
+
+		enum : std::int32_t
+		{
+			MAX_POS = 0x5
+		};
+
+		enum : std::int32_t
+		{
+			ANIMTYPE_MASK = 1,
+			ANIMTYPE_POS = 0,
+			CYCLETYPE_MASK = 6,
+			CYCLETYPE_POS = 1,
+			ACTIVE_MASK = 1 << 3,
+			DIRECTION_MASK = 1 << 4,
+			MANAGERCONTROLLED_MASK = 1 << 5,
+			COMPUTESCALEDTIME_MASK = 1 << 6,
+			FORCEUDPATE_MASK = 1 << 7,
+			MANDATORYUPDATE_MASK = 1 << 8
+		};
 
 		// members
 		NiTFlags<std::uint16_t, NiTimeController> flags;  // 10

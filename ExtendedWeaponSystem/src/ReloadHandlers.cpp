@@ -29,11 +29,11 @@ void reloadContinueFromEmpty() {
 //ready needed stuff when reload is started
 void reloadStartHandle() {
 	logInfo("reloadStartHandle");
-	WeaponInfo::weapInfo.weapAmmoIncrementor = 0;
-	WeaponInfo::weapInfo.weapAmmoToAdd = WeaponInfo::weapInfo.weapAmmoCapacity - WeaponInfo::weapInfo.weapAmmoCurrentCount;
+	Info::weapInfo.weapAmmoIncrementor = 0;
+	Info::weapInfo.weapAmmoToAdd = Info::weapInfo.weapAmmoCapacity - Info::weapInfo.weapAmmoCurrentCount;
 	reloadHasStarted = true;
 	reloadHasEnded = false;
-	SetWeapAmmoCapacity(WeaponInfo::weapInfo.weapAmmoCurrentCount);
+	SetWeapAmmoCapacity(Info::weapInfo.weapAmmoCurrentCount);
 }
 
 //clear needed stuff when reload ends
@@ -41,31 +41,31 @@ void reloadEndHandle() {
 	logInfo("reloadEndHandle");
 	reloadHasEnded = true;
 	reloadHasStarted = false;
-	WeaponInfo::weapInfo.weapAmmoIncrementor = 0;
-	WeaponInfo::weapInfo.weapAmmoToAdd = 0;
-	SetWeapAmmoCapacity(WeaponInfo::weapInfo.weapAmmoCapacity);
+	Info::weapInfo.weapAmmoIncrementor = 0;
+	Info::weapInfo.weapAmmoToAdd = 0;
+	SetWeapAmmoCapacity(Info::weapInfo.weapAmmoCapacity);
 }
 
 //Stops the reload early if there is not enough ammo in the inventory
 void StopLesserAmmo() {
-	if ((WeaponInfo::weapInfo.weapAmmoTotalCount + WeaponInfo::weapInfo.weapAmmoCurrentCount) - WeaponInfo::weapInfo.weapAmmoCapacity < 0) {
-		WeaponInfo::weapInfo.weapAmmoToAdd = WeaponInfo::weapInfo.weapAmmoTotalCount;
+	if ((Info::weapInfo.weapAmmoTotalCount + Info::weapInfo.weapAmmoCurrentCount) - Info::weapInfo.weapAmmoCapacity < 0) {
+		Info::weapInfo.weapAmmoToAdd = Info::weapInfo.weapAmmoTotalCount;
 	}
 }
 
 //Set weapon capacity to needed amount to be sure reloadComplete fills needed amount of ammo
 void SetWeapAmmoCapacity(int amount) {
-	if (!WeaponInfo::weapCurrentInstanceData) {
+	if (!Info::weapCurrentInstanceData) {
 		logInfo("Weapon instance is nullptr. Could not set ammo.");
 		return;
 	}
 
 	//This if statement is for when ammo complete of the animation goes over the original max ammo count. Will be edited later for +1 and +2 loading
-	if (amount > WeaponInfo::weapInfo.weapAmmoCapacity) {
-		WeaponInfo::weapCurrentInstanceData->ammoCapacity = WeaponInfo::weapInfo.weapAmmoCapacity;
-		logInfo("Ammo count set to: " + std::to_string(WeaponInfo::weapInfo.weapAmmoCapacity));
+	if (amount > Info::weapInfo.weapAmmoCapacity) {
+		Info::weapCurrentInstanceData->ammoCapacity = Info::weapInfo.weapAmmoCapacity;
+		logInfo("Ammo count set to: " + std::to_string(Info::weapInfo.weapAmmoCapacity));
 	} else {
-		WeaponInfo::weapCurrentInstanceData->ammoCapacity = amount;
+		Info::weapCurrentInstanceData->ammoCapacity = amount;
 		logInfo("Ammo count set to: " + std::to_string(amount));
 	}
 }

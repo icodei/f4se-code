@@ -45,6 +45,16 @@ public:
 	F4_HEAP_REDEFINE_NEW(PlayerSetWeaponStateEventSink);
 };
 
+class PlayerSightedStateChange {
+public:
+	typedef bool (PlayerSightedStateChange::*FnExecuteHandler)(Actor& a_actor, BSFixedString& a_event);
+	bool HookedExecuteHandler(Actor& a_actor, BSFixedString& a_event);
+	void HookSink();
+
+protected:
+	static std::unordered_map<uintptr_t, FnExecuteHandler> fnHash;
+};
+
 class PlayerWeaponReloadEventSink : public BSTEventSink<PlayerWeaponReloadEvent> {
 public:
 	virtual ~PlayerWeaponReloadEventSink(){};

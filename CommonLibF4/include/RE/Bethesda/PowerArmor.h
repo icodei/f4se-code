@@ -3,6 +3,8 @@
 #include "RE/Bethesda/BSCore/BSTEvent.h"
 #include "RE/Bethesda/Events.h"
 #include "RE/Bethesda/HUDModes.h"
+#include "RE/Shared/Animation/IAnimationGraphManagerHolder.h"
+#include "RE/Shared/Animation/SimpleAnimationGraphManagerHolder.h"
 
 namespace RE
 {

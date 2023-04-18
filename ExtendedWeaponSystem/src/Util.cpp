@@ -37,6 +37,10 @@ void Dump(void* mem, unsigned int size) {
 	}
 }
 
+uintptr_t SafeWrite64(uintptr_t addr, uintptr_t data) {
+	return SafeWrite_Impl(addr, data);
+}
+
 BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName) {
 	auto sources = (globalEvents->eventSources);
 	for (auto elem = sources.begin(); elem != sources.end(); ++elem) {
@@ -96,30 +100,30 @@ bool IsHoldingButton(ButtonEvent* btnEvent) {
 }
 
 bool IsPlayerInFirstPerson() {
-	if (!PlayerCamera::GetSingleton()) {
+	if (!pcam) {
 		return false;
 	}
-	return PlayerCamera::GetSingleton()->currentState == PlayerCamera::GetSingleton()->cameraStates[CameraState::kFirstPerson];
+	return pcam->currentState == pcam->cameraStates[CameraState::kFirstPerson];
 }
 
 bool IsPlayerInThirdPerson() {
-	if (!PlayerCamera::GetSingleton()) {
+	if (!pcam) {
 		return false;
 	}
-	return PlayerCamera::GetSingleton()->currentState == PlayerCamera::GetSingleton()->cameraStates[CameraState::k3rdPerson];
+	return pcam->currentState == pcam->cameraStates[CameraState::k3rdPerson];
 }
 
 bool IsPlayerSprinting() {
-	return PlayerCharacter::GetSingleton()->ActorState::moveMode & 0x0100;
+	return pc->ActorState::moveMode & 0x0100;
 }
 
 bool IsPlayerWeaponDrawn() {
-	return PlayerCharacter::GetSingleton()->GetWeaponMagicDrawn();
+	return pc->GetWeaponMagicDrawn();
 }
 
 bool IsPlayerWeaponReloadable() {
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->lock();
-	const BSTArray<EquippedItem> equipDataArr = *PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArray();
+	pc->currentProcess->GetEquippedItemArrayLock()->lock();
+	const BSTArray<EquippedItem> equipDataArr = *pc->currentProcess->GetEquippedItemArray();
 	if (equipDataArr.empty()) {
 		return false;
 	}
@@ -132,18 +136,18 @@ bool IsPlayerWeaponReloadable() {
 			break;
 		}
 	}
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
+	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
 	if (!equipData) {
 		return false;
 	}
 
-	IsReloadableDataWrapper wrapper = { 0i64, PlayerCharacter::GetSingleton() };
+	IsReloadableDataWrapper wrapper = { 0i64, pc };
 
 	return IsWeaponReloadable(&wrapper, equipData);
 }
 
 bool IsPlayerWeaponReloading() {
-	return PlayerCharacter::GetSingleton()->ActorState::gunState == GUN_STATE::kReloading;
+	return pc->ActorState::gunState == GUN_STATE::kReloading;
 }
 
 bool IsPlayerWeaponThrowable() {
@@ -222,30 +226,30 @@ bool GetForms() {
 }
 
 EquippedItem& GetPlayerEquippedItemDefault() {
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->lock();
-	EquippedItem& a_item = PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
+	pc->currentProcess->GetEquippedItemArrayLock()->lock();
+	EquippedItem& a_item = pc->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
+	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
 	return a_item;
 }
 
 EquippedWeapon& GetPlayerEquippedWeaponDefault() {
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->lock();
-	EquippedItem& a_item = PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedItemArrayLock()->unlock();
+	pc->currentProcess->GetEquippedItemArrayLock()->lock();
+	EquippedItem& a_item = pc->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
+	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
 	EquippedWeapon& a_weapon = reinterpret_cast<EquippedWeapon&>(a_item);
 	if (a_weapon.IsValid() && a_weapon.weaponData.get()) {
 		return a_weapon;
 	}
-	PlayerCharacter::GetSingleton()->currentProcess->GetEquippedWeaponByIndex(BGSEquipIndex(EquipIndex::kDefault), a_weapon);
+	pc->currentProcess->GetEquippedWeaponByIndex(BGSEquipIndex(EquipIndex::kDefault), a_weapon);
 	return a_weapon;
 }
 
 const uint32_t GetPlayerInventoryObjectCount(const TESBoundObject* item) {
-	return PlayerCharacter::GetSingleton()->GetInventoryObjectCount(item);
+	return pc->GetInventoryObjectCount(item);
 }
 
 const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name) {
-	BSFadeNode* player3D = PlayerCharacter::GetSingleton() ? PlayerCharacter::GetSingleton()->Get3D()->IsFadeNode() : nullptr;
+	BSFadeNode* player3D = pc ? pc->Get3D()->IsFadeNode() : nullptr;
 	if (!player3D) {
 		return nullptr;
 	}

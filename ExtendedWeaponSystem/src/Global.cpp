@@ -7,6 +7,7 @@ const F4SE::Trampoline* g_trampoline = nullptr;
 
 PlayerCharacter* pc = nullptr;
 PlayerCamera* pcam = nullptr;
+PlayerControls* pcon = nullptr;
 
 bool gameLoading = false;
 bool gameLoadingSave = false;

@@ -66,22 +66,48 @@ ScopeCamera::ScopeCamera(bool createDefault) :
 	} else {
 		camera = nullptr;
 		renderPlane = nullptr;
-	}
-	geometryDefault = false;
-	geometryFound = false;
-	if (WeaponHasSpecialScope()) {
-		Update3D();
+		geometryDefault = false;
 	}
 }
 
 ScopeCamera::~ScopeCamera() {
+	TESCameraState* current;
 	TESCameraState* state;
+
 	NiNode* root;
 
-	state = currentState.get();
-	if (state && !InterlockedDecrement(&state->refCount)) {
-		state->~TESCameraState();
+	current = currentState.get();
+	if (current) {
+		current->End();
 	}
+
+	auto stateA = cameraStates;
+	uint32_t total = ScopeCameraState::kTotal;
+	do {
+		state = stateA->get();
+		if (stateA->get()) {
+			stateA->~BSTSmartPointer();
+			if (!InterlockedDecrement(&state->refCount)) {
+				state->~TESCameraState();
+			}
+		}
+		++stateA;
+		--total;
+	} while (total);
+
+	//Geometry was created by us and needs to be destroyed
+	if (geometryDefault) {
+		if (!InterlockedDecrement(&camera->refCount)) {
+			camera->DeleteThis();
+		}
+		if (!InterlockedDecrement(&renderPlane->refCount)) {
+			renderPlane->DeleteThis();
+		}
+	}
+
+	camera = nullptr;
+	renderPlane = nullptr;
+
 	root = cameraRoot.get();
 	if (root) {
 		if (!InterlockedDecrement(&root->refCount)) {
@@ -117,25 +143,6 @@ bool ScopeCamera::QCameraHasRenderPlane() {
 	} else {
 		return false;
 	}
-}
-
-bool ScopeCamera::QCameraEquals(std::uint32_t cameraIndex) {
-	TESCameraState* pCurrentState = currentState.get();
-	return pCurrentState && pCurrentState == cameraStates[cameraIndex].get();
-}
-
-TESCameraState* ScopeCamera::QCameraState(std::uint32_t index) {
-	if (!index) {
-		return nullptr;
-	}
-	if (index > ScopeCameraStates::kTotal) {
-		return nullptr;
-	}
-	return cameraStates[index].get();
-}
-
-NiCamera* ScopeCamera::QRenderCamera() {
-	return camera;
 }
 
 void ScopeCamera::CreateDefault3D() {
@@ -301,20 +308,25 @@ void ScopeCamera::SetState(TESCameraState* newCameraState) {
 }
 
 void ScopeCamera::StartCorrectState() {
-	if (!weaponHasScopeThermal && !weaponHasScopeNV && !weaponHasScopePIP) {
+	if (WeaponHasNoSpecialScopes()) {
 		logError("ScopeCamera::StartCorrectState() was called and could not find the correct state to start.");
 		return;
 	}
 	if (weaponHasScopeThermal) {
 		StartThermalState();
-		return;
+		goto FoundState;
 	}
 	if (weaponHasScopeNV) {
 		StartNightVisionState();
-		return;
+		goto FoundState;
 	}
 	if (weaponHasScopePIP) {
 		StartDefaultState();
+		goto FoundState;
+	}
+FoundState:
+	{
+		UpdateCamera();
 		return;
 	}
 }
@@ -335,8 +347,6 @@ void ScopeCamera::StartNightVisionState() {
 }
 
 void ScopeCamera::Update3D() {
-	bool differentGeom = false;
-	bool differentCam = false;
 
 	BSGeometry* geom;
 	BSGeometry* newGeom;
@@ -358,7 +368,6 @@ void ScopeCamera::Update3D() {
 	if (renderPlane != newGeom) {
 		if (newGeom) {
 			renderPlane = newGeom;
-			differentGeom = true;
 		}
 
 		if (oldGeom) {
@@ -383,16 +392,11 @@ void ScopeCamera::Update3D() {
 	if (camera != newCam) {
 		if (newCam) {
 			camera = newCam;
-			differentCam = true;
 			SetCameraRoot(camera->parent);
 		}
 
 		if (oldCam) {
 		}
-	}
-
-	if (differentGeom && differentCam) {
-		geometryFound = true;
 	}
 
 	StartCorrectState();
@@ -404,6 +408,10 @@ void ScopeCamera::Update3D() {
 void ScopeCamera::UpdateCamera() {
 	if (!enabled) {
 		return;
+	}
+
+	if (!QCameraHasRenderPlane()) {
+		Update3D();
 	}
 
 	TESCameraState* pCurrentState = currentState.get();
@@ -422,7 +430,7 @@ void ScopeCamera::UpdateCamera() {
 
 ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) :
 	TESCameraState(cam, ID) {
-	logInfo("ScopeCamera::DefaultState ctor Starting...");
+	logInfo("ScopeCamera::State ctor Starting...");
 	refCount = 0;
 	camera = &cam;
 	id = ID;
@@ -438,13 +446,9 @@ ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) :
 	rotation.z = 0.0F;
 	translation = NiPoint3::ZERO;
 	zoom = 1.0F;
-	logInfo("ScopeCamera::DefaultState ctor Completed.");
 }
 
 ScopeCamera::DefaultState::~DefaultState() {
-	logInfo("ScopeCamera::DefaultState dtor Starting...");
-	RE::free(this);
-	logInfo("ScopeCamera::DefaultState dtor Completed.");
 }
 
 bool ScopeCamera::DefaultState::ShouldHandleEvent(const InputEvent* inputEvent) {  //TODO
@@ -539,22 +543,6 @@ void ScopeCamera::DefaultState::LoadGame(BGSLoadFormBuffer* a_loadGameBuffer) {
 void ScopeCamera::DefaultState::Revert(BGSLoadFormBuffer* a_loadGameBuffer) {
 }
 
-NiQuaternion& ScopeCamera::DefaultState::QInitialRotation() {
-	return initialRotation;
-}
-
-NiPoint3& ScopeCamera::DefaultState::QInitialPosition() {
-	return initialPosition;
-}
-
-NiQuaternion& ScopeCamera::DefaultState::QRotation() {
-	return rotation;
-}
-
-NiPoint3& ScopeCamera::DefaultState::QTranslation() {
-	return translation;
-}
-
 void ScopeCamera::DefaultState::SetInitialRotation(NiQuaternion& newRotation) {
 	initialRotation = newRotation;
 }
@@ -577,15 +565,10 @@ void ScopeCamera::DefaultState::SetZoom(float newZoom) {
 
 ScopeCamera::ThermalState::ThermalState(TESCamera& cam, std::uint32_t ID) :
 	DefaultState(cam, ID) {
-	logInfo("ScopeCamera::ThermalState ctor Starting...");
-
 	logInfo("ScopeCamera::ThermalState ctor Completed.");
 }
 
 ScopeCamera::ThermalState::~ThermalState() {
-	logInfo("ScopeCamera::ThermalState dtor Starting...");
-	RE::free(this);
-	logInfo("ScopeCamera::ThermalState dtor Completed.");
 }
 
 bool ScopeCamera::ThermalState::ShouldHandleEvent(const InputEvent* inputEvent) {
@@ -615,18 +598,13 @@ void ScopeCamera::ThermalState::Update(BSTSmartPointer<TESCameraState>& a_nextSt
 
 ScopeCamera::NightVisionState::NightVisionState(TESCamera& cam, std::uint32_t ID) :
 	DefaultState(cam, ID) {
-	logInfo("ScopeCamera::NightVisionState ctor Starting...");
-
 	logInfo("ScopeCamera::NightVisionState ctor Completed.");
 }
 
 ScopeCamera::NightVisionState::~NightVisionState() {
-	logInfo("ScopeCamera::NightVisionState dtor Starting...");
-	RE::free(this);
-	logInfo("ScopeCamera::NightVisionState dtor Completed.");
 }
 
-bool ScopeCamera::NightVisionState::ShouldHandleEvent(const InputEvent* inputEvent) {	//TODO
+bool ScopeCamera::NightVisionState::ShouldHandleEvent(const InputEvent* inputEvent) {  //TODO
 	return false;
 }
 
@@ -740,6 +718,8 @@ ScopeRenderer::~ScopeRenderer() {
 	}
 	pRendererCamera->~ScopeCamera();
 	pScopeCullingProc->~BSCullingProcess();
+	pScopeAccumulator->~BSShaderAccumulator();
+	pShaderParams->~ImageSpaceShaderParam();
 	logInfo("ScopeRenderer dtor Completed.");
 }
 
@@ -760,20 +740,20 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 	//bool objCullFlag = objectLODRoot->flags.flags & 1;
 	//objectLODRoot->SetAppCulled(true);
 
-	//memcpy(BSShaderManager::GetCamera(), pRendererCamera->camera, 0x1A0);
+	memcpy(BSShaderManager::GetCamera(), pRendererCamera->camera, 0x1A0);
 
 	pGraphicsState->SetCameraData(pRendererCamera->camera, false, 0.0F, 1.0F);
 	pScopeCullingProc->SetAccumulator(pScopeAccumulator);
 	pScopeCullingProc->kCullMode = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
 	pScopeCullingProc->pkCamera = pRendererCamera->camera;
-
+	pScopeCullingProc->bCameraRelatedUpdates = false;
 	pRendererCamera->Update();
 
-	//pRenderData->SetClearColor(1.0F, 1.0F, 1.0F, 1.0F);
+	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
 
-	pScopeAccumulator->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_NORMAL;
+	pScopeAccumulator->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_SINGLEPASS;
 	pScopeAccumulator->QEyePosition = pRendererCamera->camera->world.translate;
-	//pRenderData->ResetZPrePass();
+	pRenderData->ResetZPrePass();
 
 	BSPortalGraphEntry* camPortalEntry = (Main::GetSingleton())->GetCameraPortalGraphEntry();
 	if (camPortalEntry) {
@@ -798,10 +778,9 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 		multiBoundNode = nullptr;
 	}
 	BSShaderUtil::AccumulateScene(pRendererCamera->camera, multiBoundNode, *pScopeCullingProc, false);
-
-	//pShaderState->cSceneGraph = BSShaderManager::BSSM_SSN_WORLD;
-	//pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD]->ProcessQueuedLights(pScopeCullingProc);
-	//pRenderData->ResetState();
+	pShaderState->cSceneGraph = BSShaderManager::BSSM_SSN_WORLD;
+	pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD]->ProcessQueuedLights(pScopeCullingProc);
+	pRenderData->ResetState();
 
 	uint32_t renderTargetID = 24;  //RENDER_TARGET_HUDGLASS
 	uint32_t depthTargetID = 1;    //DEPTH_STENCIL_TARGET_MAIN
@@ -811,55 +790,39 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 	pTargetManager->AcquireRenderTarget(renderTargetID);
 	logInfo("Setting Targets...");
 	RenderScopeScene(pRendererCamera->camera, pScopeAccumulator, renderTargetID, depthTargetID);
-	logInfo("Setting Shadow Targets...");
-	pTargetManager->SetCurrentDepthStencilTarget(depthTargetID, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
-	pTargetManager->SetCurrentRenderTarget(0, 2, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-	pTargetManager->SetCurrentRenderTarget(2, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-	pTargetManager->SetCurrentRenderTarget(3, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-	if (pShaderState->bDeferredRGBEmit) {
-		pTargetManager->SetCurrentRenderTarget(4, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-	}
-	pTargetManager->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 
-	logInfo("Rendering Effects...");
-	pShaderParams->SetPixelConstant(0, 1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiWidth, 1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiHeight, 0.0F, 0.0F);
-	pTargetManager->SetTextureDepth(1, depthTargetID);
-	pTargetManager->SetTextureRenderTarget(2, renderTargetID, false);
-	pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
-	pImageSpaceManager->RenderEffect_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, pShaderParams);
+	pTargetManager->SetCurrentRenderTarget(0, 2, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
+	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	pTargetManager->SetCurrentDepthStencilTarget(depthTargetID, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
+	pTargetManager->SetCurrentDepthStencilTarget(0, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
+
+	pShaderParams->SetPixelConstant(0,
+		1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiWidth,
+		1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiHeight,
+		0.0F,
+		0.0F);
 
 	logInfo("Releasing Targets...");
 	pTargetManager->ReleaseDepthStencil(depthTargetID);
 	pTargetManager->ReleaseRenderTarget(renderTargetID);
 
-	pTargetManager->SetCurrentRenderTarget(0, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
 	NiTexture* renderedTexture = nullptr;
-	BSGraphics::Texture* graphicsTex = nullptr;
 	if (saveTexture) {
 		const BSFixedString strScope("ScopeTexture");
 		renderedTexture = renderedTexture->CreateEmpty(strScope, false, false);
-		graphicsTex = pTargetManager->SaveRenderTargetToTexture(renderTargetID, false, false, BSGraphics::Usage::USAGE_DEFAULT);
-		renderedTexture->rendererTexture = graphicsTex;
+		pTargetManager->SetCurrentRenderTarget(0, renderTargetID, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
+		pTargetManager->SetTextureRenderTarget(0, renderTargetID, false);
+		pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
+		pImageSpaceManager->RenderEffectHelper_Tex_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderedTexture, renderTargetID, nullptr);
+		renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTargetID, false, false, BSGraphics::Usage::USAGE_DEFAULT));
 	}
-	//memcpy(BSShaderManager::GetCamera(), shaderCam, 0x1A0);
+
+	memcpy(BSShaderManager::GetCamera(), shaderCam, 0x1A0);
 	pGraphicsState->SetCameraData(shaderCam, false, 0.0F, 1.0F);
 
 	pScopeAccumulator->ClearActivePasses(false);
 	pScopeAccumulator->ClearGroupPasses(5, false);
 	return renderedTexture;
-}
-
-void ScopeRenderer::UpdateCamera(bool updateState, bool update3D, bool updateGeneral) {
-	if (updateState) {
-		pRendererCamera->StartCorrectState();
-	}
-	if (update3D) {
-		pRendererCamera->Update3D();
-	}
-	if (updateGeneral) {
-		pRendererCamera->UpdateCamera();
-	}
 }
 
 #pragma endregion
@@ -871,14 +834,14 @@ void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulat
 	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
 
 	pTargetManager->SetCurrentDepthStencilTarget(a_depthTarget, BSGraphics::SetRenderTargetMode::SRTM_FORCE_COPY_RESTORE, 0, false);
-	pTargetManager->SetCurrentRenderTarget(0, a_renderTarget, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	pTargetManager->SetCurrentRenderTarget(1, 27, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	pTargetManager->SetCurrentRenderTarget(2, 29, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	pTargetManager->SetCurrentRenderTarget(3, 30, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	if (pShaderState->bDeferredRGBEmit) {
-		pTargetManager->SetCurrentRenderTarget(4, 31, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	}
-	pTargetManager->SetCurrentRenderTarget(5, 32, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
+	pTargetManager->SetCurrentRenderTarget(0, a_renderTarget, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
+	//pTargetManager->SetCurrentRenderTarget(1, 27, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	//pTargetManager->SetCurrentRenderTarget(2, 29, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	//pTargetManager->SetCurrentRenderTarget(3, 30, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	//if (pShaderState->bDeferredRGBEmit) {
+	//	pTargetManager->SetCurrentRenderTarget(4, 31, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	//}
+	//pTargetManager->SetCurrentRenderTarget(5, 32, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
 	pTargetManager->SetCurrentViewportForceToRenderTargetDimensions();
 	pRenderData->SetClearColor(0.0F, 0.0F, 0.0F, 0.0F);
 	pRenderData->ClearColor();
@@ -886,10 +849,10 @@ void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulat
 	pGraphicsState->SetCameraData(a_camera, false, 0.0F, 1.0F);
 	pRenderData->DoZPrePass(nullptr, nullptr, 0.0F, 1.0F, 0.0F, 1.0F);
 	a_shaderAccumulator->RenderOpaqueDecals();
-	a_shaderAccumulator->RenderBatches(4, false, -1);
-	a_shaderAccumulator->RenderBlendedDecals();
+	//a_shaderAccumulator->RenderBatches(4, false, -1);
+	//a_shaderAccumulator->RenderBlendedDecals();
 	pRenderData->Flush();
-	pRenderData->SetClearColor(1.0F, 1.0F, 1.0F, 1.0F);
+	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
 	a_shaderAccumulator->ClearEffectPasses();
 	a_shaderAccumulator->ClearActivePasses(false);
 }
@@ -897,21 +860,10 @@ void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulat
 #pragma region nsScope
 namespace nsScope {
 	ScopeRenderer* scopeRenderer = nullptr;
-	BSSpinLock* scopeRendererLock = nullptr;
 	bool initialized = false;
-	bool currentlyActive = false;
-	bool queueCreation = false;
-	bool queueDestruction = false;
 
 	void CreateRenderer() {
 		logInfo("ScopeRenderer Creation Starting...");
-
-		if (!scopeRendererLock) {
-			//create a spinlock
-			scopeRendererLock = (BSSpinLock*)RE::malloc(0x8);
-			logInfo("ScopeRendererLock Allocated...");
-			new (scopeRendererLock) BSSpinLock();
-		}
 
 		//there is already an exsisting renderer
 		if (scopeRenderer) {
@@ -923,25 +875,21 @@ namespace nsScope {
 		if (!scopeRenderer) {
 			scopeRenderer = InitRenderer();
 		}
-		currentlyActive = true;
 		initialized = true;
-		scopeRendererLock->unlock();
-		
+
 		logInfo("ScopeRenderer Creation Complete.");
 		logger::info(FMT_STRING("ScopeRenderer created at {:p}"), fmt::ptr(scopeRenderer));
 	}
 
 	void DestroyRenderer() {
 		logInfo("ScopeRenderer Destroy Starting...");
-		scopeRendererLock->lock();
 		ScopeRenderer* renderer = scopeRenderer;
 		if (scopeRenderer) {
 			scopeRenderer->~ScopeRenderer();
-			RE::free(renderer);
+			//RE::free(renderer);
 		}
 		scopeRenderer = nullptr;
-		currentlyActive = false;
-		scopeRendererLock->unlock();
+		initialized = false;
 		logInfo("ScopeRenderer Destroy Complete.");
 	}
 
@@ -974,11 +922,9 @@ namespace nsScope {
 		NiTexture* renderedTexture;
 
 		logInfo("Locking All Renderers...");
-		scopeRendererLock->lock();
 		BSGraphics::Renderer::GetSingleton().Lock();
 		renderedTexture = scopeRenderer->Render(true);
 		if (renderedTexture) {
-			
 			if (scopeRenderer->pRendererCamera->renderPlane->shaderProperty.get()->Type() != NiProperty::SHADE) {
 				//TODO: Add a creation of a shader property to the geometry for if the shaderProperty of the current geometry is nullptr or invalid
 			}
@@ -1006,26 +952,6 @@ namespace nsScope {
 		}
 		logInfo("Unlocking All Renderers...");
 		BSGraphics::Renderer::GetSingleton().Unlock();
-		scopeRendererLock->unlock();
-	}
-
-	void RevaluateRendererState() {
-		if (currentlyActive) {
-			if (WeaponHasNoSpecialScopes()) {
-				queueCreation = false;
-				queueDestruction = true;
-			}
-		} else {
-			if (WeaponHasSpecialScope()) {
-				queueCreation = true;
-				queueDestruction = false;
-			}
-		}
-	}
-
-	void UpdateCamera(bool updateState, bool update3D, bool updateGeneral) {
-		scopeRenderer->UpdateCamera(updateState, update3D, updateGeneral);
-		logInfo("nsScope::UpdateCamera() Update Done.");
 	}
 }
 

@@ -14,7 +14,7 @@ struct ScopeCameraStates {
 };
 using ScopeCameraState = ScopeCameraStates::CameraState;
 
-class ScopeCamera : public TESCamera {
+class ScopeCamera : public TESCamera {	//TODO Add BSTEventSink as a baseclass???
 public:
 	class DefaultState : public TESCameraState {
 	public:
@@ -46,12 +46,6 @@ public:
 		void SetTranslation(NiPoint3& newPos);
 		void SetZoom(float newZoom);
 
-		//member access
-		NiQuaternion& QInitialRotation();
-		NiPoint3& QInitialPosition();
-		NiQuaternion& QRotation();
-		NiPoint3& QTranslation();
-
 		//members
 		NiQuaternion initialRotation;
 		NiPoint3 initialPosition;
@@ -82,8 +76,6 @@ public:
 
 		//functions
 
-		//member access
-
 		//members
 
 		F4_HEAP_REDEFINE_NEW(ScopeCamera::ThermalState);
@@ -108,8 +100,6 @@ public:
 		virtual void Update(BSTSmartPointer<TESCameraState>& a_nextState) override;
 
 		//functions
-
-		//member access
 
 		//members
 
@@ -138,19 +128,14 @@ public:
 	void Update3D();
 	void UpdateCamera();
 	
-
 	//member access
 	bool QCameraHasRenderPlane();
-	bool QCameraEquals(uint32_t cameraIndex);
-	TESCameraState* QCameraState(uint32_t index);
-	NiCamera* QRenderCamera();
 
 	//members
 	BSTSmartPointer<TESCameraState> cameraStates[ScopeCameraState::kTotal];
 	NiCamera* camera;
 	BSGeometry* renderPlane;
 	bool geometryDefault;
-	bool geometryFound;
 
 	F4_HEAP_REDEFINE_NEW(ScopeCamera);
 };
@@ -163,7 +148,6 @@ public:
 
 	//functions
 	NiTexture* Render(bool saveTexture);
-	void UpdateCamera(bool updateState, bool update3D, bool updateGeneral);
 
 	//members
 	BSCullingProcess* pScopeCullingProc{ nullptr };
@@ -202,14 +186,8 @@ namespace nsScope {
 	void DestroyRenderer();
 	ScopeRenderer* InitRenderer();
 	void Render();
-	void RevaluateRendererState();
-	void UpdateCamera(bool updateState, bool update3D, bool updateGeneral);
 
 	//members
 	extern ScopeRenderer* scopeRenderer;
-	extern BSSpinLock* scopeRendererLock;
 	extern bool initialized;
-	extern bool currentlyActive;
-	extern bool queueCreation;
-	extern bool queueDestruction;
 }
