@@ -412,6 +412,7 @@ set(SOURCES
 	include/RE/Bethesda/InputDevice.h
 	include/RE/Bethesda/InputEvent.h
 	include/RE/Bethesda/Interface3D.h
+	include/RE/Bethesda/InterfaceStrings.h
 	include/RE/Bethesda/InventoryUserUIUtils.h
 	include/RE/Bethesda/ItemCrafted.h
 	include/RE/Bethesda/LocalMap.h
@@ -1366,6 +1367,7 @@ set(SOURCES
 	src/RE/Fallout.cpp
 	src/RE/NetImmerse/NiMain/NiAVObject.cpp
 	src/RE/NetImmerse/NiMain/NiColor.cpp
+	src/RE/NetImmerse/NiMain/NiPoint2.cpp
 	src/RE/NetImmerse/NiMain/NiPoint3.cpp
 	src/RE/NetImmerse/NiMain/NiRect.cpp
 	src/RE/NetImmerse/NiObjectNET.cpp

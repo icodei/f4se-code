@@ -1,15 +1,18 @@
 #pragma once
 #include "Custom Renderer/CustomRenderer.h"
 #include "Custom Renderer/ExtraCameraManager.h"
+#include "Custom Renderer/ScopeGeometry.h"
 #include "Custom Renderer/ScopeRendererManager.h"
 #include "Custom Renderer/ScopeShaders.h"
-#include "Custom Renderer/ScopeGeometry.h"
 
 #include "AnimationFunctions.h"
+#include "HookUtil.h"
 #include "Hooks.h"
+#include "InputUtil.h"
 #include "ReloadHandlers.h"
 #include "Util.h"
 #include "WeaponHandlers.h"
+#include "WeaponInfo.h"
 
 extern F4SE::PluginHandle g_pluginHandle;
 extern const F4SE::MessagingInterface* g_messaging;
@@ -19,6 +22,10 @@ extern const F4SE::Trampoline* g_trampoline;
 extern PlayerCharacter* pc;
 extern PlayerCamera* pcam;
 extern PlayerControls* pcon;
+
+extern uint32_t keyPressedCount;
+extern uint32_t keyPressedLast;
+extern std::chrono::system_clock::duration keyPressedLastTime;
 
 extern bool gameLoading;
 extern bool gameLoadingSave;
@@ -43,6 +50,7 @@ extern BGSKeyword* weaponIsClosedBoltKeyword;
 extern BGSKeyword* weaponIsOpenBoltKeyword;
 
 #define GET_EVENT_SOURCE(EventName) (BSTEventSource<EventName>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), #EventName);
+#define RETURN_HANDLER return ((FnExecuteHandler)fnOriginal)(a_handler, a_actor, a_event);
 
 #define _BYTE std::uint8_t
 #define _WORD std::uint16_t
@@ -90,6 +98,8 @@ extern BGSKeyword* weaponIsOpenBoltKeyword;
 #define DblPId180 0.017453292519943295F
 #define Dbl180dPI 57.29577951308232F
 
+#define BUTTON_DOUBLE_TAP 2
+#define BUTTON_TIMEOUT 0.1F
 #define BUTTON_UP 0.0F
 #define BUTTON_DOWN 1.0F
 #define BUTTON_HOLD_TIMER 0.4F

@@ -17,8 +17,11 @@ namespace RE
 	class TESObjectREFR;
 
 	enum class WEAPON_STATE : std::uint32_t;
+	enum class CrosshairMode;
 
 	struct InventoryUserUIInterfaceEntry;
+
+	struct BGSOnPlayerFireWeaponEvent;
 
 	struct BGSOnPlayerUseWorkBenchEvent
 	{
@@ -332,33 +335,23 @@ namespace RE
 	static_assert(sizeof(PlayerAmmoCountEvent) == 0x20);
 	static_assert(offsetof(PlayerAmmoCountEvent, weapon) == 0x10);
 
-	class PlayerWeaponReloadEvent :
-		public BSTValueEvent<bool>
+	class PlayerCrosshairModeEvent :
+		public BSTValueEvent<CrosshairMode>
 	{
 	private:
-		using EventSource_t = BSTGlobalEvent::EventSource<PlayerWeaponReloadEvent>;
-		using ValueEventSource_t = BSTGlobalEvent::EventSource<BSTValueRequestEvent<PlayerWeaponReloadEvent>>;
+		using EventSource_t = BSTGlobalEvent::EventSource<PlayerCrosshairModeEvent>;
+		using ValueEventSource_t = BSTGlobalEvent::EventSource<BSTValueRequestEvent<PlayerCrosshairModeEvent>>;
 
 	public:
 		[[nodiscard]] static EventSource_t* GetEventSource()
 		{
-			REL::Relocation<EventSource_t**> singleton{ REL::ID(793042) };
+			REL::Relocation<EventSource_t**> singleton{ REL::ID(1231665) };
 			if (!*singleton) {
 				*singleton = new EventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
 			}
 			return *singleton;
 		}
-
-		[[nodiscard]] static ValueEventSource_t* GetValueEventSource()
-		{
-			REL::Relocation<ValueEventSource_t**> singleton{ REL::ID(1012004) };
-			if (!*singleton) {
-				*singleton = new ValueEventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
-			}
-			return *singleton;
-		}
 	};
-	static_assert(sizeof(PlayerWeaponReloadEvent) == 0x2);
 
 	class PlayerSetWeaponStateEvent :
 		public BSTValueEvent<WEAPON_STATE>
@@ -386,6 +379,34 @@ namespace RE
 		}
 	};
 	static_assert(sizeof(PlayerSetWeaponStateEvent) == 0x8);
+
+	class PlayerWeaponReloadEvent :
+		public BSTValueEvent<bool>
+	{
+	private:
+		using EventSource_t = BSTGlobalEvent::EventSource<PlayerWeaponReloadEvent>;
+		using ValueEventSource_t = BSTGlobalEvent::EventSource<BSTValueRequestEvent<PlayerWeaponReloadEvent>>;
+
+	public:
+		[[nodiscard]] static EventSource_t* GetEventSource()
+		{
+			REL::Relocation<EventSource_t**> singleton{ REL::ID(793042) };
+			if (!*singleton) {
+				*singleton = new EventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
+			}
+			return *singleton;
+		}
+
+		[[nodiscard]] static ValueEventSource_t* GetValueEventSource()
+		{
+			REL::Relocation<ValueEventSource_t**> singleton{ REL::ID(1012004) };
+			if (!*singleton) {
+				*singleton = new ValueEventSource_t(&BSTGlobalEvent::GetSingleton()->eventSourceSDMKiller);
+			}
+			return *singleton;
+		}
+	};
+	static_assert(sizeof(PlayerWeaponReloadEvent) == 0x2);
 
 	enum class QuickContainerMode : std::int32_t
 	{
@@ -614,4 +635,20 @@ namespace RE
 		};
 		static_assert(sizeof(CellAttachDetachEventSourceSingleton) == 0x58);
 	}
+
+	class WeaponAttack
+	{
+	public:
+		struct Event
+		{
+		public:
+
+		};
+		[[nodiscard]] static BSTEventSource<WeaponAttack::Event>& GetEventSource()
+		{
+			using func_t = decltype(&WeaponAttack::GetEventSource);
+			REL::Relocation<func_t> func{ REL::ID(66546) };
+			return func();
+		}
+	};
 }

@@ -6,20 +6,20 @@ namespace RE
 	{
 		enum
 		{
-			REFLECTIONS = 0x4,
-			REFRACTIONS = 0x8,
-			DEPTH = 0x10,
-			INTERIOR = 0x20,
-			DISPLACEMENT = 0x40,
-			VA_DEPTH = 0x80,
-			CUBEMAP = 0x100,
-			SSLR = 0x200,
-			CLIP_VOLUME = 0x400,
-			DEPTH_WRITE = 0x800,
-			UNDERWATER = 0x1000,
-			NEXT_BIT = 0x2000,
+			REFLECTIONS = 1 << 2,
+			REFRACTIONS = 1 << 3,
+			DEPTH = 1 << 4,
+			INTERIOR = 1 << 5,
+			DISPLACEMENT = 1 << 6,
+			VA_DEPTH = 1 << 7,
+			CUBEMAP = 1 << 8,
+			SSLR = 1 << 9,
+			CLIP_VOLUME = 1 << 10,
+			DEPTH_WRITE = 1 << 11,
+			UNDERWATER = 1 << 12,
+			NEXT_BIT = 1 << 13,
 
-			COUNT = 0xB,
+			COUNT = 11,
 		};
 	};
 }

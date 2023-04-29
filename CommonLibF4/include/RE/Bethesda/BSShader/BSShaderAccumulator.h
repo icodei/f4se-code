@@ -99,7 +99,7 @@ namespace RE
 		ShadowSceneNode* activeShadowSceneNode;
 		BSShaderManager::etRenderMode renderMode;
 		BSLight* shadowLight;
-		NiPoint3 QEyePosition;
+		NiPoint3 eyePosition;
 		std::uint32_t QDepthPassIndex;
 		std::uint64_t gap[(0x590 - 0x580) / 6];
 

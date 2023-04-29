@@ -1,58 +1,6 @@
 #pragma once
 #include "Global.h"
 
-
-char* _MESSAGE(const char* fmt, ...);
-void Dump(void* mem, unsigned int size);
-
-template <typename T>
-T GetVirtualFunction(void* baseObject, int vtblIndex) {
-	uintptr_t* vtbl = reinterpret_cast<uintptr_t**>(baseObject)[0];
-	return reinterpret_cast<T>(vtbl[vtblIndex]);
-}
-
-template <typename T>
-T GetOffset(const void* baseObject, int offset) {
-	return *reinterpret_cast<T*>((uintptr_t)baseObject + offset);
-}
-
-template <class T>
-T SafeWrite64Function(uintptr_t addr, T data) {
-	DWORD oldProtect;
-	void* _d[2];
-	memcpy(_d, &data, sizeof(data));
-	size_t len = sizeof(_d[0]);
-
-	VirtualProtect((void*)addr, len, PAGE_EXECUTE_READWRITE, &oldProtect);
-	T olddata;
-	memset(&olddata, 0, sizeof(T));
-	memcpy(&olddata, (void*)addr, len);
-	memcpy((void*)addr, &_d[0], len);
-	VirtualProtect((void*)addr, len, oldProtect, &oldProtect);
-	return olddata;
-}
-
-template <class Ty>
-static inline Ty SafeWrite_Impl(uintptr_t addr, Ty data) {
-	DWORD oldProtect = 0;
-	Ty oldVal = 0;
-
-	if (VirtualProtect((void*)addr, sizeof(Ty), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Ty* p = (Ty*)addr;
-		oldVal = *p;
-		*p = data;
-		VirtualProtect((void*)addr, sizeof(Ty), oldProtect, &oldProtect);
-	}
-
-	return oldVal;
-}
-
-uintptr_t SafeWrite64(uintptr_t addr, uintptr_t data);
-
-BSTEventSource<void*>* GetGlobalEventSource(BSTGlobalEvent_OLD* globalEvents, const char* globalName);
-const char* GetObjectClassNameImpl(const char* result, void* objBase);
-const char* GetObjectClassName(void* objBase);
-
 enum AmmoType {
 	kAmmoType_Default = 0x0,
 	kAmmoType_Charging = 0x1,
@@ -71,8 +19,6 @@ struct IsReloadableDataWrapper {
 	void* arg2;
 };
 
-bool IsButtonPressed(ButtonEvent* btnEvent);
-bool IsHoldingButton(ButtonEvent* btnEvent);
 bool IsPlayerInFirstPerson();
 bool IsPlayerInThirdPerson();
 bool IsPlayerSprinting();
@@ -91,6 +37,9 @@ EquippedWeapon& GetPlayerEquippedWeaponDefault();
 const uint32_t GetPlayerInventoryObjectCount(const TESBoundObject* item);
 
 const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name);
+
+char* _MESSAGE(const char* fmt, ...);
+void Dump(void* mem, unsigned int size);
 
 template <typename K, typename V>
 void print_map(unordered_map<K, V> const& map) {

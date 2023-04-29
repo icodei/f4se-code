@@ -1,12 +1,12 @@
 #pragma once
 
+#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTEvent.h"
+#include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/BSInputEventReceiver.h"
 #include "RE/Bethesda/BSInputEventUser.h"
 #include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSSpring.h"
-#include "RE/Bethesda/BSCore/BSTArray.h"
-#include "RE/Bethesda/BSCore/BSTEvent.h"
-#include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/IMovementInterface.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
@@ -18,21 +18,7 @@ namespace RE
 	class QuickContainerStateEvent;
 	class UserEventEnabledEvent;
 
-	struct ActivateHandler;
-	struct AttackBlockHandler;
-	struct AutoMoveHandler;
-	struct GrabRotationHandler;
-	struct JumpHandler;
-	struct LookHandler;
-	struct MeleeThrowHandler;
-	struct MovementHandler;
-	struct ReadyWeaponHandler;
-	struct RunHandler;
-	struct SneakHandler;
-	struct SprintHandler;
 	struct TESFurnitureEvent;
-	struct TogglePOVHandler;
-	struct ToggleRunHandler;
 
 	class __declspec(novtable) ActionInput
 	{
@@ -90,7 +76,6 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BGSActionData };
 		static constexpr auto VTABLE{ VTABLE::BGSActionData };
-
 	};
 
 	class TESActionData :
@@ -99,41 +84,43 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::TESActionData };
 		static constexpr auto VTABLE{ VTABLE::TESActionData };
-
 	};
 
 	struct PlayerControlsData
 	{
 	public:
 		// members
-		NiPoint2 moveInputVec;                                // 00
-		NiPoint2 lookInputVec;                                // 08
-		NiPoint2 lookInputVecNormalized;                      // 10
-		NiPoint2 prevMoveVec;                                 // 18
-		NiPoint2 prevLookVec;                                 // 20
-		BSSpring::SpringState<NiPoint3> rotationSpeedSpring;  // 28
-		bool autoMove;                                        // 44
-		bool running;                                         // 45
-		bool togglePOV;                                       // 46
-		bool vanityModeEnabled;                               // 47
-		bool checkHeldStates;                                 // 48
-		bool setupHeldStatesForRelease;                       // 49
+		NiPoint2 moveInputVec{ NiPoint2::ZERO };              // 00
+		NiPoint2 lookInputVec{ NiPoint2::ZERO };              // 08
+		NiPoint2 lookInputVecNormalized{ NiPoint2::ZERO };    // 10
+		NiPoint2 prevMoveVec{ NiPoint2::ZERO };               // 18
+		NiPoint2 prevLookVec{ NiPoint2::ZERO };               // 20
+		BSSpring::SpringState<NiPoint3> rotationSpeedSpring
+		{
+			rotationSpeedSpring.position = NiPoint3::ZERO,
+			rotationSpeedSpring.velocity = NiPoint3::ZERO,
+			rotationSpeedSpring.springConstant = 0.0F
+		};                                                    // 28
+		bool autoMove{ false };                               // 44
+		bool running{ false };                                // 45
+		bool togglePOV{ false };                              // 46
+		bool vanityModeEnabled{ false };                      // 47
+		bool checkHeldStates{ false };                        // 48
+		bool setupHeldStatesForRelease{ false };              // 49
 	};
 	static_assert(sizeof(PlayerControlsData) == 0x4C);
 
-	class PlayerInputHandler :
-		public BSInputEventUser  // 00
+	class PlayerInputHandler : public BSInputEventUser
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::PlayerInputHandler };
 		static constexpr auto VTABLE{ VTABLE::PlayerInputHandler };
 
-		explicit constexpr PlayerInputHandler(PlayerControlsData& a_data) noexcept :
-			data(a_data)
-		{}
+		PlayerInputHandler() = delete;
+		PlayerInputHandler(PlayerControlsData& a_data) :
+			data(a_data) { ctor(a_data); }
 
-		// NOLINTNEXTLINE(modernize-use-override)
-		virtual ~PlayerInputHandler() = default;  // 00
+		virtual ~PlayerInputHandler() {}  // 00
 
 		// add
 		virtual void PerFrameUpdate() { return; };  // 09
@@ -141,36 +128,114 @@ namespace RE
 		// members
 		PlayerControlsData& data;        // 10
 		bool inQuickContainer{ false };  // 18
+
+	private:
+		PlayerInputHandler* ctor(PlayerControlsData& a_data)
+		{
+			using func_t = decltype(&PlayerInputHandler::ctor);
+			REL::Relocation<func_t> func{ REL::ID(1240396), 0xC0 };
+			return func(this, a_data);
+		}
 	};
 	static_assert(sizeof(PlayerInputHandler) == 0x20);
 
-	class HeldStateHandler :
-		public PlayerInputHandler  // 00
+	class HeldStateHandler : public PlayerInputHandler
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::HeldStateHandler };
 		static constexpr auto VTABLE{ VTABLE::HeldStateHandler };
 
-		explicit constexpr HeldStateHandler(PlayerControlsData& a_data) noexcept :
-			PlayerInputHandler(a_data)
-		{}
+		HeldStateHandler() = delete;
+		HeldStateHandler(PlayerControlsData& a_data) : PlayerInputHandler(a_data) { ctor(a_data); }
 
-		// NOLINTNEXTLINE(modernize-use-override)
-		virtual ~HeldStateHandler() = default;  // 00
+		virtual ~HeldStateHandler() {}  // 00
 
 		// add
-		virtual void UpdateHeldStateActive(const ButtonEvent* a_event)  // 10
-		{
-			heldStateActive = a_event && (a_event->value != 0.0F || a_event->heldDownSecs < 0.0F);
-		}
-
-		virtual void SetHeldStateActive(bool a_flag) { heldStateActive = a_flag; }  // 11
+		virtual void UpdateHeldStateActive(const ButtonEvent* a_event) { heldStateActive = a_event && (a_event->value != 0.0F || a_event->heldDownSecs < 0.0F); }  // 10
+		virtual void SetHeldStateActive(bool a_flag) { heldStateActive = a_flag; }                                                                                 // 11
 
 		// members
 		bool heldStateActive{ false };      // 20
 		bool triggerReleaseEvent{ false };  // 21
+
+	private:
+		HeldStateHandler* ctor(PlayerControlsData& a_data)
+		{
+			using func_t = decltype(&HeldStateHandler::ctor);
+			REL::Relocation<func_t> func{ REL::ID(908502), 0xD0 };
+			return func(this, a_data);
+		}
 	};
 	static_assert(sizeof(HeldStateHandler) == 0x28);
+
+	struct ActivateHandler;
+
+	struct AttackBlockHandler : public HeldStateHandler
+	{
+	public:
+		static constexpr auto RTTI{ RTTI::AttackBlockHandler };
+		static constexpr auto VTABLE{ VTABLE::AttackBlockHandler };
+
+		AttackBlockHandler() = delete;
+		AttackBlockHandler(PlayerControlsData& a_data) :
+			HeldStateHandler(a_data) { ctor(a_data); }
+
+		virtual ~AttackBlockHandler(){}  // 00
+
+		//members
+		std::uint32_t heldTimeMs;
+		std::uint32_t unk1C;
+		BSFixedString controlID;
+		std::uint8_t attackType;
+		std::uint8_t pad29;
+		std::uint16_t pad2A;
+		std::uint8_t attackCount;
+		float initialPowerAttackDelay;
+		std::uint32_t pad34;
+		float subsequentPowerAttackDelay;
+		bool ignore;
+		bool unk41;
+		bool heldLeft;
+		bool heldRight;
+		float fAttackQueueThresholdSec;
+		std::int64_t gap58;
+		float rightAttackHeldSeconds;
+		float rightAttackLastHeldSeconds;
+		float gap68;
+		float field_6C;
+		bool field_70;
+		char field_71;
+		bool leftAttackHeld;
+		bool rightAttackHeld;
+		bool field_74;
+		bool field_75;
+		bool field_76;
+		bool field_77;
+		bool throwingWeapon;
+
+	private:
+		AttackBlockHandler* ctor(PlayerControlsData& a_data)
+		{
+			using func_t = decltype(&AttackBlockHandler::ctor);
+			REL::Relocation<func_t> func{ REL::ID(908502) };
+			return func(this, a_data);
+		}
+	};
+	static_assert(sizeof(AttackBlockHandler) == 0x80);
+
+	struct AutoMoveHandler;
+	struct GrabRotationHandler;
+	struct JumpHandler;
+	struct LookHandler;
+	struct MeleeThrowHandler;
+	struct MovementHandler;
+	struct ReadyWeaponHandler;
+	struct RunHandler;
+	struct SneakHandler;
+	struct SprintHandler;
+
+	struct TogglePOVHandler;
+	struct ToggleRunHandler;
 
 	class __declspec(novtable) PlayerControls :
 		BSInputEventReceiver,                    // 000

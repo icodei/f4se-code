@@ -84,7 +84,7 @@ namespace RE
 		NiPointer<BSShaderAccumulator> spAccumulator;
 		ImageSpaceShaderParam params;
 		int renderTarget;
-		int field_2A4;
+		int renderMode;
 		NiAVObject* fogOfWarOverlay;
 	};
 	static_assert(sizeof(LocalMapRenderer) == 0x2B0);

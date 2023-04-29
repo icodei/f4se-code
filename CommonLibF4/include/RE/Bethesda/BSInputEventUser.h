@@ -11,7 +11,7 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::BSInputEventUser };
 		static constexpr auto VTABLE{ VTABLE::BSInputEventUser };
 
-		explicit constexpr BSInputEventUser() noexcept { stl::emplace_vtable(this); }
+		BSInputEventUser() { ctor(); }
 
 		virtual ~BSInputEventUser() = default;  // 00
 
@@ -29,6 +29,14 @@ namespace RE
 
 		// members
 		bool inputEventHandlingEnabled{ true };  // 08
+
+	private:
+		BSInputEventUser* ctor()
+		{
+			using func_t = decltype(&BSInputEventUser::ctor);
+			REL::Relocation<func_t> func{ REL::ID(1240396), 0xC0 };
+			return func(this);
+		}
 	};
 	static_assert(sizeof(BSInputEventUser) == 0x10);
 

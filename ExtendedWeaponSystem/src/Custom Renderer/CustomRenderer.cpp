@@ -718,12 +718,10 @@ ScopeRenderer::~ScopeRenderer() {
 	}
 	pRendererCamera->~ScopeCamera();
 	pScopeCullingProc->~BSCullingProcess();
-	pScopeAccumulator->~BSShaderAccumulator();
-	pShaderParams->~ImageSpaceShaderParam();
 	logInfo("ScopeRenderer dtor Completed.");
 }
 
-NiTexture* ScopeRenderer::Render(bool saveTexture) {
+NiTexture* ScopeRenderer::Render() {
 	logInfo("ScopeRenderer::Render() Starting...");
 	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
 	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
@@ -733,29 +731,54 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 	NiCamera* shaderCam = BSShaderManager::GetCamera();
 
 	ShadowSceneNode* pWorldSSN = pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD];
-	//NiAVObject* objectLODRoot = pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD]->children[3].get();
-	//if (objectLODRoot) {
-	//	InterlockedIncrement(&objectLODRoot->refCount);
-	//}
-	//bool objCullFlag = objectLODRoot->flags.flags & 1;
-	//objectLODRoot->SetAppCulled(true);
+	NiAVObject* objectLODRoot = pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD]->children[3].get();
+	NiAVObject* pObjectLODRoot = objectLODRoot;
+	if (objectLODRoot) {
+		InterlockedIncrement(&objectLODRoot->refCount);
+	}
+	bool objectLODRootCull = objectLODRoot->flags.GetBit(NiAVObject::APP_CULLED_MASK);
+	objectLODRoot->SetAppCulled(true);
+	NiNode* grassNode = BGSGrassManager::GetSingleton()->grassNode;
+	NiNode* pGrassNode = grassNode;
+	bool grassCull = grassNode->flags.GetBit(NiAVObject::APP_CULLED_MASK);
+	bool grassCullFlag = grassCull;
+	grassNode->SetAppCulled(true);
+	BSDistantObjectInstanceRenderer::QInstance().enabled = false;
 
 	memcpy(BSShaderManager::GetCamera(), pRendererCamera->camera, 0x1A0);
 
 	pGraphicsState->SetCameraData(pRendererCamera->camera, false, 0.0F, 1.0F);
 	pScopeCullingProc->SetAccumulator(pScopeAccumulator);
 	pScopeCullingProc->kCullMode = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
-	pScopeCullingProc->pkCamera = pRendererCamera->camera;
 	pScopeCullingProc->bCameraRelatedUpdates = false;
+	pScopeCullingProc->pkCamera = pRendererCamera->camera;
 	pRendererCamera->Update();
+
+	bool lightUpdateLast = pWorldSSN->DisableLightUpdate;
+	pWorldSSN->DisableLightUpdate = true;
+	bool lightUpdate = lightUpdateLast;
+
+	REL::Relocation<bool*> BSFadeNode_bFadeEnabled{ REL::ID(1220201) };
+	REL::Relocation<bool*> BSFadeNode_bDrawFadingEnabled{ REL::ID(1445134) };
+	REL::Relocation<int*> BSFadeNode_iFadeEnableCounter{ REL::ID(580186) };
+
+	bool fadeEnabledFlag = *BSFadeNode_bFadeEnabled;
+	memset(&*BSFadeNode_bFadeEnabled, 0, sizeof(bool));
+	memset(&*BSFadeNode_bDrawFadingEnabled, 0, sizeof(bool));
+	memset(&*BSFadeNode_iFadeEnableCounter, 0, sizeof(int));
+	bool fadeEnabled = fadeEnabledFlag;
 
 	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
 
-	pScopeAccumulator->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_SINGLEPASS;
-	pScopeAccumulator->QEyePosition = pRendererCamera->camera->world.translate;
+	//water here
+
+	pScopeAccumulator->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_SCREEN_SPLATTER;
+	pScopeAccumulator->eyePosition = pRendererCamera->camera->world.translate;
 	pRenderData->ResetZPrePass();
 
-	BSPortalGraphEntry* camPortalEntry = (Main::GetSingleton())->GetCameraPortalGraphEntry();
+	//here is where we would go through the array of cells for a top down render like Local Map Renderer
+
+	BSPortalGraphEntry* camPortalEntry = Main::GetSingleton()->GetCameraPortalGraphEntry();
 	if (camPortalEntry) {
 		BSPortalGraph* camPortalGraph = camPortalEntry->PortalGraph;
 		if (camPortalGraph) {
@@ -785,63 +808,135 @@ NiTexture* ScopeRenderer::Render(bool saveTexture) {
 	uint32_t renderTargetID = 24;  //RENDER_TARGET_HUDGLASS
 	uint32_t depthTargetID = 1;    //DEPTH_STENCIL_TARGET_MAIN
 	uint32_t effectID = 162;       //kBSVatsTarget
-	logInfo("Acquiring Targets...");
-	pTargetManager->AcquireDepthStencil(depthTargetID);
-	pTargetManager->AcquireRenderTarget(renderTargetID);
+	//logInfo("Acquiring Targets...");	//Need to do more research for if we need to acquire targets or not
+	//pTargetManager->AcquireDepthStencil(depthTargetID);
+	//pTargetManager->AcquireRenderTarget(renderTargetID);
 	logInfo("Setting Targets...");
 	RenderScopeScene(pRendererCamera->camera, pScopeAccumulator, renderTargetID, depthTargetID);
 
-	pTargetManager->SetCurrentRenderTarget(0, 2, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	pTargetManager->SetCurrentRenderTarget(0, 2, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);	//RENDER_TARGET_MAIN_COPY
+	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);		//RENDER_TARGET_NONE
 	pTargetManager->SetCurrentDepthStencilTarget(depthTargetID, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
 	pTargetManager->SetCurrentDepthStencilTarget(0, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
 
-	pShaderParams->SetPixelConstant(0,
-		1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiWidth,
-		1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiHeight,
-		0.0F,
-		0.0F);
+	//pShaderParams->SetPixelConstant(0,
+	//	1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiWidth,
+	//	1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiHeight,
+	//	0.0F,
+	//	0.0F);
+
+	const BSFixedString strScope("ScopeTexture");
+	NiTexture* renderedTexture = renderedTexture->CreateEmpty(strScope, false, false);
+
+	pTargetManager->SetTextureDepth(1, depthTargetID);
+	pTargetManager->SetTextureRenderTarget(2, renderTargetID, false);
+	pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
+	pImageSpaceManager->RenderEffectHelper_Tex_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderedTexture, renderTargetID, pShaderParams);
+	pImageSpaceManager->RenderEffect_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, pShaderParams);
+	pTargetManager->SetCurrentRenderTarget(0, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);	//RENDER_TARGET_MAIN
+
+	renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTargetID, false, false, BSGraphics::Usage::USAGE_DEFAULT));
 
 	logInfo("Releasing Targets...");
 	pTargetManager->ReleaseDepthStencil(depthTargetID);
 	pTargetManager->ReleaseRenderTarget(renderTargetID);
 
-	NiTexture* renderedTexture = nullptr;
-	if (saveTexture) {
-		const BSFixedString strScope("ScopeTexture");
-		renderedTexture = renderedTexture->CreateEmpty(strScope, false, false);
-		pTargetManager->SetCurrentRenderTarget(0, renderTargetID, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-		pTargetManager->SetTextureRenderTarget(0, renderTargetID, false);
-		pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
-		pImageSpaceManager->RenderEffectHelper_Tex_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderedTexture, renderTargetID, nullptr);
-		renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTargetID, false, false, BSGraphics::Usage::USAGE_DEFAULT));
-	}
-
 	memcpy(BSShaderManager::GetCamera(), shaderCam, 0x1A0);
 	pGraphicsState->SetCameraData(shaderCam, false, 0.0F, 1.0F);
+	pWorldSSN->DisableLightUpdate = lightUpdate;
+	
+	memset(&*BSFadeNode_iFadeEnableCounter, 0, sizeof(int));
+	memset(&*BSFadeNode_bFadeEnabled, fadeEnabled, sizeof(bool));
+	memset(&*BSFadeNode_bDrawFadingEnabled, fadeEnabled, sizeof(bool));
+	
+	//water here
 
 	pScopeAccumulator->ClearActivePasses(false);
 	pScopeAccumulator->ClearGroupPasses(5, false);
+	BSDistantObjectInstanceRenderer::QInstance().enabled = true;
+
+	NiAVObject* pOldGrassNode = pGrassNode;
+	pGrassNode->SetAppCulled(grassCull);
+	if (!InterlockedDecrement(&pOldGrassNode->refCount)) {
+		pOldGrassNode->DeleteThis();
+	}
+
+	objectLODRoot->SetAppCulled(objectLODRootCull);
+	if (!InterlockedDecrement(&objectLODRoot->refCount)) {
+		objectLODRoot->DeleteThis();
+	}
+	return renderedTexture;
+}
+
+NiTexture * ScopeRenderer::RenderSimple() {
+	logInfo("ScopeRenderer::Render() Starting...");
+	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
+	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
+	BSGraphics::Renderer* pRenderData = &BSGraphics::Renderer::GetSingleton();
+	ImageSpaceManager* pImageSpaceManager = ImageSpaceManager::GetSingleton();
+	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
+	NiCamera* shaderCam = BSShaderManager::GetCamera();
+
+	uint32_t renderTargetID = 24;  //RENDER_TARGET_HUDGLASS
+	uint32_t depthTargetID = 1;    //DEPTH_STENCIL_TARGET_MAIN
+	uint32_t effectID = 162;       //kBSVatsTarget
+
+	memcpy(BSShaderManager::GetCamera(), pRendererCamera->camera, 0x1A0);
+	pGraphicsState->SetCameraData(pRendererCamera->camera, false, 0.0F, 1.0F);
+	pScopeCullingProc->SetAccumulator(pScopeAccumulator);
+	pScopeCullingProc->kCullMode = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
+	pScopeCullingProc->bCameraRelatedUpdates = false;
+	pScopeCullingProc->pkCamera = pRendererCamera->camera;
+	pRendererCamera->Update();
+
+	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
+
+	pScopeAccumulator->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_VATS_MASK;
+	pScopeAccumulator->eyePosition = pRendererCamera->camera->world.translate;
+
+	pTargetManager->SetCurrentDepthStencilTarget(depthTargetID, BSGraphics::SetRenderTargetMode::SRTM_FORCE_COPY_RESTORE, 0, false);
+	pTargetManager->SetCurrentRenderTarget(0, renderTargetID, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	pTargetManager->SetCurrentViewportForceToRenderTargetDimensions();
+	pRenderData->DoZPrePass(nullptr, nullptr, 0.0F, 1.0F, 0.0F, 1.0F);
+
+	const BSFixedString strScope("ScopeTexture");
+	NiTexture* renderedTexture = renderedTexture->CreateEmpty(strScope, false, false);
+
+	pTargetManager->SetTextureDepth(1, depthTargetID);
+	pTargetManager->SetTextureRenderTarget(2, renderTargetID, false);
+	//pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
+	//pImageSpaceManager->RenderEffectHelper_Tex_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderedTexture, renderTargetID, pShaderParams);
+	//pImageSpaceManager->RenderEffect_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, pShaderParams);
+	pTargetManager->SetCurrentRenderTarget(0, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);	//RENDER_TARGET_MAIN
+
+	renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTargetID, false, false, BSGraphics::Usage::USAGE_DEFAULT));
+
+	memcpy(BSShaderManager::GetCamera(), shaderCam, 0x1A0);
+	pGraphicsState->SetCameraData(shaderCam, false, 0.0F, 1.0F);
+	pRenderData->ResetZPrePass();
+	pRenderData->ResetState();
+	pRenderData->Flush();
+
 	return renderedTexture;
 }
 
 #pragma endregion
 
-void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulator, uint32_t a_renderTarget, uint32_t a_depthTarget) {
+void ScopeRenderer::RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulator, uint32_t a_renderTarget, uint32_t a_depthTarget) {
 	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
 	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
 	BSGraphics::Renderer* pRenderData = &BSGraphics::Renderer::GetSingleton();
 	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
 
 	pTargetManager->SetCurrentDepthStencilTarget(a_depthTarget, BSGraphics::SetRenderTargetMode::SRTM_FORCE_COPY_RESTORE, 0, false);
-	pTargetManager->SetCurrentRenderTarget(0, a_renderTarget, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
-	//pTargetManager->SetCurrentRenderTarget(1, 27, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	//pTargetManager->SetCurrentRenderTarget(2, 29, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	//pTargetManager->SetCurrentRenderTarget(3, 30, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	//if (pShaderState->bDeferredRGBEmit) {
-	//	pTargetManager->SetCurrentRenderTarget(4, 31, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
-	//}
-	//pTargetManager->SetCurrentRenderTarget(5, 32, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
+	pTargetManager->SetCurrentRenderTarget(0, a_renderTarget, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);	//BASEMAP
+	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);				//NORMAL
+	pTargetManager->SetCurrentRenderTarget(2, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);				//ENVMAP
+	pTargetManager->SetCurrentRenderTarget(3, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);				//
+	if (pShaderState->bDeferredRGBEmit) {
+		pTargetManager->SetCurrentRenderTarget(4, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);			//GLOWMAP
+	}
+	pTargetManager->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);			//
 	pTargetManager->SetCurrentViewportForceToRenderTargetDimensions();
 	pRenderData->SetClearColor(0.0F, 0.0F, 0.0F, 0.0F);
 	pRenderData->ClearColor();
@@ -849,8 +944,8 @@ void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulat
 	pGraphicsState->SetCameraData(a_camera, false, 0.0F, 1.0F);
 	pRenderData->DoZPrePass(nullptr, nullptr, 0.0F, 1.0F, 0.0F, 1.0F);
 	a_shaderAccumulator->RenderOpaqueDecals();
-	//a_shaderAccumulator->RenderBatches(4, false, -1);
-	//a_shaderAccumulator->RenderBlendedDecals();
+	a_shaderAccumulator->RenderBatches(4, false, -1);
+	a_shaderAccumulator->RenderBlendedDecals();
 	pRenderData->Flush();
 	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
 	a_shaderAccumulator->ClearEffectPasses();
@@ -921,9 +1016,8 @@ namespace nsScope {
 		}
 		NiTexture* renderedTexture;
 
-		logInfo("Locking All Renderers...");
-		BSGraphics::Renderer::GetSingleton().Lock();
-		renderedTexture = scopeRenderer->Render(true);
+		//renderedTexture = scopeRenderer->Render();
+		renderedTexture = scopeRenderer->RenderSimple();
 		if (renderedTexture) {
 			if (scopeRenderer->pRendererCamera->renderPlane->shaderProperty.get()->Type() != NiProperty::SHADE) {
 				//TODO: Add a creation of a shader property to the geometry for if the shaderProperty of the current geometry is nullptr or invalid
@@ -950,8 +1044,6 @@ namespace nsScope {
 				}
 			}
 		}
-		logInfo("Unlocking All Renderers...");
-		BSGraphics::Renderer::GetSingleton().Unlock();
 	}
 }
 

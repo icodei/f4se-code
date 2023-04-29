@@ -17,6 +17,7 @@ namespace RE
 		static const NiPoint3 UNIT_Y;
 		static const NiPoint3 UNIT_Z;
 		static const NiPoint3 UNIT_ALL;
+		static const NiPoint3 INFINITY_POINT3;
 
 		NiPoint3() = default;
 		NiPoint3(value_type aValue) :

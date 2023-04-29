@@ -297,6 +297,13 @@ namespace RE
 			return func(this, a_formID, a_rank);
 		}
 
+		void SetAutoReload(bool a_auto)
+		{
+			using func_t = decltype(&PlayerCharacter::SetAutoReload);
+			REL::Relocation<func_t> func{ REL::ID(1232532), 0x60 };
+			return func(this, a_auto);
+		}
+
 		void SetEscaping(bool a_flag, bool a_escaped)
 		{
 			using func_t = decltype(&PlayerCharacter::SetEscaping);

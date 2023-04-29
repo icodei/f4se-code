@@ -143,31 +143,6 @@ namespace RE
 			void QOnlyIncreaseWhenMoving();                           //TODO
 			void SetNbFramePause();                                   //TODO
 
-
-			//notes about texture render target
-			//BSImagespaceShaderCopy::CopyRenderTarget calls SetTextureRenderTarget(0, RenderTarget, 0)
-			//LocalMapRenderer::Render calls SetTextureRenderTarget(2, iLocalMapRenderTarget, 0)
-			//BSBloodSplatterShader::SetupTechnique calls SetTextureRenderTarget(3, iAdaptedLightRenderTarget, 0)
-			//BSDFPrePassShader::SetupTechnique calls SetTextureRenderTarget(4, uiPipboyScreenTarget, 0)
-			//BSEffectShader::SetupMaterial calls SetTextureRenderTarget(6, uiPipboyScreenTarget, 0)
-			//BSLightingShader::SetupTechnique calls SetTextureRenderTarget(12, uiPipboyScreenTarget, 0)
-			//
-			//0
-			//1
-			//2
-			//3
-			//4
-			//5
-			//6
-			//7
-			//8
-			//9
-			//10
-			//11
-			//12
-			//13
-			//14
-
 			void SetTextureRenderTarget(std::int32_t textureID, std::int32_t renderTargetID, bool copyView)
 			{
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureRenderTarget);
@@ -182,18 +157,18 @@ namespace RE
 				return func(this, textureID, renderTargetID, texMode, copyView);
 			}
 
-			void SetTextureDepth(std::int32_t a1, std::int32_t depthStencilTargetID)
+			void SetTextureDepth(std::int32_t textureID, std::int32_t depthStencilTargetID)
 			{
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureDepth);
 				REL::Relocation<func_t> func{ REL::ID(182949) };
-				return func(this, a1, depthStencilTargetID);
+				return func(this, textureID, depthStencilTargetID);
 			}
 
-			void SetTextureDepth_2(std::int32_t a1, std::int32_t depthStencilTargetID, BSGraphics::TextureAddressMode texMode)
+			void SetTextureDepth_2(std::int32_t textureID, std::int32_t depthStencilTargetID, BSGraphics::TextureAddressMode texMode)
 			{
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureDepth_2);
 				REL::Relocation<func_t> func{ REL::ID(1405563) };
-				return func(this, a1, depthStencilTargetID, texMode);
+				return func(this, textureID, depthStencilTargetID, texMode);
 			}
 
 			void SetTextureStencil();              //TODO
@@ -311,7 +286,6 @@ namespace RE
 			std::uint32_t RenderTargetIdA[MAX_RENDER_TARGETS];
 			std::uint32_t DepthStencilTargetIdA[MAX_DEPTH_STENCIL_TARGETS];
 			std::uint32_t CubeMapRenderTargetIdA[MAX_CUBEMAP_RENDER_TARGETS];
-			//bool Creating;	//<- listed in the pdb but seems to mess up alignment
 			float fDynamicWidthRatio;
 			float fDynamicHeightRatio;
 			float fLowestWidthRatio;

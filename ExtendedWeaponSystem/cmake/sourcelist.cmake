@@ -1,6 +1,4 @@
 set(SOURCES
-	src/AnimationFunctions.cpp
-	src/AnimationFunctions.h
 	"src/Custom Renderer/CustomRenderer.cpp"
 	"src/Custom Renderer/CustomRenderer.h"
 	"src/Custom Renderer/ExtraCameraManager.cpp"
@@ -11,10 +9,16 @@ set(SOURCES
 	"src/Custom Renderer/ScopeRendererManager.h"
 	"src/Custom Renderer/ScopeShaders.cpp"
 	"src/Custom Renderer/ScopeShaders.h"
+	src/AnimationFunctions.cpp
+	src/AnimationFunctions.h
 	src/Global.cpp
 	src/Global.h
+	src/HookUtil.cpp
+	src/HookUtil.h
 	src/Hooks.cpp
 	src/Hooks.h
+	src/InputUtil.cpp
+	src/InputUtil.h
 	src/PCH.cpp
 	src/PCH.h
 	src/ReloadHandlers.cpp
@@ -23,5 +27,7 @@ set(SOURCES
 	src/Util.h
 	src/WeaponHandlers.cpp
 	src/WeaponHandlers.h
+	src/WeaponInfo.cpp
+	src/WeaponInfo.h
 	src/main.cpp
 )

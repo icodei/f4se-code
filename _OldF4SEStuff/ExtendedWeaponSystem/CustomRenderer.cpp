@@ -315,11 +315,11 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	(BSGraphics_gRenderer)->ResetState();
 	int depthTarget = 1;
 	int renderTarget = 27;
-	int newRenderTarget = 22;
+	int FogOfWarRenderTarget = 22;
 	if (pScopeRenderer->type == 20) {
 		depthTarget = 11;
 	}
-	newRenderTarget = (pScopeRenderer->type == 20) + 22;
+	FogOfWarRenderTarget = (pScopeRenderer->type == 20) + 22;
 	if (pScopeRenderer->type == 20) {
 		renderTarget = 21;
 	}
@@ -327,8 +327,8 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 		(BSGraphics_gRenderTargetManager)->AcquireDepthStencil(depthTarget);
 		(BSGraphics_gRenderTargetManager)->AcquireRenderTarget(renderTarget);
 	}
-	(BSGraphics_gRenderTargetManager)->AcquireRenderTarget(newRenderTarget);
-	RenderScopeScene(scopeCam->camera, pScopeRenderer->spScopeAccumulator.m_pObject, newRenderTarget, renderTarget, depthTarget);
+	(BSGraphics_gRenderTargetManager)->AcquireRenderTarget(FogOfWarRenderTarget);
+	RenderScopeScene(scopeCam->camera, pScopeRenderer->spScopeAccumulator.m_pObject, FogOfWarRenderTarget, renderTarget, depthTarget);
 	(BSGraphics_gRenderTargetManager)->SetCurrentRenderTarget(0, 2, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
 	(BSGraphics_gRenderTargetManager)->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 	(BSGraphics_gRenderTargetManager)->SetCurrentDepthStencilTarget(1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, 0);
@@ -346,12 +346,12 @@ NiTexture* ScopeRenderer::Render(bool a1) {
 	(BSGraphics_gRenderTargetManager)->SetTextureRenderTarget(2, renderTarget, 0);
 	int effect = ((pScopeRenderer->type == 20) + 152);
 	(*ImageSpaceManager_pInstance)->effectArray.m_data[effect].UseDynamicResolution = 0;
-	(*ImageSpaceManager_pInstance)->RenderEffectHelper_2((ImageSpaceManager::ImageSpaceEffectEnum)effect, newRenderTarget, pScopeRenderer->type, &pScopeRenderer->params);
+	(*ImageSpaceManager_pInstance)->RenderEffectHelper_2((ImageSpaceManager::ImageSpaceEffectEnum)effect, FogOfWarRenderTarget, pScopeRenderer->type, &pScopeRenderer->params);
 	if (pScopeRenderer->type == 20) {
 		(BSGraphics_gRenderTargetManager)->ReleaseDepthStencil(depthTarget);
 		(BSGraphics_gRenderTargetManager)->ReleaseRenderTarget(renderTarget);
 	}
-	(BSGraphics_gRenderTargetManager)->ReleaseRenderTarget(newRenderTarget);
+	(BSGraphics_gRenderTargetManager)->ReleaseRenderTarget(FogOfWarRenderTarget);
 	//Threaded stuff would happen here in LocalMapRenderer::Render
 	//BSGraphics::Context = threaded stuff
 	//if (!context) {

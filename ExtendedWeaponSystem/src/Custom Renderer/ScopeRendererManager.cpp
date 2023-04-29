@@ -215,7 +215,7 @@ NiTexture* ScopeRendererManager::Render(bool save) {
 	pRenderData->SetClearColor(1.0F, 1.0F, 1.0F, 1.0F);
 
 	pScopeManagerAccumulator->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_LOCALMAP;
-	pScopeManagerAccumulator->QEyePosition = pCamera->world.translate;
+	pScopeManagerAccumulator->eyePosition = pCamera->world.translate;
 	pRenderData->ResetZPrePass();
 
 	BSPortalGraphEntry* camPortalEntry = Main::GetSingleton()->GetCameraPortalGraphEntry();

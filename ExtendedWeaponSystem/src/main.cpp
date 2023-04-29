@@ -12,6 +12,8 @@ void initPlugin() {
 		logError("You are missing some forms");
 	}
 
+	pc->SetAutoReload(false);
+
 	reloadHasEnded = true;
 	reloadHasStarted = false;
 	weaponHasSequentialReload = false;
@@ -102,6 +104,8 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 		return false;
 	}
 
+	F4SE::AllocTrampoline(8 * 8);
+
 	return true;
 }
 
@@ -110,8 +114,6 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f
 	initLog();
 	logger::info(FMT_STRING("{:s} Loaded"), Version::PROJECT);
 	F4SE::Init(a_f4se);
-	
-	F4SE::AllocTrampoline(1024 * 64);
 
 	g_trampoline = &F4SE::GetTrampoline();
 	g_taskInterface = F4SE::GetTaskInterface();

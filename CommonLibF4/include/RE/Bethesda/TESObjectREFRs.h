@@ -5,6 +5,7 @@
 #include "RE/Bethesda/BSCore/BSTEvent.h"
 #include "RE/Bethesda/BSCore/BSTSmallArray.h"
 #include "RE/Bethesda/BSCore/MemoryManager.h"
+#include "RE/Bethesda/BSMain/IOManager.h"
 #include "RE/Bethesda/BSSoundHandle.h"
 #include "RE/Bethesda/BSStringT.h"
 #include "RE/Bethesda/BSSystem/BSFixedString.h"
@@ -21,7 +22,6 @@
 namespace RE
 {
 	enum class BIPED_OBJECT;
-	enum class IO_TASK_PRIORITY;
 
 	namespace MagicSystem
 	{

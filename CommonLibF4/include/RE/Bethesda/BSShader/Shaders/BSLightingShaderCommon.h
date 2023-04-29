@@ -6,12 +6,12 @@ namespace RE
 	{
 		enum
 		{
-			PROJECTED_UV = 8,
-			ANISO_LIGHTING = 16,
-			PIPBOY_SCREEN = 32,
-			GRADIENT_REMAP = 64,
-			MENU_SCREEN = 128,
-			NEXT_BIT = 256,
+			PROJECTED_UV = 1 << 3,
+			ANISO_LIGHTING = 1 << 4,
+			PIPBOY_SCREEN = 1 << 5,
+			GRADIENT_REMAP = 1 << 6,
+			MENU_SCREEN = 1 << 7,
+			NEXT_BIT = 1 << 8,
 
 			COUNT = 5
 		};

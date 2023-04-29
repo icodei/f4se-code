@@ -146,8 +146,12 @@ public:
 	ScopeRenderer();
 	~ScopeRenderer();
 
+	//static functions
+	static void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulator, uint32_t a_renderTarget, uint32_t a_depthTarget);
+
 	//functions
-	NiTexture* Render(bool saveTexture);
+	NiTexture* Render();
+	NiTexture* RenderSimple();
 
 	//members
 	BSCullingProcess* pScopeCullingProc{ nullptr };
@@ -159,24 +163,14 @@ public:
 	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
 };
 
-void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulator, uint32_t a_renderTarget, uint32_t a_depthTarget);
-
-class AccumulateSceneFunctor {
+class ScopeGeometry {
 public:
-	AccumulateSceneFunctor() {
-		renderer = nullptr;
-		interior = false;
-	}
-	AccumulateSceneFunctor(ScopeRenderer* pRenderer, bool isInterior) {
-		renderer = pRenderer;
-		interior = isInterior;
-	}
 
-	uint32_t operator()(TESObjectCELL* a_cell);
+	//functions
+	void InitModels();
 
 	//members
-	ScopeRenderer* renderer{ nullptr };
-	bool interior{ 0 };
+	BSFixedString rendererName;
 };
 
 namespace nsScope {

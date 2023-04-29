@@ -121,6 +121,12 @@ namespace RE
 			};
 			static_assert(sizeof(LightParams) == 0x28);
 
+			[[nodiscard]] static Renderer* Create(const BSFixedString &a_name, UI_DEPTH_PRIORITY a_depth, float a_fov, bool a_alwaysrender) {
+				using func_t = decltype(&Renderer::Create);
+				REL::Relocation<func_t> func{ REL::ID(88488) };
+				return func(a_name, a_depth, a_fov, a_alwaysrender);
+			}
+
 			[[nodiscard]] static Renderer* GetByName(const BSFixedString& a_name)
 			{
 				using func_t = decltype(&Renderer::GetByName);
@@ -140,6 +146,18 @@ namespace RE
 				using func_t = decltype(&Renderer::Disable);
 				REL::Relocation<func_t> func{ REL::ID(938370) };
 				return func(this);
+			}
+
+			void MainScreen_SetScreenAttached3D(NiAVObject* a_object) {
+				using func_t = decltype(&Renderer::MainScreen_SetScreenAttached3D);
+				REL::Relocation<func_t> func{ REL::ID(817727) };
+				return func(this, a_object);
+			}
+
+			void MainScreen_SetWorldAttached3D(NiAVObject* a_object) {
+				using func_t = decltype(&Renderer::MainScreen_SetWorldAttached3D);
+				REL::Relocation<func_t> func{ REL::ID(724778) };
+				return func(this, a_object);
 			}
 
 			// members

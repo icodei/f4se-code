@@ -19,6 +19,13 @@ namespace RE
 		// add
 		virtual void BackgroundTaskFinishedLoading() { return; }  // 01
 
+		bool CreateBackgroundSimpleManager(NiAVObject& a_object, IO_TASK_PRIORITY a_priority)
+		{
+			using func_t = decltype(&SimpleAnimationGraphManagerHolder::CreateBackgroundSimpleManager);
+			REL::Relocation<func_t> func{ REL::ID(505018) };
+			return func(this, a_object, a_priority);
+		}
+
 		// members
 		BSTSmartPointer<BSAnimationGraphManager> animationGraphManager;  // 08
 		NiPointer<SimpleAnimationGraphManagerLoadingTask> loadingTask;   // 10
