@@ -1,20 +1,24 @@
 #pragma once
 #include "Global.h"
 
-struct WeaponInfo;
+#include "WeaponInfo.h"
 
-void HanldeWeaponEquip(WeaponInfo& initInfo);
-void HanldeWeaponEquipAfter3D(WeaponInfo& initInfo);
+void HandleWeaponEquip(WeaponInfo& initInfo);
+void HandleWeaponEquipAfter3D(WeaponInfo& initInfo);
 void HandleWeaponOnLoadGame(WeaponInfo& initInfo);
+void HandleWeaponUnequip(WeaponInfo& initInfo);
 
 void HandleWeaponChange();
 void HandleWeaponDown();
+void HandleWeaponInstantDown();
 void HandleWeaponSightsEnter();
 void HandleWeaponSightsExit();
 
 void QueryReload();
 void QueryScope();
-void QueueHandlingOfWeapon(WeaponInfo& initInfo);
+void QueueHandlingOfWeaponFunctor(WeaponInfo& initInfo, std::function<void(WeaponInfo&)> functor);
+void QueueHandlingOfWeaponEquip(WeaponInfo& initInfo);
+void QueueHandlingOfWeaponUnequip(WeaponInfo& initInfo);
 
 bool WeaponHasSequentialReload();
 bool WeaponHasSpeedReload();

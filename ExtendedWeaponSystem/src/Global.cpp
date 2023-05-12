@@ -9,12 +9,15 @@ PlayerCharacter* pc = nullptr;
 PlayerCamera* pcam = nullptr;
 PlayerControls* pcon = nullptr;
 
+const ButtonEvent* firstButton = nullptr;
+const ButtonEvent* secondButton = nullptr;
 uint32_t keyPressedCount = 0;
 uint32_t keyPressedLast = 0;
-std::chrono::system_clock::duration keyPressedLastTime = std::chrono::system_clock::duration();
+float keyPressedLastTime = 0.0F;
 
 bool gameLoading = false;
 bool gameLoadingSave = false;
+
 bool isEmptyReload = false;
 bool reloadHasEnded = true;
 bool reloadHasStarted = false;

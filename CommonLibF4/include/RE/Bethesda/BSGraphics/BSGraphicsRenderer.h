@@ -133,6 +133,13 @@ namespace RE
 				return func(this);
 			}
 
+			void RestorePreviousClearColor()
+			{
+				using func_t = decltype(&BSGraphics::Renderer::RestorePreviousClearColor);
+				REL::Relocation<func_t> func{ REL::ID(593605) };
+				return func(this);
+			}
+
 			// members
 			bool skipNextPresent;                   // 00
 			ResetRenderTargets resetRenderTargets;  // 08

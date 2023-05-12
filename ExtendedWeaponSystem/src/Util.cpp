@@ -1,4 +1,5 @@
 #include "Util.h"
+#include "HookUtil.h"
 
 bool IsPlayerInFirstPerson() {
 	if (!pcam) {

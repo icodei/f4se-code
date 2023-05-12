@@ -1,7 +1,91 @@
 #include "ReloadHandlers.h"
 
-void DoSpeedReload(int32_t id) {
-	logInfo("Speed Reload");
+#include "Util.h"
+#include "WeaponInfo.h"
+
+void DoSpeedReload() {
+	//logInfo("Speed Reload");
+	const BSFixedString reloadSpeedStart("reloadSpeedStart");
+	const BSFixedString reloadSpeedReserveStart("reloadSpeedReserveStart");
+	const BSFixedString reloadSequentialSpeedStart("reloadSequentialSpeedStart");
+	const BSFixedString reloadSequentialSpeedReserveStart("reloadSequentialSpeedReserveStart");
+
+	WeaponInfo& Info = WeaponInfo::getInstance();
+
+	if (Info.weapAmmoCurrentCount) {
+		if (weaponHasSequentialReload) {
+			//
+		} else {
+			pc->NotifyAnimationGraphImpl(reloadSpeedReserveStart);
+		}
+	} else {
+		if (weaponHasSequentialReload) {
+			//
+		} else {
+			pc->NotifyAnimationGraphImpl(reloadSpeedStart);
+		}
+	}
+}
+
+void HandleSequentialReload(const BSAnimationGraphEvent& a_event) {
+	WeaponInfo& Info = WeaponInfo::getInstance();
+	const BSFixedString Event00("Event00");
+	const BSFixedString pipboyClosed("pipboyClosed");
+	const BSFixedString pipboyOpened("pipboyOpened");
+	const BSFixedString ReloadComplete("ReloadComplete");
+	const BSFixedString ReloadEnd("ReloadEnd");
+	const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
+	const BSFixedString reloadSequentialStart("reloadSequentialStart");
+	const BSFixedString sightedStateEnter("sightedStateEnter");
+	const BSFixedString sightedStateExit("sightedStateExit");
+	const BSFixedString throwEnd("throwEnd");
+	const BSFixedString weapEquip("weapEquip");
+	const BSFixedString weapForceEquip("weapForceEquip");
+	const BSFixedString weaponDraw("weaponDraw");
+	const BSFixedString WeaponFire("WeaponFire");
+	const BSFixedString weaponInstantDown("weaponInstantDown");
+	const BSFixedString weaponSwing("weaponSwing");
+	const BSFixedString weapUnequip("weapUnequip");
+
+	if (HasReloadEnded()) {
+		if (a_event.name == Event00) {
+			reloadStartHandle();
+			StopLesserAmmo();
+			isEmptyReload = Info.weapAmmoCurrentCount == 0 ? true : false;
+		}
+	}
+	if (HasReloadStarted()) {
+		if (a_event.name == ReloadEnd) {  //Better way to do this? Bolt action stuff calls reloadend event during bolt charge and reload
+			logInfo("Event Recieved: ReloadEnd");
+			reloadStop();
+		}
+		if (a_event.name == ReloadComplete) {
+			logInfo("Event Recieved: reloadComplete");
+			if ((Info.weapAmmoCapacity - 1) == Info.weapAmmoCurrentCount) {
+				reloadStop();
+			} else {
+				SetWeapAmmoCapacity(Info.weapAmmoCurrentCount + 1);
+				if (isEmptyReload) {
+					reloadContinueFromEmpty();
+				} else {
+					reloadContinue();
+				}
+			}
+		}
+		//Manually handle reload end for various situations
+		if (a_event.name == pipboyOpened) {
+			reloadStop();
+			logInfo("Event Recieved: pipboy opened");
+		}
+		if (a_event.name == weaponSwing) {
+			reloadStop();
+			logInfo("Event Recieved: weapon swing");
+		}
+		if (a_event.name == throwEnd) {
+			reloadStop();
+			logInfo("Event Recieved: throw end");
+		}
+	}
 }
 
 bool HasReloadStarted() {
@@ -17,7 +101,7 @@ void reloadStop() {
 
 	logInfo("Stopping reload loop");
 	reloadEndHandle();
-	PlayerCharacter::GetSingleton()->SetGraphVariableBool(bReloadLoop, false);
+	pc->SetGraphVariableBool(bReloadLoop, false);
 }
 
 void reloadContinue() {
@@ -25,8 +109,8 @@ void reloadContinue() {
 	const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
 
 	logInfo("Continuing reload loop");
-	PlayerCharacter::GetSingleton()->SetGraphVariableBool(bReloadLoop, true);
-	PlayerCharacter::GetSingleton()->NotifyAnimationGraphImpl(reloadSequentialReserveStart);
+	pc->SetGraphVariableBool(bReloadLoop, true);
+	pc->NotifyAnimationGraphImpl(reloadSequentialReserveStart);
 }
 
 void reloadContinueFromEmpty() {
@@ -34,8 +118,8 @@ void reloadContinueFromEmpty() {
 	const BSFixedString reloadSequentialStart("reloadSequentialStart");
 
 	logInfo("Continuing reload loop");
-	PlayerCharacter::GetSingleton()->SetGraphVariableBool(bReloadLoop, true);
-	PlayerCharacter::GetSingleton()->NotifyAnimationGraphImpl(reloadSequentialStart);
+	pc->SetGraphVariableBool(bReloadLoop, true);
+	pc->NotifyAnimationGraphImpl(reloadSequentialStart);
 }
 
 //ready needed stuff when reload is started
@@ -58,6 +142,15 @@ void reloadEndHandle() {
 	Info.weapAmmoIncrementor = 0;
 	Info.weapAmmoToAdd = 0;
 	SetWeapAmmoCapacity(Info.weapAmmoCapacity);
+}
+
+bool ShouldReload() {
+	WeaponInfo& Info = WeaponInfo::getInstance();
+	if (Info.weapCurrentInstanceData->ammoCapacity == Info.weapAmmoCurrentCount) {
+		return false;
+	} else {
+		return true;
+	}
 }
 
 //Stops the reload early if there is not enough ammo in the inventory

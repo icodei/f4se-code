@@ -1,4 +1,5 @@
 #include "WeaponInfo.h"
+#include "Util.h"
 
 void WeaponInfo::ClearWeaponInfo() {
 	WeaponInfo& info = WeaponInfo::getInstance();

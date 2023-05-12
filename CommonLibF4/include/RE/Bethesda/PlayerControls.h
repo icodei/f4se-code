@@ -125,6 +125,8 @@ namespace RE
 		// add
 		virtual void PerFrameUpdate() { return; };  // 09
 
+		F4_HEAP_REDEFINE_NEW(PlayerInputHandler);
+
 		// members
 		PlayerControlsData& data;        // 10
 		bool inQuickContainer{ false };  // 18
@@ -153,6 +155,8 @@ namespace RE
 		// add
 		virtual void UpdateHeldStateActive(const ButtonEvent* a_event) { heldStateActive = a_event && (a_event->value != 0.0F || a_event->heldDownSecs < 0.0F); }  // 10
 		virtual void SetHeldStateActive(bool a_flag) { heldStateActive = a_flag; }                                                                                 // 11
+
+		F4_HEAP_REDEFINE_NEW(HeldStateHandler);
 
 		// members
 		bool heldStateActive{ false };      // 20
@@ -228,8 +232,41 @@ namespace RE
 	struct JumpHandler;
 	struct LookHandler;
 	struct MeleeThrowHandler;
-	struct MovementHandler;
-	struct ReadyWeaponHandler;
+
+	struct MovementHandler : public PlayerInputHandler
+	{
+	public:
+		static constexpr auto RTTI{ RTTI::MovementHandler };
+		static constexpr auto VTABLE{ VTABLE::MovementHandler };
+		//members
+	};
+	static_assert(sizeof(MovementHandler) == 0x20);
+
+	struct ReadyWeaponHandler : public PlayerInputHandler
+	{
+	public:
+		static constexpr auto RTTI{ RTTI::ReadyWeaponHandler };
+		static constexpr auto VTABLE{ VTABLE::ReadyWeaponHandler };
+
+		ReadyWeaponHandler() = delete;
+		ReadyWeaponHandler(PlayerControlsData& a_data) :
+			PlayerInputHandler(a_data) { ctor(a_data); }
+
+		virtual ~ReadyWeaponHandler() {}  // 00
+
+		//members
+		bool unk20;	//020
+
+	private:
+		ReadyWeaponHandler* ctor(PlayerControlsData& a_data)
+		{
+			using func_t = decltype(&ReadyWeaponHandler::ctor);
+			REL::Relocation<func_t> func{ REL::ID(590232), 0211 };
+			return func(this, a_data);
+		}
+	};
+	static_assert(sizeof(ReadyWeaponHandler) == 0x28);
+
 	struct RunHandler;
 	struct SneakHandler;
 	struct SprintHandler;

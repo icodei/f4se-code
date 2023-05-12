@@ -1,6 +1,9 @@
 #include "WeaponHandlers.h"
 
-void HanldeWeaponEquip(WeaponInfo& initInfo) {
+#include "Custom Renderer/CustomRenderer.h"
+#include "Util.h"
+
+void HandleWeaponEquip(WeaponInfo& initInfo) {
 	WeaponInfo& Info = WeaponInfo::getInstance();
 	string weaponName = initInfo.weapForm->GetFullName();
 	if (initInfo.weapCurrentInstanceData != initInfo.weapInstanceData) {
@@ -20,7 +23,7 @@ void HanldeWeaponEquip(WeaponInfo& initInfo) {
 	HandleWeaponChange();
 }
 
-void HanldeWeaponEquipAfter3D(WeaponInfo& initInfo) {
+void HandleWeaponEquipAfter3D(WeaponInfo& initInfo) {
 	if (!nsScope::initialized || !nsScope::scopeRenderer) {
 		goto skipRender;
 	}
@@ -50,20 +53,30 @@ void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
 	HandleWeaponChange();
 }
 
+void HandleWeaponUnequip(WeaponInfo& initInfo) {
+	string weaponName = initInfo.weapForm->GetFullName();
+	logInfo(";=================================== Player Unequip ===================================;");
+	logInfo("Weapon: " + weaponName);
+	WeaponInfo::ClearWeaponInfo();
+	logInfo(";======================================================================================;");
+}
+
 void HandleWeaponChange() {
 	if (!nsScope::scopeRenderer && WeaponHasSpecialScope()) {
 		logInfo("Weapon needs custom renderer");
 		nsScope::CreateRenderer();
 		nsScope::scopeRenderer->pRendererCamera->StartCorrectState();
 	} else {
-		if (nsScope::scopeRenderer) {
-			nsScope::DestroyRenderer();
-		}
+		nsScope::DestroyRenderer();
 	}
 }
 
 void HandleWeaponDown() {
+	nsScope::DestroyRenderer();
+}
 
+void HandleWeaponInstantDown() {
+	nsScope::DestroyRenderer();
 }
 
 void HandleWeaponSightsEnter() {
@@ -80,6 +93,7 @@ skipRender:
 }
 
 void HandleWeaponSightsExit() {
+
 }
 
 void QueryReload() {
@@ -132,7 +146,39 @@ void QueryScope() {
 	}
 }
 
-void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
+void QueueHandlingOfWeaponFunctor(WeaponInfo& initInfo, std::function<void(WeaponInfo&)> functor) {
+	//Weapon is already in queue
+	if (weaponIsQueued) {
+		return;
+	}
+	weaponIsQueued = true;
+
+	std::thread([&initInfo, &functor]() -> void {
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		//Is weapon still in queue
+		if (weaponIsQueued) {
+			g_taskInterface->AddTask([&initInfo, &functor]() {
+				if (*(bool*)((uintptr_t)pc->currentProcess->high + 0x594)) {
+					weaponIsQueued = false;
+					QueueHandlingOfWeaponFunctor(initInfo, functor);
+					return;
+				}
+
+				//Reset variables here?
+
+				if (pc->currentProcess->middleHigh->equippedItems.size() == 0) {
+					weaponIsQueued = false;
+					return;
+				}
+
+				functor(FillWeaponInfo(initInfo));
+				weaponIsQueued = false;
+			});
+		}
+	}).detach();
+}
+
+void QueueHandlingOfWeaponEquip(WeaponInfo& initInfo) {
 	//Weapon is already in queue
 	if (weaponIsQueued) {
 		return;
@@ -146,7 +192,7 @@ void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
 			g_taskInterface->AddTask([&initInfo]() {
 				if (*(bool*)((uintptr_t)pc->currentProcess->high + 0x594)) {
 					weaponIsQueued = false;
-					QueueHandlingOfWeapon(initInfo);
+					QueueHandlingOfWeaponEquip(initInfo);
 					return;
 				}
 
@@ -157,7 +203,39 @@ void QueueHandlingOfWeapon(WeaponInfo& initInfo) {
 					return;
 				}
 
-				HanldeWeaponEquip(FillWeaponInfo(initInfo));
+				HandleWeaponEquip(FillWeaponInfo(initInfo));
+				weaponIsQueued = false;
+			});
+		}
+	}).detach();
+}
+
+void QueueHandlingOfWeaponUnequip(WeaponInfo& initInfo) {
+	//Weapon is already in queue
+	if (weaponIsQueued) {
+		return;
+	}
+	weaponIsQueued = true;
+
+	std::thread([&initInfo]() -> void {
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		//Is weapon still in queue
+		if (weaponIsQueued) {
+			g_taskInterface->AddTask([&initInfo]() {
+				if (*(bool*)((uintptr_t)pc->currentProcess->high + 0x594)) {
+					weaponIsQueued = false;
+					QueueHandlingOfWeaponUnequip(initInfo);
+					return;
+				}
+
+				//Reset variables here?
+
+				if (pc->currentProcess->middleHigh->equippedItems.size() == 0) {
+					weaponIsQueued = false;
+					return;
+				}
+
+				HandleWeaponUnequip(FillWeaponInfo(initInfo));
 				weaponIsQueued = false;
 			});
 		}

@@ -1,18 +1,4 @@
 #pragma once
-#include "Custom Renderer/CustomRenderer.h"
-#include "Custom Renderer/ExtraCameraManager.h"
-#include "Custom Renderer/ScopeGeometry.h"
-#include "Custom Renderer/ScopeRendererManager.h"
-#include "Custom Renderer/ScopeShaders.h"
-
-#include "AnimationFunctions.h"
-#include "HookUtil.h"
-#include "Hooks.h"
-#include "InputUtil.h"
-#include "ReloadHandlers.h"
-#include "Util.h"
-#include "WeaponHandlers.h"
-#include "WeaponInfo.h"
 
 extern F4SE::PluginHandle g_pluginHandle;
 extern const F4SE::MessagingInterface* g_messaging;
@@ -23,12 +9,15 @@ extern PlayerCharacter* pc;
 extern PlayerCamera* pcam;
 extern PlayerControls* pcon;
 
+extern const ButtonEvent* firstButton;
+extern const ButtonEvent* secondButton;
 extern uint32_t keyPressedCount;
 extern uint32_t keyPressedLast;
-extern std::chrono::system_clock::duration keyPressedLastTime;
+extern float keyPressedLastTime;
 
 extern bool gameLoading;
 extern bool gameLoadingSave;
+
 extern bool isEmptyReload;
 extern bool reloadHasEnded;
 extern bool reloadHasStarted;
@@ -50,7 +39,7 @@ extern BGSKeyword* weaponIsClosedBoltKeyword;
 extern BGSKeyword* weaponIsOpenBoltKeyword;
 
 #define GET_EVENT_SOURCE(EventName) (BSTEventSource<EventName>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), #EventName);
-#define RETURN_HANDLER return ((FnExecuteHandler)fnOriginal)(a_handler, a_actor, a_event);
+#define RETURN_HANDLER(fnOriginal) return ((FnExecuteHandler)fnOriginal)(a_handler, a_actor, a_event);
 
 #define _BYTE std::uint8_t
 #define _WORD std::uint16_t

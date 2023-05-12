@@ -1,5 +1,9 @@
 #include "Custom Renderer/CustomRenderer.h"
 
+#include "Custom Renderer/ScopeGeometry.h"
+#include "Util.h"
+#include "WeaponHandlers.h"
+
 #pragma region ScopeCamera
 
 ScopeCamera::ScopeCamera() :
@@ -138,11 +142,7 @@ void ScopeCamera::SetEnabled(bool bEnabled) {  //TODO
 }
 
 bool ScopeCamera::QCameraHasRenderPlane() {
-	if (renderPlane) {
-		return true;
-	} else {
-		return false;
-	}
+	return renderPlane;
 }
 
 void ScopeCamera::CreateDefault3D() {
@@ -347,7 +347,6 @@ void ScopeCamera::StartNightVisionState() {
 }
 
 void ScopeCamera::Update3D() {
-
 	BSGeometry* geom;
 	BSGeometry* newGeom;
 	BSGeometry* oldGeom;
@@ -424,8 +423,6 @@ void ScopeCamera::UpdateCamera() {
 	if (pCurrentState == cameraStates[ScopeCameraState::kNightVision].get()) {
 		((ScopeCamera::NightVisionState*)pCurrentState)->Update(currentState);
 	}
-
-	Update();
 }
 
 ScopeCamera::DefaultState::DefaultState(TESCamera& cam, std::uint32_t ID) :
@@ -491,18 +488,9 @@ void ScopeCamera::DefaultState::Update(BSTSmartPointer<TESCameraState>& a_nextSt
 	if (camera->GetCameraRoot(spCameraRoot)) {
 		updatedQuatRotation.ToRotation(updatedRotation);
 
-		pCameraRoot->local.rotate.entry[0].pt[0] = updatedRotation.entry[0].pt[0];
-		pCameraRoot->local.rotate.entry[0].pt[1] = updatedRotation.entry[0].pt[1];
-		pCameraRoot->local.rotate.entry[0].pt[2] = updatedRotation.entry[0].pt[2];
-		pCameraRoot->local.rotate.entry[0].pt[3] = updatedRotation.entry[0].pt[3];
-		pCameraRoot->local.rotate.entry[1].pt[0] = updatedRotation.entry[1].pt[0];
-		pCameraRoot->local.rotate.entry[1].pt[1] = updatedRotation.entry[1].pt[1];
-		pCameraRoot->local.rotate.entry[1].pt[2] = updatedRotation.entry[1].pt[2];
-		pCameraRoot->local.rotate.entry[1].pt[3] = updatedRotation.entry[1].pt[3];
-		pCameraRoot->local.rotate.entry[2].pt[0] = updatedRotation.entry[2].pt[0];
-		pCameraRoot->local.rotate.entry[2].pt[1] = updatedRotation.entry[2].pt[1];
-		pCameraRoot->local.rotate.entry[2].pt[2] = updatedRotation.entry[2].pt[2];
-		pCameraRoot->local.rotate.entry[2].pt[3] = updatedRotation.entry[2].pt[3];
+		pCameraRoot->local.rotate.entry[0] = updatedRotation.entry[0];
+		pCameraRoot->local.rotate.entry[1] = updatedRotation.entry[1];
+		pCameraRoot->local.rotate.entry[2] = updatedRotation.entry[2];
 		pCameraRoot->local.translate = updatedTranslation;
 		pCameraRoot->Update(updateData);
 	}
@@ -814,8 +802,8 @@ NiTexture* ScopeRenderer::Render() {
 	logInfo("Setting Targets...");
 	RenderScopeScene(pRendererCamera->camera, pScopeAccumulator, renderTargetID, depthTargetID);
 
-	pTargetManager->SetCurrentRenderTarget(0, 2, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);	//RENDER_TARGET_MAIN_COPY
-	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);		//RENDER_TARGET_NONE
+	pTargetManager->SetCurrentRenderTarget(0, 2, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);  //RENDER_TARGET_MAIN_COPY
+	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);   //RENDER_TARGET_NONE
 	pTargetManager->SetCurrentDepthStencilTarget(depthTargetID, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
 	pTargetManager->SetCurrentDepthStencilTarget(0, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
 
@@ -833,7 +821,7 @@ NiTexture* ScopeRenderer::Render() {
 	pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
 	pImageSpaceManager->RenderEffectHelper_Tex_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderedTexture, renderTargetID, pShaderParams);
 	pImageSpaceManager->RenderEffect_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, pShaderParams);
-	pTargetManager->SetCurrentRenderTarget(0, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);	//RENDER_TARGET_MAIN
+	pTargetManager->SetCurrentRenderTarget(0, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);  //RENDER_TARGET_MAIN
 
 	renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTargetID, false, false, BSGraphics::Usage::USAGE_DEFAULT));
 
@@ -844,11 +832,11 @@ NiTexture* ScopeRenderer::Render() {
 	memcpy(BSShaderManager::GetCamera(), shaderCam, 0x1A0);
 	pGraphicsState->SetCameraData(shaderCam, false, 0.0F, 1.0F);
 	pWorldSSN->DisableLightUpdate = lightUpdate;
-	
+
 	memset(&*BSFadeNode_iFadeEnableCounter, 0, sizeof(int));
 	memset(&*BSFadeNode_bFadeEnabled, fadeEnabled, sizeof(bool));
 	memset(&*BSFadeNode_bDrawFadingEnabled, fadeEnabled, sizeof(bool));
-	
+
 	//water here
 
 	pScopeAccumulator->ClearActivePasses(false);
@@ -868,20 +856,21 @@ NiTexture* ScopeRenderer::Render() {
 	return renderedTexture;
 }
 
-NiTexture * ScopeRenderer::RenderSimple() {
-	logInfo("ScopeRenderer::Render() Starting...");
+NiTexture* ScopeRenderer::RenderSimple() {
+	logInfo("ScopeRenderer::RenderSimple() Starting...");
 	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
 	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
 	BSGraphics::Renderer* pRenderData = &BSGraphics::Renderer::GetSingleton();
 	ImageSpaceManager* pImageSpaceManager = ImageSpaceManager::GetSingleton();
 	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
-	NiCamera* shaderCam = BSShaderManager::GetCamera();
+	ShadowSceneNode* pWorldSSN = pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD];
+	NiCamera* pShaderCam = BSShaderManager::GetCamera();
 
 	uint32_t renderTargetID = 24;  //RENDER_TARGET_HUDGLASS
 	uint32_t depthTargetID = 1;    //DEPTH_STENCIL_TARGET_MAIN
 	uint32_t effectID = 162;       //kBSVatsTarget
 
-	memcpy(BSShaderManager::GetCamera(), pRendererCamera->camera, 0x1A0);
+	pRenderData->ResetState();
 	pGraphicsState->SetCameraData(pRendererCamera->camera, false, 0.0F, 1.0F);
 	pScopeCullingProc->SetAccumulator(pScopeAccumulator);
 	pScopeCullingProc->kCullMode = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
@@ -891,31 +880,38 @@ NiTexture * ScopeRenderer::RenderSimple() {
 
 	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
 
+	pScopeAccumulator->activeShadowSceneNode = pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD];
 	pScopeAccumulator->renderMode = BSShaderManager::etRenderMode::BSSM_RENDER_VATS_MASK;
 	pScopeAccumulator->eyePosition = pRendererCamera->camera->world.translate;
 
+	NiAVObject* multiBoundNode;
+	if (pWorldSSN->children.size() > 8) {
+		multiBoundNode = pWorldSSN->children[8].get();
+	} else {
+		multiBoundNode = nullptr;
+	}
+	BSShaderUtil::AccumulateScene(pRendererCamera->camera, multiBoundNode, *pScopeCullingProc, false);
+	//BSShaderUtil::RenderScene(pRendererCamera->camera, pScopeAccumulator, false);
+
 	pTargetManager->SetCurrentDepthStencilTarget(depthTargetID, BSGraphics::SetRenderTargetMode::SRTM_FORCE_COPY_RESTORE, 0, false);
+	pTargetManager->SetCurrentRenderTarget(1, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
 	pTargetManager->SetCurrentRenderTarget(0, renderTargetID, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 	pTargetManager->SetCurrentViewportForceToRenderTargetDimensions();
-	pRenderData->DoZPrePass(nullptr, nullptr, 0.0F, 1.0F, 0.0F, 1.0F);
 
 	const BSFixedString strScope("ScopeTexture");
 	NiTexture* renderedTexture = renderedTexture->CreateEmpty(strScope, false, false);
 
 	pTargetManager->SetTextureDepth(1, depthTargetID);
-	pTargetManager->SetTextureRenderTarget(2, renderTargetID, false);
-	//pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
-	//pImageSpaceManager->RenderEffectHelper_Tex_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderedTexture, renderTargetID, pShaderParams);
-	//pImageSpaceManager->RenderEffect_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, pShaderParams);
-	pTargetManager->SetCurrentRenderTarget(0, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);	//RENDER_TARGET_MAIN
-
+	pTargetManager->SetTextureRenderTarget(1, renderTargetID, false);
+	//pImageSpaceManager->RenderEffect_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, nullptr);
+	//pImageSpaceManager->RenderEffectHelper_2((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, 2, nullptr);
 	renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTargetID, false, false, BSGraphics::Usage::USAGE_DEFAULT));
+	pImageSpaceManager->RenderEffectHelper_Tex_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderedTexture, renderTarget, nullptr);
 
-	memcpy(BSShaderManager::GetCamera(), shaderCam, 0x1A0);
-	pGraphicsState->SetCameraData(shaderCam, false, 0.0F, 1.0F);
-	pRenderData->ResetZPrePass();
-	pRenderData->ResetState();
-	pRenderData->Flush();
+	pRenderData->RestorePreviousClearColor();
+	pTargetManager->SetCurrentRenderTarget(0, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);
+	pGraphicsState->SetCameraData(pShaderCam, false, 0.0F, 1.0F);
+	
 
 	return renderedTexture;
 }
@@ -929,14 +925,14 @@ void ScopeRenderer::RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_
 	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
 
 	pTargetManager->SetCurrentDepthStencilTarget(a_depthTarget, BSGraphics::SetRenderTargetMode::SRTM_FORCE_COPY_RESTORE, 0, false);
-	pTargetManager->SetCurrentRenderTarget(0, a_renderTarget, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);	//BASEMAP
-	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);				//NORMAL
-	pTargetManager->SetCurrentRenderTarget(2, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);				//ENVMAP
-	pTargetManager->SetCurrentRenderTarget(3, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);				//
+	pTargetManager->SetCurrentRenderTarget(0, a_renderTarget, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);  //BASEMAP
+	pTargetManager->SetCurrentRenderTarget(1, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);              //NORMAL
+	pTargetManager->SetCurrentRenderTarget(2, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);              //ENVMAP
+	pTargetManager->SetCurrentRenderTarget(3, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);              //
 	if (pShaderState->bDeferredRGBEmit) {
-		pTargetManager->SetCurrentRenderTarget(4, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);			//GLOWMAP
+		pTargetManager->SetCurrentRenderTarget(4, -1, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);  //GLOWMAP
 	}
-	pTargetManager->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);			//
+	pTargetManager->SetCurrentRenderTarget(5, -1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);  //
 	pTargetManager->SetCurrentViewportForceToRenderTargetDimensions();
 	pRenderData->SetClearColor(0.0F, 0.0F, 0.0F, 0.0F);
 	pRenderData->ClearColor();
@@ -977,12 +973,12 @@ namespace nsScope {
 	}
 
 	void DestroyRenderer() {
-		logInfo("ScopeRenderer Destroy Starting...");
-		ScopeRenderer* renderer = scopeRenderer;
-		if (scopeRenderer) {
-			scopeRenderer->~ScopeRenderer();
-			//RE::free(renderer);
+		if (!scopeRenderer) {
+			//logWarn("nsScope::DestroyRenderer() Was called but renderer is already nullptr");
+			return;
 		}
+		logInfo("ScopeRenderer Destroy Starting...");
+		scopeRenderer->~ScopeRenderer();
 		scopeRenderer = nullptr;
 		initialized = false;
 		logInfo("ScopeRenderer Destroy Complete.");

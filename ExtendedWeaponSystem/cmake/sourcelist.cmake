@@ -17,6 +17,8 @@ set(SOURCES
 	src/HookUtil.h
 	src/Hooks.cpp
 	src/Hooks.h
+	src/HookInfo.cpp
+	src/HookInfo.h
 	src/InputUtil.cpp
 	src/InputUtil.h
 	src/PCH.cpp

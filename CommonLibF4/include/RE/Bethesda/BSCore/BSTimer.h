@@ -5,6 +5,12 @@ namespace RE
 	class BSTimer
 	{
 	public:
+		static BSTimer& GetTimer()
+		{
+			REL::Relocation<BSTimer*> timer{ REL::ID(1256126) };
+			return *timer;
+		}
+
 		// members
 		std::int64_t highPrecisionInitTime;  // 00
 		float clamp;                         // 08

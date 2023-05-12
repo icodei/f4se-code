@@ -1,5 +1,14 @@
 #include "Hooks.h"
 
+#include "Global.h"
+#include "HookInfo.h"
+#include "HookUtil.h"
+#include "InputUtil.h"
+#include "ReloadHandlers.h"
+#include "Util.h"
+#include "WeaponHandlers.h"
+#include "WeaponInfo.h"
+
 #pragma region EventSink
 
 #pragma region MenuOpenCloseEventSink
@@ -16,6 +25,10 @@ BSEventNotifyControl MenuOpenCloseEventSink::ProcessEvent(const MenuOpenCloseEve
 			HandleWeaponOnLoadGame(FillWeaponInfo(Info));
 			gameLoadingSave = false;
 		}
+		if (pc->autoReload) {
+			pc->SetAutoReload(false);
+			pc->autoReloadTimer = -1.0F;
+		}
 	}
 	return BSEventNotifyControl::kContinue;
 }
@@ -23,9 +36,6 @@ BSEventNotifyControl MenuOpenCloseEventSink::ProcessEvent(const MenuOpenCloseEve
 
 #pragma region PlayerAmmoCountEventSink
 BSEventNotifyControl PlayerAmmoCountEventSink::ProcessEvent(const PlayerAmmoCountEvent& a_event, BSTEventSource<PlayerAmmoCountEvent>* a_source) {
-	if (!weaponHasSequentialReload) {
-		return BSEventNotifyControl::kContinue;
-	}
 	if (!a_event.optionalValue.has_value()) {
 		return BSEventNotifyControl::kContinue;
 	}
@@ -48,7 +58,6 @@ BSEventNotifyControl PlayerAmmoCountEventSink::ProcessEvent(const PlayerAmmoCoun
 
 	Info.weapAmmoCurrentCount = a_event.optionalValue.value().clipAmmo;
 	Info.weapAmmoTotalCount = a_event.optionalValue.value().reserveAmmo;
-	logInfo("ammo count: " + std::to_string(Info.weapAmmoCurrentCount));
 	return BSEventNotifyControl::kContinue;
 }
 
@@ -66,25 +75,23 @@ BSEventNotifyControl PlayerSetWeaponStateEventSink::ProcessEvent(const PlayerSet
 	WEAPON_STATE state = a_event.optionalValue.value();
 	switch (state) {
 	case WEAPON_STATE::kSheathed:
-		if (nsScope::initialized) {
-			logInfo("Scope Weapon Sheathed");
-		}
+		logInfo("Weapon Sheathed");
+		return BSEventNotifyControl::kContinue;
 	case WEAPON_STATE::kWantToDraw:
-
+		logInfo("Weapon Wants To Draw");
+		return BSEventNotifyControl::kContinue;
 	case WEAPON_STATE::kDrawing:
-		if (nsScope::initialized) {
-			logInfo("Scope Weapon Drawing");
-		}
+		logInfo("Weapon Drawing");
+		return BSEventNotifyControl::kContinue;
 	case WEAPON_STATE::kDrawn:
-		if (nsScope::initialized) {
-			logInfo("Scope Weapon Drawn");
-		}
+		logInfo("Weapon Drawn");
+		return BSEventNotifyControl::kContinue;
 	case WEAPON_STATE::kWantToSheathe:
-
+		logInfo("Weapon Wants To Sheathe");
+		return BSEventNotifyControl::kContinue;
 	case WEAPON_STATE::kSheathing:
-		if (nsScope::initialized) {
-			logInfo("Scope Weapon Sheathing");
-		}
+		logInfo("Weapon Sheathing");
+		return BSEventNotifyControl::kContinue;
 	default:
 		return BSEventNotifyControl::kContinue;
 	}
@@ -102,10 +109,10 @@ BSEventNotifyControl PlayerWeaponReloadEventSink::ProcessEvent(const PlayerWeapo
 //adding too much to this hook causes the equip to stall and do weird things
 //Bingle showed me how threading worked :) hopefully that should fix the issues with the above comment
 BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_event, BSTEventSource<TESEquipEvent>* a_source) {
-	if (a_event.isEquipping == false) {
+	if (!a_event.FormID) {
 		return BSEventNotifyControl::kContinue;
 	}
-	if (a_event.owner != PlayerCharacter::GetSingleton()) {
+	if (a_event.owner != pc) {
 		return BSEventNotifyControl::kContinue;
 	}
 	TESForm* form = TESForm::GetFormByID(a_event.FormID);
@@ -118,13 +125,17 @@ BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_even
 	//Dump(const_cast<TESEquipEvent*>(&a_event), 0xB0);
 
 	WeaponInfo& Info = WeaponInfo::getInstance();
-
-	if (Info.weapCurrentInstanceData != a_event.instanceData) {
-		Info.weapCurrentInstanceData = a_event.instanceData;
+	if (a_event.isEquipping) {
+		//std::thread([&Info]() {
+		//	HandleWeaponEquip(FillWeaponInfo(Info));
+		//}).detach();
+		QueueHandlingOfWeaponEquip(FillWeaponInfo(Info));
+	} else {
+		std::thread([&Info]() {
+			HandleWeaponUnequip(FillWeaponInfo(Info));
+		}).detach();
+		//QueueHandlingOfWeaponUnequip(FillWeaponInfo(Info));
 	}
-	std::thread([&Info]() {
-		HanldeWeaponEquip(FillWeaponInfo(Info));
-	}).detach();
 
 	return BSEventNotifyControl::kContinue;
 }
@@ -145,6 +156,7 @@ BSEventNotifyControl TESFurnitureEventSink::ProcessEvent(const TESFurnitureEvent
 
 #pragma region TESLoadGameEventSink
 BSEventNotifyControl TESLoadGameEventSink::ProcessEvent(const TESLoadGameEvent& a_event, BSTEventSource<TESLoadGameEvent>* a_source) {
+	logInfo("Game Loaded");
 	return BSEventNotifyControl::kContinue;
 }
 #pragma endregion TESLoadGameEventSink
@@ -155,16 +167,19 @@ BSEventNotifyControl TESLoadGameEventSink::ProcessEvent(const TESLoadGameEvent& 
 
 #pragma region Handlers
 
-#pragma region PlayerAnimGraphEventHandler
-BSEventNotifyControl PlayerAnimGraphEventHandler::HookedProcessEvent(const BSAnimationGraphEvent& a_event, BSTEventSource<BSAnimationGraphEvent>* a_source) {
+#pragma region PlayerAnimationGraphEventHandler
+BSEventNotifyControl PlayerAnimationGraphEventHandler::HookedProcessEvent(const BSAnimationGraphEvent& a_event, BSTEventSource<BSAnimationGraphEvent>* a_source) {
+	HookInfo& HookInfo = HookInfo::getInstance();
 	WeaponInfo& Info = WeaponInfo::getInstance();
-	const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
-	const BSFixedString reloadSequentialStart("reloadSequentialStart");
 	const BSFixedString Event00("Event00");
 	const BSFixedString pipboyClosed("pipboyClosed");
 	const BSFixedString pipboyOpened("pipboyOpened");
 	const BSFixedString ReloadComplete("ReloadComplete");
 	const BSFixedString ReloadEnd("ReloadEnd");
+	const BSFixedString reloadSequentialReserveStart("reloadSequentialReserveStart");
+	const BSFixedString reloadSequentialStart("reloadSequentialStart");
+	const BSFixedString reloadStateEnter("reloadStateEnter");
+	const BSFixedString reloadStateExit("reloadStateExit");
 	const BSFixedString sightedStateEnter("sightedStateEnter");
 	const BSFixedString sightedStateExit("sightedStateExit");
 	const BSFixedString throwEnd("throwEnd");
@@ -177,50 +192,23 @@ BSEventNotifyControl PlayerAnimGraphEventHandler::HookedProcessEvent(const BSAni
 	const BSFixedString weapUnequip("weapUnequip");
 
 	if (weaponHasSequentialReload) {
-		if (HasReloadEnded()) {
-			if (a_event.name == Event00) {
-				reloadStartHandle();
-				StopLesserAmmo();
-				isEmptyReload = Info.weapAmmoCurrentCount == 0 ? true : false;
-			}
+		HandleSequentialReload(a_event);
+	}
+
+	if (!weaponHasSequentialReload) {
+		if (a_event.name == reloadStateEnter) {
+			reloadHasStarted = true;
+			reloadHasEnded = false;
 		}
-		if (HasReloadStarted()) {
-			if (a_event.name == ReloadEnd) {  //Better way to do this? Bolt action stuff calls reloadend event during bolt charge and reload
-				logInfo("Event Recieved: ReloadEnd");
-				reloadStop();
-			}
-			if (a_event.name == ReloadComplete) {
-				logInfo("Event Recieved: reloadComplete");
-				if ((Info.weapAmmoCapacity - 1) == Info.weapAmmoCurrentCount) {
-					reloadStop();
-				} else {
-					SetWeapAmmoCapacity(Info.weapAmmoCurrentCount + 1);
-					if (isEmptyReload) {
-						reloadContinueFromEmpty();
-					} else {
-						reloadContinue();
-					}
-				}
-			}
-			//Manually handle reload end for various situations
-			if (a_event.name == pipboyOpened) {
-				reloadStop();
-				logInfo("Event Recieved: pipboy opened");
-			}
-			if (a_event.name == weaponSwing) {
-				reloadStop();
-				logInfo("Event Recieved: weapon swing");
-			}
-			if (a_event.name == throwEnd) {
-				reloadStop();
-				logInfo("Event Recieved: throw end");
-			}
+		if (a_event.name == reloadStateExit) {
+			reloadHasStarted = false;
+			reloadHasEnded = true;
 		}
 	}
 
 	//These functions could be moved into a new hook by hooking sighted and equip handlers
 	//if (a_event.name == weaponDraw) {
-	//	HanldeWeaponEquipAfter3D(Info::weapInfo);
+	//	HandleWeaponEquipAfter3D(Info::weapInfo);
 	//}
 	//if (a_event.name == sightedStateEnter) {
 	//	HandleWeaponSightsEnter();
@@ -228,33 +216,30 @@ BSEventNotifyControl PlayerAnimGraphEventHandler::HookedProcessEvent(const BSAni
 	//if (a_event.name == sightedStateExit) {
 	//	HandleWeaponSightsExit();
 	//}
-	//if (a_event.name == weaponInstantDown) {
-	//	HandleWeaponDown();
-	//}
+	if (a_event.name == weaponInstantDown) {
+		HandleWeaponInstantDown();
+	}
 
-	FnProcessEvent fn = fnHash.at(*(uintptr_t*)this);
+	FnProcessEvent fn = HookInfo.fnPlayerAnimationGraphEventHash.at(*(uintptr_t*)this);
 	return fn ? (this->*fn)(a_event, a_source) : BSEventNotifyControl::kContinue;
 }
 
-void PlayerAnimGraphEventHandler::HookSink() {
+void PlayerAnimationGraphEventHandler::HookSink() {
+	HookInfo& Info = HookInfo::getInstance();
 	uintptr_t vtable = *(uintptr_t*)this;
-	auto it = fnHash.find(vtable);
-	if (it == fnHash.end()) {
-		FnProcessEvent fn = HookUtil::SafeWrite64Function(vtable + 0x8, &PlayerAnimGraphEventHandler::HookedProcessEvent);
-		fnHash.insert(std::pair<uintptr_t, FnProcessEvent>(vtable, fn));
+	auto it = Info.fnPlayerAnimationGraphEventHash.find(vtable);
+	if (it == Info.fnPlayerAnimationGraphEventHash.end()) {
+		FnProcessEvent fn = HookUtil::SafeWrite64Function(vtable + 0x8, &PlayerAnimationGraphEventHandler::HookedProcessEvent);
+		Info.fnPlayerAnimationGraphEventHash.insert(std::pair<uintptr_t, FnProcessEvent>(vtable, fn));
 	}
 }
-std::unordered_map<uintptr_t, PlayerAnimGraphEventHandler::FnProcessEvent> PlayerAnimGraphEventHandler::fnHash;
-#pragma endregion PlayerAnimGraphEventHandler
+#pragma endregion PlayerAnimationGraphEventHandler
 
 #pragma region PlayerAttackHandler
 void PlayerAttackHandler::HandleButtonEvent(const ButtonEvent* inputEvent) {
-	if (weaponHasSpeedReload) {
-		if (inputEvent->value == 1.0f && inputEvent->heldDownSecs == 0.0f) {
-			if (inputEvent->strUserEvent == std::string_view("ReadyWeapon")) {
-				IsButtonDoubleTapFunctor(inputEvent->idCode, &DoSpeedReload);
-			}
-		}
+	if (inputEvent->strUserEvent == "SecondaryAttack") {
+	}
+	if (inputEvent->strUserEvent == "PrimaryAttack") {
 	}
 }
 
@@ -273,274 +258,260 @@ void PlayerAttackHandler::HandleLeftAttack(const ButtonEvent* inputEvent) {
 void PlayerAttackHandler::HandleRightAttack(const ButtonEvent* inputEvent) {
 }
 
-void PlayerAttackHandler::HookedHandleButtonEvent(const ButtonEvent* inputEvent) {
+void PlayerAttackHandlerHook::HookedHandleButtonEvent(const ButtonEvent* inputEvent) {
+	HookInfo& Info = HookInfo::getInstance();
 	if (inputEvent->strUserEvent == "SecondaryAttack") {
 	}
 	if (inputEvent->strUserEvent == "PrimaryAttack") {
 	}
-	FnHandleButtonEvent fn = fnHash.at(*(uintptr_t*)this);
+	FnHandleButtonEvent fn = Info.fnPlayerAttackHash.at(*(uintptr_t*)this);
 	if (fn) {
 		(this->*fn)(inputEvent);
 	}
 }
 
-void PlayerAttackHandler::HookSink() {
+void PlayerAttackHandlerHook::HookSink() {
+	HookInfo& Info = HookInfo::getInstance();
 	uintptr_t vtable = *(uintptr_t*)this;
-	auto it = fnHash.find(vtable);
-	if (it == fnHash.end()) {
-		FnHandleButtonEvent fn = HookUtil::SafeWrite64Function(vtable + 0x40, &PlayerAttackHandler::HookedHandleButtonEvent);
-		fnHash.insert(std::pair<uintptr_t, FnHandleButtonEvent>(vtable, fn));
+	auto it = Info.fnPlayerAttackHash.find(vtable);
+	if (it == Info.fnPlayerAttackHash.end()) {
+		FnHandleButtonEvent fn = HookUtil::SafeWrite64Function(vtable + 0x40, &PlayerAttackHandlerHook::HookedHandleButtonEvent);
+		Info.fnPlayerAttackHash.insert(std::pair<uintptr_t, FnHandleButtonEvent>(vtable, fn));
 	}
 }
-std::unordered_map<uintptr_t, PlayerAttackHandler::FnHandleButtonEvent> PlayerAttackHandler::fnHash;
 #pragma endregion PlayerAttackHandler
 
+#pragma region PlayerReadyWeaponHandler
+void PlayerReadyWeaponHandler::HandleButtonEvent(const ButtonEvent* inputEvent) {
+}
+
+void PlayerReadyWeaponHandlerHook::HookedHandleButtonEvent(const ButtonEvent* inputEvent) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (weaponHasSpeedReload && HasReloadEnded()) {
+		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
+			if (ShouldReload()) {
+				DoSpeedReload();
+				PlayerControls::GetSingleton()->readyWeaponHandler->unk20 = 1;  //Could be problematic?
+			}
+		}
+		//IsButtonDoubleTapFunctor(inputEvent, &DoSpeedReload);
+	}
+	FnHandleButtonEvent fn = Info.fnPlayerReadyWeaponHash.at(*(uintptr_t*)this);
+	if (fn) {
+		(this->*fn)(inputEvent);
+	}
+}
+
+void PlayerReadyWeaponHandlerHook::HookSink() {
+	HookInfo& Info = HookInfo::getInstance();
+	uintptr_t vtable = *(uintptr_t*)this;
+	auto it = Info.fnPlayerReadyWeaponHash.find(vtable);
+	if (it == Info.fnPlayerReadyWeaponHash.end()) {
+		FnHandleButtonEvent fn = HookUtil::SafeWrite64Function(vtable + 0x40, &PlayerReadyWeaponHandlerHook::HookedHandleButtonEvent);
+		Info.fnPlayerReadyWeaponHash.insert(std::pair<uintptr_t, FnHandleButtonEvent>(vtable, fn));
+	}
+}
+#pragma endregion PlayerReadyWeaponHandler
+
 #pragma region PlayerSightedStateChange
-bool PlayerSightedStateChangeHandler::HookedExecuteHandler(void* a_handler, Actor& a_actor, BSFixedString& a_event) {
-	if (a_event == "Enter") {
-		logInfo("SightedStateEnter");
+bool PlayerSightedStateChangeHandler::HookedSetInIronSights(bool EnterIronSights) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (EnterIronSights) {
 		HandleWeaponSightsEnter();
-	} else if (a_event == "Exit") {
-		logInfo("SightedStateExit");
+	} else if (!EnterIronSights) {
 		HandleWeaponSightsExit();
 	}
 
-	RETURN_HANDLER;
+	FnSetInIronSights fn = Info.fnPlayerSetIronSightsHash.at(*(uintptr_t*)this);
+	return fn ? (this->*fn)(EnterIronSights) : false;
 }
 
-void PlayerSightedStateChangeHandler::Hook() {
-	REL::Relocation<uintptr_t> HandlerVtable{ VTABLE::PlayerSightedStateChangeHandler[0] };
-	fnOriginal = (FnExecuteHandler)HandlerVtable.write_vfunc(0x1, PlayerSightedStateChangeHandler::HookedExecuteHandler);
+void PlayerSightedStateChangeHandler::HookSink() {
+	HookInfo& Info = HookInfo::getInstance();
+	uintptr_t vtable = *(uintptr_t*)this;
+	auto it = Info.fnPlayerSetIronSightsHash.find(vtable);
+	if (it == Info.fnPlayerSetIronSightsHash.end()) {
+		FnSetInIronSights fn = HookUtil::SafeWrite64Function(vtable + 0x128, &PlayerSightedStateChangeHandler::HookedSetInIronSights);
+		Info.fnPlayerSetIronSightsHash.insert(std::pair<uintptr_t, FnSetInIronSights>(vtable, fn));
+	}
 }
-PlayerSightedStateChangeHandler::FnExecuteHandler PlayerSightedStateChangeHandler::fnOriginal;
 #pragma endregion PlayerSightedStateChangeHandler
-
-#pragma region PlayerWeaponAttachHandler
-bool PlayerWeaponAttachHandler::HookedExecuteHandler(void* a_handler, Actor& a_actor, BSFixedString& a_event) {
-	if (&a_actor != pc) {
-		RETURN_HANDLER;
-	}
-
-	logInfo("PlayerWeaponAttachHandler");
-	HanldeWeaponEquipAfter3D(WeaponInfo::getInstance());
-	RETURN_HANDLER;
-}
-
-void PlayerWeaponAttachHandler::Hook() {
-	REL::Relocation<uintptr_t> HandlerVtable{ VTABLE::WeaponAttachHandler[0] };
-	fnOriginal = (FnExecuteHandler)HandlerVtable.write_vfunc(0x1, PlayerWeaponDrawHandler::HookedExecuteHandler);
-}
-PlayerWeaponAttachHandler::FnExecuteHandler PlayerWeaponAttachHandler::fnOriginal;
-#pragma endregion PlayerWeaponAttachHandler
-
-#pragma region PlayerWeaponDrawHandler
-bool PlayerWeaponDrawHandler::HookedExecuteHandler(void* a_handler, Actor& a_actor, BSFixedString& a_event) {
-	if (&a_actor != pc) {
-		RETURN_HANDLER;
-	}
-
-	logInfo("PlayerWeaponDrawHandler");
-	RETURN_HANDLER;
-}
-
-void PlayerWeaponDrawHandler::Hook() {
-	REL::Relocation<uintptr_t> HandlerVtable{ VTABLE::WeaponDrawHandler[0] };
-	fnOriginal = (FnExecuteHandler)HandlerVtable.write_vfunc(0x1, PlayerWeaponDrawHandler::HookedExecuteHandler);
-}
-PlayerWeaponDrawHandler::FnExecuteHandler PlayerWeaponDrawHandler::fnOriginal;
-#pragma endregion PlayerWeaponDrawHandler
-
-#pragma region PlayerWeaponSheatheHandler
-bool PlayerWeaponSheatheHandler::HookedExecuteHandler(void* a_handler, Actor& a_actor, BSFixedString& a_event) {
-	if (&a_actor != pc) {
-		RETURN_HANDLER;
-	}
-
-	logInfo("PlayerWeaponSheatheHandler");
-	HandleWeaponDown();
-	RETURN_HANDLER;
-}
-
-void PlayerWeaponSheatheHandler::Hook() {
-	REL::Relocation<uintptr_t> HandlerVtable{ VTABLE::WeaponSheatheHandler[0] };
-	fnOriginal = (FnExecuteHandler)HandlerVtable.write_vfunc(0x1, PlayerSightedStateChangeHandler::HookedExecuteHandler);
-}
-PlayerWeaponSheatheHandler::FnExecuteHandler PlayerWeaponSheatheHandler::fnOriginal;
-#pragma endregion PlayerWeaponSheatheHandler
 
 #pragma endregion Handlers
 
 #pragma region TryHooks
 
 void TryHookMenuOpenCloseEvent() {
-	if (hookedList.at("MenuOpenCloseEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("MenuOpenCloseEvent") == true) {
 		return;
 	}
 	BSTEventSource<MenuOpenCloseEvent>* eventSource = UI::GetSingleton()->GetEventSource<MenuOpenCloseEvent>();
 	if (eventSource) {
 		MenuOpenCloseEventSink* OnMenuOpenCloseEventSink = new MenuOpenCloseEventSink();
 		eventSource->RegisterSink(OnMenuOpenCloseEventSink);
-		hookedList.at("MenuOpenCloseEvent") = true;
+		Info.hookedList.at("MenuOpenCloseEvent") = true;
 	}
 }
 
 void TryHookPlayerAmmoCountEvent() {
-	if (hookedList.at("PlayerAmmoCountEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("PlayerAmmoCountEvent") == true) {
 		return;
 	}
-	//BSTEventSource<PlayerAmmoCountEvent>* eventSource = PlayerAmmoCountEventSink::GetEventSource();
 	BSTEventSource<PlayerAmmoCountEvent>* eventSource = PlayerAmmoCountEvent::GetEventSource();
 	if (eventSource) {
 		PlayerAmmoCountEventSink* OnPlayerAmmoCountEventSink = new PlayerAmmoCountEventSink();
 		eventSource->RegisterSink(OnPlayerAmmoCountEventSink);
-		hookedList.at("PlayerAmmoCountEvent") = true;
+		Info.hookedList.at("PlayerAmmoCountEvent") = true;
 	}
 }
 
 void TryHookPlayerAnimGraphEvent() {
-	if (hookedList.at("PlayerAnimGraphEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("PlayerAnimGraphEvent") == true) {
 		return;
 	}
 	auto player = PlayerCharacter::GetSingleton();
 	if (player) {
-		((PlayerAnimGraphEventHandler*)((uintptr_t)player + 0x38))->HookSink();
-		hookedList.at("PlayerAnimGraphEvent") = true;
+		((PlayerAnimationGraphEventHandler*)((uintptr_t)player + 0x38))->HookSink();
+		Info.hookedList.at("PlayerAnimGraphEvent") = true;
 	}
 }
 
 void TryHookPlayerAttackHandler() {
-	if (hookedList.at("PlayerAttackHandler") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("PlayerAttackHandler") == true) {
 		return;
 	}
 	auto controls = PlayerControls::GetSingleton();
 	if (controls) {
 		PlayerAttackHandler* OnPlayerAttack = new PlayerAttackHandler(controls->data);
 		controls->RegisterHandler(OnPlayerAttack);
-		//((PlayerAttackHandler*)controls->attackHandler)->HookSink();
-		hookedList.at("PlayerAttackHandler") = true;
+		((PlayerAttackHandlerHook*)controls->attackHandler)->HookSink();
+		Info.hookedList.at("PlayerAttackHandler") = true;
+	}
+}
+
+void TryHookPlayerReadyWeaponHandler() {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("PlayerReadyWeaponHandler") == true) {
+		return;
+	}
+	auto controls = PlayerControls::GetSingleton();
+	if (controls) {
+		PlayerReadyWeaponHandler* OnPlayerReadyWeapon = new PlayerReadyWeaponHandler(controls->data);
+		controls->RegisterHandler(OnPlayerReadyWeapon);
+		((PlayerReadyWeaponHandlerHook*)controls->readyWeaponHandler)->HookSink();
+		Info.hookedList.at("PlayerReadyWeaponHandler") = true;
 	}
 }
 
 void TryHookPlayerSetWeaponStateEvent() {
-	if (hookedList.at("PlayerSetWeaponStateEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("PlayerSetWeaponStateEvent") == true) {
 		return;
 	}
 	BSTEventSource<PlayerSetWeaponStateEvent>* eventSource = PlayerSetWeaponStateEvent::GetEventSource();
 	if (eventSource) {
 		PlayerSetWeaponStateEventSink* OnPlayerSetWeaponStateEvent = new PlayerSetWeaponStateEventSink();
 		eventSource->RegisterSink(OnPlayerSetWeaponStateEvent);
-		hookedList.at("PlayerSetWeaponStateEvent") = true;
+		Info.hookedList.at("PlayerSetWeaponStateEvent") = true;
 	}
 }
 
 void TryHookPlayerSightedStateChangeHandler() {
-	if (hookedList.at("PlayerSightedStateChangeHandler") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("PlayerSightedStateChangeHandler") == true) {
 		return;
 	}
 	auto player = PlayerCharacter::GetSingleton();
 	if (player) {
-		PlayerSightedStateChangeHandler::Hook();
-		hookedList.at("PlayerSightedStateChangeHandler") = true;
-	}
-}
-
-void TryHookPlayerWeaponAttachHandler() {
-	if (hookedList.at("PlayerWeaponAttachHandler") == true) {
-		return;
-	}
-	auto player = PlayerCharacter::GetSingleton();
-	if (player) {
-		PlayerWeaponAttachHandler::Hook();
-		hookedList.at("PlayerWeaponAttachHandler") = true;
-	}
-}
-
-void TryHookPlayerWeaponDrawHandler() {
-	if (hookedList.at("PlayerWeaponDrawHandler") == true) {
-		return;
-	}
-	auto player = PlayerCharacter::GetSingleton();
-	if (player) {
-		PlayerWeaponDrawHandler::Hook();
-		hookedList.at("PlayerWeaponDrawHandler") = true;
+		((PlayerSightedStateChangeHandler*)((uintptr_t)player + 0x128))->HookSink();
+		Info.hookedList.at("PlayerSightedStateChangeHandler") = true;
 	}
 }
 
 void TryHookPlayerWeaponReloadEvent() {
-	if (hookedList.at("PlayerWeaponReloadEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("PlayerWeaponReloadEvent") == true) {
 		return;
 	}
 	BSTEventSource<PlayerWeaponReloadEvent>* eventSource = PlayerWeaponReloadEvent::GetEventSource();
 	if (eventSource) {
 		PlayerWeaponReloadEventSink* OnPlayerWeaponReloadEvent = new PlayerWeaponReloadEventSink();
 		eventSource->RegisterSink(OnPlayerWeaponReloadEvent);
-		hookedList.at("PlayerWeaponReloadEvent") = true;
-	}
-}
-
-void TryHookPlayerWeaponSheatheHandler() {
-	if (hookedList.at("PlayerWeaponSheatheHandler") == true) {
-		return;
-	}
-	auto player = PlayerCharacter::GetSingleton();
-	if (player) {
-		PlayerWeaponSheatheHandler::Hook();
-		hookedList.at("PlayerWeaponSheatheHandler") = true;
+		Info.hookedList.at("PlayerWeaponReloadEvent") = true;
 	}
 }
 
 void TryHookTESEquipEvent() {
-	if (hookedList.at("TESEquipEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("TESEquipEvent") == true) {
 		return;
 	}
 	BSTEventSource<TESEquipEvent>* eventSource = &TESEquipEvent::GetSingleton();
 	if (eventSource) {
 		TESEquipEventSink* OnTESEquipEvent = new TESEquipEventSink();
 		eventSource->RegisterSink(OnTESEquipEvent);
-		hookedList.at("TESEquipEvent") = true;
+		Info.hookedList.at("TESEquipEvent") = true;
 	}
 }
 
 void TryHookTESFurnitureEvent() {
-	if (hookedList.at("TESFurnitureEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("TESFurnitureEvent") == true) {
 		return;
 	}
 	BSTEventSource<TESFurnitureEvent>* eventSource = TESFurnitureEvent::GetEventSource();
 	if (eventSource) {
 		TESFurnitureEventSink* OnTESFurnitureEvent = new TESFurnitureEventSink();
 		eventSource->RegisterSink(OnTESFurnitureEvent);
-		hookedList.at("TESFurnitureEvent") = true;
+		Info.hookedList.at("TESFurnitureEvent") = true;
 	}
 }
 
 void TryHookTESLoadGameEvent() {
-	if (hookedList.at("TESLoadGameEvent") == true) {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.at("TESLoadGameEvent") == true) {
 		return;
 	}
 	BSTEventSource<TESLoadGameEvent>* eventSource = TESLoadGameEvent::GetEventSource();
 	if (eventSource) {
 		TESLoadGameEventSink* OnTESLoadGameEvent = new TESLoadGameEventSink();
 		eventSource->RegisterSink(OnTESLoadGameEvent);
-		hookedList.at("TESLoadGameEvent") = true;
+		Info.hookedList.at("TESLoadGameEvent") = true;
 	}
 }
 
 void TryHooks() {
+	HookInfo& Info = HookInfo::getInstance();
+	if (!Info.hookedList.empty()) {
+		int i = 0;
+		for (const std::pair<const char*, bool>& n : Info.hookedList) {
+			if (n.second) {
+				++i;
+			}
+		}
+		if (i && i == Info.hookedList.size()) {
+			return;
+		}
+	}
+
 	logInfo("Trying for hooks...");
 	TryHookMenuOpenCloseEvent();
 	TryHookPlayerAttackHandler();
 	TryHookPlayerAnimGraphEvent();
+	TryHookPlayerReadyWeaponHandler();
 	TryHookPlayerSightedStateChangeHandler();
-	TryHookPlayerWeaponAttachHandler();
-	TryHookPlayerWeaponDrawHandler();
-	TryHookPlayerWeaponSheatheHandler();
 	TryHookTESEquipEvent();
 	TryHookTESFurnitureEvent();
 	TryHookTESLoadGameEvent();
 }
 
-//Used to hook certain things that CTD if hooked at the wrong time
 void TrySpecialHooks() {
+	HookInfo& Info = HookInfo::getInstance();
+
 	logInfo("Trying for special hooks...");
 	TryHookPlayerAmmoCountEvent();
 	TryHookPlayerSetWeaponStateEvent();
@@ -550,18 +521,17 @@ void TrySpecialHooks() {
 
 #pragma region Init
 void initHooks() {
-	if (hookedList.empty()) {
-		hookedList = {
+	HookInfo& Info = HookInfo::getInstance();
+	if (Info.hookedList.empty()) {
+		Info.hookedList = {
 			{ "MenuOpenCloseEvent", false },
 			{ "PlayerAmmoCountEvent", false },
 			{ "PlayerAnimGraphEvent", false },
 			{ "PlayerAttackHandler", false },
+			{ "PlayerReadyWeaponHandler", false },
 			{ "PlayerSetWeaponStateEvent", false },
 			{ "PlayerSightedStateChangeHandler", false },
-			{ "PlayerWeaponAttachHandler", false },
-			{ "PlayerWeaponDrawHandler", false },
 			{ "PlayerWeaponReloadEvent", false },
-			{ "PlayerWeaponSheatheHandler", false },
 			{ "TESEquipEvent", false },
 			{ "TESFurnitureEvent", false },
 			{ "TESLoadGameEvent", false },
@@ -569,15 +539,27 @@ void initHooks() {
 	}
 	TryHooks();
 	logInfo(";=============================== Hooks Install Complete ===============================;");
-	print_map(std::as_const(hookedList));
+	print_map(std::as_const(Info.hookedList));
 	logInfo(";======================================================================================;");
 }
 
 //Mostly for global events
 void initSpecialHooks() {
+	HookInfo& Info = HookInfo::getInstance();
+	if (!Info.hookedList.empty()) {
+		int i = 0;
+		for (const std::pair<const char*, bool>& n : Info.hookedList) {
+			if (n.second) {
+				++i;
+			}
+		}
+		if (i && i == Info.hookedList.size()) {
+			return;
+		}
+	}
 	TrySpecialHooks();
 	logInfo(";=========================== Special Hooks Install Complete ===========================;");
-	print_map(std::as_const(hookedList));
+	print_map(std::as_const(Info.hookedList));
 	logInfo(";======================================================================================;");
 }
 #pragma endregion

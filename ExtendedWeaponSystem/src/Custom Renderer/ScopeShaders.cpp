@@ -1,4 +1,5 @@
 #include "Custom Renderer/ScopeShaders.h"
+#include "Util.h"
 
 //TESEffectShader::CreateEffectShaderData but without the reset part breaking it
 BSEffectShaderData* CreateEffectShaderDataCustom(TESEffectShader* shader, NiTexture* tex1, NiTexture* tex2, NiTexture* tex3) {

@@ -1,14 +1,14 @@
 #pragma once
 
 #include "RE/Bethesda/BGSMod.h"
-#include "RE/Bethesda/BSSystem/BSFixedString.h"
-#include "RE/Bethesda/BSLock.h"
-#include "RE/Bethesda/BSStringT.h"
+#include "RE/Bethesda/BSCore/BSSimpleList.h"
 #include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/Bethesda/BSCore/BSTHashMap.h"
-#include "RE/Bethesda/BSCore/BSSimpleList.h"
-#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/BSCore/BSTTuple.h"
+#include "RE/Bethesda/BSLock.h"
+#include "RE/Bethesda/BSStringT.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSSystem/BSTSmartPointer.h"
 #include "RE/Bethesda/FormComponents.h"
 #include "RE/Bethesda/TESCondition.h"
 #include "RE/Bethesda/TESForms.h"
@@ -509,6 +509,35 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::TESObjectWEAP };
 		static constexpr auto VTABLE{ VTABLE::TESObjectWEAP };
 		static constexpr auto FORM_ID{ ENUM_FORM_ID::kWEAP };
+
+		enum Flags
+		{
+			kPlayerOnly = 1 << 0,
+			kNPCsUseAmmo = 1 << 1,
+			kNoJamAfterReload = 1 << 2,
+			kChargingReload = 1 << 3,
+			kMinorCrime = 1 << 4,
+			kFixedRange = 1 << 5,
+			kPreventUse = 1 << 6,
+			kOverrideDamage = 1 << 7,
+			kEffectOnDeath = 1 << 8,
+			kChargingAttack = 1 << 9,
+			kAlternateRumble = 1 << 10,
+			kHoldInputToPower = 1 << 11,
+			kNonHostile = 1 << 12,
+			kBoundWeapon = 1 << 13,
+			kIgnoreResist = 1 << 14,
+			kAutomatic = 1 << 15,
+			kRepeatableSingleFire = 1 << 16,
+			kCantDrop = 1 << 17,
+			kHideBackpack = 1 << 18,
+			kEmbeddedWeapon = 1 << 19,
+			kNotPlayable = 1 << 20,
+			kHasScope = 1 << 21,
+			kBoltAction = 1 << 22,
+			kSecondaryWeapon = 1 << 23,
+			kDisableShells = 1 << 24,
+		};
 
 		struct RangedData
 		{

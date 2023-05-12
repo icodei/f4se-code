@@ -1,5 +1,8 @@
 #include "Global.h"
 
+#include "Hooks.h"
+#include "Util.h"
+
 void initPlugin() {
 	pc = PlayerCharacter::GetSingleton();
 	logger::info(FMT_STRING("Player: {:p}"), fmt::ptr(pc));
@@ -11,8 +14,6 @@ void initPlugin() {
 	if (!GetForms()) {
 		logError("You are missing some forms");
 	}
-
-	pc->SetAutoReload(false);
 
 	reloadHasEnded = true;
 	reloadHasStarted = false;
@@ -54,7 +55,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	case F4SE::MessagingInterface::kPostLoad:
 
 	case F4SE::MessagingInterface::kPostPostLoad:
-		
+
 	case F4SE::MessagingInterface::kPreLoadGame:
 
 	case F4SE::MessagingInterface::kPostLoadGame:
@@ -77,7 +78,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 		gameLoadingSave = true;
 		break;
 	case F4SE::MessagingInterface::kGameLoaded:
-		
+
 	case F4SE::MessagingInterface::kGameDataReady:
 		if (reinterpret_cast<bool>(msg->data)) {
 			initPlugin();
@@ -87,8 +88,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	}
 }
 
-extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a_f4se, F4SE::PluginInfo* a_info)
-{
+extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a_f4se, F4SE::PluginInfo* a_info) {
 	a_info->infoVersion = F4SE::PluginInfo::kVersion;
 	a_info->name = Version::PROJECT.data();
 	a_info->version = Version::MAJOR;
@@ -109,8 +109,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 	return true;
 }
 
-extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f4se)
-{
+extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f4se) {
 	initLog();
 	logger::info(FMT_STRING("{:s} Loaded"), Version::PROJECT);
 	F4SE::Init(a_f4se);
