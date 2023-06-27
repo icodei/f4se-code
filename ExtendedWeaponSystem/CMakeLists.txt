@@ -121,6 +121,10 @@ target_compile_features(
 		cxx_std_20
 )
 
+include_directories(
+	${CMAKE_SOURCE_DIR}/Shared
+)
+
 target_include_directories(
 	${PROJECT_NAME}
 	PRIVATE

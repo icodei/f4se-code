@@ -26,6 +26,8 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::BSShaderProperty };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::BSShaderProperty };
 
+		static constexpr auto CLEAR_RENDER_PASS_STATE{ 0x7FFFFFFF };
+
 		enum EShaderPropertyFlag
 		{
 			BSSP_SPECULAR = 0x0,
@@ -195,6 +197,20 @@ namespace RE
 		virtual std::uint32_t DetermineUtilityShaderDecl() const { return 0; }                                                                                                                                               // 3D
 		virtual std::uint32_t GetMaterialType() const { return 0; }                                                                                                                                                          // 3E
 		virtual void DoClearRenderPasses() { return; }                                                                                                                                                                       // 3F
+
+		void ClearRenderPasses()
+		{
+			using func_t = decltype(&BSShaderProperty::ClearRenderPasses);
+			REL::Relocation<func_t> func{ REL::ID(1065016) };
+			return func(this);
+		}
+
+		void SetMaterial(BSShaderMaterial* a_material, bool a1)
+		{
+			using func_t = decltype(&BSShaderProperty::SetMaterial);
+			REL::Relocation<func_t> func{ REL::ID(706318) };
+			return func(this, a_material, a1);
+		}
 
 		void SetEffectShaderData(BSEffectShaderData* shaderData)
 		{

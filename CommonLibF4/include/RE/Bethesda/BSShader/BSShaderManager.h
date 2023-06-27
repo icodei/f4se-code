@@ -1,6 +1,7 @@
 #pragma once
 #include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
@@ -22,6 +23,8 @@ namespace RE
 	class NiTexture;
 	class ShadowSceneNode;
 
+	struct BSReloadShaderI;
+
 	class BSShaderManager
 	{
 	public:
@@ -31,6 +34,11 @@ namespace RE
 		{
 			REL::Relocation<NiCamera**> singleton{ REL::ID(543218) };
 			return *singleton;
+		}
+
+		static void SetCamera(NiCamera* a_camera)
+		{
+			REL::safe_write(REL::ID(543218).address(), (uintptr_t)a_camera);
 		}
 
 		static NiCamera* GetMainCamera()
@@ -43,6 +51,11 @@ namespace RE
 		{
 			REL::Relocation<NiPointer<NiCamera>*> singleton{ REL::ID(175576) };
 			return *singleton;
+		}
+
+		static void SetMainCamera(NiCamera* a_camera)
+		{
+			REL::safe_write(REL::ID(175576).address(), (uintptr_t)a_camera);
 		}
 
 		//custom helper functions end
@@ -68,7 +81,13 @@ namespace RE
 
 		//static member DefaultErrorMapID
 		//static member DefaultNormalMapID
-		//static function GetShader
+
+		static BSShader* GetShader(std::uint32_t shaderIndex)
+		{
+			using func_t = decltype(&BSShaderManager::GetShader);
+			REL::Relocation<func_t> func{ REL::ID(918107) };
+			return func(shaderIndex);
+		}
 
 		using SHADERERRORFUNC = void (*)(char*, NiAVObject*);
 		using GARBAGECOLLECTORADDFUNC = void (*)(NiAVObject*);
@@ -413,6 +432,21 @@ namespace RE
 		//static function SetDebugRenderTexture
 		//static function GetSelfIllumCount
 		//static function SetSelfIllumCount
+		
+		static void RegisterShaderLoader(const char* a_name, BSReloadShaderI* a_shader)
+		{
+			using func_t = decltype(&BSShaderManager::RegisterShaderLoader);
+			REL::Relocation<func_t> func{ REL::ID(1569773) };
+			return func(a_name, a_shader);
+		}
+
+		static void UnregisterShaderLoader(const char* a_name)
+		{
+			using func_t = decltype(&BSShaderManager::UnregisterShaderLoader);
+			REL::Relocation<func_t> func{ REL::ID(425866) };
+			return func(a_name);
+		}
+		
 		//...
 
 		static BSShaderAccumulator* GetCurrentAccumulator()
@@ -438,11 +472,18 @@ namespace RE
 		//static member InstanceGroups
 		//static member IMap
 		//static member pTimerFunction
-		//static member iENabledPasses
+		//static member iEnabledPasses
 		//static member bInitialized
 		static constexpr auto NUM_RENDERFLAG_BITS{ 0x10 };
 		//static member usRenderFlags
 		//...
+
+		static BSTHashMap<BSFixedString, BSReloadShaderI*>& GetShaderLoaderMap()
+		{
+			REL::Relocation<BSTHashMap<BSFixedString, BSReloadShaderI*>*> ShaderLoaderMap{ REL::ID(637314), 0x8 };
+			return *ShaderLoaderMap;
+		}
+
 		//static member St
 		//static member pCurrentShaderAccumulator
 		//static member usRenderMode

@@ -1,8 +1,23 @@
 #pragma once
 
-namespace RE 
+namespace RE
 {
-	struct BSWaterShaderCommonFeatures
+	namespace BSWaterShaderVertexDecl
+	{
+		enum
+		{
+			NONE,
+			VERTEX_COLORS = 1 << 0,
+			NORMAL_TEXCOORD = 1 << 1,
+			NEXT_BIT = 1 << 2,
+
+			COUNT = 2,
+
+			MASK = 3,
+		};
+	}
+
+	namespace BSWaterShaderCommonFeatures
 	{
 		enum
 		{
@@ -21,5 +36,23 @@ namespace RE
 
 			COUNT = 11,
 		};
-	};
+	}
+
+	namespace BSWaterShaderUniqueFeatures
+	{
+		enum
+		{
+			SPECULAR_NUM_LIGHTS = 0,
+			LOD = 8,
+			STENCIL,
+			STENCIL_DISPLACEMENT,
+			SIMPLE,
+			FOG,
+
+			COUNT,
+
+			NUM_BITS = 5,
+			MASK = 15,
+		};
+	}
 }

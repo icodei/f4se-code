@@ -30,11 +30,11 @@ namespace RE
 		virtual void FinishAccumulatingPreResolveDepth() {}
 		virtual void FinishAccumulatingPostResolveDepth() {}
 
-		void ClearActivePasses(bool a1)
+		void ClearActivePasses(bool clearLists)
 		{
 			using func_t = decltype(&BSShaderAccumulator::ClearActivePasses);
 			REL::Relocation<func_t> func{ REL::ID(596187) };
-			return func(this, a1);
+			return func(this, clearLists);
 		}
 
 		void ClearEffectPasses()
@@ -44,18 +44,24 @@ namespace RE
 			return func(this);
 		}
 
-		void ClearGroupPasses(std::int32_t a1, bool a2)
+		void ClearGroupPasses(std::int32_t geomGroup, bool freePasses)
 		{
 			using func_t = decltype(&BSShaderAccumulator::ClearGroupPasses);
 			REL::Relocation<func_t> func{ REL::ID(226148) };
-			return func(this, a1, a2);
+			return func(this, geomGroup, freePasses);
 		}
 
-		void RenderBatches(std::int32_t a1, bool a2, std::int32_t a3)
+		static bool RegisterObject_Standard(BSShaderAccumulator* a_accumulator, BSGeometry* a_geometry, BSShaderProperty* a_property) {
+			using func_t = decltype(&BSShaderAccumulator::RegisterObject_Standard);
+			REL::Relocation<func_t> func{ REL::ID(289935) };
+			return func(a_accumulator, a_geometry, a_property);
+		}
+
+		void RenderBatches(std::int32_t passIndex, bool alpha, std::int32_t geometryGroup)
 		{
 			using func_t = decltype(&BSShaderAccumulator::RenderBatches);
 			REL::Relocation<func_t> func{ REL::ID(1048494) };
-			return func(this, a1, a2, a3);
+			return func(this, passIndex, alpha, geometryGroup);
 		}
 
 		void RenderBlendedDecals()
@@ -88,10 +94,10 @@ namespace RE
 		std::int64_t field_A0;
 		std::int32_t field_A8;
 		std::int32_t field_AC;
-		bool m_firstPerson;
+		bool firstPerson;
 		bool ZPrePass;
-		NiColorA QSilhouetteColor;
-		std::int8_t QRenderDecals;
+		NiColorA SilhouetteColor;
+		std::int8_t RenderDecals;
 		std::int8_t field_C5;
 		BSBatchRenderer batchRenders;
 		std::int64_t field_548;
@@ -100,7 +106,7 @@ namespace RE
 		BSShaderManager::etRenderMode renderMode;
 		BSLight* shadowLight;
 		NiPoint3 eyePosition;
-		std::uint32_t QDepthPassIndex;
+		std::uint32_t DepthPassIndex;
 		std::uint64_t gap[(0x590 - 0x580) / 6];
 
 	private:

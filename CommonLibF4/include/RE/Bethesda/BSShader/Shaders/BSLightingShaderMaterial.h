@@ -13,6 +13,31 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialBase };
 		static constexpr auto TYPE{ BSMATERIAL_TYPE_LIGHTING };
 
+		enum Type
+		{
+			kDefault = 0,
+			kEnvmap,
+			kGlowmap,
+			kParallax,
+			kFace,
+			kSkinTint,
+			kHairTint,
+			kParallaxOcc,
+			kLandscape,
+			kLODLandscape,
+			kSnow,
+			kMultiLayerParallax,
+			kTreeAnim,
+			kLODObjects,
+			kMultiIndexSnow,
+			kLODObjectsHD,
+			kEye,
+			kCloud,
+			kLODLandscapeNoise,
+			kLODLandscapeBlend,
+			kDismemberment
+		};
+
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES
 		{
 			MD_BASEMAP = 0x1,
@@ -92,7 +117,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterial };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterial };
-		static constexpr auto TYPE{ ShaderTypes::kDefault };
+		static constexpr auto TYPE{ kDefault };
 
 		virtual ~BSLightingShaderMaterial();
 	};
@@ -102,7 +127,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialDismemberment };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialDismemberment };
-		static constexpr auto TYPE{ ShaderTypes::kDismemberment };
+		static constexpr auto TYPE{ kDismemberment };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_DISMEMBER
 		{
@@ -119,7 +144,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialEnvmap };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialEnvmap };
-		static constexpr auto TYPE{ ShaderTypes::kEnvmap };
+		static constexpr auto TYPE{ kEnvmap };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_ENVMAP
 		{
@@ -143,7 +168,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialEye };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialEye };
-		static constexpr auto TYPE{ ShaderTypes::kEye };
+		static constexpr auto TYPE{ kEye };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_EYE
 		{
@@ -171,7 +196,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialFace };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialFace };
-		static constexpr auto TYPE{ ShaderTypes::kFace };
+		static constexpr auto TYPE{ kFace };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_FACE
 		{
@@ -188,7 +213,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialGlowmap };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialGlowmap };
-		static constexpr auto TYPE{ ShaderTypes::kGlowmap };
+		static constexpr auto TYPE{ kGlowmap };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_GLOWMAP
 		{
@@ -205,7 +230,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialLODLandscape };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialLODLandscape };
-		static constexpr auto TYPE{ ShaderTypes::kLODLandscape };
+		static constexpr auto TYPE{ kLODLandscape };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_LOD_LANDSCAPE
 		{
@@ -233,7 +258,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialLandscape };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialLandscape };
-		static constexpr auto TYPE{ ShaderTypes::kLandscape };
+		static constexpr auto TYPE{ kLandscape };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_LANDSCAPE
 		{
@@ -285,7 +310,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialMultiLayerParallax };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialMultiLayerParallax };
-		static constexpr auto TYPE{ ShaderTypes::kMultiLayerParallax };
+		static constexpr auto TYPE{ kMultiLayerParallax };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_ML_PARALAX
 		{
@@ -316,7 +341,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialParallax };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialParallax };
-		static constexpr auto TYPE{ ShaderTypes::kParallax };
+		static constexpr auto TYPE{ kParallax };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_PARALLAX
 		{
@@ -333,7 +358,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialParallaxOcc };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialParallaxOcc };
-		static constexpr auto TYPE{ ShaderTypes::kParallaxOcc };
+		static constexpr auto TYPE{ kParallaxOcc };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_PARALLAX_OCC
 		{
@@ -354,7 +379,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSLightingShaderMaterialSkinTint };
 		static constexpr auto VTABLE{ VTABLE::BSLightingShaderMaterialSkinTint };
-		static constexpr auto TYPE{ ShaderTypes::kSkinTint };
+		static constexpr auto TYPE{ kSkinTint };
 
 		enum LIGHTING_SHADER_MATERIAL_DIFFERENCES_SKIN_TINT
 		{

@@ -11,6 +11,11 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::BSEffectShader };
 		static constexpr auto TYPE{ BSShaderManager::BSSM_SHADER_EFFECT };
 
+		static constexpr auto X{ 0 };
+		static constexpr auto Y{ 1 };
+		static constexpr auto Z{ 2 };
+		static constexpr auto W{ 3 };
+
 		// members
 		std::byte gap[0x120 - 0x118];
 	};

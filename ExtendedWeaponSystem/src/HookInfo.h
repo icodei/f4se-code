@@ -5,7 +5,8 @@
 
 struct HookInfo {
 private:
-	HookInfo(){};
+	HookInfo() {}
+	~HookInfo() { ClearHookInfo(); }
 
 public:
 	HookInfo(HookInfo const&) = delete;
@@ -16,6 +17,8 @@ public:
 	static HookInfo& getInstance();
 
 	//members
+	uintptr_t PCUpdateMainThreadOrig;
+
 	std::unordered_map<uintptr_t, PlayerAnimationGraphEventHandler::FnProcessEvent> fnPlayerAnimationGraphEventHash;
 	std::unordered_map<uintptr_t, PlayerAttackHandlerHook::FnHandleButtonEvent> fnPlayerAttackHash;
 	std::unordered_map<uintptr_t, PlayerReadyWeaponHandlerHook::FnHandleButtonEvent> fnPlayerReadyWeaponHash;

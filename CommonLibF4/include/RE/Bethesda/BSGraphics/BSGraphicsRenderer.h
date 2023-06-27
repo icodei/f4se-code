@@ -2,6 +2,8 @@
 #include "RE/Bethesda/BSGraphics/BSGraphics.h"
 #include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 
+#include <d3d9.h>
+
 namespace RE
 {
 	namespace BSGraphics
@@ -34,7 +36,7 @@ namespace RE
 			std::uint32_t presentInterval;                // 0040
 			ID3D11Device* device;                         // 0048
 			ID3D11DeviceContext* context;                 // 0050
-			RendererWindow renderWindow[32];              // 0058
+			RendererWindow renderWindow[32];              // 0058	- Window[0] seems to be the main display output
 			RenderTarget renderTargets[101];              // 0A58
 			DepthStencilTarget depthStencilTargets[13];   // 1D48
 			CubeMapRenderTarget cubeMapRenderTargets[2];  // 2500
@@ -58,6 +60,19 @@ namespace RE
 				return *singleton;
 			}
 
+			void Begin(std::uint32_t window) {
+				using func_t = decltype(&BSGraphics::Renderer::Begin);
+				REL::Relocation<func_t> func{ REL::ID(288964) };
+				return func(this, window);
+			}
+
+			void End()
+			{
+				using func_t = decltype(&BSGraphics::Renderer::End);
+				REL::Relocation<func_t> func{ REL::ID(700869) };
+				return func(this);
+			}
+
 			void IncRef(Buffer* vertexBuffer)
 			{
 				using func_t = decltype(&BSGraphics::Renderer::IncRef);
@@ -70,6 +85,12 @@ namespace RE
 				using func_t = decltype(&BSGraphics::Renderer::DecRef);
 				REL::Relocation<func_t> func{ REL::ID(194808) };
 				return func(this, vertexBuffer);
+			}
+
+			bool TryLock() {
+				using func_t = decltype(&BSGraphics::Renderer::TryLock);
+				REL::Relocation<func_t> func{ REL::ID(1259999) };
+				return func(this);
 			}
 
 			void Lock() {
@@ -112,6 +133,20 @@ namespace RE
 				return func(this);
 			}
 
+			bool MapTexture(BSGraphics::Texture* texture, Map mapType, TextureAccess& textureAccess)
+			{
+				using func_t = decltype(&BSGraphics::Renderer::MapTexture);
+				REL::Relocation<func_t> func{ REL::ID(952687) };
+				return func(this, texture, mapType, textureAccess);
+			}
+
+			void UnmapTexture(BSGraphics::Texture* texture)
+			{
+				using func_t = decltype(&BSGraphics::Renderer::UnmapTexture);
+				REL::Relocation<func_t> func{ REL::ID(835184) };
+				return func(this, texture);
+			}
+
 			void SetClearColor(float red, float green, float blue, float alpha)
 			{
 				using func_t = decltype(&BSGraphics::Renderer::SetClearColor);
@@ -138,6 +173,27 @@ namespace RE
 				using func_t = decltype(&BSGraphics::Renderer::RestorePreviousClearColor);
 				REL::Relocation<func_t> func{ REL::ID(593605) };
 				return func(this);
+			}
+
+			//CUT DEBUG FUNCTIONS
+			//Hook and overwrite the cut functions with these???
+			//void PushDebugMarker(char const* a_name)
+			//{
+				//size_t v2;          // r8
+				//wchar_t Dest[260];  // [rsp+20h] [rbp-208h] BYREF
+
+				//v2 = -1;
+				//do
+				//	++v2;
+				//while (a_name[v2]);
+				//Dest[v2] = 0;
+				//mbstowcs(Dest, a_name, v2);
+				//D3DPERF_BeginEvent(0xFFFFFFFF, Dest);
+			//}
+
+			void PopDebugMarker()
+			{
+				D3DPERF_EndEvent();
 			}
 
 			// members

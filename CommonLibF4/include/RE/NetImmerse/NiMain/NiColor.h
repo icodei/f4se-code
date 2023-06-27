@@ -33,6 +33,7 @@ namespace RE
 			b = blue;
 			a = alpha;
 		}
+		NiColorA(float color) : r(color), g(color), b(color), a(1.0) {}
 
 		static const NiColorA WHITE;
 		static const NiColorA BLACK;

@@ -60,9 +60,31 @@ namespace RE
 			return func(this, p1, p2);
 		}
 
-		void SetViewFrustrum(NiFrustum& a_frustum)
+		void SetFOV(float FOV)
 		{
-			using func_t = decltype(&NiCamera::SetViewFrustrum);
+			BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
+
+			NiCamera* camera = this;
+			NiFrustum* updatedFrutstum = new NiFrustum(0);
+			float bufferRatio;
+			float v5;
+
+			updatedFrutstum->nearPlane = 15.0F;
+			updatedFrutstum->farPlane = 15000.0F;
+			camera->maxFarNearRatio = 15000.0F / 15.0F;
+			bufferRatio = (float)(pGraphicsState->uiBackBufferHeight / pGraphicsState->uiBackBufferWidth);
+			v5 = tanf((0.017453292F * FOV) * 0.15F);
+			updatedFrutstum->ortho = false;
+			updatedFrutstum->rightPlane = v5 * 0.75F;
+			updatedFrutstum->leftPlane = -(v5 * 0.75F);
+			updatedFrutstum->topPlane = (v5 * bufferRatio) * 0.75F;
+			updatedFrutstum->bottomPlane = -(updatedFrutstum->topPlane);
+			camera->SetViewFrustum(*updatedFrutstum);
+		}
+
+		void SetViewFrustum(NiFrustum& a_frustum)
+		{
+			using func_t = decltype(&NiCamera::SetViewFrustum);
 			REL::Relocation<func_t> func{ REL::ID(24787) };
 			return func(this, a_frustum);
 		}

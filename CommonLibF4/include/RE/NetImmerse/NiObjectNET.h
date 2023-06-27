@@ -24,18 +24,24 @@ namespace RE
 			COPY_UNIQUE = 0x2,
 		};
 
-
 		NiObjectNET();
 		virtual ~NiObjectNET();  // NOLINT(modernize-use-override) 00
 
-		F4_HEAP_REDEFINE_NEW(NiObjectNET);
-
 		[[nodiscard]] std::string_view GetName() const { return name; }
+
+		void SetNameConst(const BSFixedString& a_name)
+		{
+			using func_t = decltype(&NiObjectNET::SetNameConst);
+			REL::Relocation<func_t> func{ REL::ID(493272) };
+			return func(this, a_name);
+		}
 
 		// members
 		BSFixedString name{ "" };                 // 10
 		NiPointer<NiTimeController> controllers;  // 18
 		NiExtraDataContainer* extra{ nullptr };   // 20
+
+		F4_HEAP_REDEFINE_NEW(NiObjectNET);
 	};
 	static_assert(sizeof(NiObjectNET) == 0x28);
 }

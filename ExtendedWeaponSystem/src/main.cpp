@@ -1,6 +1,8 @@
 #include "Global.h"
 
+#include "INIInfo.h"
 #include "Hooks.h"
+#include "HookInfo.h"
 #include "Util.h"
 
 void initPlugin() {
@@ -61,6 +63,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	case F4SE::MessagingInterface::kPostLoadGame:
 		if (reinterpret_cast<bool>(msg->data)) {
 			initSpecialHooks();
+			INIInfo::LoadINIConfigs();
 			gameLoadingSave = true;
 		}
 		break;
@@ -75,6 +78,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	case F4SE::MessagingInterface::kNewGame:
 		logInfo("New Game");
 		initSpecialHooks();
+		INIInfo::LoadINIConfigs();
 		gameLoadingSave = true;
 		break;
 	case F4SE::MessagingInterface::kGameLoaded:
@@ -83,6 +87,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 		if (reinterpret_cast<bool>(msg->data)) {
 			initPlugin();
 			initHooks();
+			INIInfo::initINIConfigs();
 		}
 		break;
 	}
@@ -114,7 +119,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f
 	logger::info(FMT_STRING("{:s} Loaded"), Version::PROJECT);
 	F4SE::Init(a_f4se);
 
-	g_trampoline = &F4SE::GetTrampoline();
+	F4SE::Trampoline& g_trampoline = F4SE::GetTrampoline();
 	g_taskInterface = F4SE::GetTaskInterface();
 	g_pluginHandle = F4SE::GetPluginHandle();
 	g_messaging = F4SE::GetMessagingInterface();
@@ -126,5 +131,10 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_f
 	if (g_messaging->RegisterListener(OnF4SEMessage)) {
 		logInfo("Registered listener");
 	}
+
+	REL::Relocation<uintptr_t> ptr_PCUpdateMainThread{ REL::ID(633524), 0x22D };
+
+	HookInfo::getInstance().PCUpdateMainThreadOrig = g_trampoline.write_call<5>(ptr_PCUpdateMainThread.address(), &PlayerUpdateHandler::HookedUpdate);
+
 	return true;
 }

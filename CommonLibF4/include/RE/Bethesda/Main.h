@@ -1,9 +1,9 @@
 #pragma once
 
-#include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSCore/BSTEvent.h"
-#include "RE/Bethesda/BSTMessageQueue.h"
 #include "RE/Bethesda/BSCore/BSTTuple.h"
+#include "RE/Bethesda/BSMain/BSPointerHandle.h"
+#include "RE/Bethesda/BSTMessageQueue.h"
 
 namespace RE
 {
@@ -92,8 +92,6 @@ namespace RE
 			return func();
 		}
 
-		
-
 		// members
 		BSTArray<BSTTuple<float, BSPointerHandle<Actor>>> sortedVisibleHighActors;  // 08
 		std::uint32_t localMapRenderDelay;                                          // 20
@@ -121,4 +119,10 @@ namespace RE
 		BSSaveDataSystemUtilityImage saveDataIconImages[3];                         // 220
 	};
 	static_assert(sizeof(Main) == 0x268);
+
+	BSTimer& GetAppTimer()
+	{
+		REL::Relocation<BSTimer*> appTimer{ REL::ID(1013228) };
+		return *appTimer;
+	}
 }

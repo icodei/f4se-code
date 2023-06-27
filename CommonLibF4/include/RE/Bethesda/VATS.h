@@ -82,4 +82,16 @@ namespace RE
 		BSSpinLock spinLock;                                   // D0
 	};
 	static_assert(sizeof(VATS) == 0xD8);
+
+	class VatsEffectTarget
+	{
+	public:
+
+	};
+	//static_assert(sizeof(VatsEffectTarget) == 0xA8);
+
+	namespace VatsEffectControl
+	{
+
+	}
 }

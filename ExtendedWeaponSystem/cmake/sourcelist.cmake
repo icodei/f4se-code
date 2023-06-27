@@ -9,16 +9,21 @@ set(SOURCES
 	"src/Custom Renderer/ScopeRendererManager.h"
 	"src/Custom Renderer/ScopeShaders.cpp"
 	"src/Custom Renderer/ScopeShaders.h"
+	src/Shaders/Code/ScopeConstant.hlsli
+	src/Shaders/Code/ScopeShader_PS.hlsl
+	src/Shaders/Code/ScopeShader_VS.hlsl
 	src/AnimationFunctions.cpp
 	src/AnimationFunctions.h
 	src/Global.cpp
 	src/Global.h
+	src/HookInfo.cpp
+	src/HookInfo.h
 	src/HookUtil.cpp
 	src/HookUtil.h
 	src/Hooks.cpp
 	src/Hooks.h
-	src/HookInfo.cpp
-	src/HookInfo.h
+	src/INIInfo.cpp
+	src/INIInfo.h
 	src/InputUtil.cpp
 	src/InputUtil.h
 	src/PCH.cpp

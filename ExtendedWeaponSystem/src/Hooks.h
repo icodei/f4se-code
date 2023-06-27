@@ -135,5 +135,14 @@ public:
 	F4_HEAP_REDEFINE_NEW(PlayerSightedStateChangeHandler);
 };
 
+class PlayerUpdateHandler {
+public:
+	~PlayerUpdateHandler() {}
+
+	void HookedUpdate();
+
+	F4_HEAP_REDEFINE_NEW(PlayerUpdateHandler);
+};
+
 void initHooks();
 void initSpecialHooks();

@@ -57,18 +57,15 @@ namespace RE
 
 		void SetBaseTexture(NiTexture* newTex)
 		{
-			BSEffectShaderMaterial* pMaterial;
-			NiTexture* oldTex;
-
-			pMaterial = (BSEffectShaderMaterial*)this->material;
-			oldTex = pMaterial->spBaseTexture.get();
+			BSEffectShaderMaterial* pMaterial = (BSEffectShaderMaterial*)this->material;
+			NiTexture* oldTex = pMaterial->spBaseTexture.get();
 			if (oldTex != newTex) {
 				if (newTex) {
-					_InterlockedIncrement((volatile long*)&newTex->refCount);
+					InterlockedIncrement(&newTex->refCount);
 				}
 				pMaterial->spBaseTexture.reset(newTex);
 				if (oldTex) {
-					if (!_InterlockedDecrement((volatile long*)&oldTex->refCount)) {
+					if (!InterlockedDecrement(&oldTex->refCount)) {
 						oldTex->DeleteThis();
 					}
 				}
@@ -84,18 +81,15 @@ namespace RE
 
 		void SetEnvMapMask(NiTexture* newTex)
 		{
-			BSEffectShaderMaterial* pMaterial;
-			NiTexture* oldTex;
-
-			pMaterial = (BSEffectShaderMaterial*)this->material;
-			oldTex = pMaterial->spEnvironmentMapMaskTexture.get();
+			BSEffectShaderMaterial* pMaterial = (BSEffectShaderMaterial*)material;
+			NiTexture* oldTex = pMaterial->spEnvironmentMapMaskTexture.get();
 			if (oldTex != newTex) {
 				if (newTex) {
-					_InterlockedIncrement((volatile long*)&newTex->refCount);
+					InterlockedIncrement(&newTex->refCount);
 				}
 				pMaterial->spEnvironmentMapMaskTexture.reset(newTex);
 				if (oldTex) {
-					if (!_InterlockedDecrement((volatile long*)&oldTex->refCount)) {
+					if (!InterlockedDecrement(&oldTex->refCount)) {
 						oldTex->DeleteThis();
 					}
 				}
@@ -104,18 +98,15 @@ namespace RE
 
 		void SetGrayscaleTexture(NiTexture* newTex)
 		{
-			BSEffectShaderMaterial* pMaterial;
-			NiTexture* oldTex;
-
-			pMaterial = (BSEffectShaderMaterial*)this->material;
-			oldTex = pMaterial->spGrayscaleTexture.get();
+			BSEffectShaderMaterial* pMaterial = (BSEffectShaderMaterial*)material;
+			NiTexture* oldTex = pMaterial->spGrayscaleTexture.get();
 			if (oldTex != newTex) {
 				if (newTex) {
-					_InterlockedIncrement((volatile long*)&newTex->refCount);
+					InterlockedIncrement(&newTex->refCount);
 				}
 				pMaterial->spGrayscaleTexture.reset(newTex);
 				if (oldTex) {
-					if (!_InterlockedDecrement((volatile long*)&oldTex->refCount)) {
+					if (!InterlockedDecrement(&oldTex->refCount)) {
 						oldTex->DeleteThis();
 					}
 				}
@@ -124,18 +115,15 @@ namespace RE
 
 		void SetNormalMap(NiTexture* newTex)
 		{
-			BSEffectShaderMaterial* pMaterial;
-			NiTexture* oldTex;
-
-			pMaterial = (BSEffectShaderMaterial*)this->material;
-			oldTex = pMaterial->spNormalTexture.get();
+			BSEffectShaderMaterial* pMaterial = (BSEffectShaderMaterial*)material;
+			NiTexture* oldTex = pMaterial->spNormalTexture.get();
 			if (oldTex != newTex) {
 				if (newTex) {
-					_InterlockedIncrement((volatile long*)&newTex->refCount);
+					InterlockedIncrement(&newTex->refCount);
 				}
 				pMaterial->spNormalTexture.reset(newTex);
 				if (oldTex) {
-					if (!_InterlockedDecrement((volatile long*)&oldTex->refCount)) {
+					if (!InterlockedDecrement(&oldTex->refCount)) {
 						oldTex->DeleteThis();
 					}
 				}

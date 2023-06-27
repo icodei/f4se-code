@@ -45,6 +45,13 @@ namespace RE
 			return func(name, isDDX, a1);
 		}
 
+		static void SetAllowDegrade(bool degrade)
+		{
+			using func_t = decltype(&NiTexture::SetAllowDegrade);
+			REL::Relocation<func_t> func{ REL::ID(948181) };
+			return func(degrade);
+		}
+
 		void SetRendererTexture(BSGraphics::Texture* texture)
 		{
 			using func_t = decltype(&NiTexture::SetRendererTexture);

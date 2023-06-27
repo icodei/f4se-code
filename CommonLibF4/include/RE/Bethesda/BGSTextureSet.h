@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/Bethesda/BSResource/BSResource.h"
+#include "RE/Bethesda/BSResource/BSResourceID.h"
 #include "RE/Bethesda/BSShader/BSShaderData.h"
 #include "RE/Bethesda/BSTextureSet.h"
 #include "RE/Bethesda/FormComponents.h"

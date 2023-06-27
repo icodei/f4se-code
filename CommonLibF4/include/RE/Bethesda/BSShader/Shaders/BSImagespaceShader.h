@@ -10,6 +10,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSImagespaceShader };
 		static constexpr auto VTABLE{ VTABLE::BSImagespaceShader };
+		static constexpr auto TYPE{ BSShaderManager::BSSM_SHADER_IMAGESPACE };
 
 		BSImagespaceShader() = delete;
 		BSImagespaceShader(const char* fxpName) { ctor(fxpName); }

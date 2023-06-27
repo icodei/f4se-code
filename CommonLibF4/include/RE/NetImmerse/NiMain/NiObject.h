@@ -81,8 +81,17 @@ namespace RE
 		virtual const NiRTTI* GetStreamableRTTI() { return GetRTTI(); }                                    // 23
 		virtual std::uint32_t GetBlockAllocationSize() const { return 0; }                                 // 24
 		virtual NiObjectGroup* GetGroup() const { return nullptr; }                                        // 25
-		virtual void SetGroup([[maybe_unused]] NiObjectGroup* a_group) { return; }                                 // 26
+		virtual void SetGroup([[maybe_unused]] NiObjectGroup* a_group) { return; }                         // 26
 		virtual NiControllerManager* IsNiControllerManager() { return nullptr; }                           // 27
+
+		NiObject* DynamicCast(const NiRTTI* type) const
+		{
+			using func_t = decltype(&NiObject::DynamicCast);
+			REL::Relocation<func_t> func{ REL::ID(80812) };
+			return func(this, type);
+		}
+
+
 
 		F4_HEAP_REDEFINE_NEW(NiObject);
 	};

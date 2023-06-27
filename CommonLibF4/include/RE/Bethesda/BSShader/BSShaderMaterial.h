@@ -20,31 +20,6 @@ namespace RE
 			BSMATERIAL_TYPE_WATER = 0x3,
 		};
 
-		enum ShaderTypes
-		{
-			kDefault = 0,
-			kEnvmap,
-			kGlowmap,
-			kParallax,
-			kFace,
-			kSkinTint,
-			kHairTint,
-			kParallaxOcc,
-			kLandscape,
-			kLODLandscape,
-			kSnow,
-			kMultiLayerParallax,
-			kTreeAnim,
-			kLODObjects,
-			kMultiIndexSnow,
-			kLODObjectsHD,
-			kEye,
-			kCloud,
-			kLODLandscapeNoise,
-			kLODLandscapeBlend,
-			kDismemberment
-		};
-
 		enum MATERIAL_DIFFERENCES
 		{
 			MD_TYPE = 0x0,

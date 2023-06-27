@@ -1,0 +1,17 @@
+set(SOURCES
+	src/Global.cpp
+	src/Global.h
+	src/HookInfo.cpp
+	src/HookInfo.h
+	src/HookUtil.cpp
+	src/HookUtil.h
+	src/Hooks.cpp
+	src/Hooks.h
+	src/PCH.cpp
+	src/PCH.h
+	src/ShaderInfo.cpp
+	src/ShaderInfo.h
+	src/Util.cpp
+	src/Util.h
+	src/main.cpp
+)

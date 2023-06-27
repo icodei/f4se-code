@@ -148,6 +148,13 @@ namespace RE
 			return func(this);
 		}
 
+		void SetProperty(NiShadeProperty* a_property)
+		{
+			using func_t = decltype(&BSGeometry::SetProperty);
+			REL::Relocation<func_t> func{ REL::ID(254895), -0x18 };
+			return func(this, a_property);
+		}
+
 		//members
 		NiBound kModelBound;                       // 120
 		NiPointer<NiProperty> effectState;         // 130

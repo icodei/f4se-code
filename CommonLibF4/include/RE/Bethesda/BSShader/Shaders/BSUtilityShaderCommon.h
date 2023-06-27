@@ -2,4 +2,35 @@
 
 namespace RE
 {
+	struct BSUtilityShaderCommonFeatures
+	{
+		enum
+		{
+			ALPHA_TEST = 1 << 7,
+			CLIP_VOLUME = 1 << 8,
+			RENDER_NORMAL = 1 << 9,
+			RENDER_NORMAL_FALLOFF = 1 << 10,
+			RENDER_NORMAL_CLAMP = 1 << 11,
+			RENDER_NORMAL_CLEAR = 1 << 12,
+			RENDER_DEPTH = 1 << 13,
+			RENDER_SHADOWMAP = 1 << 14,
+			RENDER_SHADOWMAP_CLAMP = 1 << 15,
+			RENDER_SHADOWMAP_PB = 1 << 16,
+			DEBUG_COLOR = 1 << 17,
+			DEBUG_SHADOWSPLIT = 1 << 18,
+			SILHOUETTE_COLOR = 1 << 19,
+			GRAYSCALE_MASK = 1 << 20,
+			COMBINED = 1 << 21,
+			TINT = 1 << 22,
+			INSTANCED = 1 << 23,
+			VATS_MASK = 1 << 24,
+			RENDER_BASE_TEXTURE = 1 << 25,
+			TREE_ANIM = 1 << 26,
+			LOD_OBJECT = 1 << 27,
+			ADDITIONAL_ALPHA_MASK = 1 << 28,
+			VATS_DEBUG_COLOR = 1 << 29,
+			SPLINE = 1 << 30,
+			DYNAMIC_TESSELLATION = 2147483648
+		};
+	};
 }

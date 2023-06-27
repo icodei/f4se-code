@@ -229,6 +229,7 @@ set(SOURCES
 	include/RE/Bethesda/BSResource/BSResourceEntryDB.h
 	include/RE/Bethesda/BSResource/BSResourceEntryQueue.h
 	include/RE/Bethesda/BSResource/BSResourceEnums.h
+	include/RE/Bethesda/BSResource/BSResourceHandle.h
 	include/RE/Bethesda/BSResource/BSResourceID.h
 	include/RE/Bethesda/BSResource/BSResourceLocation.h
 	include/RE/Bethesda/BSResource/BSResourceStream.h
@@ -306,6 +307,7 @@ set(SOURCES
 	include/RE/Bethesda/BSShader/BSMTAManager.h
 	include/RE/Bethesda/BSShader/BSMTRManagerDefs.h
 	include/RE/Bethesda/BSShader/BSMeshLODTriShape.h
+	include/RE/Bethesda/BSShader/BSRenderPass.h
 	include/RE/Bethesda/BSShader/BSShader.h
 	include/RE/Bethesda/BSShader/BSShaderAccumulator.h
 	include/RE/Bethesda/BSShader/BSShaderData.h
@@ -335,6 +337,7 @@ set(SOURCES
 	include/RE/Bethesda/BSShader/Shaders/BSDFTiledLighting.h
 	include/RE/Bethesda/BSShader/Shaders/BSDistantTreeShader.h
 	include/RE/Bethesda/BSShader/Shaders/BSEffectShader.h
+	include/RE/Bethesda/BSShader/Shaders/BSEffectShaderCommon.h
 	include/RE/Bethesda/BSShader/Shaders/BSEffectShaderData.h
 	include/RE/Bethesda/BSShader/Shaders/BSEffectShaderMaterial.h
 	include/RE/Bethesda/BSShader/Shaders/BSEffectShaderProperty.h

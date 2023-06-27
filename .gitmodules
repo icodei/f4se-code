@@ -1,0 +1,3 @@
+[submodule "Shared/Detours"]
+	path = Shared/Detours
+	url = https://github.com/microsoft/Detours.git

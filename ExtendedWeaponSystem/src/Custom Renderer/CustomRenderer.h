@@ -14,7 +14,7 @@ struct ScopeCameraStates {
 };
 using ScopeCameraState = ScopeCameraStates::CameraState;
 
-class ScopeCamera : public TESCamera {	//TODO Add BSTEventSink as a baseclass???
+class ScopeCamera : public TESCamera {  //TODO Add BSTEventSink as a baseclass???
 public:
 	class DefaultState : public TESCameraState {
 	public:
@@ -48,10 +48,10 @@ public:
 
 		//members
 		NiQuaternion initialRotation;
-		NiPoint3 initialPosition;
+		NiPoint3 initialPosition{ NiPoint3::ZERO };
 		NiQuaternion rotation;
-		NiPoint3 translation;
-		float zoom;
+		NiPoint3 translation{ NiPoint3::ZERO };
+		float zoom{ 1.0F };
 
 		F4_HEAP_REDEFINE_NEW(ScopeCamera::DefaultState);
 	};
@@ -120,6 +120,7 @@ public:
 	bool IsInThermalMode();
 	bool IsInNightVisionMode();
 	void Reset();
+	void SetFOV(float FOV);
 	void SetState(TESCameraState* newCameraState);
 	void StartCorrectState();
 	void StartDefaultState();
@@ -127,24 +128,24 @@ public:
 	void StartNightVisionState();
 	void Update3D();
 	void UpdateCamera();
-	
+
 	//member access
 	bool QCameraHasRenderPlane();
 
 	//members
 	BSTSmartPointer<TESCameraState> cameraStates[ScopeCameraState::kTotal];
-	NiCamera* camera;
-	BSGeometry* renderPlane;
-	bool geometryDefault;
+	NiCamera* camera{ nullptr };
+	BSGeometry* renderPlane{ nullptr };
+	bool geometryDefault{ false };
 
 	F4_HEAP_REDEFINE_NEW(ScopeCamera);
 };
 #pragma endregion
 
-class ScopeRenderer {
+class ScopeCustomRenderer {
 public:
-	ScopeRenderer();
-	~ScopeRenderer();
+	ScopeCustomRenderer();
+	~ScopeCustomRenderer();
 
 	//static functions
 	static void RenderScopeScene(NiCamera* a_camera, BSShaderAccumulator* a_shaderAccumulator, uint32_t a_renderTarget, uint32_t a_depthTarget);
@@ -157,31 +158,68 @@ public:
 	BSCullingProcess* pScopeCullingProc{ nullptr };
 	ScopeCamera* pRendererCamera{ nullptr };
 	BSShaderAccumulator* pScopeAccumulator{ nullptr };
-	ImageSpaceShaderParam* pShaderParams;
+	ImageSpaceShaderParam* pShaderParams{ nullptr };
 	uint32_t renderTarget{ 19 };
 
-	F4_HEAP_REDEFINE_NEW(ScopeRenderer);
+	F4_HEAP_REDEFINE_NEW(ScopeCustomRenderer);
 };
 
-class ScopeGeometry {
+class ScopeLensModel {
 public:
+	ScopeLensModel();
+	ScopeLensModel(int32_t a_target, int32_t a_swap);
+	~ScopeLensModel();
 
 	//functions
 	void InitModels();
+	void InitRenderer();
+	void InitTargets();
+	Interface3D::Renderer* GetRenderer();
+	const BSFixedString GetRendererName() const;
+	void Show(bool forceShow);
+	void Hide();
+
+	//FX functions
+	void ChangeFOV(float FOV);
+	void ClearFX();
+	void DoNightVisionFX();
+	void DoThermalFX();
 
 	//members
-	BSFixedString rendererName;
+	NiNode* renderRoot{ nullptr };        //TextureLoader
+	BSGeometry* renderPlane{ nullptr };   //TextureLoader:0
+	NiNode* reticleRoot{ nullptr };       //reticle_ui_stencil
+	BSGeometry* reticlePlane{ nullptr };  //reticle_ui_stencil:0
+	NiNode* scopeRoot{ nullptr };         //ScopeViewParts
+	NiNode* rootNode{ nullptr };          //ScopeAiming
+	int32_t renderTarget{ 37 };
+	int32_t swapTarget{ -1 };
+	bool FXNoneActive{ true };
+	bool FXNightVisionActive{ false };
+	bool FXThermalActive{ false };
+	bool visible{ false };
+
+	F4_HEAP_REDEFINE_NEW(ScopeLensModel);
 };
 
-namespace nsScope {
+namespace ScopeRenderer {
 
-	//functions
-	void CreateRenderer();
-	void DestroyRenderer();
-	ScopeRenderer* InitRenderer();
+	//custom renderer functions
+	void CreateCustomRenderer();
+	void DestroyCustomRenderer();
+	ScopeCustomRenderer* InitCustomRenderer();
 	void Render();
 
-	//members
-	extern ScopeRenderer* scopeRenderer;
-	extern bool initialized;
+	//custom renderer members
+	extern ScopeCustomRenderer* scopeCustomRenderer;
+	extern bool customRendererInitialized;
+
+	//interface3D renderer functions
+	void CreateLensRenderer();
+	void DestroyLensRenderer();
+	ScopeLensModel* InitLensRenderer();
+
+	//interface3D renderer members
+	extern ScopeLensModel* scopeLensRenderer;
+	extern bool lensRendererInitialized;
 }

@@ -3,7 +3,6 @@
 extern F4SE::PluginHandle g_pluginHandle;
 extern const F4SE::MessagingInterface* g_messaging;
 extern const F4SE::TaskInterface* g_taskInterface;
-extern const F4SE::Trampoline* g_trampoline;
 
 extern PlayerCharacter* pc;
 extern PlayerCamera* pcam;
@@ -14,6 +13,7 @@ extern const ButtonEvent* secondButton;
 extern uint32_t keyPressedCount;
 extern uint32_t keyPressedLast;
 extern float keyPressedLastTime;
+extern int hotKey;
 
 extern bool gameLoading;
 extern bool gameLoadingSave;
@@ -40,6 +40,7 @@ extern BGSKeyword* weaponIsOpenBoltKeyword;
 
 #define GET_EVENT_SOURCE(EventName) (BSTEventSource<EventName>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), #EventName);
 #define RETURN_HANDLER(fnOriginal) return ((FnExecuteHandler)fnOriginal)(a_handler, a_actor, a_event);
+#define ASSERT(s) ((FMT_STRING("{}() {} ({} line {})"), __func__, s, __FILE__, __LINE__))
 
 #define _BYTE std::uint8_t
 #define _WORD std::uint16_t
@@ -86,6 +87,8 @@ extern BGSKeyword* weaponIsOpenBoltKeyword;
 #define Flt180dPI 57.29578018F
 #define DblPId180 0.017453292519943295F
 #define Dbl180dPI 57.29577951308232F
+
+#define DEG_TO_RAD 0.017453292F
 
 #define BUTTON_DOUBLE_TAP 2
 #define BUTTON_TIMEOUT 0.1F

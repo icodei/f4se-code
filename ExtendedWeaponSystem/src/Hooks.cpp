@@ -53,6 +53,13 @@ BSEventNotifyControl PlayerAmmoCountEventSink::ProcessEvent(const PlayerAmmoCoun
 		Info.weapAmmoCapacity = a_event.weapon->weaponData.ammoCapacity;
 	}
 
+	const BSFixedString iWeaponCharge("iWeaponCharge");
+	int32_t weaponCharge = NULL;
+	IAnimationGraphManagerHolder* graph = pc->GetCurrentBiped()->object[stl::to_underlying(BIPED_OBJECT::kWeaponGun)].objectGraphManager.get();
+	if (graph && graph->GetGraphVariableIntByName(iWeaponCharge, weaponCharge)) {
+		logInfo("WeaponCharge: " + std::to_string(weaponCharge));
+	}
+
 	//logInfo("PlayerAmmoCountEvent Dump");
 	//Dump(const_cast<PlayerAmmoCountEvent*>(&a_event), 0x30);
 
@@ -291,7 +298,6 @@ void PlayerReadyWeaponHandlerHook::HookedHandleButtonEvent(const ButtonEvent* in
 		if (GetAsyncKeyState(VK_CONTROL) & 0x8000) {
 			if (ShouldReload()) {
 				DoSpeedReload();
-				PlayerControls::GetSingleton()->readyWeaponHandler->unk20 = 1;  //Could be problematic?
 			}
 		}
 		//IsButtonDoubleTapFunctor(inputEvent, &DoSpeedReload);
@@ -337,7 +343,23 @@ void PlayerSightedStateChangeHandler::HookSink() {
 }
 #pragma endregion PlayerSightedStateChangeHandler
 
+#pragma region PlayerUpdateHandler
+void PlayerUpdateHandler::HookedUpdate() {
+	HookInfo& Info = HookInfo::getInstance();
+
+
+
+	typedef void (*FnUpdate)();
+	FnUpdate fn = (FnUpdate)Info.PCUpdateMainThreadOrig;
+	if (fn) {
+		(*fn)();
+	}
+}
+#pragma endregion PlayerUpdateHandler
+
 #pragma endregion Handlers
+
+/*;========================================================================================================================================================;*/
 
 #pragma region TryHooks
 
@@ -538,9 +560,9 @@ void initHooks() {
 		};
 	}
 	TryHooks();
-	logInfo(";=============================== Hooks Install Complete ===============================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Hooks Install Complete "sv, 80));
 	print_map(std::as_const(Info.hookedList));
-	logInfo(";======================================================================================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
 }
 
 //Mostly for global events
@@ -558,8 +580,8 @@ void initSpecialHooks() {
 		}
 	}
 	TrySpecialHooks();
-	logInfo(";=========================== Special Hooks Install Complete ===========================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Special Hooks Install Complete "sv, 80));
 	print_map(std::as_const(Info.hookedList));
-	logInfo(";======================================================================================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
 }
 #pragma endregion

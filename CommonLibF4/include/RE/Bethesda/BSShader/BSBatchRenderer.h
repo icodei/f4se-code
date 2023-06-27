@@ -6,6 +6,7 @@
 namespace RE
 {
 	class BSRenderPass;
+	class BSShader;
 
 	struct PersistentPassList
 	{
@@ -21,6 +22,7 @@ namespace RE
 	public:
 		static constexpr auto RTTI{ RTTI::BSBatchRenderer };
 		static constexpr auto VTABLE{ VTABLE::BSBatchRenderer };
+		static constexpr auto NUM_FLAG_BITS{ 0x8 };
 
 		enum class GEOMETRY_GROUP_ENUM : std::uint32_t
 		{
@@ -104,6 +106,27 @@ namespace RE
 		static_assert(sizeof(PassGroup) == 0x10);
 
 		virtual ~BSBatchRenderer() {}  // 00
+
+		static bool BeginPass(std::uint32_t aTechnique, BSShader* aShader)
+		{
+			using func_t = decltype(&BSBatchRenderer::BeginPass);
+			REL::Relocation<func_t> func{ REL::ID(1519438) };
+			return func(aTechnique, aShader);
+		}
+
+		static bool RenderPassImmediately(BSRenderPass* aPass, std::uint32_t aTechnique, bool alpha)
+		{
+			using func_t = decltype(&BSBatchRenderer::RenderPassImmediately);
+			REL::Relocation<func_t> func{ REL::ID(244233) };
+			return func(aPass, aTechnique, alpha);
+		}
+
+		static void EndPass()
+		{
+			using func_t = decltype(&BSBatchRenderer::EndPass);
+			REL::Relocation<func_t> func{ REL::ID(15937) };
+			return func();
+		}
 
 		BSTArray<PassGroup> renderPasses[13];                                                                                  // 008
 		BSTSmallIndexScatterTable<BSTArray<PassGroup>, RenderPassMapAccess> renderPassMap[13];                                 // 140

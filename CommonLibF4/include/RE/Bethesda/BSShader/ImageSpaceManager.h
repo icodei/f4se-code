@@ -14,7 +14,6 @@ namespace RE
 	class ImageSpaceLUTData;
 	class NiTexture;
 
-	//ImageSpaceManager instance is created by BSShaderManager::Initialize
 	class ImageSpaceManager
 	{
 	public:
@@ -27,7 +26,8 @@ namespace RE
 
 		enum ImageSpaceEffectEnum
 		{
-			kUNK0,
+			kNONE = -1,
+			kUNK0 = 0,
 			kUNK1,
 			kSunbeams,
 			kHDR,
@@ -282,6 +282,13 @@ namespace RE
 			using func_t = decltype(&ImageSpaceManager::RenderEffectHelper_Tex_1);
 			REL::Relocation<func_t> func{ REL::ID(111275) };
 			return func(this, a_effect, a_texture, a_target, a_param);
+		}
+
+		BSTriShape* CreatePartialScreenGeometry(std::uint32_t width, std::uint32_t height)
+		{
+			using func_t = decltype(&ImageSpaceManager::CreatePartialScreenGeometry);
+			REL::Relocation<func_t> func{ REL::ID(1103472) };
+			return func(this, width, height);
 		}
 
 		NiPointer<BSTriShape>& SelectScreenShape(ImageSpaceEffect* a_effect)

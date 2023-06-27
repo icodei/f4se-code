@@ -3,6 +3,8 @@
 void HookInfo::ClearHookInfo() {
 	HookInfo& Info = HookInfo::getInstance();
 
+	Info.PCUpdateMainThreadOrig = NULL;
+
 	Info.fnPlayerAnimationGraphEventHash.clear();
 	Info.fnPlayerAttackHash.clear();
 	Info.fnPlayerReadyWeaponHash.clear();

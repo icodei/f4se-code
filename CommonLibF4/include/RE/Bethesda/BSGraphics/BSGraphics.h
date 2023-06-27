@@ -1,6 +1,6 @@
 #pragma once
-#include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 #include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
@@ -27,7 +27,6 @@ struct IDXGISwapChain;
 
 enum DXGI_FORMAT;
 
-
 namespace RE
 {
 	enum class DXGI_MODE_SCALING;
@@ -37,6 +36,12 @@ namespace RE
 
 	class NiCamera;
 	class NiTexture;
+
+	static constexpr auto MAX_VS_CONSTANTS{ 32 };
+	static constexpr auto MAX_HS_CONSTANTS{ 32 };
+	static constexpr auto MAX_DS_CONSTANTS{ 32 };
+	static constexpr auto MAX_PS_CONSTANTS{ 32 };
+	static constexpr auto MAX_CS_CONSTANTS{ 32 };
 
 	struct DXGI_RATIONAL
 	{
@@ -49,7 +54,6 @@ namespace RE
 
 	namespace BSGraphics
 	{
-
 		enum class DepthStencilExtraMode;
 
 		struct AutoDebugMarker
@@ -106,6 +110,15 @@ namespace RE
 			//members
 		};
 
+		enum class Map
+		{
+			MAP_READ = 1,
+			MAP_WRITE,
+			MAP_READ_WRITE,
+			MAP_WRITE_DISCARD,
+			MAP_WRITE_NO_OVERWRITE
+		};
+
 		class TextureHeader
 		{
 		public:
@@ -123,7 +136,7 @@ namespace RE
 		{
 		public:
 			//members
-			ID3D11Texture2D* m_Texture;
+			ID3D11Texture2D* m_Texture;  //UNK
 			ID3D11Texture2D* tex2D;
 			ID3D11ShaderResourceView* m_ResourceView;
 			std::uint64_t field_18;
@@ -133,9 +146,15 @@ namespace RE
 			std::uint32_t field_34;
 			std::uint32_t currentAllocFrame;
 			std::uint8_t minLOD;
-			std::uint8_t field_3D;
+			std::uint8_t degradeLevel;
 			std::byte field_3E;
 			std::byte field_3F;
+		};
+
+		class TextureAccess
+		{
+		public:
+			D3D11_MAPPED_SUBRESOURCE resource;
 		};
 
 		class ConstantGroup
@@ -151,63 +170,98 @@ namespace RE
 		class ComputeShader
 		{
 		public:
+			void* GetByteCodeBuffer() const
+			{
+				uintptr_t addr = *(uintptr_t*)this;
+				addr += 0x88;
+				return (void*)addr;
+			}
+
 			// members
-			std::uint32_t id{ 0 };                   // 00
-			ID3D11ComputeShader* shader{ nullptr };  // 08
-			std::uint32_t byteCodeSize{ 0 };         // 10
-			ConstantGroup constantBuffers[3];        // 18
-			std::uint64_t shaderDesc{ 0 };           // 60
-			std::int8_t constantTable[32]{ 0 };      // 68
+			std::uint32_t id{ 0 };                             // 00
+			ID3D11ComputeShader* shader{ nullptr };            // 08
+			std::uint32_t byteCodeSize{ 0 };                   // 10
+			ConstantGroup constantBuffers[3];                  // 18
+			std::uint64_t shaderDesc{ 0 };                     // 60
+			std::int8_t constantTable[MAX_CS_CONSTANTS]{ 0 };  // 68
 		};
 		static_assert(sizeof(ComputeShader) == 0x88);
 
 		class DomainShader
 		{
 		public:
+			void* GetByteCodeBuffer() const
+			{
+				uintptr_t addr = *(uintptr_t*)this;
+				addr += 0x88;
+				return (void*)addr;
+			}
+
 			// members
-			std::uint32_t id{ 0 };                  // 00
-			ID3D11DomainShader* shader{ nullptr };  // 08
-			std::uint32_t byteCodeSize{ 0 };        // 10
-			ConstantGroup constantBuffers[3]{ 0 };  // 18
-			std::uint64_t shaderDesc{ 0 };          // 60
-			std::int8_t constantTable[32]{ 0 };     // 68
+			std::uint32_t id{ 0 };                             // 00
+			ID3D11DomainShader* shader{ nullptr };             // 08
+			std::uint32_t byteCodeSize{ 0 };                   // 10
+			ConstantGroup constantBuffers[3]{ 0 };             // 18
+			std::uint64_t shaderDesc{ 0 };                     // 60
+			std::int8_t constantTable[MAX_DS_CONSTANTS]{ 0 };  // 68
 		};
 		static_assert(sizeof(DomainShader) == 0x88);
 
 		class HullShader
 		{
 		public:
+			void* GetByteCodeBuffer() const
+			{
+				uintptr_t addr = *(uintptr_t*)this;
+				addr += 0x88;
+				return (void*)addr;
+			}
+
 			// members
-			std::uint32_t id{ 0 };                // 00
-			ID3D11HullShader* shader{ nullptr };  // 08
-			std::uint32_t byteCodeSize{ 0 };      // 10
-			ConstantGroup constantBuffers[3];     // 18
-			std::uint64_t shaderDesc{ 0 };        // 60
-			std::int8_t constantTable[32]{ 0 };   // 68
+			std::uint32_t id{ 0 };                             // 00
+			ID3D11HullShader* shader{ nullptr };               // 08
+			std::uint32_t byteCodeSize{ 0 };                   // 10
+			ConstantGroup constantBuffers[3];                  // 18
+			std::uint64_t shaderDesc{ 0 };                     // 60
+			std::int8_t constantTable[MAX_HS_CONSTANTS]{ 0 };  // 68
 		};
 		static_assert(sizeof(HullShader) == 0x88);
 
 		class PixelShader
 		{
 		public:
+			void* GetByteCodeBuffer() const
+			{
+				uintptr_t addr = *(uintptr_t*)this;
+				addr += 0x88;
+				return (void*)addr;
+			}
+
 			// members
-			std::uint32_t id{ 0 };                 // 00
-			ID3D11PixelShader* shader{ nullptr };  // 08
-			ConstantGroup constantBuffers[3];      // 10
-			std::int8_t constantTable[32]{ 0 };    // 58
+			std::uint32_t id{ 0 };                             // 00
+			ID3D11PixelShader* shader{ nullptr };              // 08
+			ConstantGroup constantBuffers[3];                  // 10
+			std::int8_t constantTable[MAX_PS_CONSTANTS]{ 0 };  // 58
 		};
 		static_assert(sizeof(PixelShader) == 0x78);
 
 		class VertexShader
 		{
 		public:
+			void* GetByteCodeBuffer() const
+			{
+				uintptr_t addr = *(uintptr_t*)this;
+				addr += 0x88;
+				return (void*)addr;
+			}
+
 			// members
-			std::uint32_t id{ 0 };                  // 00
-			ID3D11VertexShader* shader{ nullptr };  // 08
-			std::uint32_t byteCodeSize{ 0 };        // 10
-			ConstantGroup constantBuffers[3];       // 18
-			std::uint64_t shaderDesc{ 0 };          // 60
-			std::int8_t constantTable[32]{ 0 };     // 68
+			std::uint32_t id{ 0 };                             // 00
+			ID3D11VertexShader* shader{ nullptr };             // 08
+			std::uint32_t byteCodeSize{ 0 };                   // 10
+			ConstantGroup constantBuffers[3];                  // 18
+			std::uint64_t shaderDesc{ 0 };                     // 60
+			std::int8_t constantTable[MAX_VS_CONSTANTS]{ 0 };  // 68
 		};
 		static_assert(sizeof(VertexShader) == 0x88);
 
@@ -394,6 +448,12 @@ namespace RE
 			DEPTH_STENCIL_EX_COUNT
 		};
 
+		RendererWindow* GetCurrentRenderWindow();
+		ID3D11Device* GetDevice();
+		ID3D11DeviceContext* GetMainContext();
+		ID3D11DeviceContext* GetImmediateContext();
+		Context* GetDefaultContext();
+		RendererShadowState& GetRendererShadowState();
+		RendererShadowState& GetLastDrawCallRendererShadowState();
 	};
-	//static_assert(std::is_empty_v<BSGraphics>);
 }

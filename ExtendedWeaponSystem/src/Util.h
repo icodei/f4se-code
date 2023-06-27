@@ -29,14 +29,17 @@ bool IsPlayerWeaponThrowable();
 bool IsWeaponReloadable(IsReloadableDataWrapper* data, const EquippedItem* item);
 bool IsWeaponThrowable(uint32_t equipIndex);
 
-TESForm* GetFormFromIdentifier(const string& identifier);
-bool GetForms();
-
 EquippedItem& GetPlayerEquippedItemDefault();
 EquippedWeapon& GetPlayerEquippedWeaponDefault();
 const uint32_t GetPlayerInventoryObjectCount(const TESBoundObject* item);
 
 const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name);
+const NiAVObject* GetByNameFromPlayer3D(const char* name);
+
+/*;========================================================================================================================================================;*/
+
+TESForm* GetFormFromIdentifier(const string& identifier);
+bool GetForms();
 
 char* _MESSAGE(const char* fmt, ...);
 void Dump(void* mem, unsigned int size);

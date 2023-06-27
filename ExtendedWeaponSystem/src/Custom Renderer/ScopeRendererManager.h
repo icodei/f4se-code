@@ -2,7 +2,7 @@
 #include "Global.h"
 
 /*
-//This will technically do everything that ScopeRenderer and ScopeCamera does but without allocating the custom classes
+//This will technically do everything that ScopeCustomRenderer and ScopeCamera does but without allocating the custom classes
 class ScopeRendererManager {
 public:
 

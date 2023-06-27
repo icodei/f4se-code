@@ -2,6 +2,7 @@
 
 #include "Custom Renderer/CustomRenderer.h"
 #include "Util.h"
+#include "Global.h"
 
 void HandleWeaponEquip(WeaponInfo& initInfo) {
 	WeaponInfo& Info = WeaponInfo::getInstance();
@@ -12,28 +13,22 @@ void HandleWeaponEquip(WeaponInfo& initInfo) {
 	if (!initInfo.weapCurrentInstanceData || !initInfo.weapInstanceData) {
 		return;
 	}
-	logInfo(";================================ Player TESEquipEvent ================================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Player TESEquipEvent "sv, 80));
 	logInfo("Weapon: " + weaponName);
 	logInfo("CurrentAmmoCount: " + std::to_string(initInfo.weapAmmoCurrentCount));
 	logInfo("AmmoCapacity: " + std::to_string(initInfo.weapAmmoCapacity));
 	logInfo("TotalAmmoCount: " + std::to_string(initInfo.weapAmmoTotalCount));
 	QueryReload();
 	QueryScope();
-	logInfo(";======================================================================================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
 	HandleWeaponChange();
 }
 
 void HandleWeaponEquipAfter3D(WeaponInfo& initInfo) {
-	if (!nsScope::initialized || !nsScope::scopeRenderer) {
-		goto skipRender;
-	}
-
-	nsScope::scopeRenderer->pRendererCamera->Update3D();
-
-skipRender:
-	{
-		//In the future anything further added that does not involve the scope renderer should go here
-	}
+	//if (!ScopeRenderer::initialized || !ScopeRenderer::scopeCustomRenderer) {
+	//
+	//}
+	//ScopeRenderer::scopeCustomRenderer->pRendererCamera->Update3D();
 }
 
 void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
@@ -42,58 +37,82 @@ void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
 		initInfo.weapCurrentInstanceData = const_cast<TESObjectWEAP::InstanceData*>(initInfo.weapInstanceData);
 	}
 	string weaponName = initInfo.weapForm->GetFullName();
-	logInfo(";====================== Game Loaded. Getting Initial Weapon Stats =====================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
+	logInfo(fmt::format(FMT_STRING(";{0: ^{1}};"), " Game Loaded "sv, 80));
+	logInfo(fmt::format(FMT_STRING(";{0: ^{1}};"), " Getting Initial Weapon Stats "sv, 80));
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
 	logInfo("Weapon: " + weaponName);
 	logInfo("CurrentAmmoCount: " + std::to_string(initInfo.weapAmmoCurrentCount));
 	logInfo("AmmoCapacity: " + std::to_string(initInfo.weapAmmoCapacity));
 	logInfo("TotalAmmoCount: " + std::to_string(initInfo.weapAmmoTotalCount));
 	QueryReload();
 	QueryScope();
-	logInfo(";======================================================================================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
 	HandleWeaponChange();
 }
 
 void HandleWeaponUnequip(WeaponInfo& initInfo) {
 	string weaponName = initInfo.weapForm->GetFullName();
-	logInfo(";=================================== Player Unequip ===================================;");
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Player Unequip "sv, 80));
 	logInfo("Weapon: " + weaponName);
+	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
+	HandleWeaponChange();
 	WeaponInfo::ClearWeaponInfo();
-	logInfo(";======================================================================================;");
 }
 
 void HandleWeaponChange() {
-	if (!nsScope::scopeRenderer && WeaponHasSpecialScope()) {
-		logInfo("Weapon needs custom renderer");
-		nsScope::CreateRenderer();
-		nsScope::scopeRenderer->pRendererCamera->StartCorrectState();
+	if (!ScopeRenderer::scopeCustomRenderer && WeaponHasSpecialScope()) {
+		//logInfo("Weapon needs custom renderer");
+		//ScopeRenderer::CreateCustomRenderer();
+		//ScopeRenderer::scopeCustomRenderer->pRendererCamera->StartCorrectState();
 	} else {
-		nsScope::DestroyRenderer();
+		//ScopeRenderer::DestroyCustomRenderer();
+	}
+
+	if (!ScopeRenderer::scopeLensRenderer && WeaponHasSpecialScope()) {
+		logInfo("Weapon needs custom renderer");
+		ScopeRenderer::CreateLensRenderer();
+	} else {
+		if (ScopeRenderer::scopeLensRenderer->visible) {
+			ScopeRenderer::scopeLensRenderer->Hide();
+		}
+		ScopeRenderer::DestroyLensRenderer();
 	}
 }
 
 void HandleWeaponDown() {
-	nsScope::DestroyRenderer();
+	if (ScopeRenderer::scopeCustomRenderer) {
+		ScopeRenderer::DestroyCustomRenderer();
+	}
+	if (ScopeRenderer::scopeLensRenderer) {
+		ScopeRenderer::DestroyLensRenderer();
+	}
 }
 
 void HandleWeaponInstantDown() {
-	nsScope::DestroyRenderer();
+	if (ScopeRenderer::scopeCustomRenderer) {
+		ScopeRenderer::DestroyCustomRenderer();
+	}
+	if (ScopeRenderer::scopeLensRenderer) {
+		ScopeRenderer::scopeLensRenderer->Hide();
+		ScopeRenderer::DestroyLensRenderer();
+	}
 }
 
 void HandleWeaponSightsEnter() {
-	if (!nsScope::initialized || !nsScope::scopeRenderer) {
-		goto skipRender;
+	if (ScopeRenderer::scopeCustomRenderer) {
+		ScopeRenderer::scopeCustomRenderer->pRendererCamera->UpdateCamera();
+		ScopeRenderer::Render();
 	}
-	nsScope::scopeRenderer->pRendererCamera->UpdateCamera();
-	nsScope::Render();
-
-skipRender:
-	{
-		//In the future anything further added that does not involve the scope renderer should go here
+	if (ScopeRenderer::scopeLensRenderer) {
+		ScopeRenderer::scopeLensRenderer->Show(true);
 	}
 }
 
 void HandleWeaponSightsExit() {
-
+	if (ScopeRenderer::scopeLensRenderer) {
+		ScopeRenderer::scopeLensRenderer->Hide();
+	}
 }
 
 void QueryReload() {
@@ -118,31 +137,32 @@ void QueryScope() {
 	if (WeaponHasNightVisionScope()) {
 		weaponHasScopeNV = true;
 		i++;
-		logInfo("NightVision scope found");
+		logInfo("Weapon has night vision scope");
 	} else {
 		weaponHasScopeNV = false;
 	}
 	if (WeaponHasPIPScope()) {
 		weaponHasScopePIP = true;
 		i++;
-		logInfo("PIP scope found");
+		logInfo("Weapon has PIP scope");
 	} else {
 		weaponHasScopePIP = false;
 	}
 	if (WeaponHasThermalScope()) {
 		weaponHasScopeThermal = true;
 		i++;
-		logInfo("Thermal scope found");
+		logInfo("Weapon has thermal scope");
 	} else {
 		weaponHasScopeThermal = false;
 	}
 
 	if (WeaponHasNoSpecialScopes()) {
-		logInfo("No special scopes were found");
+		logInfo("Weapon does not have special scopes");
 	}
 
 	if (i > 1) {
-		logError("QueryScope() Found more than one scope type. Unexpected results may happen");
+		auto error = "Found more than one scope type. Unexpected results may happen"sv;
+		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
 	}
 }
 

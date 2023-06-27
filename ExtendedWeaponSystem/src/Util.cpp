@@ -67,6 +67,57 @@ bool IsWeaponThrowable(uint32_t equipIndex) {
 	return equipIndex == EquipIndex::kThrowable;
 }
 
+EquippedItem& GetPlayerEquippedItemDefault() {
+	pc->currentProcess->GetEquippedItemArrayLock()->lock();
+	EquippedItem& a_item = pc->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
+	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
+	return a_item;
+}
+
+EquippedWeapon& GetPlayerEquippedWeaponDefault() {
+	pc->currentProcess->GetEquippedItemArrayLock()->lock();
+	EquippedItem& a_item = pc->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
+	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
+	EquippedWeapon& a_weapon = reinterpret_cast<EquippedWeapon&>(a_item);
+	if (a_weapon.IsValid() && a_weapon.weaponData.get()) {
+		return a_weapon;
+	}
+	pc->currentProcess->GetEquippedWeaponByIndex(BGSEquipIndex(EquipIndex::kDefault), a_weapon);
+	return a_weapon;
+}
+
+const uint32_t GetPlayerInventoryObjectCount(const TESBoundObject* item) {
+	return pc->GetInventoryObjectCount(item);
+}
+
+const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name) {
+	BSFadeNode* player3D = pc ? pc->Get3D()->IsFadeNode() : nullptr;
+	if (!player3D) {
+		return nullptr;
+	}
+	NiAVObject* obj;
+	obj = BSUtilities::GetObjectByName(player3D, name, true, true);
+	if (!obj) {
+		return nullptr;
+	}
+	return obj;
+}
+
+const NiAVObject* GetByNameFromPlayer3D(const char* name) {
+	BSFadeNode* player3D = pc ? pc->Get3D()->IsFadeNode() : nullptr;
+	if (!player3D) {
+		return nullptr;
+	}
+	NiAVObject* obj;
+	obj = BSUtilities::GetObjectByString(player3D, name, true, true);
+	if (!obj) {
+		return nullptr;
+	}
+	return obj;
+}
+
+/*;========================================================================================================================================================;*/
+
 TESForm* GetFormFromIdentifier(const string& identifier) {
 	auto delimiter = identifier.find('|');
 	if (delimiter != string::npos) {
@@ -125,42 +176,6 @@ bool GetForms() {
 		toReturn = false;
 	}
 	return toReturn;
-}
-
-EquippedItem& GetPlayerEquippedItemDefault() {
-	pc->currentProcess->GetEquippedItemArrayLock()->lock();
-	EquippedItem& a_item = pc->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
-	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
-	return a_item;
-}
-
-EquippedWeapon& GetPlayerEquippedWeaponDefault() {
-	pc->currentProcess->GetEquippedItemArrayLock()->lock();
-	EquippedItem& a_item = pc->currentProcess->GetEquippedItemArray()->data()[EquipIndex::kDefault];
-	pc->currentProcess->GetEquippedItemArrayLock()->unlock();
-	EquippedWeapon& a_weapon = reinterpret_cast<EquippedWeapon&>(a_item);
-	if (a_weapon.IsValid() && a_weapon.weaponData.get()) {
-		return a_weapon;
-	}
-	pc->currentProcess->GetEquippedWeaponByIndex(BGSEquipIndex(EquipIndex::kDefault), a_weapon);
-	return a_weapon;
-}
-
-const uint32_t GetPlayerInventoryObjectCount(const TESBoundObject* item) {
-	return pc->GetInventoryObjectCount(item);
-}
-
-const NiAVObject* GetByNameFromPlayer3D(const BSFixedString& name) {
-	BSFadeNode* player3D = pc ? pc->Get3D()->IsFadeNode() : nullptr;
-	if (!player3D) {
-		return nullptr;
-	}
-	NiAVObject* obj;
-	obj = BSUtilities::GetObjectByName(player3D, name, true, true);
-	if (!obj) {
-		return nullptr;
-	}
-	return obj;
 }
 
 char tempbuf[8192] = { 0 };

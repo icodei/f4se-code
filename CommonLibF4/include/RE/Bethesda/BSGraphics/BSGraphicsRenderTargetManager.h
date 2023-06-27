@@ -1,8 +1,8 @@
 #pragma once
-#include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
-#include "RE/Bethesda/BSGraphics/BSGraphics.h"
 #include "RE/Bethesda/Atomic.h"
 #include "RE/Bethesda/BSCore/BSSimpleList.h"
+#include "RE/Bethesda/BSGraphics/BSGraphics.h"
+#include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 
 #include <DirectXMath.h>
 #include <d3d11.h>
@@ -14,7 +14,6 @@ namespace RE
 		class RenderTargetManager
 		{
 		public:
-
 			[[nodiscard]] static RenderTargetManager& GetSingleton()
 			{
 				REL::Relocation<RenderTargetManager*> singleton{ REL::ID(1508457) };
@@ -119,7 +118,13 @@ namespace RE
 				return func(this);
 			}
 
-			void SetUseDynamicResolutionViewportAsDefaultViewport();  //TODO
+			void SetUseDynamicResolutionViewportAsDefaultViewport(bool a1)
+			{
+				using func_t = decltype(&BSGraphics::RenderTargetManager::SetUseDynamicResolutionViewportAsDefaultViewport);
+				REL::Relocation<func_t> func{ REL::ID(676851) };
+				return func(this, a1);
+			}
+
 			void GetUseDynamicResolutionViewportAsDefaultViewport();  //TODO
 			void UpdateDynamicResolution();                           //TODO
 			void QGetDynamicWidthRatio();                             //TODO
@@ -145,6 +150,9 @@ namespace RE
 
 			void SetTextureRenderTarget(std::int32_t textureID, std::int32_t renderTargetID, bool copyView)
 			{
+				if (textureID >= 16) {
+					//Assert: Bad texture stage
+				}
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureRenderTarget);
 				REL::Relocation<func_t> func{ REL::ID(1433009) };
 				return func(this, textureID, renderTargetID, copyView);
@@ -152,6 +160,9 @@ namespace RE
 
 			void SetTextureRenderTarget_2(std::uint32_t textureID, std::int32_t renderTargetID, BSGraphics::TextureAddressMode texMode, bool copyView)
 			{
+				if (textureID >= 16) {
+					//Assert: Bad texture stage
+				}
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureRenderTarget_2);
 				REL::Relocation<func_t> func{ REL::ID(1513035) };
 				return func(this, textureID, renderTargetID, texMode, copyView);
@@ -159,6 +170,9 @@ namespace RE
 
 			void SetTextureDepth(std::int32_t textureID, std::int32_t depthStencilTargetID)
 			{
+				if (textureID >= 16) {
+					//Assert: Bad texture stage
+				}
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureDepth);
 				REL::Relocation<func_t> func{ REL::ID(182949) };
 				return func(this, textureID, depthStencilTargetID);
@@ -166,6 +180,9 @@ namespace RE
 
 			void SetTextureDepth_2(std::int32_t textureID, std::int32_t depthStencilTargetID, BSGraphics::TextureAddressMode texMode)
 			{
+				if (textureID >= 16) {
+					//Assert: Bad texture stage
+				}
 				using func_t = decltype(&BSGraphics::RenderTargetManager::SetTextureDepth_2);
 				REL::Relocation<func_t> func{ REL::ID(1405563) };
 				return func(this, textureID, depthStencilTargetID, texMode);
@@ -232,7 +249,13 @@ namespace RE
 				return func(this, target);
 			}
 
-			void QIsAcquiredRenderTarget();                  //TODO
+			bool QIsAcquiredRenderTarget(std::int32_t target)
+			{
+				using func_t = decltype(&BSGraphics::RenderTargetManager::QIsAcquiredRenderTarget);
+				REL::Relocation<func_t> func{ REL::ID(110930) };
+				return func(this, target);
+			}
+
 			void QIsAcquiredDepthStencil();                  //TODO
 			void QIsAcquiredCubemap();                       //TODO
 			void SyncRenderTarget();                         //TODO
@@ -267,9 +290,9 @@ namespace RE
 				return func(this, renderTargetID, srgb, a2, use);
 			}
 
-			#define MAX_RENDER_TARGETS 0x64         //static
-			#define MAX_DEPTH_STENCIL_TARGETS 0xC   //static
-			#define MAX_CUBEMAP_RENDER_TARGETS 0x1  //static
+#define MAX_RENDER_TARGETS 0x64         //static
+#define MAX_DEPTH_STENCIL_TARGETS 0xC   //static
+#define MAX_CUBEMAP_RENDER_TARGETS 0x1  //static
 
 			//Here is where private would start
 			//private:
