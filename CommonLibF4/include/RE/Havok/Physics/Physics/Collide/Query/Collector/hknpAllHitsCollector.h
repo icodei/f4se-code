@@ -1,8 +1,8 @@
 #pragma once
 
 #include "RE/Havok/Common/Base/Container/Array/hkFixedInPlaceArray.h"
-#include "RE/Havok/hknpCollisionQueryCollector.h"
-#include "RE/Havok/hknpCollisionResult.h"
+#include "RE/Havok/Physics/Physics/Collide/Query/Collector/hknpCollisionQueryCollector.h"
+#include "RE/Havok/Physics/Physics/Collide/Query/hknpCollisionResult.h"
 
 namespace RE
 {

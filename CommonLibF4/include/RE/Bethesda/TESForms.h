@@ -8,6 +8,7 @@
 #include "RE/Bethesda/BSCore/BSTSet.h"
 #include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/BSCore/BSTTuple.h"
+#include "RE/Bethesda/BSHavok/bhkWorld.h"
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSShader/ImageSpace.h"
@@ -111,6 +112,7 @@ namespace RE
 	class BGSTransform;
 	class BGSVoiceType;
 	class BGSZoomData;
+	class bhkWorld;
 	class ConeProjectile;
 	class DialoguePackage;
 	class EffectSetting;
@@ -1458,6 +1460,13 @@ namespace RE
 			kWarnToLeave = 1u << 9,
 		};
 
+		[[nodiscard]] bhkWorld* GetbhkWorld() const
+		{
+			using func_t = decltype(&TESObjectCELL::GetbhkWorld);
+			REL::Relocation<func_t> func{ REL::ID(1326073) };
+			return func(this);
+		}
+
 		[[nodiscard]] bool GetCantWaitHere()
 		{
 			using func_t = decltype(&TESObjectCELL::GetCantWaitHere);
@@ -1505,6 +1514,13 @@ namespace RE
 			using func_t = decltype(&TESObjectCELL::GetRegionList);
 			REL::Relocation<func_t> func{ REL::ID(1565031) };
 			return func(this, a_createIfMissing);
+		}
+
+		[[nodiscard]] NiAVObject* Pick(bhkPickData& pd)
+		{
+			using func_t = decltype(&TESObjectCELL::Pick);
+			REL::Relocation<func_t> func{ REL::ID(434717) };
+			return func(this, pd);
 		}
 
 		[[nodiscard]] TESWaterForm* GetWaterType() const noexcept;

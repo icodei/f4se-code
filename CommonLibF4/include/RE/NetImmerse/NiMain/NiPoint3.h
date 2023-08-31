@@ -1,4 +1,6 @@
 #pragma once
+//#include "RE/Bethesda/BSCore/BSTPoint3.h"
+#include "RE/Bethesda/BSCore/BSTPoint.h"
 
 namespace RE
 {
@@ -41,6 +43,9 @@ namespace RE
 		{
 			return (x == a_rhs.x && y == a_rhs.y && z == a_rhs.z);
 		}
+
+		//TODO BSTPoint3 operator @1402B7D30
+		operator BSTPoint3<value_type>() {}
 
 		// members
 		value_type x{ 0.0F };  // 0

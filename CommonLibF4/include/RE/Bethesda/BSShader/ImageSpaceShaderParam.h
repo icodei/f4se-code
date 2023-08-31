@@ -1,27 +1,32 @@
 #pragma once
-#include "RE/Bethesda/BSSystem/BSFixedString.h"
+#include "RE/Bethesda/BSCore/BSTArray.h"
 #include "RE/Bethesda/BSGraphics/BSGraphicsTypes.h"
 #include "RE/Bethesda/BSShader/ImageSpace.h"
-#include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSSystem/BSFixedString.h"
 #include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 #include "RE/NetImmerse/NiMain/NiTArray.h"
 #include "RE/NetImmerse/NiMain/NiTCollection.h"
 
 namespace RE
 {
-	class ImageSpaceShaderParam : public ImageSpaceEffectParam
+	class __declspec(novtable) ImageSpaceShaderParam : public ImageSpaceEffectParam
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::ImageSpaceShaderParam };
 		static constexpr auto VTABLE{ VTABLE::ImageSpaceShaderParam };
 
-		#define VCONSTANT_REG_START 0;
-		#define PCONSTANT_REG_START 0;
-		#define TEXOFFSET_MAX 3;
+#define VCONSTANT_REG_START 0;
+#define PCONSTANT_REG_START 0;
+#define TEXOFFSET_MAX 3;
 
-		ImageSpaceShaderParam() { ctor(); }
+		ImageSpaceShaderParam()
+		{
+			typedef ImageSpaceShaderParam* func_t(ImageSpaceShaderParam*);
+			REL::Relocation<func_t> func{ REL::ID(109702) };
+			func(this);
+		}
 
-		virtual ~ImageSpaceShaderParam() {}
+		virtual ~ImageSpaceShaderParam() {}  // 00
 
 		void ResizeConstantGroup(std::uint32_t a1, std::uint32_t a2)
 		{
@@ -58,14 +63,6 @@ namespace RE
 		std::uint32_t dispatchVal_84;
 		std::uint8_t gap88[4];
 		std::uint32_t field_8C;
-
-	private:
-		ImageSpaceShaderParam* ctor()
-		{
-			using func_t = decltype(&ImageSpaceShaderParam::ctor);
-			REL::Relocation<func_t> func{ REL::ID(109702) };
-			return func(this);
-		}
 	};
 	static_assert(sizeof(ImageSpaceShaderParam) == 0x90);
 }

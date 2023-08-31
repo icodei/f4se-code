@@ -38,32 +38,51 @@ namespace RE
 			BSVisitControl operator()(NiAVObject* ap3D, T visitor);
 		};
 
-		BSVisitControl VisitSceneGraphAVObjects(NiAVObject* apAVObject, BSVisit::BSVisitControl (&visitor)(NiAVObject*))
+		BSVisitControl VisitSceneGraphAVObjects(NiAVObject* apAVObject, BSVisitControl (&visitor)(NiAVObject*))
 		{
 			using func_t = decltype(&VisitSceneGraphAVObjects);
 			REL::Relocation<func_t> func{ REL::ID(1449576) };
 			return func(apAVObject, visitor);
 		}
 
-		BSVisitControl VisitScenegraphGeometries_AVObject(NiAVObject* apAVObject, BSVisit::BSVisitControl (&visitor)(NiAVObject*))
+		BSVisitControl VisitScenegraphGeometries_AVObject(NiAVObject* apAVObject, BSVisitControl (&visitor)(NiAVObject*))
 		{
 			using func_t = decltype(&VisitScenegraphGeometries_AVObject);
 			REL::Relocation<func_t> func{ REL::ID(298633) };
 			return func(apAVObject, visitor);
 		}
 
-		BSVisitControl VisitScenegraphGeometries_Geometry(NiAVObject* apAVObject, BSVisit::BSVisitControl (&visitor)(BSGeometry*))
+		BSVisitControl VisitScenegraphGeometries_Geometry(NiAVObject* apAVObject, BSVisitControl (&visitor)(BSGeometry*))
 		{
 			using func_t = decltype(&VisitScenegraphGeometries_Geometry);
 			REL::Relocation<func_t> func{ REL::ID(240214) };
 			return func(apAVObject, visitor);
 		}
 
-		BSVisitControl VisitScenegraphNodes(NiAVObject* ap3D, BSVisit::BSVisitControl (&visitor)(NiAVObject*))
+		BSVisitControl VisitScenegraphNodes(NiAVObject* ap3D, BSVisitControl (&visitor)(NiAVObject*))
 		{
 			using func_t = decltype(&VisitScenegraphNodes);
 			REL::Relocation<func_t> func{ REL::ID(659184) };
 			return func(ap3D, visitor);
+		}
+
+		BSVisitControl VisitSimple(NiAVObject* ap3D, const std::function<BSVisitControl(NiAVObject*)>& visitor)
+		{
+			if (visitor(ap3D))
+				return Continue;
+
+			NiPointer<NiNode> node(ap3D->IsNode());
+			if (node) {
+				for (auto it = node->children.begin(); it != node->children.end(); ++it) {
+					NiPointer<NiAVObject> object(*it);
+					if (object) {
+						if (VisitSimple(object.get(), visitor))
+							return Continue;
+					}
+				}
+			}
+
+			return Stop;
 		}
 	}
 

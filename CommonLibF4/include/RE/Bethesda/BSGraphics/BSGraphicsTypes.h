@@ -1,6 +1,6 @@
 #pragma once
-#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/Bethesda/BSCore/BSSimpleList.h"
+#include "RE/Bethesda/BSCore/BSTHashMap.h"
 #include "RE/NetImmerse/NiMain/NiColor.h"
 #include "RE/NetImmerse/NiMain/NiPoint2.h"
 #include "RE/NetImmerse/NiMain/NiPoint3.h"
@@ -434,6 +434,7 @@ namespace RE
 		struct TextureInfo  //Line 672
 		{
 		public:
+			//members
 		};
 
 		struct TextureStreamData  //Line 703
@@ -480,5 +481,6 @@ namespace RE
 			DirectX::XMMATRIX kPreviousViewProjUnjittered;
 			DirectX::XMMATRIX kInv1stPersonProjMat;
 		};
+		static_assert(sizeof(ViewData) == 0x210);
 	};
 }

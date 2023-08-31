@@ -1,4 +1,5 @@
 #pragma once
+#include "RE/Bethesda/BSCore/BSTPointBase.h"
 
 namespace RE
 {

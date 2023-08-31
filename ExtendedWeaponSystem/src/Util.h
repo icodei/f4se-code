@@ -38,6 +38,8 @@ const NiAVObject* GetByNameFromPlayer3D(const char* name);
 
 /*;========================================================================================================================================================;*/
 
+bool IsTESFilePresent(const char* name);
+
 TESForm* GetFormFromIdentifier(const string& identifier);
 bool GetForms();
 
@@ -48,7 +50,7 @@ template <typename K, typename V>
 void print_map(unordered_map<K, V> const& map) {
 	auto print_key_value = [](const auto& key, const auto& value) {
 		if (!value) {
-			logger::warn(FMT_STRING("Hook: {:s} IsHooked: {:s}"), key, value);
+			logger::info(FMT_STRING("Hook: {:s} IsHooked: {:s}"), key, value);
 		} else {
 			logger::info(FMT_STRING("Hook: {:s} IsHooked: {:s}"), key, value);
 		}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "RE/Bethesda/CRC.h"
+
 namespace RE
 {
 	struct BSIntrusiveRefCounted
@@ -157,7 +159,7 @@ namespace RE
 		}
 
 		// 2a
-		BSTSmartPointer& operator=(BSTSmartPointer&& a_rhs) noexcept
+		BSTSmartPointer& operator=(BSTSmartPointer&& a_rhs)
 		{
 			if (this != std::addressof(a_rhs)) {
 				TryDetach();

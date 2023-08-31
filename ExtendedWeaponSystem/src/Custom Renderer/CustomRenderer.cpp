@@ -23,9 +23,9 @@ ScopeCamera::ScopeCamera() :
 		logInfo("ScopeCamera - Created ScopeCamera::DefaultState");
 	} else {
 		camDefaultState = nullptr;
-		auto error = "- ScopeCamera::DefaultState Creation FAILED"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
 	}
+	ASSERT(camDefaultState, MESSAGE_CENTERED("- ScopeCamera::DefaultState Creation FAILED"));
+
 	//thermalState init
 	camThermalState = (ThermalState*)RE::malloc(sizeof(ThermalState));
 	if (camThermalState) {
@@ -34,9 +34,9 @@ ScopeCamera::ScopeCamera() :
 		logInfo("ScopeCamera - Created ScopeCamera::ThermalState");
 	} else {
 		camThermalState = nullptr;
-		auto error = "- ScopeCamera::ThermalState Creation FAILED"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
 	}
+	ASSERT(camThermalState, MESSAGE_CENTERED("- ScopeCamera::ThermalState Creation FAILED"));
+
 	//nightVisionState init
 	camNightVisionState = (NightVisionState*)RE::malloc(sizeof(NightVisionState));
 	if (camNightVisionState) {
@@ -45,9 +45,8 @@ ScopeCamera::ScopeCamera() :
 		logInfo("ScopeCamera - Created ScopeCamera::NightVisionState");
 	} else {
 		camNightVisionState = nullptr;
-		auto error = "- ScopeCamera::NightVisionState Creation FAILED"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
 	}
+	ASSERT(camNightVisionState, MESSAGE_CENTERED("- ScopeCamera::NightVisionState Creation FAILED"));
 
 	//oldState
 	oldCamState = currentState.get();
@@ -78,6 +77,7 @@ ScopeCamera::ScopeCamera(bool createDefault) :
 }
 
 ScopeCamera::~ScopeCamera() {
+	logInfo("ScopeCamera dtor Starting...");
 	TESCameraState* current;
 	TESCameraState* state;
 
@@ -121,6 +121,7 @@ ScopeCamera::~ScopeCamera() {
 			root->DeleteThis();
 		}
 	}
+	logInfo("ScopeCamera dtor Completed.");
 }
 
 void ScopeCamera::SetCameraRoot(NiNode* newRoot) {
@@ -154,15 +155,12 @@ void ScopeCamera::CreateDefault3D() {
 	NiCamera* newCam;
 	NiCamera* currentCam;
 
-	//cam = (NiCamera*)RE::malloc(0x1A0);
 	cam = NiCamera::Create();
 	if (cam) {
 		newCam = cam;
 		logInfo("ScopeCamera - Created NiCamera");
 	} else {
 		newCam = nullptr;
-		auto error = "- NiCamera Creation FAILED"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
 	}
 	currentCam = camera;
 	if (camera != newCam) {
@@ -179,6 +177,7 @@ void ScopeCamera::CreateDefault3D() {
 			currentCam = camera;
 		}
 	}
+	ASSERT(camera, MESSAGE_CENTERED("- NiCamera Creation FAILED"));
 
 	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
 	float widthRatio = pGraphicsState->uiBackBufferWidth / pGraphicsState->uiBackBufferHeight;
@@ -200,15 +199,12 @@ void ScopeCamera::CreateDefault3D() {
 	NiNode* node;
 
 	node = (NiNode*)RE::malloc(0x140);
-	//node = NiNode::Create();
 	if (node) {
 		new (node) NiNode(1);
 		newNode = node;
 		logInfo("ScopeCamera - Created NiNode");
 	} else {
 		newNode = nullptr;
-		auto error = "- NiNode Creation FAILED"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
 	}
 	currentNode = cameraRoot.get();
 	if (currentNode != newNode) {
@@ -220,6 +216,8 @@ void ScopeCamera::CreateDefault3D() {
 			currentNode->DeleteThis();
 		}
 	}
+	ASSERT(cameraRoot, MESSAGE_CENTERED("- NiNode Creation FAILED"));
+
 	cameraRoot->AttachChild(camera, true);
 
 	BSGeometry* geo;
@@ -234,8 +232,6 @@ void ScopeCamera::CreateDefault3D() {
 		logInfo("ScopeCamera - Created BSTriShape");
 	} else {
 		newGeo = nullptr;
-		auto error = "- BSTriShape Creation FAILED"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
 	}
 	currentGeo = renderPlane;
 	if (currentGeo != newGeo) {
@@ -247,6 +243,8 @@ void ScopeCamera::CreateDefault3D() {
 			currentGeo->DeleteThis();
 		}
 	}
+	ASSERT(renderPlane, MESSAGE_CENTERED("- BSTriShape Creation FAILED"));
+
 	geometryDefault = true;
 
 	//Needs aditional setup for the default render plane
@@ -335,11 +333,7 @@ void ScopeCamera::SetState(TESCameraState* newCameraState) {
 }
 
 void ScopeCamera::StartCorrectState() {
-	if (WeaponHasNoSpecialScopes()) {
-		auto error = "was called and could not find the correct state to start"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
-		return;
-	}
+	ASSERT(WeaponHasSpecialScope(), MESSAGE_CENTERED("was called and could not find the correct state to start"));
 	if (weaponHasScopeThermal) {
 		StartThermalState();
 		goto FoundState;
@@ -383,7 +377,9 @@ void ScopeCamera::Update3D() {
 
 	logInfo("Looking for new camera and geometry...");
 
-	geom = (BSGeometry*)GetByNameFromPlayer3D(geomName);
+	BSTriShape* foundGeom = const_cast<NiAVObject*>(GetByNameFromPlayer3D(geomName))->IsTriShape();
+	geom = foundGeom->Clone()->IsTriShape();
+	geom->name = geomName;
 	if (geom) {
 		logInfo("Found the geometry of the scope.");
 		newGeom = geom;
@@ -407,7 +403,9 @@ void ScopeCamera::Update3D() {
 
 	const BSFixedString camName = "ScopePOV";
 
-	cam = (NiCamera*)GetByNameFromPlayer3D(camName);
+	NiCamera* foundCam = (NiCamera*)const_cast<NiAVObject*>(GetByNameFromPlayer3D(camName));
+	cam = (NiCamera*)foundCam->Clone();
+	cam->name = camName;
 	if (cam) {
 		logInfo("Found the scope camera.");
 		newCam = cam;
@@ -508,7 +506,7 @@ void ScopeCamera::DefaultState::Update(BSTSmartPointer<TESCameraState>& a_nextSt
 	NiPointer<NiNode> spCameraRoot = nullptr;
 	NiNode* pCameraRoot = nullptr;
 
-	NiUpdateData updateData{ NiUpdateData(0.0F, 0) };
+	NiUpdateData updateData(0.0F, 0);
 
 	GetTranslation(updatedTranslation);
 	GetRotation(updatedQuatRotation);
@@ -715,26 +713,37 @@ ScopeCustomRenderer::ScopeCustomRenderer() {
 
 ScopeCustomRenderer::~ScopeCustomRenderer() {
 	logInfo("ScopeCustomRenderer dtor Starting...");
-	BSShaderAccumulator* shaderAccum;
+	//BSShaderAccumulator* shaderAccum;
 	NiCamera* cam;
 	TESCameraState* state;
 
+	logInfo("ImageSpaceShaderParam dtor Starting...");
 	pShaderParams->~ImageSpaceShaderParam();
-	shaderAccum = pScopeAccumulator;
-	if (shaderAccum && !InterlockedDecrement(&shaderAccum->refCount)) {
-		shaderAccum->DeleteThis();
-	}
+	logInfo("ImageSpaceShaderParam dtor Completed.");
+
+	//shaderAccum = pScopeAccumulator;
+	//if (shaderAccum && !InterlockedDecrement(&shaderAccum->refCount)) {
+	//	shaderAccum->DeleteThis();
+	//}
+
 	cam = pRendererCamera->camera;
 	if (cam && !InterlockedDecrement(&cam->refCount)) {
 		cam->DeleteThis();
 	}
+
 	state = pRendererCamera->currentState.get();
 	if (state && !InterlockedDecrement(&state->refCount)) {
 		state->~TESCameraState();
 	}
+
 	pRendererCamera->~ScopeCamera();
-	pScopeCullingProc->SetAccumulator(nullptr);
+
+	logInfo("BSCullingProcess dtor Starting...");
 	pScopeCullingProc->~BSCullingProcess();
+	logInfo("BSCullingProcess dtor Completed.");
+	
+	//TODO - Did the BSCullingProcess delete our ShaderAccumulator?
+
 	logInfo("ScopeCustomRenderer dtor Completed.");
 }
 
@@ -759,13 +768,13 @@ void ScopeCustomRenderer::RenderScopeScene(NiCamera* a_camera, BSShaderAccumulat
 	pRenderData->Flush();
 	pGraphicsState->SetCameraData(a_camera, false, 0.0F, 1.0F);
 	pRenderData->DoZPrePass(nullptr, nullptr, 0.0F, 1.0F, 0.0F, 1.0F);
-	a_shaderAccumulator->RenderOpaqueDecals();
-	a_shaderAccumulator->RenderBatches(4, false, -1);
-	a_shaderAccumulator->RenderBlendedDecals();
+	//a_shaderAccumulator->RenderOpaqueDecals();
+	//a_shaderAccumulator->RenderBatches(4, false, -1);
+	//a_shaderAccumulator->RenderBlendedDecals();
 	pRenderData->Flush();
 	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
-	a_shaderAccumulator->ClearEffectPasses();
-	a_shaderAccumulator->ClearActivePasses(false);
+	//a_shaderAccumulator->ClearEffectPasses();
+	//a_shaderAccumulator->ClearActivePasses(false);
 }
 
 NiTexture* ScopeCustomRenderer::Render() {
@@ -795,10 +804,13 @@ NiTexture* ScopeCustomRenderer::Render() {
 	BSShaderManager::SetCamera(pRendererCamera->camera);
 
 	pGraphicsState->SetCameraData(pRendererCamera->camera, false, 0.0F, 1.0F);
-	pScopeCullingProc->SetAccumulator(pScopeAccumulator);
-	pScopeCullingProc->kCullMode = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
-	pScopeCullingProc->bCameraRelatedUpdates = false;
-	pScopeCullingProc->pkCamera = pRendererCamera->camera;
+
+	BSCullingProcess cullingProc(0);
+	(&cullingProc)->SetAccumulator(pScopeAccumulator);
+	(&cullingProc)->kCullMode = BSCullingProcess::BSCP_CULL_IGNOREMULTIBOUNDS;
+	(&cullingProc)->bCameraRelatedUpdates = false;
+	(&cullingProc)->pkCamera = pRendererCamera->camera;
+
 	pRendererCamera->Update();
 
 	bool lightUpdateLast = pWorldSSN->DisableLightUpdate;
@@ -829,7 +841,7 @@ NiTexture* ScopeCustomRenderer::Render() {
 	if (camPortalEntry) {
 		BSPortalGraph* camPortalGraph = camPortalEntry->PortalGraph;
 		if (camPortalGraph) {
-			BSShaderUtil::AccumulateSceneArray(pRendererCamera->camera, &camPortalGraph->AlwaysRenderArray, *pScopeCullingProc, false);
+			//BSShaderUtil::AccumulateSceneArray(pRendererCamera->camera, &camPortalGraph->AlwaysRenderArray, cullingProc, false);
 		}
 	}
 
@@ -839,7 +851,7 @@ NiTexture* ScopeCustomRenderer::Render() {
 	} else {
 		portalSharedNode = nullptr;
 	}
-	BSShaderUtil::AccumulateScene(pRendererCamera->camera, portalSharedNode, *pScopeCullingProc, false);
+	//BSShaderUtil::AccumulateScene(pRendererCamera->camera, portalSharedNode, cullingProc, false);
 
 	NiAVObject* multiBoundNode;
 	if (pWorldSSN->children.size() > 8) {
@@ -847,7 +859,8 @@ NiTexture* ScopeCustomRenderer::Render() {
 	} else {
 		multiBoundNode = nullptr;
 	}
-	BSShaderUtil::AccumulateScene(pRendererCamera->camera, multiBoundNode, *pScopeCullingProc, false);
+	//BSShaderUtil::AccumulateScene(pRendererCamera->camera, multiBoundNode, cullingProc, false);
+
 	pShaderState->cSceneGraph = BSShaderManager::BSSM_SSN_WORLD;
 	pShaderState->pShadowSceneNode[BSShaderManager::BSSM_SSN_WORLD]->ProcessQueuedLights(pScopeCullingProc);
 	pRenderData->ResetState();
@@ -873,15 +886,15 @@ NiTexture* ScopeCustomRenderer::Render() {
 
 	pTargetManager->SetCurrentDepthStencilTarget(0, BSGraphics::SetRenderTargetMode::SRTM_RESTORE, 0, false);
 
-	pShaderParams->SetPixelConstant(0,
+	/*pShaderParams->SetPixelConstant(0,
 		1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiWidth,
 		1.0F / pTargetManager->pRenderTargetDataA[renderTargetID].uiHeight,
 		0.0F,
-		0.0F);
+		0.0F);*/
 
 	pTargetManager->SetTextureDepth(1, depthTargetID);
 	pTargetManager->SetTextureRenderTarget(2, renderTargetID, false);
-	pImageSpaceManager->effectArray[effectID].UseDynamicResolution = false;
+	pImageSpaceManager->effectList[effectID]->useDynamicResolution = false;
 	pImageSpaceManager->RenderEffectHelper_2((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, renderTargetID, pShaderParams);
 	pTargetManager->SetCurrentRenderTarget(0, 1, BSGraphics::SetRenderTargetMode::SRTM_RESTORE);  //RENDER_TARGET_MAIN
 
@@ -907,6 +920,7 @@ NiTexture* ScopeCustomRenderer::Render() {
 	pScopeAccumulator->ClearActivePasses(false);
 	pScopeAccumulator->ClearGroupPasses(5, false);
 	BSDistantObjectInstanceRenderer::QInstance().enabled = true;
+	(&cullingProc)->~BSCullingProcess();
 
 	NiAVObject* pOldGrassNode = pGrassNode;
 	pGrassNode->SetAppCulled(grassCull);
@@ -922,17 +936,13 @@ NiTexture* ScopeCustomRenderer::Render() {
 }
 
 NiTexture* ScopeCustomRenderer::RenderSimple() {
-	logInfo("ScopeCustomRenderer::RenderSimple() Starting...");
+	logInfo("RenderSimple Starting...");
 	BSGraphics::State* pGraphicsState = &BSGraphics::State::GetSingleton();
 	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
 	BSGraphics::Renderer* pRenderData = &BSGraphics::Renderer::GetSingleton();
 	ImageSpaceManager* pImageSpaceManager = ImageSpaceManager::GetSingleton();
 	BSShaderManager::State* pShaderState = &BSShaderManager::State::GetSingleton();
 	NiCamera* pShaderCam = BSShaderManager::GetCamera();
-
-	uint32_t renderTargetID = stl::to_underlying<RenderTargetMode>(RenderTargetMode::RENDER_TARGET_GB_ALBEDO_SPEC);
-	uint32_t depthTargetID = stl::to_underlying<DepthStencilTargetMode>(DepthStencilTargetMode::DEPTH_STENCIL_TARGET_MAIN);
-	uint32_t effectID = stl::to_underlying<ImageSpaceManager::ImageSpaceEffectEnum>(ImageSpaceManager::ImageSpaceEffectEnum::kHUDGlass);
 
 	pScopeCullingProc->SetAccumulator(pScopeAccumulator);
 	pScopeCullingProc->kCullMode = BSCullingProcess::BSCP_CULL_NORMAL;
@@ -946,8 +956,8 @@ NiTexture* ScopeCustomRenderer::RenderSimple() {
 	pScopeAccumulator->firstPerson = true;
 
 	bool shouldRelease = false;
-	if (!pTargetManager->QIsAcquiredRenderTarget(renderTargetID)) {
-		pTargetManager->AcquireRenderTarget(renderTargetID);
+	if (!pTargetManager->QIsAcquiredRenderTarget(renderTarget)) {
+		pTargetManager->AcquireRenderTarget(renderTarget);
 		shouldRelease = true;
 	}
 
@@ -971,15 +981,15 @@ NiTexture* ScopeCustomRenderer::RenderSimple() {
 	BSShaderUtil::AccumulateScene(pRendererCamera->camera, pRendererCamera->cameraRoot.get(), *pScopeCullingProc, false);
 
 	//pImageSpaceManager->RenderEffect_1((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, nullptr);
-	pImageSpaceManager->RenderEffectHelper_2((ImageSpaceManager::ImageSpaceEffectEnum)effectID, renderTargetID, renderTargetID, nullptr);
+	pImageSpaceManager->RenderEffectHelper_2((ImageSpaceManager::ImageSpaceEffectEnum)effect, renderTarget, renderTarget, nullptr);
 
 	pRenderData->SetClearColor(0.2F, 0.2F, 0.2F, 1.0F);
 
-	pTargetManager->SetCurrentDepthStencilTarget(depthTargetID, BSGraphics::SetRenderTargetMode::SRTM_CLEAR, 0, false);
-	pTargetManager->SetCurrentRenderTarget(0, renderTargetID, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
+	pTargetManager->SetCurrentDepthStencilTarget(depthTarget, BSGraphics::SetRenderTargetMode::SRTM_CLEAR, 0, false);
+	pTargetManager->SetCurrentRenderTarget(0, renderTarget, BSGraphics::SetRenderTargetMode::SRTM_CLEAR);
 
-	pTargetManager->SetTextureDepth(0, depthTargetID);
-	pTargetManager->SetTextureRenderTarget(0, renderTargetID, false);
+	pTargetManager->SetTextureDepth(0, depthTarget);
+	pTargetManager->SetTextureRenderTarget(0, renderTarget, false);
 
 	pRenderData->ClearColor();
 
@@ -1040,13 +1050,13 @@ NiTexture* ScopeCustomRenderer::RenderSimple() {
 	strScope.~BSFixedString();
 	renderedTexture = emptyTexture;
 
-	BSShaderAccumulator::RegisterObject_Standard(pScopeAccumulator, pRendererCamera->renderPlane, shaderProperty);
+	//BSShaderAccumulator::RegisterObject_Standard(pScopeAccumulator, pRendererCamera->renderPlane, shaderProperty);
 	//BSShaderUtil::RenderScene(pRendererCamera->camera, pScopeAccumulator, false);
 	pGraphicsState->SetCameraData(pRendererCamera->camera, false, 0.0F, 1.0F);
-	pScopeAccumulator->StartAccumulating(pRendererCamera->camera);
-	pScopeAccumulator->FinishAccumulating();
+	//pScopeAccumulator->StartAccumulating(pRendererCamera->camera);
+	//pScopeAccumulator->FinishAccumulating();
 
-	renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTargetID, true, true, BSGraphics::Usage::USAGE_DYNAMIC));
+	renderedTexture->SetRendererTexture(pTargetManager->SaveRenderTargetToTexture(renderTarget, true, true, BSGraphics::Usage::USAGE_DYNAMIC));
 
 	/*
 	BSRenderPass* pass = shaderProperty->GetRenderPasses(pRendererCamera->renderPlane, (uint32_t)pScopeAccumulator->renderMode, pScopeAccumulator)->passList;
@@ -1071,7 +1081,7 @@ NiTexture* ScopeCustomRenderer::RenderSimple() {
 	//pass->~BSRenderPass();
 
 	if (shouldRelease) {
-		pTargetManager->ReleaseRenderTarget(renderTargetID);
+		pTargetManager->ReleaseRenderTarget(renderTarget);
 	}
 
 	BSGraphics::TextureAccess mappedResource;
@@ -1099,8 +1109,6 @@ NiTexture* ScopeCustomRenderer::RenderSimple() {
 ScopeLensModel::ScopeLensModel() {
 	renderRoot = nullptr;
 	renderPlane = nullptr;
-	reticleRoot = nullptr;
-	reticlePlane = nullptr;
 	scopeRoot = nullptr;
 	rootNode = nullptr;
 	renderTarget = -1;
@@ -1110,27 +1118,22 @@ ScopeLensModel::ScopeLensModel() {
 	Interface3D::Renderer::Create(GetRendererName(), UI_DEPTH_PRIORITY::k3DUnderHUD, 50.0F, true)->hideScreenWhenDisabled = false;
 
 	if (GetByNameFromPlayer3D("ScopeAiming")) {
-		rootNode = const_cast<NiAVObject*>(GetByNameFromPlayer3D("ScopeAiming"))->IsNode();
+		NiNode* foundRootNode = const_cast<NiAVObject*>(GetByNameFromPlayer3D("ScopeAiming"))->IsNode();
+		rootNode = foundRootNode->Clone()->IsNode();
 		logInfo("Found Model Root.");
 	}
 	if (GetByNameFromPlayer3D("ScopeViewParts")) {
-		scopeRoot = const_cast<NiAVObject*>(GetByNameFromPlayer3D("ScopeViewParts"))->IsNode();
+		NiNode* foundScopeRoot = const_cast<NiAVObject*>(GetByNameFromPlayer3D("ScopeViewParts"))->IsNode();
+		scopeRoot = foundScopeRoot->Clone()->IsNode();
 		logInfo("Found Scope Root.");
 	}
 	if (GetByNameFromPlayer3D("TextureLoader:0")) {
-		renderPlane = const_cast<NiAVObject*>(GetByNameFromPlayer3D("TextureLoader:0"))->IsTriShape();
+		BSTriShape* foundRenderPlane = const_cast<NiAVObject*>(GetByNameFromPlayer3D("TextureLoader:0"))->IsTriShape();
+		renderPlane = foundRenderPlane->Clone()->IsTriShape();
 		logInfo("Found Scope Render Plane.");
 		BSShaderUtil::SetTexturesCanDegrade(renderPlane, false);
 		if (renderPlane && renderPlane->parent) {
 			renderRoot = renderPlane->parent;
-		}
-	}
-	if (GetByNameFromPlayer3D("reticle_ui_stencil:0")) {
-		reticlePlane = const_cast<NiAVObject*>(GetByNameFromPlayer3D("reticle_ui_stencil:0"))->IsTriShape();
-		logInfo("Found Scope Reticle Plane.");
-		BSShaderUtil::SetTexturesCanDegrade(reticlePlane, false);
-		if (reticlePlane && reticlePlane->parent) {
-			reticleRoot = reticlePlane->parent;
 		}
 	}
 
@@ -1167,18 +1170,12 @@ void ScopeLensModel::InitModels() {
 	BSTriShape* renderPlaneCurrent = nullptr;
 	BSTriShape* renderPlaneNew = nullptr;
 	BSTriShape* render = nullptr;
-	BSTriShape* reticlePlaneCurrent = nullptr;
-	BSTriShape* reticlePlaneNew = nullptr;
-	BSTriShape* reticle = nullptr;
 
 	if (!rootNode) {
 		createRoot = true;
 	}
 	if (!renderPlane) {
 		createRenderPlane = true;
-	}
-	if (!reticlePlane) {
-		createReticlePlane = true;
 	}
 
 	if (createRoot) {
@@ -1290,107 +1287,16 @@ void ScopeLensModel::InitModels() {
 		renderRoot->AttachChild(renderPlane, true);
 		renderPlane->Update(update);
 	}
-	if (createReticlePlane) {
-		//There was no reticlePlane found. We need to make it ourself
-		NiNode* rootCurrent = nullptr;
-		NiNode* rootNew = nullptr;
-		NiNode* root = nullptr;
-
-		//There was no rootNode found. We need to make it ourself
-		root = (NiNode*)RE::aligned_alloc(0x140, 0x10);
-		if (root) {
-			new (rootNew) NiNode(0);
-		} else {
-			rootNew = nullptr;
-		}
-		rootCurrent = reticleRoot;
-		if (rootCurrent != rootNew) {
-			if (rootNew) {
-				InterlockedIncrement(&rootNew->refCount);
-			}
-			reticleRoot = rootNew;
-			if (rootCurrent && !InterlockedDecrement(&rootCurrent->refCount)) {
-				rootCurrent->DeleteThis();
-			}
-		}
-		reticleRoot->name = "reticle_ui_stencil"sv;
-		rootNode->AttachChild(reticleRoot, true);
-		reticleRoot->Update(update);
-
-		reticle = ImageSpaceManager::GetSingleton()->CreatePartialScreenGeometry(1, 1);
-		if (reticle) {
-		} else {
-			reticlePlaneNew = nullptr;
-		}
-		if (reticlePlane) {
-			reticlePlaneCurrent = reticlePlane->IsTriShape();
-		} else {
-			reticlePlaneCurrent = nullptr;
-		}
-		if (reticlePlaneCurrent != reticlePlaneNew) {
-			if (reticlePlaneNew) {
-				InterlockedIncrement(&reticlePlaneNew->refCount);
-			}
-			reticlePlane = reticlePlaneNew;
-			if (reticlePlaneCurrent && !InterlockedDecrement(&reticlePlaneCurrent->refCount)) {
-				reticlePlaneCurrent->DeleteThis();
-			}
-		}
-		reticlePlane->name = "reticle_ui_stencil:0"sv;
-
-		BSEffectShaderProperty* prop = nullptr;
-		BSEffectShaderProperty* propNew = nullptr;
-		BSEffectShaderProperty* propCurrent = nullptr;
-
-		propNew = BSEffectShaderProperty::Create();
-		if (propNew) {
-		} else {
-			propNew = nullptr;
-		}
-		propNew->SetMaterial(propNew->material, true);
-		((BSEffectShaderMaterial*)(propNew->material))->kBaseColor = NiColorA::BLACK;
-		propNew->SetupGeometry(reticlePlane);
-		propCurrent = (BSEffectShaderProperty*)reticlePlane->QShaderProperty();
-		if (propCurrent != propNew) {
-			InterlockedIncrement(&propNew->refCount);
-			reticlePlane->SetProperty(propNew);
-			if (propCurrent) {
-				if (!InterlockedDecrement(&propCurrent->refCount)) {
-					propCurrent->DeleteThis();
-				}
-			}
-		}
-
-		NiAlphaProperty* alphaProp = nullptr;
-		NiAlphaProperty* alphaPropNew = nullptr;
-
-		alphaProp = (NiAlphaProperty*)RE::malloc(0x30);
-		alphaPropNew = alphaProp;
-		if (alphaProp) {
-		} else {
-			alphaPropNew = nullptr;
-		}
-		alphaPropNew->flags.flags |= 1;
-		reticlePlane->AttachProperty(alphaPropNew);
-		reticlePlane->flags.SetBit(true, NiAVObject::ALWAYS_DRAW);
-		reticlePlane->worldBound.fRadius = 1.0F;
-
-		reticlePlane->local.translate.x = 0.0;  //TODO
-		reticlePlane->local.translate.y = 0.0;  //TODO
-		reticlePlane->local.translate.z = 0.0;  //TODO
-		reticleRoot->AttachChild(reticlePlane, true);
-		reticlePlane->Update(update);
-	}
 }
 
 void ScopeLensModel::InitRenderer() {
 	Interface3D::Renderer* renderer = GetRenderer();
 	SceneGraph* world = Main::GetWorldSceneGraph();
 
-	renderer->Offscreen_SetDisplayMode(Interface3D::ScreenMode::kScreenAttached, "TextureLoader:0", "Materials\\Interface\\ScopeLens.BGEM");
+	renderer->Offscreen_SetDisplayMode(Interface3D::ScreenMode::kScreenAttached, nullptr, "Materials\\Interface\\ScopeLens.BGEM");
 	renderer->Offscreen_SetRenderTargetSize(Interface3D::OffscreenMenuSize::kFullFrame);
 	renderer->MainScreen_SetBackgroundMode(Interface3D::BackgroundMode::kLive);
-	//renderer->MainScreen_EnableScreenAttached3DMasking("TextureLoaderShadow:0", "Materials\\Interface\\ScopeLensShadow.BGEM");
+	renderer->MainScreen_EnableScreenAttached3DMasking(nullptr, "Materials\\Interface\\ScopeLensShadow.BGEM");
 	renderer->Offscreen_SetPostEffect(Interface3D::PostEffect::kNone);
 	renderer->clearColor = NiColorA(0.0F);
 	renderer->postAA = true;
@@ -1398,10 +1304,10 @@ void ScopeLensModel::InitRenderer() {
 	renderer->useLongRangeCamera = true;
 	renderer->customRenderTarget = renderTarget;
 	renderer->customSwapTarget = swapTarget;
-	renderer->Offscreen_Set3D(reticleRoot);
+	//renderer->Offscreen_Set3D(renderRoot);
 	//renderer->Offscreen_Set3D(world);
 	renderer->MainScreen_SetScreenAttached3D(renderRoot);
-	renderer->MainScreen_RegisterGeometryRequiringFullViewport(renderRoot);
+	//renderer->MainScreen_RegisterGeometryRequiringFullViewport(renderRoot);
 }
 
 void ScopeLensModel::InitTargets() {
@@ -1472,7 +1378,7 @@ void ScopeLensModel::DoNightVisionFX() {
 	if (FXThermalActive) {
 		ClearFX();
 	}
-	
+
 	renderer->Offscreen_QPipboyEffectControl().doScanlines = true;
 	renderer->Offscreen_SetRenderTargetSize(Interface3D::OffscreenMenuSize::kPipboy);
 	renderer->Offscreen_SetPostEffect(Interface3D::PostEffect::kPipboy);
@@ -1504,6 +1410,277 @@ void ScopeLensModel::DoThermalFX() {
 	}
 }
 #pragma endregion ScopeLensModel
+
+#pragma region ScopeReticleModel
+ScopeReticleModel::ScopeReticleModel() {
+	reticleRoot = nullptr;
+	reticlePlane = nullptr;
+	scopeRoot = nullptr;
+	rootNode = nullptr;
+	renderTarget = -1;
+	swapTarget = -1;
+	visible = false;
+
+	Interface3D::Renderer::Create(GetRendererName(), UI_DEPTH_PRIORITY::k3DUnderHUD, 50.0F, true)->hideScreenWhenDisabled = false;
+
+	if (GetByNameFromPlayer3D("ScopeAiming")) {
+		NiNode* foundRootNode = const_cast<NiAVObject*>(GetByNameFromPlayer3D("ScopeAiming"))->IsNode();
+
+		rootNode = foundRootNode->Clone()->IsNode();
+		rootNode->name = "ScopeAiming";
+		logInfo("Found Model Root.");
+	}
+	if (GetByNameFromPlayer3D("ScopeViewParts")) {
+		NiNode* foundScopeRoot = const_cast<NiAVObject*>(GetByNameFromPlayer3D("ScopeViewParts"))->IsNode();
+		scopeRoot = foundScopeRoot->Clone()->IsNode();
+		scopeRoot->name = "ScopeViewParts";
+		logInfo("Found Scope Root.");
+	}
+	if (GetByNameFromPlayer3D("reticle_ui_stencil")) {
+		NiNode* foundReticleRoot = const_cast<NiAVObject*>(GetByNameFromPlayer3D("reticle_ui_stencil"))->IsNode();
+		reticleRoot = foundReticleRoot->Clone()->IsNode();
+		reticleRoot->name = "reticle_ui_stencil";
+		logInfo("Found Scope Reticle Root.");
+	}
+	if (GetByNameFromPlayer3D("reticle_ui_stencil:0")) {
+		BSTriShape* foundReticlePlane = const_cast<NiAVObject*>(GetByNameFromPlayer3D("reticle_ui_stencil:0"))->IsTriShape();
+		reticlePlane = foundReticlePlane->Clone()->IsTriShape();
+		reticlePlane->name = "reticle_ui_stencil:0";
+		logInfo("Found Scope Reticle Plane.");
+		BSShaderUtil::SetTexturesCanDegrade(reticlePlane, false);
+		if (reticlePlane && foundReticlePlane->parent && !reticleRoot) {
+			reticleRoot = foundReticlePlane->parent->Clone()->IsNode();
+		}
+	}
+
+	InitModels();
+	InitRenderer();
+	InitTargets();
+}
+
+ScopeReticleModel::ScopeReticleModel(int32_t a_target, int32_t a_swap) :
+	ScopeReticleModel() {
+	renderTarget = a_target;
+	swapTarget = a_swap;
+}
+
+ScopeReticleModel::~ScopeReticleModel() {
+	Interface3D::Renderer* renderer = GetRenderer();
+	if (renderer) {
+		renderer->Release();
+	}
+	NiNode* root = rootNode;
+	if (root && !InterlockedDecrement(&root->refCount)) {
+		root->DeleteThis();
+	}
+	//Do we need to destroy the geometry?
+}
+
+void ScopeReticleModel::InitModels() {
+	bool createRoot = false;
+	bool createReticlePlane = false;
+
+	NiUpdateData update(0.0F, 0);
+
+	BSTriShape* reticlePlaneCurrent = nullptr;
+	BSTriShape* reticlePlaneNew = nullptr;
+	BSTriShape* reticle = nullptr;
+
+	if (!rootNode) {
+		createRoot = true;
+	}
+	if (!reticlePlane) {
+		createReticlePlane = true;
+	}
+
+	if (createRoot) {
+		NiNode* rootCurrent = nullptr;
+		NiNode* rootNew = nullptr;
+		NiNode* root = nullptr;
+
+		//There was no rootNode found. We need to make it ourself
+		root = (NiNode*)RE::aligned_alloc(0x140, 0x10);
+		if (root) {
+			new (rootNew) NiNode(0);
+		} else {
+			rootNew = nullptr;
+		}
+		rootCurrent = rootNode;
+		if (rootCurrent != rootNew) {
+			if (rootNew) {
+				InterlockedIncrement(&rootNew->refCount);
+			}
+			rootNode = rootNew;
+			if (rootCurrent && !InterlockedDecrement(&rootCurrent->refCount)) {
+				rootCurrent->DeleteThis();
+			}
+		}
+		rootNode->name = "ScopeViewParts"sv;
+		//TODO: Position this new root node to the proper spot (WeaponBone?)
+		//Do we need to attach this to the weapon bone?
+		rootNode->Update(update);
+	}
+	if (createReticlePlane) {
+		//There was no reticlePlane found. We need to make it ourself
+		NiNode* rootCurrent = nullptr;
+		NiNode* rootNew = nullptr;
+		NiNode* root = nullptr;
+
+		//There was no rootNode found. We need to make it ourself
+		root = (NiNode*)RE::aligned_alloc(0x140, 0x10);
+		if (root) {
+			new (rootNew) NiNode(0);
+		} else {
+			rootNew = nullptr;
+		}
+		rootCurrent = reticleRoot;
+		if (rootCurrent != rootNew) {
+			if (rootNew) {
+				InterlockedIncrement(&rootNew->refCount);
+			}
+			reticleRoot = rootNew;
+			if (rootCurrent && !InterlockedDecrement(&rootCurrent->refCount)) {
+				rootCurrent->DeleteThis();
+			}
+		}
+		reticleRoot->name = "reticle_ui_stencil"sv;
+		reticleRoot->local.translate.x = 0.0;    //TODO
+		reticleRoot->local.translate.y = 350.0;  //TODO
+		reticleRoot->local.translate.z = 0.0;    //TODO
+		rootNode->AttachChild(reticleRoot, true);
+		reticleRoot->Update(update);
+
+		reticle = ImageSpaceManager::GetSingleton()->CreatePartialScreenGeometry(1, 1);
+		if (reticle) {
+		} else {
+			reticlePlaneNew = nullptr;
+		}
+		if (reticlePlane) {
+			reticlePlaneCurrent = reticlePlane->IsTriShape();
+		} else {
+			reticlePlaneCurrent = nullptr;
+		}
+		if (reticlePlaneCurrent != reticlePlaneNew) {
+			if (reticlePlaneNew) {
+				InterlockedIncrement(&reticlePlaneNew->refCount);
+			}
+			reticlePlane = reticlePlaneNew;
+			if (reticlePlaneCurrent && !InterlockedDecrement(&reticlePlaneCurrent->refCount)) {
+				reticlePlaneCurrent->DeleteThis();
+			}
+		}
+		reticlePlane->name = "reticle_ui_stencil:0"sv;
+
+		BSEffectShaderProperty* prop = nullptr;
+		BSEffectShaderProperty* propNew = nullptr;
+		BSEffectShaderProperty* propCurrent = nullptr;
+
+		propNew = BSEffectShaderProperty::Create();
+		if (propNew) {
+		} else {
+			propNew = nullptr;
+		}
+		propNew->SetMaterial(propNew->material, true);
+		((BSEffectShaderMaterial*)(propNew->material))->kBaseColor = NiColorA::BLACK;
+		propNew->SetupGeometry(reticlePlane);
+		propCurrent = (BSEffectShaderProperty*)reticlePlane->QShaderProperty();
+		if (propCurrent != propNew) {
+			InterlockedIncrement(&propNew->refCount);
+			reticlePlane->SetProperty(propNew);
+			if (propCurrent) {
+				if (!InterlockedDecrement(&propCurrent->refCount)) {
+					propCurrent->DeleteThis();
+				}
+			}
+		}
+
+		NiAlphaProperty* alphaProp = nullptr;
+		NiAlphaProperty* alphaPropNew = nullptr;
+
+		alphaProp = (NiAlphaProperty*)RE::malloc(0x30);
+		alphaPropNew = alphaProp;
+		if (alphaProp) {
+		} else {
+			alphaPropNew = nullptr;
+		}
+		alphaPropNew->flags.flags |= 1;
+		reticlePlane->AttachProperty(alphaPropNew);
+		reticlePlane->flags.SetBit(true, NiAVObject::ALWAYS_DRAW);
+		reticlePlane->worldBound.fRadius = 1.0F;
+
+		reticlePlane->local.translate.x = 0.0;  //TODO
+		reticlePlane->local.translate.y = 0.0;  //TODO
+		reticlePlane->local.translate.z = 0.0;  //TODO
+		reticleRoot->AttachChild(reticlePlane, true);
+		reticlePlane->Update(update);
+	}
+}
+
+void ScopeReticleModel::InitRenderer() {
+	Interface3D::Renderer* renderer = GetRenderer();
+	SceneGraph* world = Main::GetWorldSceneGraph();
+
+	renderer->Offscreen_SetDisplayMode(Interface3D::ScreenMode::kScreenAttached, nullptr, "Materials\\Interface\\ScopeLens.BGEM");
+	renderer->Offscreen_SetRenderTargetSize(Interface3D::OffscreenMenuSize::kFullFrame);
+	renderer->MainScreen_SetBackgroundMode(Interface3D::BackgroundMode::kLive);
+	renderer->MainScreen_EnableScreenAttached3DMasking(nullptr, "Materials\\Interface\\ScopeLensShadow.BGEM");
+	renderer->Offscreen_SetPostEffect(Interface3D::PostEffect::kNone);
+	renderer->menuBlend = Interface3D::OffscreenMenuBlendMode::kAlpha;
+	renderer->clearColor = NiColorA(0.0F);
+	renderer->postAA = true;
+	renderer->useFullPremultAlpha = true;
+	renderer->useLongRangeCamera = true;
+	renderer->customRenderTarget = renderTarget;
+	renderer->customSwapTarget = swapTarget;
+	renderer->MainScreen_SetScreenAttached3D(reticleRoot);
+
+	//aditional setup for models
+	NiUpdateData update(0.0F, 0);
+	reticleRoot->local.translate.x = 0.0;    //TODO
+	reticleRoot->local.translate.y = 350.0;  //TODO
+	reticleRoot->local.translate.z = 0.0;    //TODO
+	reticleRoot->Update(update);
+
+	reticlePlane->local.translate.x = 0.0;  //TODO
+	reticlePlane->local.translate.y = 0.0;  //TODO
+	reticlePlane->local.translate.z = 0.0;  //TODO
+	reticlePlane->local.scale = 2.0;        //TODO - change the scale based on the FOV
+	reticlePlane->Update(update);
+}
+
+void ScopeReticleModel::InitTargets() {
+	BSGraphics::RenderTargetManager* pTargetManager = &BSGraphics::RenderTargetManager::GetSingleton();
+	if (renderTarget != -1 && !pTargetManager->QIsAcquiredRenderTarget(renderTarget)) {
+		pTargetManager->AcquireRenderTarget(renderTarget);
+	}
+	if (swapTarget != -1 && !pTargetManager->QIsAcquiredRenderTarget(swapTarget)) {
+		pTargetManager->AcquireRenderTarget(swapTarget);
+	}
+}
+
+Interface3D::Renderer* ScopeReticleModel::GetRenderer() {
+	return Interface3D::Renderer::GetByName(GetRendererName());
+}
+
+const BSFixedString ScopeReticleModel::GetRendererName() const {
+	static BSFixedString ScopeGeometryStr("ScopeReticleModel");
+	return ScopeGeometryStr;
+}
+
+void ScopeReticleModel::Show(bool forceShow) {
+	if (!visible || forceShow) {
+		GetRenderer()->Enable(true);
+		visible = true;
+	}
+}
+
+void ScopeReticleModel::Hide() {
+	if (visible) {
+		GetRenderer()->Disable();
+		visible = false;
+	}
+}
+#pragma endregion ScopeReticleModel
 
 #pragma region ScopeRenderer
 namespace ScopeRenderer {
@@ -1607,6 +1784,25 @@ namespace ScopeRenderer {
 	bool customRendererInitialized = false;
 #pragma endregion ScopeCustomRenderer
 
+#pragma region ScopeInterface
+	void CreateAllInterfaceRenderers() {
+		CreateLensRenderer();
+		CreateReticleRenderer();
+	}
+
+	void DestroyAllInterfaceRenderers() {
+		DestroyLensRenderer();
+		DestroyReticleRenderer();
+	}
+
+	void HideAllInterfaceRenderers() {
+		if (scopeLensRenderer && scopeLensRenderer->visible) {
+			scopeLensRenderer->Hide();
+		}
+		if (scopeReticleRenderer && scopeReticleRenderer->visible) {
+			scopeReticleRenderer->Hide();
+		}
+	}
 #pragma region ScopeLensRenderer
 	void CreateLensRenderer() {
 		if (!scopeLensRenderer) {
@@ -1617,6 +1813,9 @@ namespace ScopeRenderer {
 	void DestroyLensRenderer() {
 		lensRendererInitialized = false;
 		if (scopeLensRenderer) {
+			if (scopeLensRenderer->visible) {
+				scopeLensRenderer->Hide();
+			}
 			scopeLensRenderer->~ScopeLensModel();
 			scopeLensRenderer = nullptr;
 		}
@@ -1630,6 +1829,34 @@ namespace ScopeRenderer {
 	ScopeLensModel* scopeLensRenderer = nullptr;
 	bool lensRendererInitialized = false;
 #pragma endregion ScopeLensRenderer
+
+#pragma region ScopeReticleRenderer
+	void CreateReticleRenderer() {
+		if (!scopeReticleRenderer) {
+			scopeReticleRenderer = InitReticleRenderer();
+		}
+	}
+
+	void DestroyReticleRenderer() {
+		reticleRendererInitialized = false;
+		if (scopeReticleRenderer) {
+			if (scopeReticleRenderer->visible) {
+				scopeReticleRenderer->Hide();
+			}
+			scopeReticleRenderer->~ScopeReticleModel();
+			scopeReticleRenderer = nullptr;
+		}
+	}
+
+	ScopeReticleModel* InitReticleRenderer() {
+		reticleRendererInitialized = true;
+		return new ScopeReticleModel();
+	}
+
+	ScopeReticleModel* scopeReticleRenderer = nullptr;
+	bool reticleRendererInitialized = false;
+#pragma endregion ScopeReticleRenderer
+#pragma endregion ScopeInterface
 }
 
 #pragma endregion ScopeRenderer

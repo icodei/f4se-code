@@ -151,11 +151,14 @@ BSEventNotifyControl TESEquipEventSink::ProcessEvent(const TESEquipEvent& a_even
 #pragma region TESFurnitureEventSink
 //TODO: check what furniture the player is getting into. Might be able to ignore power armor frame
 BSEventNotifyControl TESFurnitureEventSink::ProcessEvent(const TESFurnitureEvent& a_event, BSTEventSource<TESFurnitureEvent>* a_source) {
-	if (a_event.actor.get() != PlayerCharacter::GetSingleton()) {
+	if (a_event.actor.get() != pc) {
 		return BSEventNotifyControl::kContinue;
 	}
 	if (a_event.type.get() == TESFurnitureEvent::FurnitureEventType::kExit) {
 	} else {
+		if (a_event.targetFurniture) {
+
+		}
 	}
 	return BSEventNotifyControl::kContinue;
 }
@@ -163,7 +166,6 @@ BSEventNotifyControl TESFurnitureEventSink::ProcessEvent(const TESFurnitureEvent
 
 #pragma region TESLoadGameEventSink
 BSEventNotifyControl TESLoadGameEventSink::ProcessEvent(const TESLoadGameEvent& a_event, BSTEventSource<TESLoadGameEvent>* a_source) {
-	logInfo("Game Loaded");
 	return BSEventNotifyControl::kContinue;
 }
 #pragma endregion TESLoadGameEventSink
@@ -560,9 +562,9 @@ void initHooks() {
 		};
 	}
 	TryHooks();
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Hooks Install Complete "sv, 80));
+	logInfo(MESSAGE_TITLE_FANCY_CENTERED(" Hooks Install Complete "));
 	print_map(std::as_const(Info.hookedList));
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
+	logInfo(MESSAGE_FOOTER_FANCY_CENTERED);
 }
 
 //Mostly for global events
@@ -580,8 +582,8 @@ void initSpecialHooks() {
 		}
 	}
 	TrySpecialHooks();
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Special Hooks Install Complete "sv, 80));
+	logInfo(MESSAGE_TITLE_FANCY_CENTERED(" Special Hooks Install Complete "));
 	print_map(std::as_const(Info.hookedList));
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
+	logInfo(MESSAGE_FOOTER_FANCY_CENTERED);
 }
 #pragma endregion

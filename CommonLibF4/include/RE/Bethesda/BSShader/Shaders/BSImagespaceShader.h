@@ -13,9 +13,14 @@ namespace RE
 		static constexpr auto TYPE{ BSShaderManager::BSSM_SHADER_IMAGESPACE };
 
 		BSImagespaceShader() = delete;
-		BSImagespaceShader(const char* fxpName) { ctor(fxpName); }
+		BSImagespaceShader(const char* fxpName)
+		{
+			typedef BSImagespaceShader* func_t(BSImagespaceShader*, const char*);
+			REL::Relocation<func_t> func{ REL::ID(103011) };
+			func(this, fxpName);
+		}
 
-		virtual ~BSImagespaceShader();
+		virtual ~BSImagespaceShader();	// 00
 
 		static ImageSpaceShaderParam& GetDefaultParam()
 		{
@@ -38,12 +43,5 @@ namespace RE
 		BSTArray<void*> pixelConstantGroup;
 		BSTArray<void*> array_210;
 		BSTArray<void*> array_228;
-	private:
-		BSImagespaceShader* ctor(const char* fxpName)
-		{
-			using func_t = decltype(&BSImagespaceShader::ctor);
-			REL::Relocation<func_t> func{ REL::ID(103011) };
-			return func(this, fxpName);
-		}
 	};
 }

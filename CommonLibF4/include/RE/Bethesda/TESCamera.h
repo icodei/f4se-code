@@ -63,7 +63,12 @@ namespace RE
 		static constexpr auto VTABLE{ VTABLE::TESCameraState };
 
 		TESCameraState() = delete;
-		TESCameraState(TESCamera& cam, std::uint32_t ID) { ctor(cam, ID); }
+		TESCameraState(TESCamera& cam, std::uint32_t ID)
+		{
+			typedef TESCameraState* func_t(TESCameraState*, TESCamera&, std::uint32_t);
+			REL::Relocation<func_t> func{ REL::ID(1277606), 0x3 };
+			func(this, cam, ID);
+		}
 
 		virtual ~TESCameraState() {}  // 00
 
@@ -82,14 +87,6 @@ namespace RE
 		std::uint32_t id;   // 20
 
 		F4_HEAP_REDEFINE_NEW(TESCameraState);
-
-	private:
-		TESCameraState* ctor(TESCamera& cam, std::uint32_t ID)
-		{
-			using func_t = decltype(&TESCameraState::ctor);
-			REL::Relocation<func_t> func{ REL::ID(1277606), 0x3 };
-			return func(this, cam, ID);
-		}
 	};
 	static_assert(offsetof(TESCameraState, camera) == 0x18);
 	static_assert(offsetof(TESCameraState, id) == 0x20);
@@ -101,7 +98,12 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::TESCamera };
 		static constexpr auto VTABLE{ VTABLE::TESCamera };
 
-		TESCamera() { ctor(); }
+		TESCamera()
+		{
+			typedef TESCamera* func_t(TESCamera*);
+			REL::Relocation<func_t> func{ REL::ID(807071) };
+			func(this);
+		}
 
 		virtual ~TESCamera() {}  // 00
 
@@ -147,14 +149,6 @@ namespace RE
 		bool enabled;                                  // 30
 
 		F4_HEAP_REDEFINE_NEW(TESCamera);
-
-	private:
-		TESCamera* ctor()
-		{
-			using func_t = decltype(&TESCamera::ctor);
-			REL::Relocation<func_t> func{ REL::ID(807071) };
-			return func(this);
-		}
 	};
 	static_assert(sizeof(TESCamera) == 0x38);
 

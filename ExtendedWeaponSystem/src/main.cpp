@@ -7,11 +7,11 @@
 
 void initPlugin() {
 	pc = PlayerCharacter::GetSingleton();
-	logger::info(FMT_STRING("Player: {:p}"), fmt::ptr(pc));
+	logInfo(fmt::format(FMT_STRING("Player: {:p}"), fmt::ptr(pc)));
 	pcam = PlayerCamera::GetSingleton();
-	logger::info(FMT_STRING("Player Camera: {:p}"), fmt::ptr(pcam));
+	logInfo(fmt::format(FMT_STRING("Player Camera: {:p}"), fmt::ptr(pcam)));
 	pcon = PlayerControls::GetSingleton();
-	logger::info(FMT_STRING("Player Controls: {:p}"), fmt::ptr(pcon));
+	logInfo(fmt::format(FMT_STRING("Player Controls: {:p}"), fmt::ptr(pcon)));
 
 	if (!GetForms()) {
 		logError("You are missing some forms");
@@ -49,7 +49,7 @@ void initLog() {
 	spdlog::set_default_logger(std::move(log));
 	spdlog::set_pattern("[%m/%d/%Y - %T] [EWS] [%^%l%$] %v"s);
 
-	logger::info(FMT_STRING("{:s} v{:s}"), Version::PROJECT, Version::NAME);
+	logger::info(FMT_STRING("{:s} v{:s} log opened"), Version::PROJECT, Version::NAME);
 }
 
 void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
@@ -61,7 +61,9 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 	case F4SE::MessagingInterface::kPreLoadGame:
 
 	case F4SE::MessagingInterface::kPostLoadGame:
+		logInfo("Post Load Game");
 		if (reinterpret_cast<bool>(msg->data)) {
+			logInfo("Post Load Game Successful");
 			initSpecialHooks();
 			INIInfo::LoadINIConfigs();
 			gameLoadingSave = true;
@@ -79,7 +81,7 @@ void OnF4SEMessage(F4SE::MessagingInterface::Message* msg) {
 		logInfo("New Game");
 		initSpecialHooks();
 		INIInfo::LoadINIConfigs();
-		gameLoadingSave = true;
+		gameLoadingSave = false;
 		break;
 	case F4SE::MessagingInterface::kGameLoaded:
 
@@ -100,13 +102,13 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Query(const F4SE::QueryInterface* a
 
 	if (a_f4se->IsEditor()) {
 		stl::report_and_fail(fmt::format(FMT_STRING("loaded in editor")));
-		return false;
+		//return false;
 	}
 
 	const auto ver = a_f4se->RuntimeVersion();
 	if (ver < F4SE::RUNTIME_1_10_162) {
 		stl::report_and_fail(fmt::format(FMT_STRING("unsupported runtime v{:s}"), ver.string()));
-		return false;
+		//return false;
 	}
 
 	F4SE::AllocTrampoline(8 * 8);

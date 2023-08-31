@@ -159,7 +159,9 @@ public:
 	ScopeCamera* pRendererCamera{ nullptr };
 	BSShaderAccumulator* pScopeAccumulator{ nullptr };
 	ImageSpaceShaderParam* pShaderParams{ nullptr };
-	uint32_t renderTarget{ 19 };
+	int32_t renderTarget{ stl::to_underlying<RenderTargetMode>(RenderTargetMode::RENDER_TARGET_GB_ALBEDO_SPEC) };
+	int32_t depthTarget{ stl::to_underlying<DepthStencilTargetMode>(DepthStencilTargetMode::DEPTH_STENCIL_TARGET_MAIN) };
+	int32_t effect{ stl::to_underlying<ImageSpaceManager::ImageSpaceEffectEnum>(ImageSpaceManager::ImageSpaceEffectEnum::kModMenu) };
 
 	F4_HEAP_REDEFINE_NEW(ScopeCustomRenderer);
 };
@@ -186,14 +188,12 @@ public:
 	void DoThermalFX();
 
 	//members
-	NiNode* renderRoot{ nullptr };        //TextureLoader
-	BSGeometry* renderPlane{ nullptr };   //TextureLoader:0
-	NiNode* reticleRoot{ nullptr };       //reticle_ui_stencil
-	BSGeometry* reticlePlane{ nullptr };  //reticle_ui_stencil:0
-	NiNode* scopeRoot{ nullptr };         //ScopeViewParts
-	NiNode* rootNode{ nullptr };          //ScopeAiming
-	int32_t renderTarget{ 37 };
-	int32_t swapTarget{ -1 };
+	NiNode* renderRoot{ nullptr };       //TextureLoader
+	BSGeometry* renderPlane{ nullptr };  //TextureLoader:0
+	NiNode* scopeRoot{ nullptr };        //ScopeViewParts
+	NiNode* rootNode{ nullptr };         //ScopeAiming
+	int32_t renderTarget{ stl::to_underlying<RenderTargetMode>(RenderTargetMode::RENDER_TARGET_HUDGLASS) };
+	int32_t swapTarget{ stl::to_underlying<RenderTargetMode>(RenderTargetMode::RENDER_TARGET_HUDGLASS_SWAP) };
 	bool FXNoneActive{ true };
 	bool FXNightVisionActive{ false };
 	bool FXThermalActive{ false };
@@ -202,7 +202,37 @@ public:
 	F4_HEAP_REDEFINE_NEW(ScopeLensModel);
 };
 
+class ScopeReticleModel {
+public:
+	ScopeReticleModel();
+	ScopeReticleModel(int32_t a_target, int32_t a_swap);
+	~ScopeReticleModel();
+
+	//functions
+	void InitModels();
+	void InitRenderer();
+	void InitTargets();
+	Interface3D::Renderer* GetRenderer();
+	const BSFixedString GetRendererName() const;
+	void Show(bool forceShow);
+	void Hide();
+
+	//members
+	NiNode* reticleRoot{ nullptr };       //reticle_ui_stencil
+	BSGeometry* reticlePlane{ nullptr };  //reticle_ui_stencil:0
+	NiNode* scopeRoot{ nullptr };         //ScopeViewParts
+	NiNode* rootNode{ nullptr };          //ScopeAiming
+	int32_t renderTarget{ stl::to_underlying<RenderTargetMode>(RenderTargetMode::RENDER_TARGET_AO) };
+	int32_t swapTarget{ stl::to_underlying<RenderTargetMode>(RenderTargetMode::RENDER_TARGET_AO_SWAP_0) };
+	bool visible{ false };
+
+	F4_HEAP_REDEFINE_NEW(ScopeReticleModel);
+};
+
 namespace ScopeRenderer {
+
+	//Custom Renderer
+	//The custom renderer will draw the world with FX inside the scope
 
 	//custom renderer functions
 	void CreateCustomRenderer();
@@ -215,11 +245,32 @@ namespace ScopeRenderer {
 	extern bool customRendererInitialized;
 
 	//interface3D renderer functions
+	void CreateAllInterfaceRenderers();
+	void DestroyAllInterfaceRenderers();
+	void HideAllInterfaceRenderers();
+
+	//Lens Renderer
+	//The lens renderer will have the black circle depth effect that magnified scopes have
+
+	//lens renderer functions
 	void CreateLensRenderer();
 	void DestroyLensRenderer();
 	ScopeLensModel* InitLensRenderer();
 
-	//interface3D renderer members
+	//lens renderer members
 	extern ScopeLensModel* scopeLensRenderer;
 	extern bool lensRendererInitialized;
+
+	//Reticle Renderer
+	//The reticle renderer will have the red dot sight effect
+
+	//reticle renderer functions
+	void CreateReticleRenderer();
+	void DestroyReticleRenderer();
+	ScopeReticleModel* InitReticleRenderer();
+
+	//reticle renderer members
+	extern ScopeReticleModel* scopeReticleRenderer;
+	extern bool reticleRendererInitialized;
+
 }

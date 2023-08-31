@@ -14,150 +14,141 @@ namespace RE
 	class ImageSpaceTexture
 	{
 	public:
-		//ImageSpaceTexture::GetDepthStencilBuffer(): This is not depth stencil buffer.  Use QIsDepthStencilBuffer() first
-
-		//void SetTextureRenderTarget(std::int32_t a_target) {}                       //TODO
-		//void SetTextureDepthBuffer(std::int32_t a_target) {}                        //TODO
-		//void SetTextureStencilBuffer(std::int32_t a_target) {}                      //TODO
-		//void SetTexture(NiTexture* a_texture) {}                                    //TODO
-		//void GetDimensions(std::int32_t& a_width, std::int32_t& a_height) const {}  //TODO
-		NiTexture* GetTexture() const {}                                            //TODO
-
-		std::int32_t GetRenderTarget() const
-		{
-			if (RenderTarget < 0) {
-				//Assert: ImageSpaceTexture::GetRenderTarget(): This is not a render target.  Use QIsRenderTarget() first.
-			}
-			using func_t = decltype(&ImageSpaceTexture::GetRenderTarget);
-			REL::Relocation<func_t> func{ REL::ID(332612) };
-			return func(this);
-		}
-
-		ImageSpaceTexture& operator=(ImageSpaceTexture& a_ref) { return op_equals(a_ref); }
-
-		//members
-		bool unk01;
-		NiPointer<NiTexture> tex;
-		int RenderTarget;
-		int DepthBuffer;
-		int StencilBuffer;
-		BSGraphics::TextureFilterMode FilterMode;
-		BSGraphics::TextureAddressMode ClampMode;
-		bool isAcquired;
-
-	private:
-		//ImageSpaceTexture* ctor() {}
-		//ImageSpaceTexture* copy_ctor(ImageSpaceTexture& a_ref) {}
-		ImageSpaceTexture& op_equals(ImageSpaceTexture& a_ref)
-		{
-			using func_t = decltype(&ImageSpaceTexture::op_equals);
-			REL::Relocation<func_t> func{ REL::ID(1420823) };
-			return func(this, a_ref);
-		}
+		// members
+		bool forceAniso;                           // 00
+		NiTexture* texture;                        // 08
+		std::int32_t renderTarget;                 // 10
+		std::int32_t depthBuffer;                  // 14
+		std::int32_t stencilBuffer;                // 18
+		BSGraphics::TextureFilterMode filterMode;  // 1C
+		BSGraphics::TextureAddressMode clampMode;  // 20
+		bool acquiredTarget;                       // 24
 	};
+	static_assert(sizeof(ImageSpaceTexture) == 0x28);
 
-	class ImageSpaceEffectParam
+	class __declspec(novtable) ImageSpaceEffectParam
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::ImageSpaceEffectParam };
 		static constexpr auto VTABLE{ VTABLE::ImageSpaceEffectParam };
 
-		ImageSpaceEffectParam() { ctor(); }
-		virtual ~ImageSpaceEffectParam() {}
-
-	private:
-		ImageSpaceEffectParam* ctor()
+		ImageSpaceEffectParam()
 		{
-			using func_t = decltype(&ImageSpaceEffectParam::ctor);
+			typedef ImageSpaceEffectParam* func_t(ImageSpaceEffectParam*);
 			REL::Relocation<func_t> func{ REL::ID(1464304) };
-			return func(this);
+			func(this);
 		}
+
+		virtual ~ImageSpaceEffectParam() {}	// 00
 	};
 
-	class ImageSpaceEffect
+	class __declspec(novtable) ImageSpaceEffect
 	{
 	public:
 		static constexpr auto RTTI{ RTTI::ImageSpaceEffect };
 		static constexpr auto VTABLE{ VTABLE::ImageSpaceEffect };
 
-		class EffectInput
+		struct EffectDesc
 		{
 		public:
-			//members
+			// members
+			std::uint32_t startEffect;       // 00
+			std::uint32_t lastEffect;        // 04
+			ImageSpaceEffect* parentEffect;  // 08
+			std::uint64_t labelWait;         // 10
+			std::uint64_t* writeLabel;       // 18
 		};
+		static_assert(sizeof(EffectDesc) == 0x20);
 
-		class EffectDesc
+		struct EffectInput
 		{
 		public:
-			//members
-			std::uint64_t field_0;
-			std::uint64_t field_8;
-			std::uint64_t field_10;
-			std::uint64_t field_18;
+			// members
+			std::int32_t texIndex;                     // 00
+			BSGraphics::TextureFilterMode filterMode;  // 04
 		};
+		static_assert(sizeof(EffectInput) == 0x08);
 
-		ImageSpaceEffect() { ctor(); }
+		ImageSpaceEffect()
+		{
+			typedef ImageSpaceEffect* func_t(ImageSpaceEffect*);
+			REL::Relocation<func_t> func{ REL::ID(343213) };
+			func(this);
+		}
 
 		virtual ~ImageSpaceEffect() {}
 
-		//add
-		virtual void Render(BSTriShape*, ImageSpaceEffectParam*) { return; }
-		virtual void Dispatch(ImageSpaceEffectParam*, bool, std::uint32_t, EffectDesc*) { return; }	//Assert: Only BSImagespaceComputeShaders should call dispatch.
-		virtual void Setup(ImageSpaceManager*, ImageSpaceEffectParam*) { return; }
-		virtual void Shutdown(void) { return; }
-		virtual void BorrowTextures(ImageSpaceEffectParam*) { return; }
-		virtual void ReturnTextures(void) { return; }
-		virtual void UpdateComputeShaderParam(std::uint32_t) { return; }
-		virtual bool IsActive(void) { return false; }
-		virtual bool UpdateParams(ImageSpaceEffectParam*) { return false; }
-		virtual bool SetRenderStates(ImageSpaceEffectParam*) { return false; }
-		virtual bool RestoreRenderStates(ImageSpaceEffectParam*) { return false; }
+		// add
+		virtual void Render(BSTriShape* a_geometry, ImageSpaceEffectParam* a_param);                                                   // 01
+		virtual void Dispatch(ImageSpaceEffectParam* a_param, bool a_useAsyncPipe, std::uint32_t a_effect, EffectDesc* a_effectDesc);  // 02 - Only BSImagespaceComputeShaders should call dispatch.
+		virtual void Setup(ImageSpaceManager* a_manager, ImageSpaceEffectParam* a_param);                                              // 03
+		virtual void Shutdown();                                                                                                       // 04
+		virtual void BorrowTextures(ImageSpaceEffectParam* a_param);                                                                   // 05
+		virtual void ReturnTextures();                                                                                                 // 06
+		virtual void UpdateComputeShaderParam(std::uint32_t a_effect);                                                                 // 07
+		virtual bool IsActive();                                                                                                       // 08
+		virtual bool UpdateParams(ImageSpaceEffectParam* a_param);                                                                     // 09
+		virtual bool SetRenderStates(ImageSpaceEffectParam* a_param);                                                                  // 0A
+		virtual bool RestoreRenderStates(ImageSpaceEffectParam* a_param);                                                              // 0B
 
-		//members
-		std::uint64_t unk08;
-		NiTPrimitiveArray<ImageSpaceEffect*> pImageSpaceEffectArray;
-		NiTPrimitiveArray<ImageSpaceEffectParam*> pImageSpaceEffectParamArray;
-		NiTPrimitiveArray<ImageSpaceTexture*> texArray;
-		NiTPrimitiveArray<ImageSpaceTexture*> field_58;
-		NiTPrimitiveArray<EffectInput*> pEffectInputArray;
-		NiTPrimitiveArray<int*> pIntArray;
-		bool isComputeShader;
-		std::uint8_t field_A1;
-		std::uint32_t field_A4;
-		bool UseDynamicResolution;
-
-	private:
-		ImageSpaceEffect* ctor()
-		{
-			using func_t = decltype(&ImageSpaceEffect::ctor);
-			REL::Relocation<func_t> func{ REL::ID(343213) };
-			return func(this);
-		}
+		// members
+		bool isActive;                                              // 08
+		bool paramsChanged;                                         // 09
+		NiTPrimitiveArray<ImageSpaceEffect*> effectList;            // 10
+		NiTPrimitiveArray<ImageSpaceEffectParam*> effectParamList;  // 28
+		NiTPrimitiveArray<ImageSpaceTexture*> textures;             // 40
+		NiTPrimitiveArray<ImageSpaceTexture*> vsTextures;           // 58
+		NiTPrimitiveArray<EffectInput*> effectInputs;               // 70
+		NiTPrimitiveArray<std::int32_t*> effectOutput;              // 88
+		bool isComputeShader;                                       // A0
+		std::uint32_t nbOutput;                                     // A4
+		bool useDynamicResolution;                                  // A8
 	};
+	static_assert(sizeof(ImageSpaceEffect) == 0xB0);
 
-	class ImageSpaceBaseData
+	struct ImageSpaceBaseData
 	{
 	public:
-		//members
-		float hdrData[9];
-		float cinematicData[3];
-		float tintData[4];
-		float dofData[6];
+		// members
+		float hdrData[9];        // 00
+		float cinematicData[3];  // 24
+		float tintData[4];       // 30
+		float dofData[6];        // 40
 	};
 	static_assert(sizeof(ImageSpaceBaseData) == 0x58);
 
-	class ImageSpaceLUTData
+	struct ImageSpaceLUTData
 	{
 	public:
-		//members
-		BSFixedString field_0;
-		std::uint8_t gap8[24];
-		BSFixedString field_20;
-		NiPointer<NiTexture> field_28;
-		NiPointer<NiTexture> field_30;
-		std::uint64_t field_38;
-		std::uint64_t field_40;
-		std::uint64_t field_48;
-		std::uint64_t final1;
+		// members
+		BSFixedString filename[4];          // 00
+		float weight[4];                    // 20
+		NiPointer<NiTexture> niTexture[4];  // 30
+		BSGraphics::Texture* texture[4];    // 50
 	};
+	static_assert(sizeof(ImageSpaceLUTData) == 0x70);
+
+	struct ImageSpaceModData
+	{
+	public:
+
+		enum data
+		{
+		};
+
+		// members
+		float data[20];  // 00
+	};
+	static_assert(sizeof(ImageSpaceModData) == 0x50);
+
+	struct ImageSpaceData
+	{
+	public:
+		// members
+		ImageSpaceBaseData baseData;  //00
+		ImageSpaceModData modData;    //58
+		float highestTintAmount;      //A8
+		float highestFadeAmount;      //AC
+	};
+	static_assert(sizeof(ImageSpaceData) == 0xB0);
 }

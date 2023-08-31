@@ -118,6 +118,12 @@ const NiAVObject* GetByNameFromPlayer3D(const char* name) {
 
 /*;========================================================================================================================================================;*/
 
+bool IsTESFilePresent(const char* name) {
+	TESDataHandler* g_dataHandler = TESDataHandler::GetSingleton();
+	const TESFile* mod = (g_dataHandler)->LookupModByName(name);
+	return mod;
+}
+
 TESForm* GetFormFromIdentifier(const string& identifier) {
 	auto delimiter = identifier.find('|');
 	if (delimiter != string::npos) {
@@ -145,36 +151,33 @@ TESForm* GetFormFromIdentifier(const string& identifier) {
 	return nullptr;
 }
 
-//Gather the forms we need
 bool GetForms() {
-	bool toReturn = true;
+	bool toReturn = false;
 	weaponHasSequentialReloadKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED4")->As<BGSKeyword>();
-	if (!weaponHasSequentialReloadKeyword) {
-		logError("Unable to get weaponHasSequentialReloadKeyword, you are lacking some file/files");
-	}
+	ASSERT(weaponHasSequentialReloadKeyword, "Unable to get weaponHasSequentialReloadKeyword, you are lacking some file/files");
+
 	weaponHasSpeedReloadKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|ECBD")->As<BGSKeyword>();
-	if (!weaponHasSpeedReloadKeyword) {
-		logError("Unable to get weaponHasSpeedReloadKeyword, you are lacking some file/files");
-	}
-	weaponHasScopeThermalKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|6436")->As<BGSKeyword>();
-	if (!weaponHasScopeThermalKeyword) {
-		logError("Unable to get weaponHasThermalScopeKeyword, you are lacking some file/files");
-	}
+	ASSERT(weaponHasSpeedReloadKeyword, "Unable to get weaponHasSpeedReloadKeyword, you are lacking some file/files");
+
 	weaponIsClosedBoltKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED8")->As<BGSKeyword>();
-	if (!weaponIsClosedBoltKeyword) {
-		logError("Unable to get weaponIsClosedBoltKeyword, you are lacking some file/files");
-	}
+	ASSERT(weaponIsClosedBoltKeyword, "Unable to get weaponIsClosedBoltKeyword, you are lacking some file/files");
+
 	weaponIsOpenBoltKeyword = GetFormFromIdentifier("ExtendedWeaponSystem.esm|1ED9")->As<BGSKeyword>();
-	if (!weaponIsOpenBoltKeyword) {
-		logError("Unable to get weaponIsOpenBoltKeyword, you are lacking some file/files");
-	}
-	//ThermalFXS = GetFormFromIdentifier("Code_SharedAttachments.esm|5BCB")->As<BGSKeyword>();
-	//if (!ThermalFXS) {
-	//	logError("Unable to get ThermalFXS, you are lacking some file/files");
-	//}
-	if (!weaponHasSequentialReloadKeyword || !weaponHasScopeThermalKeyword || !weaponIsClosedBoltKeyword || !weaponIsOpenBoltKeyword || !weaponHasSpeedReloadKeyword) {
-		toReturn = false;
-	}
+	ASSERT(weaponIsOpenBoltKeyword, "Unable to get weaponIsOpenBoltKeyword, you are lacking some file/files");
+
+
+	ASSERT(IsTESFilePresent("Code_SharedAttachments.esm") == true, "You are missing Code_SharedAttachments.esm! Several features of this mod may not work without it.");
+
+	weaponHasScopeMagnificationKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|9F1DD")->As<BGSKeyword>();
+	ASSERT(weaponHasScopeMagnificationKeyword, "Unable to get weaponHasScopeMagnificationKeyword, you are lacking some file/files");
+
+	weaponHasScopeNVKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|9F1DE")->As<BGSKeyword>();
+	ASSERT(weaponHasScopeNVKeyword, "Unable to get weaponHasScopeNVKeyword, you are lacking some file/files");
+
+	weaponHasScopeThermalKeyword = GetFormFromIdentifier("Code_SharedAttachments.esm|6436")->As<BGSKeyword>();
+	ASSERT(weaponHasScopeThermalKeyword, "Unable to get weaponHasScopeThermalKeyword, you are lacking some file/files");
+	
+	toReturn = true;
 	return toReturn;
 }
 

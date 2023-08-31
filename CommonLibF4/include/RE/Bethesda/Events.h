@@ -525,28 +525,17 @@ namespace RE
 		std::uint32_t unkC;                         // 0C	Refr FormID?
 		std::uint16_t unk10;                        // 10	ID?
 		bool isEquipping;                           // 12
-		std::uint8_t unk13;                         // 13	InventoryStackIndex
-		std::uint32_t unk14;                        // 14
-		std::uint64_t unk18;                        // 18
-		std::uint64_t unk20;                        // 20
-		std::uint64_t unk28;                        // 28
-		std::uint64_t unk30;                        // 30
-		std::uint64_t unk38;                        // 38
-		std::uint64_t unk40;                        // 40
-		std::uint64_t unk48;                        // 48
-		std::uint64_t unk50;                        // 50
-		std::uint64_t unk58;                        // 58
-		std::uint64_t unk60;                        // 60
-		std::uint64_t unk68;                        // 68
-		std::uint64_t unk70;                        // 70
-		std::uint64_t unk78;                        // 78
-		std::uint64_t unk80;                        // 80
-		BGSInventoryItem::Stack* invItem;           // 88
-		std::uint64_t unk90;                        // 90
-		std::uint64_t unk98;                        // 98
-		TESObject* item;                            // A0
-		TESObjectWEAP::InstanceData* instanceData;  // A8
+		char padding2[111];							// PAST THIS POINT IS NO LONGER PART OF TESEQUIPEVENT!!!
+													// IT IS VOLITILE DATA THAT JUST HAPPENS TO BE AFTER THIS STRUCT
+		BGSInventoryItem::Stack* invItem;
+		char padding3[15];
+		TESObject* item;
+		TESObjectWEAP::InstanceData* instanceData;
 	};
+	//static_assert(offsetof(TESEquipEvent, invItem) == 0x88);
+	//static_assert(offsetof(TESEquipEvent, instanceData) == 0xA8);
+	//static_assert(sizeof(TESEquipEvent) == 0xB0);
+
 
 	struct TESFurnitureEvent
 	{

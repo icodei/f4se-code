@@ -55,7 +55,7 @@ namespace RE
 		public:
 			//members
 			hknpBodyId m_bodyId;
-			unsigned int m_shapeKey;
+			std::uint32_t m_shapeKey;
 			hkBool m_isOverlapping;
 		};
 
@@ -76,7 +76,7 @@ namespace RE
 		float m_keepDistance;
 		float m_keepContactTolerance;
 		float m_contactAngleSensitivity;
-		int m_userPlanes;
+		std::int32_t m_userPlanes;
 		float m_maxCharacterSpeedForSolver;
 		float m_characterStrength;
 		float m_characterMass;

@@ -6,13 +6,13 @@
 
 namespace RE
 {
-	class BSTriShape;
 	class BSReadWriteLock;
-	class ImageSpaceBaseData;
+	class BSTriShape;
 	class ImageSpaceEffect;
 	class ImageSpaceEffectParam;
-	class ImageSpaceLUTData;
 	class NiTexture;
+	struct ImageSpaceBaseData;
+	struct ImageSpaceLUTData;
 
 	class ImageSpaceManager
 	{
@@ -298,32 +298,29 @@ namespace RE
 			return func(this, a_effect);
 		}
 
-		//members
-		std::uint64_t field_0;                            // 000
-		std::uint64_t field_8;                            // 008
-		NiTPrimitiveArray<ImageSpaceEffect> effectArray;  // 010 - allocates 0x740 on ctor
-		NiPointer<BSTriShape> ScreenTriShape;             // 028
-		BSTriShape* ScreenTriShapeColors;                 // 030
-		NiPointer<BSTriShape> DynamicScreenTriShape;      // 038
-		NiPointer<BSTriShape> PartialScreenTriShape;      // 040
-		bool isPartialScreen;                             // 048
-		std::uint32_t field_4C;                           // 04C
+		// members
+		NiRect<std::int32_t> scissorRect;                 // 000
+		NiTPrimitiveArray<ImageSpaceEffect*> effectList;  // 010
+		NiPointer<BSTriShape> screenTriShape;             // 028
+		NiPointer<BSTriShape> screenTriShapeColors;       // 030
+		NiPointer<BSTriShape> dynamicScreenTriShape;      // 038
+		NiPointer<BSTriShape> partialScreenTriShape;      // 040
+		bool enablePartialRender;                         // 048
+		std::int32_t mainTarget;                          // 04C
 		NiColorA refractionTint;                          // 050
-		ImageSpaceBaseData* CurrentBaseData;              // 060
-		ImageSpaceBaseData* OverrideBaseData;             // 068
-		ImageSpaceBaseData* UnderwaterBaseData;           // 070
-		ImageSpaceBaseData* ConsoleBaseData;              // 078
-		ImageSpaceBaseData field_80;                      // 080
-		std::uint8_t gapD8[88];                           // 0D8
-		ImageSpaceLUTData field_130;                      // 130
-		std::uint8_t gap188[24];                          // 188
-		ImageSpaceLUTData* imageSpaceLUT;                 // 1A0
-		float motionBlurMin;                              // 1A8
-		float motionBlurMax;                              // 1AC
-		std::uint32_t field_1B0;                          // 1B0
-		std::uint8_t field_1B4;                           // 1B4
-		std::uint8_t field_1B5;                           // 1B5
-		std::uint8_t field_1B6;                           // 1B6
+		const ImageSpaceBaseData* paseData;               // 060
+		const ImageSpaceBaseData* overRideBaseData;       // 068
+		const ImageSpaceBaseData* underwaterBaseData;     // 070
+		ImageSpaceBaseData* consoleBaseData;              // 078
+		ImageSpaceData currentEOFData;                    // 080
+		ImageSpaceLUTData lutData;                        // 130
+		ImageSpaceLUTData* overrideLUTData;               // 1A0
+		float motionBlurIntensity;                        // 1A8
+		float motionBlurMaxBlur;                          // 1AC
+		std::uint32_t forceNoBokehDepthOfField;           // 1B0
+		bool isReady;                                     // 1B4
+		bool saveTarget;                                  // 1B5
+		bool useBokehDepthOfField;                        // 1B6
 	};
 	static_assert(sizeof(ImageSpaceManager) == 0x1B8);
 }

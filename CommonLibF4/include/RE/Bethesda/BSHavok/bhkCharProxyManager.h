@@ -1,7 +1,8 @@
 #pragma once
-#include "RE/Bethesda/BSHavok/bhkIWorldstepListener.h"
 #include "RE/Bethesda/BSCore/BSTArray.h"
+#include "RE/Bethesda/BSCore/BSTArrayAlg.h"
 #include "RE/Bethesda/BSCore/BSTHashMap.h"
+#include "RE/Bethesda/BSHavok/bhkIWorldstepListener.h"
 #include "RE/Havok/Common/Base/Container/Array/hkArray.h"
 #include "RE/Havok/Common/Base/Types/Physics/ContactPoint/hkContactPoint.h"
 #include "RE/Havok/Physics/Physics/Extensions/CharacterControl/Proxy/hknpCharacterProxy.h"
@@ -11,9 +12,10 @@
 
 namespace RE
 {
-	class hknpWorld;
+	class bhkCharacterController;
 	class bhkCharProxyController;
 	class bhkCharRigidBodyController;
+	class hknpWorld;
 
 	class bhkCharProxyManager : public bhkIWorldStepListener
 	{
@@ -27,7 +29,7 @@ namespace RE
 			//members
 			hknpBodyId TriggerBodyId;
 			hknpBodyId OtherBodyId;
-			int eStatus;  //hknpTriggerEvent::Status
+			std::int32_t eStatus;  //hknpTriggerEvent::Status
 			hknpWorld* pPhysicsWorld;
 		};
 
@@ -60,15 +62,15 @@ namespace RE
 		{
 		public:
 			//members
-			BSTAlignedArray<bhkCharProxyManager::HandleBumpedCharacterCmd, 16> HandleBumpedCharacterCmdA;
-			BSTAlignedArray<bhkCharProxyManager::AddDynamicBodyContactCmd, 16> AddDynamicBodyContactCmdA;
-			BSTAlignedArray<bhkCharProxyManager::TriggerVolumeEventCmd, 16> TriggerVolumeEventCmdA;
-			BSTAlignedArray<bhkCharProxyManager::DeferredHkObjectInteractionsCmd, 16> DeferredHkObjectInteractionsCmdA;
+			BSTAlignedArray<HandleBumpedCharacterCmd, 16> HandleBumpedCharacterCmdA;
+			BSTAlignedArray<AddDynamicBodyContactCmd, 16> AddDynamicBodyContactCmdA;
+			BSTAlignedArray<TriggerVolumeEventCmd, 16> TriggerVolumeEventCmdA;
+			BSTAlignedArray<DeferredHkObjectInteractionsCmd, 16> DeferredHkObjectInteractionsCmdA;
 		};
 
 		//memebrs
 		BSTArray<bhkCharProxyController*> ProxyControllersA;
 		BSTHashMap<bhkCharProxyController*, std::uint32_t> mProxyControllerIndex;
-		BSTAlignedArray<bhkCharProxyManager::ThreadLocalCharRBDeferredCmds, 16> DeferredCommandsA;
+		BSTAlignedArray<ThreadLocalCharRBDeferredCmds, 16> DeferredCommandsA;
 	};
 }

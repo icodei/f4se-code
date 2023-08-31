@@ -21,6 +21,7 @@ extern bool gameLoadingSave;
 extern bool isEmptyReload;
 extern bool reloadHasEnded;
 extern bool reloadHasStarted;
+extern bool weaponHasScopeMagnification;
 extern bool weaponHasScopeNV;
 extern bool weaponHasScopePIP;
 extern bool weaponHasScopeThermal;
@@ -30,6 +31,7 @@ extern bool weaponIsClosedBolt;
 extern bool weaponIsOpenBolt;
 extern bool weaponIsQueued;
 
+extern BGSKeyword* weaponHasScopeMagnificationKeyword;
 extern BGSKeyword* weaponHasScopeNVKeyword;
 extern BGSKeyword* weaponHasScopePIPKeyword;
 extern BGSKeyword* weaponHasScopeThermalKeyword;
@@ -40,7 +42,27 @@ extern BGSKeyword* weaponIsOpenBoltKeyword;
 
 #define GET_EVENT_SOURCE(EventName) (BSTEventSource<EventName>*)GetGlobalEventSource(BSTGlobalEvent_OLD::GetSingleton(), #EventName);
 #define RETURN_HANDLER(fnOriginal) return ((FnExecuteHandler)fnOriginal)(a_handler, a_actor, a_event);
-#define ASSERT(s) ((FMT_STRING("{}() {} ({} line {})"), __func__, s, __FILE__, __LINE__))
+
+#define MESSAGE_HEADER_FANCY_CENTERED (fmt::format(FMT_STRING(";{0:=^{1}};"), "", 80))
+#define MESSAGE_TITLE_FANCY_CENTERED(s) (fmt::format(FMT_STRING(";{0:=^{1}};"), s, 80))
+#define MESSAGE_SUBHEADER_FANCY_CENTERED (fmt::format(FMT_STRING(";{0:=^{1}};"), "", 80))
+#define MESSAGE_BODY_FANCY_CENTERED(s) (fmt::format(FMT_STRING(";{0: ^{1}};"), s, 80))
+#define MESSAGE_BODY_FANCY_LEFT(s) (fmt::format(FMT_STRING(";{0: <{1}};"), s, 80))
+#define MESSAGE_BODY_2_FANCY_LEFT(s, s2) (fmt::format(FMT_STRING(";{0: <{1}};"), (fmt::format(FMT_STRING("{}: {:>}"), s, s2)), 80))
+#define MESSAGE_FOOTER_FANCY_CENTERED (fmt::format(FMT_STRING(";{0:=^{1}};"), "", 80))
+
+#define MESSAGE_CENTERED(s) (fmt::format(FMT_STRING("{0: ^{1}}"), s, 80))
+
+#ifndef NDEBUG
+#	define ASSERT_MESSSAGE(s) (fmt::format(FMT_STRING("{}() {} ({} line {})"), __func__, s, __FILE__, __LINE__))
+#else
+#	define ASSERT_MESSSAGE(s) (fmt::format(FMT_STRING("ERROR: {}"), s))
+#endif
+
+#define ASSERT(e, s)                       \
+	if (!e) {                              \
+		logger::error(ASSERT_MESSSAGE(s)); \
+	}
 
 #define _BYTE std::uint8_t
 #define _WORD std::uint16_t

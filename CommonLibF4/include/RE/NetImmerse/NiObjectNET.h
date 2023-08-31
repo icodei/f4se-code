@@ -36,6 +36,26 @@ namespace RE
 			return func(this, a_name);
 		}
 
+		static char GetDefaultAppendCharacter(void)
+		{
+			using func_t = decltype(&NiObjectNET::GetDefaultAppendCharacter);
+			REL::Relocation<func_t> func{ REL::ID(468580), 0xE };
+			return func();
+		}
+
+		static CopyType GetDefaultCopyType(void)
+		{
+			using func_t = decltype(&NiObjectNET::GetDefaultCopyType);
+			REL::Relocation<func_t> func{ REL::ID(468580), 0x1E };
+			return func();
+		}
+
+		static void SetDefaultCopyType(CopyType a_copy) {
+			using func_t = decltype(&NiObjectNET::SetDefaultCopyType);
+			REL::Relocation<func_t> func{ REL::ID(1129741), 0x30 };
+			return func(a_copy);
+		}
+
 		// members
 		BSFixedString name{ "" };                 // 10
 		NiPointer<NiTimeController> controllers;  // 18

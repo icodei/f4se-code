@@ -122,13 +122,13 @@ namespace RE
 		class TextureHeader
 		{
 		public:
-			//members
-			std::uint16_t height;
-			std::uint16_t width;
-			std::uint8_t mipLevels;
-			std::uint8_t format;
-			std::uint8_t field_6;
-			std::uint8_t field_7;
+			// members
+			std::uint16_t height = 0;   // 0
+			std::uint16_t width = 0;    // 2
+			std::uint8_t mipCount = 0;  // 3
+			std::uint8_t format = 0;    // 5
+			std::uint8_t flags = 0;     // 6
+			std::uint8_t tilemode = 0;  // 7
 		};
 		static_assert(sizeof(TextureHeader) == 0x8);
 
@@ -306,117 +306,85 @@ namespace RE
 		{
 		public:
 			//members
-			std::uint32_t m_StateUpdateFlags;
-			std::uint32_t m_ModifiedBits0x4;
-			std::uint32_t m_ModifiedBits0x8;
-			std::uint32_t m_ModifiedBits0xC;
-			std::uint32_t m_ModifiedBits0x10;
-			std::uint32_t m_ModifiedBits0x14;
-			std::uint32_t m_ModifiedBits0x18;
-			std::uint32_t m_ModifiedBits0x1C;
-			std::uint32_t m_ModifiedBits0x20;
-			std::uint32_t m_CSUAVModifiedBits;
-			bool m_TextureDepthSomethingBool;
-			bool m_TextureSomethingBool;
-			bool field_2A;
-			bool field_2B;
-			std::uint32_t m_RenderTargets[8];
-			std::uint32_t m_CurrentDepthStencilIndex;
-			std::uint32_t m_CurrentDepthStencilSliceIndex;
-			std::uint32_t m_CurrentCubeMapRenderTargetIndex;
-			std::uint32_t m_CurrentCubeMapRenderTargetViewIndex;
-			SetRenderTargetMode m_SetRenderTargetMode[8];
-			SetRenderTargetMode m_SetDepthStencilMode;
-			SetRenderTargetMode m_SetCubeMapRenderTargetMode;
-			std::uint32_t rendertarget;
-			std::uint32_t depthstenciltargetindex;
-			std::uint32_t cubemaprendertargetindex;
-			D3D11_VIEWPORT m_ViewPort;
-			DepthStencilDepthMode m_DepthStencilDepthMode;
-			DepthStencilStencilMode m_DepthStencilStencilMode;
-			DepthStencilExtraMode m_DepthStencilExtraMode;
-			std::uint32_t m_StencilRef;
-			RasterStateCullMode m_RasterStateFillMode;
-			RasterStateCullMode m_RasterStateCullMode;
-			RasterStateDepthBiasMode m_RasterStateDepthBiasMode;
-			RasterStateScissorMode m_RasterStateScissorMode;
-			AlphaBlendMode m_AlphaBlendMode;
-			AlphaBlendAlphaToCoverage m_AlphaBlendAlphaToCoverage;
-			AlphaBlendWriteMode m_AlphaBlendWriteMode;
-			bool m_AlphaTestEnabled;
-			float m_AlphaTestRef;
-			TextureAddressMode m_VSTextureAddressMode[16];
-			TextureFilterMode m_VSTextureFilterMode[16];
-			ID3D11ShaderResourceView* m_VSTexture[16];
-			std::uint32_t m_VSTextureSomething[16];
-			std::uint32_t m_DSTextureAddressMode[16];
-			std::uint32_t m_DSTextureFilterMode[16];
-			ID3D11ShaderResourceView* m_DSTexture[16];
-			std::uint32_t m_DSTextureFilter[16];
-			TextureAddressMode textureAddressMode[16];
-			std::uint32_t field_3A0;
-			std::uint32_t field_3A4;
-			std::byte gap3A8[56];
-			ID3D11ShaderResourceView* m_Texture[16];
-			std::uint32_t m_TextureSomething[16];
-			std::uint32_t m_CSTextureAddressMode[16];
-			std::uint32_t m_CSTextureFilterMode[16];
-			ID3D11ShaderResourceView* SRViewArray[16];
-			std::uint32_t m_CSTextureSomething[8];
-			void* field_5C0;
-			std::uint64_t field_5C8;
-			std::uint64_t field_5D0;
-			std::uint64_t field_5D8;
-			ID3D11UnorderedAccessView* field_5E0;
-			std::uint64_t field_5E8;
-			std::uint64_t field_5F0;
-			std::uint64_t field_5F8;
-			std::uint64_t field_600;
-			std::uint64_t field_608;
-			std::uint64_t field_610;
-			std::uint64_t field_618;
-			std::uint64_t field_620;
-			std::uint64_t field_628;
-			ID3D11Buffer* m_ZPrePassConstantBuffer;
-			std::uint64_t field_638;
-			std::uint64_t field_640;
-			ID3D11Buffer* m_AlphaTestZPrePassConstantBufferPS;
-			std::uint64_t field_650;
-			std::uint64_t field_658;
-			std::uint64_t field_660;
-			std::uint64_t field_668;
-			std::uint64_t field_670;
-			std::uint64_t field_678;
-			std::uint64_t field_680;
-			VertexShader* m_CurrentVertexShader;
-			DomainShader* m_CurrentDomainShader;
-			HullShader* m_CurrentHullShader;
-			PixelShader* m_CurrentPixelShader;
+			std::uint32_t stateUpdateFlags;
+			std::uint32_t VSTextureFlags;
+			std::uint32_t VSTextureState;
+			std::uint32_t DSTextureFlags;
+			std::uint32_t DSTextureState;
+			std::uint32_t textureFlags;
+			std::uint32_t textureState;
+			std::uint32_t CSTextureFlags;
+			std::uint32_t CSTextureState;
+			std::uint32_t CSUAVState;
+			std::uint8_t clearTextureDepth;
+			std::uint8_t clearTextureStencil;
+			std::byte gap2A[2];
+			std::uint32_t renderTarget[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+			std::byte gap4C[16];
+			stl::enumeration<BSGraphics::SetRenderTargetMode, std::uint32_t> setRenderTargetMode[D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT];
+			stl::enumeration<BSGraphics::SetRenderTargetMode, std::uint32_t> setDepthStencilMode;
+			stl::enumeration<BSGraphics::SetRenderTargetMode, std::uint32_t> setCubeMapRenderTargetMode;
+			std::byte field_84[4];
+			std::byte field_88[8];
+			D3D11_VIEWPORT viewport;
+			stl::enumeration<BSGraphics::DepthStencilDepthMode, std::uint32_t> depthStencilDepthMode;
+			stl::enumeration<BSGraphics::DepthStencilStencilMode, std::uint32_t> depthStencilStencilMode;
+			stl::enumeration<BSGraphics::DepthStencilExtraMode, std::uint32_t> depthStencilExtraMode;
+			std::byte gapB4[4];
+			stl::enumeration<BSGraphics::RasterStateFillMode, std::uint32_t> rasterStateFillMode;
+			stl::enumeration<BSGraphics::RasterStateCullMode, std::uint32_t> rasterStateCullMode;
+			stl::enumeration<BSGraphics::RasterStateDepthBiasMode, std::uint32_t> rasterStateDepthBiasMode;
+			stl::enumeration<BSGraphics::RasterStateScissorMode, std::uint32_t> rasterStateScissorMode;
+			stl::enumeration<BSGraphics::AlphaBlendMode, std::uint32_t> alphaBlendMode;
+			stl::enumeration<BSGraphics::AlphaBlendAlphaToCoverage, std::uint32_t> alphaBlendAlphaToCoverage;
+			stl::enumeration<BSGraphics::AlphaBlendWriteMode, std::uint32_t> alphaBlendWriteMode;
+			std::byte gapD4[8];
+			stl::enumeration<BSGraphics::TextureAddressMode, std::uint32_t> VSTextureAddressMode[16];
+			stl::enumeration<BSGraphics::TextureFilterMode, std::uint32_t> VSTextureFilterMode[16];
+			std::byte gap15C[4];
+			ID3D11ShaderResourceView* VSTexture[16];
+			std::uint32_t VSTextureMinLodMode[16];
+			stl::enumeration<BSGraphics::TextureAddressMode, std::uint32_t> DSTextureAddressMode[16];
+			stl::enumeration<BSGraphics::TextureFilterMode, std::uint32_t> DSTextureFilterMode[16];
+			ID3D11ShaderResourceView* DSTexture[16];
+			std::uint32_t DSTextureMinLodMode[16];
+			stl::enumeration<BSGraphics::TextureAddressMode, std::uint32_t> textureAddressMode[16];
+			stl::enumeration<BSGraphics::TextureFilterMode, std::uint32_t> textureFilterMode[16];
+			ID3D11ShaderResourceView* texture[16];
+			std::uint32_t textureMinLodMode[16];
+			stl::enumeration<BSGraphics::TextureAddressMode, std::uint32_t> CSTextureAddressMode[16];
+			stl::enumeration<BSGraphics::TextureFilterMode, std::uint32_t> CSTextureFilterMode[16];
+			ID3D11ShaderResourceView* CSTexture[16];
+			std::uint32_t CSTextureMinLodMode[16];
+			ID3D11UnorderedAccessView* CSUAV[8];
+			std::byte gap620[104];
+			BSGraphics::VertexShader* currentVertexShader;
+			BSGraphics::DomainShader* currentDomainShader;
+			BSGraphics::HullShader* currentHullShader;
+			BSGraphics::PixelShader* currentPixelShader;
 			std::uint32_t field_6A8;
 			std::uint32_t field_6AC;
-			NiPoint3 actorCollision;
-			std::uint32_t field_6BC;
-			NiPoint3 field_6C0;
-			std::uint32_t field_6CC;
-			ViewData m_ViewData;
-			float m_PreviousClearColor[4];
-			float field_8F0;
-			float clearcolor6;
-			float clearcolor7;
-			float clearcolor8;
+			NiPoint3 posAdjust;
+			std::byte gap6BC[4];
+			NiPoint3 lastPosAdjust;
+			std::byte gap6CC[532];
+			float clearColor[4];
+			float lastClearColor[4];
+			std::byte gap900[16];
 		};
+		static_assert(sizeof(RendererShadowState) == 0x910);  // Unconfirmed
 
 		class RendererWindow
 		{
 		public:
 			//members
-			void* hwnd;
-			std::int32_t windowX;
-			std::int32_t windowY;
-			std::int32_t windowWidth;
-			std::int32_t windowHeight;
-			IDXGISwapChain* swapChain;
-			RenderTarget swapChainRenderTarget;
+			void* hwnd;                          // 00
+			std::int32_t windowX;                // 08
+			std::int32_t windowY;                // 0C
+			std::int32_t windowWidth;            // 10
+			std::int32_t windowHeight;           // 14
+			IDXGISwapChain* swapChain;           // 18
+			RenderTarget swapChainRenderTarget;  // 20
 		};
 		static_assert(sizeof(RendererWindow) == 0x50);
 
@@ -424,8 +392,45 @@ namespace RE
 		{
 		public:
 			//members
+			ID3D11DeviceContext* deviceContext;                  // 0000
+			ID3D11Buffer* shaderConstantBuffer;                  // 0008
+			ID3D11Buffer* ConstantBuffer1[541];                  // 0010	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer2[20];                   // 10F8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer3[10];                   // 1198	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer4[28];                   // 11E8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer5[20];                   // 12C8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer6[10];                   // 1368	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer7[20];                   // 13B8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer8[20];                   // 1458	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer9[10];                   // 14F8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer10[20];                  // 1548	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer11[36];                  // 15E8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer12[20];                  // 1708	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer13[40];                  // 17A8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer14[20];                  // 18E8	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer15[20];                  // 1988	-	ByteWidth: 16
+			ID3D11Buffer* ConstantBuffer16[34];                  // 1A28	-	ByteWidth: 16
+			ID3D11Buffer* perFrameConstantBuffer;                // 1B38	-	ByteWidth: 752
+			ID3D11Buffer* computeConstantBuffer;                 // 1B40	-	ByteWidth: 576
+			ID3D11Buffer* instanceTransformConstantBuffer;       // 1B48	-	ByteWidth: 65520
+			BSGraphics::ConstantGroup miscConstantGroup;         // 1B50
+			std::uint64_t gap1B68;                               // 1B68
+			BSGraphics::RendererShadowState currentShadowState;  // 1B70
+			BSGraphics::RendererShadowState lastShadowState;     // 2480
+			ID3D11Buffer* dynamicVertexBuffer[8];
+			std::byte gap2DD0[96];
+			std::uint32_t currentDynamicVertexBuffer;
+			std::uint32_t currentDynamicVertexBufferOffset;
+			ID3D11Buffer* sharedParticleIndexBuffer;
+			ID3D11Buffer* sharedParticleStaticBuffer;
+			std::byte gap2E48[360];
+			BSTHashMap<std::uint64_t, ID3D11InputLayout*> inputLayoutMap;
+			ID3D11InputLayout* particleShaderInputLayout;
+			std::byte gap2FE8[8];
 		};
-		//static_assert(sizeof(Context) == 0x2FF0);
+		static_assert(offsetof(Context, currentShadowState) == 0x1B70);
+		static_assert(offsetof(Context, lastShadowState) == 0x2480);
+		static_assert(sizeof(Context) == 0x2FF0);
 
 		enum class DepthStencilExtraMode : std::int32_t
 		{

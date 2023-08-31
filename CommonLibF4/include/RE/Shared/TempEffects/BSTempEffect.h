@@ -15,6 +15,9 @@ namespace RE
 		kDebris,
 		kSPG,
 		kEffect,
+		kReference,
+		kModelReference,
+		kShaderReference,
 	};
 
 	class __declspec(novtable) BSTempEffect :
@@ -24,6 +27,11 @@ namespace RE
 		static constexpr auto RTTI{ RTTI::BSTempEffect };
 		static constexpr auto VTABLE{ VTABLE::BSTempEffect };
 		static constexpr auto Ni_RTTI{ Ni_RTTI::BSTempEffect };
+		static constexpr auto TYPE{ TEMP_EFFECT_TYPE::kEffect };
+
+		BSTempEffect() { ctor(); }
+		BSTempEffect(TESObjectCELL* a_cell, float a_time) { ctor2(a_cell, a_time); }
+		virtual ~BSTempEffect() {}
 
 		// add
 		virtual void Initialize() { return; };
@@ -33,7 +41,7 @@ namespace RE
 		virtual NiAVObject* Get3D() { return nullptr; };
 		virtual bool GetManagerHandlesSaveLoad() { return false; };
 		virtual bool GetClearWhenCellIsUnloaded() { return false; };
-		virtual TEMP_EFFECT_TYPE GetType() { return TEMP_EFFECT_TYPE::kEffect; };
+		virtual TEMP_EFFECT_TYPE GetType() { return TYPE; };
 		virtual void SaveGame(BGSSaveGameBuffer*) { return; };
 		virtual void LoadGame(BGSLoadGameBuffer*) { return; };
 		virtual void FinishLoadGame(BGSLoadGameBuffer*) { return; };
@@ -53,7 +61,22 @@ namespace RE
 		bool active;
 		std::uint32_t effectID;
 		NiAVObject* obj;
-		std::uint64_t unk38;
+		ObjectRefHandle target;
+
+	private:
+		BSTempEffect* ctor()
+		{
+			using func_t = decltype(&BSTempEffect::ctor);
+			REL::Relocation<func_t> func{ REL::ID(3328) };
+			return func(this);
+		}
+
+		BSTempEffect* ctor2(TESObjectCELL* a_cell, float a_time)
+		{
+			using func_t = decltype(&BSTempEffect::ctor2);
+			REL::Relocation<func_t> func{ REL::ID(176918) };
+			return func(this, a_cell, a_time);
+		}
 	};
 	static_assert(sizeof(BSTempEffect) == 0x40);
 }

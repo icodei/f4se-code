@@ -21,6 +21,7 @@ bool gameLoadingSave = false;
 bool isEmptyReload = false;
 bool reloadHasEnded = true;
 bool reloadHasStarted = false;
+bool weaponHasScopeMagnification = false;
 bool weaponHasScopeNV = false;
 bool weaponHasScopePIP = false;
 bool weaponHasScopeThermal = false;
@@ -30,6 +31,7 @@ bool weaponIsClosedBolt = false;
 bool weaponIsOpenBolt = false;
 bool weaponIsQueued = false;
 
+BGSKeyword* weaponHasScopeMagnificationKeyword = nullptr;
 BGSKeyword* weaponHasScopeNVKeyword = nullptr;
 BGSKeyword* weaponHasScopePIPKeyword = nullptr;
 BGSKeyword* weaponHasScopeThermalKeyword = nullptr;

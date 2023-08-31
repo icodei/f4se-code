@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RE/NetImmerse/NiMain/NiRefObject.h"
+#include "RE/NetImmerse/NiMain/NiSmartPointer.h"
 
 namespace RE
 {
@@ -91,7 +92,33 @@ namespace RE
 			return func(this, type);
 		}
 
+		NiObject* Clone(void)
+		{
+			using func_t = decltype(&NiObject::Clone);
+			REL::Relocation<func_t> func{ REL::ID(604942) };
+			return func(this);
+		}
 
+		NiObject* CloneParam(NiCloningProcess& a_process)
+		{
+			using func_t = decltype(&NiObject::CloneParam);
+			REL::Relocation<func_t> func{ REL::ID(418201) };
+			return func(this, a_process);
+		}
+
+		NiObject* CreateSharedClone(NiCloningProcess& a_process)
+		{
+			using func_t = decltype(&NiObject::CreateSharedClone);
+			REL::Relocation<func_t> func{ REL::ID(1029727) };
+			return func(this, a_process);
+		}
+
+		NiObject* CreateDeepCopy(NiPointer<NiObject>& a_object)
+		{
+			using func_t = decltype(&NiObject::CreateDeepCopy);
+			REL::Relocation<func_t> func{ REL::ID(750380) };
+			return func(this, a_object);
+		}
 
 		F4_HEAP_REDEFINE_NEW(NiObject);
 	};

@@ -170,6 +170,21 @@ namespace RE
 				return (fx - 4) <= 2 || fx == 3;
 			}
 
+			// HIGHLIGHT
+
+			void Highlight_SetEffect(HighlightEffect a_effect)
+			{
+				highlightfx = a_effect;
+			}
+
+			void Highlight_SetElement(NiAVObject* a_object, bool a_highlightOffscreen) {
+				using func_t = decltype(&Renderer::Highlight_SetElement);
+				REL::Relocation<func_t> func{ REL::ID(1291591) };
+				return func(this, a_object, a_highlightOffscreen);
+			}
+
+			// MAINSCREEN
+
 			void MainScreen_AddPointLight(NiPoint3 a_position, NiColor a_diffuse, float a_specular, float a_dimmer)
 			{
 				using func_t = decltype(&Renderer::MainScreen_AddPointLight);
@@ -219,6 +234,8 @@ namespace RE
 				return func(this, a_object);
 			}
 
+			// OFFSCREEN
+
 			void Offscreen_AddLight(NiPoint3 a_position, NiColor a_diffuse, NiColor a_specular, float a_dimmer)
 			{
 				using func_t = decltype(&Renderer::Offscreen_AddLight);
@@ -254,6 +271,9 @@ namespace RE
 				return func(this);
 			}
 
+			//Sets offscreenElement to a_object and iterates each child if it is an NiNode. If there are any BSFadeNodes then the ALWAYS_DRAW flag is set
+			//WorkshopMenuGeometry->sp3DRoot uses this in the WorkshopMenuGeometry ctor
+			//Inventory3DManager uses this in AddLoadedModel to add an object to the pipboy inventory preview
 			void Offscreen_Set3D(NiAVObject* a_object)
 			{
 				using func_t = decltype(&Renderer::Offscreen_Set3D);

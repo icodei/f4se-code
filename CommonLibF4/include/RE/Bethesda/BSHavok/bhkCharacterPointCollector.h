@@ -1,5 +1,5 @@
 #pragma once
-#include "RE/Havok/hknpAllHitsCollector.h"
+#include "RE/Havok/Physics/Physics/Collide/Query/Collector/hknpAllHitsCollector.h"
 
 namespace RE
 {

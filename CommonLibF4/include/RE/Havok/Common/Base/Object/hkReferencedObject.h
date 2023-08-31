@@ -1,6 +1,6 @@
 #pragma once
-
 #include "RE/Havok/Common/Base/Object/hkBaseObject.h"
+#include "RE/Havok/Common/Base/Types/hkBaseDefs.h"
 
 namespace RE
 {

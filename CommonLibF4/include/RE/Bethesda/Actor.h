@@ -7,6 +7,7 @@
 #include "RE/Bethesda/BSCore/BSTSingleton.h"
 #include "RE/Bethesda/BSCore/BSTSmallArray.h"
 #include "RE/Bethesda/BSCore/BSTTuple.h"
+#include "RE/Bethesda/BSHavok/bhkCollisionFilter.h"
 #include "RE/Bethesda/BSLock.h"
 #include "RE/Bethesda/BSMain/BSPointerHandle.h"
 #include "RE/Bethesda/BSSoundHandle.h"
@@ -42,46 +43,42 @@ namespace RE
 	template <class>
 	class DoNothingUnhandledPolicy;
 
-	class ActiveEffect;
-	class ActorMagicCaster;
-	class ActorMover;
-	class ActorPackageLoadFormBuffer;
-	class AimModel;
-	class AIProcess;
-	class BGSLoadFormBuffer;
-	class BGSSaveFormBuffer;
-	class bhkCharacterController;
-	class bhkCharacterMoveFinishEvent;
-	class bhkCharacterStateChangeEvent;
-	class bhkNonSupportContactEvent;
-	class bhkNPCollisionObject;
-	class bhkRagdollPenetrationUtil;
-	class BipedAnim;
-	class BSCloneReserver;
-	class BSClothExtraData;
-	class BSFaceGenAnimationData;
-	class BSLightingShaderProperty;
-	class BSPathingRequest;
-	class BSTransformDeltaEvent;
-	class CombatController;
-	class CombatGroup;
-	class EffectItem;
-	class EquippedItem;
-	class EquippedItemData;
-	class HitData;
-	class IAnimationStanceData;
-	class IProcedureTreeExecState;
-	class MovementControllerNPC;
-	class MovementMessageActorCollision;
-	class MovementMessageNewPath;
-	class MovementMessageUpdateRequestImmediate;
-	class MuzzleFlash;
-	class PackageLocation;
-	class PerkEntryVisitor;
-	class QueuedFile;
 	class QueuedItem;
-	class TESFaction;
-	class TESObjectWEAP;
+	class QueuedFile;
+	class PerkEntryVisitor;
+	class PackageLocation;
+	class MuzzleFlash;
+	class MovementMessageUpdateRequestImmediate;
+	class MovementMessageNewPath;
+	class MovementMessageActorCollision;
+	class MovementControllerNPC;
+	class IProcedureTreeExecState;
+	class IAnimationStanceData;
+	class HitData;
+	class EquippedItemData;
+	class EquippedItem;
+	class EffectItem;
+	class CombatGroup;
+	class CombatController;
+	class BSPathingRequest;
+	class BSLightingShaderProperty;
+	class BSFaceGenAnimationData;
+	class BSClothExtraData;
+	class BSCloneReserver;
+	class BipedAnim;
+	class bhkRagdollPenetrationUtil;
+	class bhkNPCollisionObject;
+	class bhkNonSupportContactEvent;
+	class bhkCharacterStateChangeEvent;
+	class bhkCharacterMoveFinishEvent;
+	class bhkCharacterController;
+	class BGSSaveFormBuffer;
+	class AIProcess;
+	class AimModel;
+	class ActorPackageLoadFormBuffer;
+	class ActorMover;
+	class ActorMagicCaster;
+	class ActiveEffect;
 
 	struct ActorCPMEvent;
 	struct ActorInventoryEvent;
@@ -91,6 +88,7 @@ namespace RE
 	struct BSAnimationGraphVariableCache;
 	struct BSMovementDataChangedEvent;
 	struct BSSubGraphActivationUpdate;
+	struct BSTransformDeltaEvent;
 	struct CastPowerItem;
 	struct DeferredHideLimb;
 	struct HighProcessData;
@@ -302,8 +300,18 @@ namespace RE
 	class EquippedWeapon
 	{
 	public:
-		EquippedWeapon() { ctor(); }
-		EquippedWeapon(EquippedWeapon& a_copy) { ctorCopy(a_copy); }
+		EquippedWeapon()
+		{
+			typedef EquippedWeapon* func_t(EquippedWeapon*);
+			REL::Relocation<func_t> func{ REL::ID(1257653) };
+			func(this);
+		}
+		EquippedWeapon(EquippedWeapon& a_copy)
+		{
+			typedef EquippedWeapon* func_t(EquippedWeapon*, EquippedWeapon&);
+			REL::Relocation<func_t> func{ REL::ID(1062418) };
+			func(this, a_copy);
+		}
 
 		bool IsValid() { return weapon.IsValid(); }
 		bool IsValid() const { return weapon.IsValid(); }
@@ -313,22 +321,6 @@ namespace RE
 		const BGSEquipSlot* equipSlot;             // 10
 		BGSEquipIndex equipIndex;                  // 18
 		NiPointer<EquippedWeaponData> weaponData;  // 20
-
-	private:
-		EquippedWeapon* ctor()
-		{
-			//0x07133F0
-			using func_t = decltype(&EquippedWeapon::ctor);
-			REL::Relocation<func_t> func{ REL::ID(1257653) };
-			return func(this);
-		}
-		EquippedWeapon* ctorCopy(EquippedWeapon& a_equippedWeapon)
-		{
-			//0x0010970
-			using func_t = decltype(&EquippedWeapon::ctorCopy);
-			REL::Relocation<func_t> func{ REL::ID(1062418) };
-			return func(this, a_equippedWeapon);
-		}
 	};
 	static_assert(sizeof(EquippedWeapon) == 0x28);
 
@@ -1056,6 +1048,139 @@ namespace RE
 			using func_t = decltype(&Actor::TrespassAlarm);
 			REL::Relocation<func_t> func{ REL::ID(1109888) };
 			return func(this, a_refr, a_owner, a_crime);
+		}
+
+		void HandleDefaultAnimationSwitch()
+		{
+			using func_t = decltype(&Actor::HandleDefaultAnimationSwitch);
+			REL::Relocation<func_t> func{ REL::ID(1163130) };
+			return func(this);
+		}
+
+		void HandleItemEquip(bool bCullBone)
+		{
+			using func_t = decltype(&Actor::HandleItemEquip);
+			REL::Relocation<func_t> func{ REL::ID(164912) };
+			return func(this, bCullBone);
+		}
+
+		bool PerformAction(BGSAction* a_action, TESObjectREFR* a_target)
+		{
+			using func_t = decltype(&Actor::PerformAction);
+			REL::Relocation<func_t> func{ REL::ID(1057231) };
+			return func(this, a_action, a_target);
+		}
+
+		void SetGunState(GUN_STATE gun_state, bool unk = true)
+		{
+			using func_t = decltype(&Actor::SetGunState);
+			REL::Relocation<func_t> func{ REL::ID(977675) };
+			return func(this, gun_state, unk);
+		}
+
+		void GetAimVector(NiPoint3& out)
+		{
+			using func_t = decltype(&Actor::GetAimVector);
+			REL::Relocation<func_t> func{ REL::ID(554863) };
+			return func(this, out);
+		}
+
+		uint32_t GetCurrentCollisionGroup()
+		{
+			using func_t = decltype(&Actor::GetCurrentCollisionGroup);
+			REL::Relocation<func_t> func{ REL::ID(410500) };
+			return func(this);
+		}
+
+		CFilter GetCollisionFilter()
+		{
+			using func_t = decltype(&Actor::GetCollisionFilter);
+			REL::Relocation<func_t> func{ REL::ID(1474995) };
+			return func(this);
+		}
+
+		bool GetCurrentFireLocation(BGSEquipIndex index, NiPoint3& out)
+		{
+			using func_t = decltype(&Actor::GetCurrentFireLocation);
+			REL::Relocation<func_t> func{ REL::ID(663107) };
+			return func(this, index, out);
+		}
+
+		float GetDesiredSpeed()
+		{
+			using func_t = decltype(&Actor::GetDesiredSpeed);
+			REL::Relocation<func_t> func{ REL::ID(106892) };
+			return func(this);
+		}
+
+		NiAVObject* GetClosestBone(NiPoint3 pos, NiPoint3 dir)
+		{
+			using func_t = decltype(&Actor::GetClosestBone);
+			REL::Relocation<func_t> func{ REL::ID(1180004) };
+			return func(this, pos, dir);
+		}
+
+		bhkCharacterController* Move(float deltaTime, NiPoint3 deltaPos, bool unk)
+		{
+			using func_t = decltype(&Actor::Move);
+			REL::Relocation<func_t> func{ REL::ID(737625) };
+			return func(this, deltaTime, deltaPos, unk);
+		}
+
+		void ExitCover()
+		{
+			using func_t = decltype(&Actor::ExitCover);
+			REL::Relocation<func_t> func{ REL::ID(770035) };
+			return func(this);
+		}
+
+		TESCombatStyle* GetCombatStyle()
+		{
+			using func_t = decltype(&Actor::GetCombatStyle);
+			REL::Relocation<func_t> func{ REL::ID(1270929) };
+			return func(this);
+		}
+
+		bool IsCrippled()
+		{
+			using func_t = decltype(&Actor::IsCrippled);
+			REL::Relocation<func_t> func{ REL::ID(1238666) };
+			return func(this);
+		}
+
+		bool IsFollowing()
+		{
+			using func_t = decltype(&Actor::IsFollowing);
+			REL::Relocation<func_t> func{ REL::ID(629579) };
+			return func(this);
+		}
+
+		bool IsPathValid()
+		{
+			using func_t = decltype(&Actor::IsPathValid);
+			REL::Relocation<func_t> func{ REL::ID(1522194) };
+			return func(this);
+		}
+
+		bool IsPathing()
+		{
+			using func_t = decltype(&Actor::IsPathing);
+			REL::Relocation<func_t> func{ REL::ID(989661) };
+			return func(this);
+		}
+
+		bool IsPathingComplete()
+		{
+			using func_t = decltype(&Actor::IsPathingComplete);
+			REL::Relocation<func_t> func{ REL::ID(817283) };
+			return func(this);
+		}
+
+		bool IsQuadruped()
+		{
+			using func_t = decltype(&Actor::IsQuadruped);
+			REL::Relocation<func_t> func{ REL::ID(1552322) };
+			return func(this);
 		}
 
 		// members

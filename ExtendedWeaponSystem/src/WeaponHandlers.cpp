@@ -1,8 +1,8 @@
 #include "WeaponHandlers.h"
 
 #include "Custom Renderer/CustomRenderer.h"
-#include "Util.h"
 #include "Global.h"
+#include "Util.h"
 
 void HandleWeaponEquip(WeaponInfo& initInfo) {
 	WeaponInfo& Info = WeaponInfo::getInstance();
@@ -13,22 +13,21 @@ void HandleWeaponEquip(WeaponInfo& initInfo) {
 	if (!initInfo.weapCurrentInstanceData || !initInfo.weapInstanceData) {
 		return;
 	}
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Player TESEquipEvent "sv, 80));
-	logInfo("Weapon: " + weaponName);
-	logInfo("CurrentAmmoCount: " + std::to_string(initInfo.weapAmmoCurrentCount));
-	logInfo("AmmoCapacity: " + std::to_string(initInfo.weapAmmoCapacity));
-	logInfo("TotalAmmoCount: " + std::to_string(initInfo.weapAmmoTotalCount));
+	logInfo(MESSAGE_TITLE_FANCY_CENTERED(" Player TESEquipEvent "));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" Weapon", initInfo.weapForm->fullName.c_str()));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" CurrentAmmoCount", std::to_string(initInfo.weapAmmoCurrentCount)));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" AmmoCapacity", std::to_string(initInfo.weapAmmoCapacity)));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" TotalAmmoCount", std::to_string(initInfo.weapAmmoTotalCount)));
 	QueryReload();
 	QueryScope();
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
+	logInfo(MESSAGE_FOOTER_FANCY_CENTERED);
 	HandleWeaponChange();
 }
 
 void HandleWeaponEquipAfter3D(WeaponInfo& initInfo) {
-	//if (!ScopeRenderer::initialized || !ScopeRenderer::scopeCustomRenderer) {
-	//
-	//}
-	//ScopeRenderer::scopeCustomRenderer->pRendererCamera->Update3D();
+	if (ScopeRenderer::customRendererInitialized) {
+		ScopeRenderer::scopeCustomRenderer->pRendererCamera->Update3D();
+	}
 }
 
 void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
@@ -36,47 +35,50 @@ void HandleWeaponOnLoadGame(WeaponInfo& initInfo) {
 	if (initInfo.weapCurrentInstanceData != initInfo.weapInstanceData) {
 		initInfo.weapCurrentInstanceData = const_cast<TESObjectWEAP::InstanceData*>(initInfo.weapInstanceData);
 	}
-	string weaponName = initInfo.weapForm->GetFullName();
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
-	logInfo(fmt::format(FMT_STRING(";{0: ^{1}};"), " Game Loaded "sv, 80));
-	logInfo(fmt::format(FMT_STRING(";{0: ^{1}};"), " Getting Initial Weapon Stats "sv, 80));
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
-	logInfo("Weapon: " + weaponName);
-	logInfo("CurrentAmmoCount: " + std::to_string(initInfo.weapAmmoCurrentCount));
-	logInfo("AmmoCapacity: " + std::to_string(initInfo.weapAmmoCapacity));
-	logInfo("TotalAmmoCount: " + std::to_string(initInfo.weapAmmoTotalCount));
+
+	logInfo(MESSAGE_HEADER_FANCY_CENTERED);
+	logInfo(MESSAGE_BODY_FANCY_CENTERED(" Game Loaded "));
+	logInfo(MESSAGE_BODY_FANCY_CENTERED(" Getting Initial Weapon Stats "));
+	logInfo(MESSAGE_SUBHEADER_FANCY_CENTERED);
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" Weapon", initInfo.weapForm->fullName.c_str()));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" CurrentAmmoCount", std::to_string(initInfo.weapAmmoCurrentCount)));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" AmmoCapacity", std::to_string(initInfo.weapAmmoCapacity)));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" TotalAmmoCount", std::to_string(initInfo.weapAmmoTotalCount)));
 	QueryReload();
 	QueryScope();
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
+	logInfo(MESSAGE_FOOTER_FANCY_CENTERED);
 	HandleWeaponChange();
 }
 
 void HandleWeaponUnequip(WeaponInfo& initInfo) {
-	string weaponName = initInfo.weapForm->GetFullName();
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), " Player Unequip "sv, 80));
-	logInfo("Weapon: " + weaponName);
-	logInfo(fmt::format(FMT_STRING(";{0:=^{1}};"), ""sv, 80));
+	logInfo(MESSAGE_TITLE_FANCY_CENTERED(" Player Unequip "));
+	logInfo(MESSAGE_BODY_2_FANCY_LEFT(" Weapon", initInfo.weapForm->fullName.c_str()));
+	logInfo(MESSAGE_FOOTER_FANCY_CENTERED);
 	HandleWeaponChange();
 	WeaponInfo::ClearWeaponInfo();
 }
 
 void HandleWeaponChange() {
-	if (!ScopeRenderer::scopeCustomRenderer && WeaponHasSpecialScope()) {
-		//logInfo("Weapon needs custom renderer");
-		//ScopeRenderer::CreateCustomRenderer();
-		//ScopeRenderer::scopeCustomRenderer->pRendererCamera->StartCorrectState();
+	if (!WeaponHasSpecialScope()) {
+		return;
+	}
+	if (!ScopeRenderer::scopeCustomRenderer) {
+		ScopeRenderer::CreateCustomRenderer();
+		ScopeRenderer::scopeCustomRenderer->pRendererCamera->StartCorrectState();
 	} else {
-		//ScopeRenderer::DestroyCustomRenderer();
+		ScopeRenderer::DestroyCustomRenderer();
 	}
 
-	if (!ScopeRenderer::scopeLensRenderer && WeaponHasSpecialScope()) {
-		logInfo("Weapon needs custom renderer");
+	if (!ScopeRenderer::scopeLensRenderer && weaponHasScopeMagnification) {
 		ScopeRenderer::CreateLensRenderer();
 	} else {
-		if (ScopeRenderer::scopeLensRenderer->visible) {
-			ScopeRenderer::scopeLensRenderer->Hide();
-		}
 		ScopeRenderer::DestroyLensRenderer();
+	}
+
+	if (!ScopeRenderer::scopeReticleRenderer) {
+		ScopeRenderer::CreateReticleRenderer();
+	} else {
+		ScopeRenderer::DestroyReticleRenderer();
 	}
 }
 
@@ -87,6 +89,9 @@ void HandleWeaponDown() {
 	if (ScopeRenderer::scopeLensRenderer) {
 		ScopeRenderer::DestroyLensRenderer();
 	}
+	if (ScopeRenderer::scopeReticleRenderer) {
+		ScopeRenderer::DestroyReticleRenderer();
+	}
 }
 
 void HandleWeaponInstantDown() {
@@ -94,18 +99,23 @@ void HandleWeaponInstantDown() {
 		ScopeRenderer::DestroyCustomRenderer();
 	}
 	if (ScopeRenderer::scopeLensRenderer) {
-		ScopeRenderer::scopeLensRenderer->Hide();
 		ScopeRenderer::DestroyLensRenderer();
+	}
+	if (ScopeRenderer::scopeReticleRenderer) {
+		ScopeRenderer::DestroyReticleRenderer();
 	}
 }
 
 void HandleWeaponSightsEnter() {
 	if (ScopeRenderer::scopeCustomRenderer) {
 		ScopeRenderer::scopeCustomRenderer->pRendererCamera->UpdateCamera();
-		ScopeRenderer::Render();
+		//ScopeRenderer::Render();
 	}
 	if (ScopeRenderer::scopeLensRenderer) {
 		ScopeRenderer::scopeLensRenderer->Show(true);
+	}
+	if (ScopeRenderer::scopeReticleRenderer) {
+		ScopeRenderer::scopeReticleRenderer->Show(true);
 	}
 }
 
@@ -113,22 +123,62 @@ void HandleWeaponSightsExit() {
 	if (ScopeRenderer::scopeLensRenderer) {
 		ScopeRenderer::scopeLensRenderer->Hide();
 	}
+	if (ScopeRenderer::scopeReticleRenderer) {
+		ScopeRenderer::scopeReticleRenderer->Hide();
+	}
+}
+
+void MarkWeaponForPhysics(Actor* a_actor) {
+	NiNode* node = a_actor->Get3D()->IsNode();
+	bhkWorld* world = a_actor->parentCell->GetbhkWorld();
+	if (node && node->children[0].get()) {
+		BSVisit::VisitSimple(node->children[0].get(), [&](NiAVObject* obj) {
+			if (obj->name.length() != 0 && obj->collisionObject) {  //TODO
+				BSVisit::VisitSimple(obj, [a_actor, world](NiAVObject* obj) {
+					if (!obj->collisionObject)
+						return BSVisit::Stop;
+
+					logInfo("Collision object found");
+					bhkNPCollisionObject* colObj = obj->collisionObject->IsbhkNPCollisionObject();
+					if (!colObj || !world) {
+						logWarn("Obj is not bhkNPCollisionObject or bhkWorld does not exist");
+						return BSVisit::Stop;
+					}
+					hknpBSWorld* hkWorld = *(hknpBSWorld**)((uintptr_t)world + 0x60);
+					if (hkWorld) {
+						hkWorld->MarkForWrite();
+					}
+					colObj->CreateInstance(*world);
+					CFilter filter;
+					filter.filter = (((a_actor)->GetCollisionFilter().filter >> 16) << 16) | 0x1408;
+					colObj->SetCollisionFilterInfo(filter);
+					colObj->SetMotionType(hknpMotionPropertiesId::Preset::KEYFRAMED);
+					if (hkWorld) {
+						hkWorld->UnmarkForWrite();
+					}
+					return BSVisit::Stop;
+				});
+				logInfo("Activate Havok - Done");
+			}
+			return BSVisit::Stop;
+		});
+	}
 }
 
 void QueryReload() {
 	if (WeaponHasSpeedReload()) {
 		weaponHasSpeedReload = true;
-		logInfo("Weapon has speed reloads");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon has speed reloads"));
 	} else {
 		weaponHasSpeedReload = false;
-		logInfo("Weapon does not have speed reloads");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon does not have speed reloads"));
 	}
 	if (WeaponHasSequentialReload()) {
 		weaponHasSequentialReload = true;
-		logInfo("Weapon has sequential reloads");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon has sequential reloads"));
 	} else {
 		weaponHasSequentialReload = false;
-		logInfo("Weapon does not have sequential reloads");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon does not have sequential reloads"));
 	}
 }
 
@@ -137,33 +187,30 @@ void QueryScope() {
 	if (WeaponHasNightVisionScope()) {
 		weaponHasScopeNV = true;
 		i++;
-		logInfo("Weapon has night vision scope");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon has night vision scope"));
 	} else {
 		weaponHasScopeNV = false;
 	}
 	if (WeaponHasPIPScope()) {
 		weaponHasScopePIP = true;
 		i++;
-		logInfo("Weapon has PIP scope");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon has PIP scope"));
 	} else {
 		weaponHasScopePIP = false;
 	}
 	if (WeaponHasThermalScope()) {
 		weaponHasScopeThermal = true;
 		i++;
-		logInfo("Weapon has thermal scope");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon has thermal scope"));
 	} else {
 		weaponHasScopeThermal = false;
 	}
 
 	if (WeaponHasNoSpecialScopes()) {
-		logInfo("Weapon does not have special scopes");
+		logInfo(MESSAGE_BODY_FANCY_LEFT(" Weapon does not have special scopes"));
 	}
 
-	if (i > 1) {
-		auto error = "Found more than one scope type. Unexpected results may happen"sv;
-		logError(fmt::format(FMT_STRING(";{0: ^{1}};"), (ASSERT(error)), 80));
-	}
+	ASSERT(((i == 1) || (i == 0)), MESSAGE_CENTERED("Found more than one scope type. Unexpected results may happen"));
 }
 
 void QueueHandlingOfWeaponFunctor(WeaponInfo& initInfo, std::function<void(WeaponInfo&)> functor) {
@@ -268,6 +315,10 @@ bool WeaponHasSequentialReload() {
 
 bool WeaponHasSpeedReload() {
 	return pc->WornHasKeyword(weaponHasSpeedReloadKeyword);
+}
+
+bool WeaponHasMagnificationScope() {
+	return pc->WornHasKeyword(weaponHasScopeMagnificationKeyword);
 }
 
 bool WeaponHasNightVisionScope() {

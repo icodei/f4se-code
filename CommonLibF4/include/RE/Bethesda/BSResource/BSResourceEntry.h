@@ -16,10 +16,17 @@ namespace RE
 			BSTSmartPointer<Stream> pStream;
 		};
 
-		template<class T>
-		class Entry : EntryBase
+		template <class T_Type, class T_EntryDBTraitsCArgs>
+		class Entry : public EntryBase
 		{
+		public:
+			using U_Type = T_Type;
+			using U_EntryDBTraitsCArgs = T_EntryDBTraitsCArgs;
 
+			// members
+			Entry<T_Type, T_EntryDBTraitsCArgs>* next;  // 00
+			T_Type data;                                // ??
+			std::uint32_t flags;                        // ??
 		};
 	}
 }
